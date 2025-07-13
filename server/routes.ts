@@ -20,7 +20,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await agentService.initializeAgents();
       res.json({ success: true, message: "AI agents initialized successfully" });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -30,7 +30,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const agents = await storage.getAllAgents();
       res.json(agents);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -40,7 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const communications = await storage.getAgentCommunications();
       res.json(communications);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -51,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const communication = await storage.createAgentCommunication(validatedData);
       res.json(communication);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -61,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const networks = await storage.getAllBlockchainNetworks();
       res.json(networks);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -72,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const deployment = await blockchainService.deployToken(validatedData);
       res.json(deployment);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -83,7 +83,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const status = await blockchainService.getDeploymentStatus(networkId);
       res.json(status);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const creator = await storage.createCreator(validatedData);
       res.json(creator);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -104,7 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const creators = await storage.getAllCreators();
       res.json(creators);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -115,7 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tracking = await storage.createContentTracking(validatedData);
       res.json(tracking);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stats = await storage.getContentTrackingStats();
       res.json(stats);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -135,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rewards = await storage.getRewardDistributions();
       res.json(rewards);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -146,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reward = await storage.createRewardDistribution(validatedData);
       res.json(reward);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -156,7 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const poolData = await storage.getPoolManagement();
       res.json(poolData);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -166,7 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const compliance = await storage.getComplianceRecords();
       res.json(compliance);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -193,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         compliance
       });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
