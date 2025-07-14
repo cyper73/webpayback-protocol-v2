@@ -77,10 +77,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
-      {/* Banner Multilingua - Visibile sopra tutto */}
-      <div style={{backgroundColor: '#3b82f6', color: 'white', padding: '8px', textAlign: 'center', fontSize: '14px'}}>
-        🌍 WebPayback - Piattaforma Globale | 🇺🇸 English | 🇮🇹 Italiano | 🇪🇸 Español | 🇫🇷 Français | 🇩🇪 Deutsch | 🇵🇹 Português | 🇷🇺 Русский | 🇨🇳 中文 | + 4 altre lingue
-      </div>
+
       
       {/* Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-40">
