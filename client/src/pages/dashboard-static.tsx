@@ -29,7 +29,7 @@ export default function Dashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('it');
+  const [currentLanguage, setCurrentLanguage] = useState('en');
   const { t, changeLanguage } = useTranslations(currentLanguage);
   const [forceRerender, setForceRerender] = useState(0);
   
@@ -88,7 +88,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-deep-space text-white">
+    <div className="min-h-screen bg-deep-space text-white" key={`lang-${currentLanguage}-${forceRerender}`}>
 
       
       {/* Navigation Header */}

@@ -104,14 +104,8 @@
           }
         });
         
-        // Load saved language
-        const savedLang = localStorage.getItem('webpayback-language');
-        if (savedLang) {
-          const savedItem = document.querySelector(`[data-lang="${savedLang}"]`);
-          if (savedItem) {
-            savedItem.click();
-          }
-        }
+        // Clear saved language on page load to always start with English
+        localStorage.removeItem('webpayback-language');
       });
     </script>
     

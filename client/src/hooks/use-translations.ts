@@ -245,11 +245,10 @@ const TRANSLATIONS: TranslationData = {
   }
 };
 
-export const useTranslations = (initialLanguage: string = 'it') => {
+export const useTranslations = (initialLanguage: string = 'en') => {
   const [currentLanguage, setCurrentLanguage] = useState(() => {
-    // Initialize with saved language if available
-    const savedLang = localStorage.getItem('webpayback-language');
-    return savedLang || initialLanguage;
+    // Don't use saved language on refresh, always start with English
+    return initialLanguage;
   });
   
   // Listen for language changes from HTML dropdown
@@ -273,7 +272,7 @@ export const useTranslations = (initialLanguage: string = 'it') => {
     window.addEventListener('languageChange', handleLanguageEvent as EventListener);
     
     // Check for language changes more frequently
-    const interval = setInterval(checkLanguageChange, 500);
+    const interval = setInterval(checkLanguageChange, 300);
     
     // Initial check
     checkLanguageChange();
