@@ -13,14 +13,36 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { Box, Wallet, Coins } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function Dashboard() {
-  const { data: dashboardData, isLoading } = useQuery({
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
+  
+  // Disable auto-refresh when user is interacting
+  useEffect(() => {
+    const handleUserActivity = () => {
+      setIsUserInteracting(true);
+      setTimeout(() => setIsUserInteracting(false), 5000); // Resume after 5 seconds of inactivity
+    };
+    
+    window.addEventListener('scroll', handleUserActivity);
+    window.addEventListener('click', handleUserActivity);
+    window.addEventListener('keydown', handleUserActivity);
+    
+    return () => {
+      window.removeEventListener('scroll', handleUserActivity);
+      window.removeEventListener('click', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+    };
+  }, []);
+
+  const { data: dashboardData, isLoading, isFetching } = useQuery({
     queryKey: ["/api/analytics/dashboard"],
-    refetchInterval: 30000, // Refresh every 30 seconds to reduce interruptions
+    refetchInterval: isUserInteracting ? false : 30000, // Pause during user interaction
   });
 
-  if (isLoading) {
+  // Show loading screen only on initial load, not on refetch
+  if (isLoading && !dashboardData) {
     return (
       <div className="min-h-screen bg-deep-space text-white flex items-center justify-center">
         <div className="text-center">
@@ -45,8 +67,10 @@ export default function Dashboard() {
                 <span className="text-xl font-bold gradient-text">WebPayback Protocol</span>
               </div>
               <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
-                <div className="w-2 h-2 bg-neon-green rounded-full pulse-animation"></div>
-                <span className="text-sm text-gray-300">Level 280 AI Agents Active</span>
+                <div className={`w-2 h-2 rounded-full ${isFetching ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
+                <span className="text-sm text-gray-300">
+                  {isFetching ? 'Syncing...' : 'Level 280 AI Agents Active'}
+                </span>
               </div>
             </div>
             

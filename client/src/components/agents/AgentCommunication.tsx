@@ -17,7 +17,7 @@ const agentColors = {
 };
 
 export default function AgentCommunication() {
-  const { data: communications = [] } = useQuery({
+  const { data: communications = [], isLoading } = useQuery({
     queryKey: ["/api/agents/communications"],
     refetchInterval: 30000, // Refresh every 30 seconds to reduce interruptions
   });
