@@ -14,6 +14,8 @@ import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
+import LanguageBanner from "@/components/ui/language-banner";
+import { useTranslations } from "@/hooks/use-translations";
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
@@ -28,6 +30,8 @@ export default function Dashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const { t, changeLanguage } = useTranslations(currentLanguage);
 
   const fetchDashboardData = async (isRefresh = false) => {
     try {
@@ -65,10 +69,22 @@ export default function Dashboard() {
 
   const { agents, networks, creators, stats, rewards, pool, compliance } = dashboardData;
 
+  const handleLanguageChange = (language: { code: string; name: string; flag: string; region: string }) => {
+    setCurrentLanguage(language.code);
+    changeLanguage(language.code);
+    console.log('Language changed to:', language);
+  };
+
   return (
     <div className="min-h-screen bg-deep-space text-white">
+      {/* Language Banner */}
+      <LanguageBanner 
+        currentLanguage={currentLanguage}
+        onLanguageChange={handleLanguageChange}
+      />
+      
       {/* Navigation Header */}
-      <header className="glass-card border-b border-white/10 sticky top-0 z-50">
+      <header className="glass-card border-b border-white/10 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -79,7 +95,7 @@ export default function Dashboard() {
               <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
                 <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
                 <span className="text-sm text-gray-300">
-                  {isRefreshing ? 'Syncing...' : 'Level 280 AI Agents Active'}
+                  {isRefreshing ? 'Syncing...' : t('level_280_agents')}
                 </span>
               </div>
             </div>
@@ -107,7 +123,7 @@ export default function Dashboard() {
             
             <Card className="glass-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
+                <CardTitle className="text-xl font-bold gradient-text">{t('reward_distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
