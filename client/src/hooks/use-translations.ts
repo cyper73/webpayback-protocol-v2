@@ -246,7 +246,11 @@ const TRANSLATIONS: TranslationData = {
 };
 
 export const useTranslations = (initialLanguage: string = 'it') => {
-  const [currentLanguage, setCurrentLanguage] = useState(initialLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState(() => {
+    // Initialize with saved language if available
+    const savedLang = localStorage.getItem('webpayback-language');
+    return savedLang || initialLanguage;
+  });
   
   // Listen for language changes from HTML dropdown
   useEffect(() => {
@@ -268,8 +272,8 @@ export const useTranslations = (initialLanguage: string = 'it') => {
     // Add event listener for language changes
     window.addEventListener('languageChange', handleLanguageEvent as EventListener);
     
-    // Check every second for language changes (fallback)
-    const interval = setInterval(checkLanguageChange, 1000);
+    // Check for language changes more frequently
+    const interval = setInterval(checkLanguageChange, 500);
     
     // Initial check
     checkLanguageChange();

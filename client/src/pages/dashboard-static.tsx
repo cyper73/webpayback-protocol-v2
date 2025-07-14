@@ -31,6 +31,17 @@ export default function Dashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('it');
   const { t, changeLanguage } = useTranslations(currentLanguage);
+  const [forceRerender, setForceRerender] = useState(0);
+  
+  // Debug per vedere se funziona
+  useEffect(() => {
+    console.log('Dashboard language changed to:', currentLanguage);
+    console.log('Level 280 agents text:', t('level_280_agents'));
+    console.log('Recent creator rewards text:', t('recent_creator_rewards'));
+    
+    // Force component re-render when language changes
+    setForceRerender(prev => prev + 1);
+  }, [currentLanguage, t]);
   
 
 
