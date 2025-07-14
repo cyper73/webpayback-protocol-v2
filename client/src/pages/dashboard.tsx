@@ -36,24 +36,36 @@ export default function Dashboard() {
     };
   }, []);
 
-  const { data: dashboardData, isLoading, isFetching } = useQuery({
+  const { data: dashboardData, isFetching } = useQuery({
     queryKey: ["/api/analytics/dashboard"],
     refetchInterval: isUserInteracting ? false : 30000, // Pause during user interaction
+    // Never show loading screen, always show content
+    staleTime: 0,
+    cacheTime: 5 * 60 * 1000, // 5 minutes cache
+    // Provide placeholder data to prevent loading states
+    placeholderData: {
+      agents: [],
+      networks: [],
+      creators: [],
+      stats: { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 },
+      rewards: [],
+      pool: [],
+      compliance: []
+    }
   });
 
-  // Show loading screen only on initial load, not on refetch
-  if (isLoading && !dashboardData) {
-    return (
-      <div className="min-h-screen bg-deep-space text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-electric-blue mx-auto mb-4"></div>
-          <p className="text-gray-300">Initializing Level 280 AI Agents...</p>
-        </div>
-      </div>
-    );
-  }
+  // Always show content, never loading screen
+  // This prevents the initialization message from appearing
 
-  const { agents = [], networks = [], creators = [], stats = {}, rewards = [], pool = [], compliance = [] } = dashboardData || {};
+  const { agents = [], networks = [], creators = [], stats = {}, rewards = [], pool = [], compliance = [] } = dashboardData || {
+    agents: [],
+    networks: [],
+    creators: [],
+    stats: { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 },
+    rewards: [],
+    pool: [],
+    compliance: []
+  };
 
   return (
     <div className="min-h-screen bg-deep-space text-white">

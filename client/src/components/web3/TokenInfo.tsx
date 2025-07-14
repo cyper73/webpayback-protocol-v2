@@ -59,10 +59,21 @@ export default function TokenInfo() {
     return parseFloat(value).toFixed(6);
   };
 
+  // Show empty state instead of loading to prevent refresh issues
   if (!tokenInfo || !poolInfo || !networkStatus) {
     return (
-      <div className="animate-pulse">
-        <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+      <div className="space-y-6">
+        <Card className="border-gray-500/20 bg-gray-900/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5 text-gray-400" />
+              Loading Network Status...
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-gray-400">Connecting to blockchain...</div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
