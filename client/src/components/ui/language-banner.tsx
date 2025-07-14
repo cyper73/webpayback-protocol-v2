@@ -103,12 +103,12 @@ export default function LanguageBanner({
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-electric-blue/20 via-purple-500/20 to-electric-blue/20 border-y border-white/10 backdrop-blur-sm">
+    <div className="relative bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-blue-600/30 border-b border-white/20 py-3">
       {/* Scrolling Languages */}
-      <div className="overflow-hidden py-2">
-        <div className={`flex items-center gap-8 ${isScrolling ? 'animate-scroll' : ''}`}>
+      <div className="overflow-hidden">
+        <div className={`flex items-center gap-8 px-4 ${isScrolling ? 'animate-scroll' : ''}`}>
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <Globe className="h-4 w-4 text-electric-blue" />
+            <Globe className="h-4 w-4 text-blue-400" />
             <span className="text-sm font-medium text-white">
               {getTranslation('global_platform')}
             </span>
@@ -119,7 +119,7 @@ export default function LanguageBanner({
             {SUPPORTED_LANGUAGES.concat(SUPPORTED_LANGUAGES).map((lang, index) => (
               <div 
                 key={`${lang.code}-${index}`} 
-                className="flex items-center gap-2 whitespace-nowrap cursor-pointer hover:text-electric-blue transition-colors"
+                className="flex items-center gap-2 whitespace-nowrap cursor-pointer hover:text-blue-400 transition-colors"
                 onClick={() => handleLanguageSelect(lang)}
               >
                 <span className="text-base">{lang.flag}</span>
@@ -143,7 +143,7 @@ export default function LanguageBanner({
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 bg-glass-dark/50 hover:bg-glass-dark/70 px-3 py-1.5 rounded-lg border border-white/10 transition-all duration-200"
+            className="flex items-center gap-2 bg-slate-800/70 hover:bg-slate-700/70 px-3 py-1.5 rounded-lg border border-white/10 transition-all duration-200"
           >
             <span className="text-sm">{selectedLanguage.flag}</span>
             <span className="text-xs font-medium text-white">
@@ -156,7 +156,7 @@ export default function LanguageBanner({
 
           {/* Dropdown */}
           {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-glass-dark border border-white/10 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800 border border-white/10 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
               <div className="p-2">
                 <div className="text-xs font-medium text-gray-400 px-2 py-1 mb-1">
                   {getTranslation('select_language')}
@@ -167,7 +167,7 @@ export default function LanguageBanner({
                     onClick={() => handleLanguageSelect(lang)}
                     className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
                       selectedLanguage.code === lang.code
-                        ? 'bg-electric-blue/20 text-electric-blue'
+                        ? 'bg-blue-600/20 text-blue-400'
                         : 'text-gray-300 hover:bg-white/10 hover:text-white'
                     }`}
                   >

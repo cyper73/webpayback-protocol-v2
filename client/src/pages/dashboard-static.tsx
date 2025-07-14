@@ -14,8 +14,8 @@ import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-import LanguageBanner from "@/components/ui/language-banner";
-import { useTranslations } from "@/hooks/use-translations";
+import LanguageBannerSimple from "@/components/ui/language-banner-simple";
+// import { useTranslations } from "@/hooks/use-translations";
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
@@ -31,7 +31,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('en');
-  const { t, changeLanguage } = useTranslations(currentLanguage);
+  // const { t, changeLanguage } = useTranslations(currentLanguage);
 
   const fetchDashboardData = async (isRefresh = false) => {
     try {
@@ -71,17 +71,14 @@ export default function Dashboard() {
 
   const handleLanguageChange = (language: { code: string; name: string; flag: string; region: string }) => {
     setCurrentLanguage(language.code);
-    changeLanguage(language.code);
+    // changeLanguage(language.code);
     console.log('Language changed to:', language);
   };
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
       {/* Language Banner */}
-      <LanguageBanner 
-        currentLanguage={currentLanguage}
-        onLanguageChange={handleLanguageChange}
-      />
+      <LanguageBannerSimple />
       
       {/* Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-40">
@@ -95,7 +92,7 @@ export default function Dashboard() {
               <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
                 <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
                 <span className="text-sm text-gray-300">
-                  {isRefreshing ? 'Syncing...' : t('level_280_agents')}
+                  {isRefreshing ? 'Syncing...' : 'Level 280 AI Agents Active'}
                 </span>
               </div>
             </div>
@@ -123,7 +120,7 @@ export default function Dashboard() {
             
             <Card className="glass-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-xl font-bold gradient-text">{t('reward_distribution')}</CardTitle>
+                <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
