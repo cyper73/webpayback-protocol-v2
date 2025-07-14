@@ -14,7 +14,7 @@ import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-import LanguageBannerSimple from "@/components/ui/language-banner-simple";
+// import LanguageBannerSimple from "@/components/ui/language-banner-simple";
 // import { useTranslations } from "@/hooks/use-translations";
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
@@ -77,8 +77,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
-      {/* Language Banner */}
-      <LanguageBannerSimple />
+      {/* Banner Multilingua - Visibile sopra tutto */}
+      <div style={{backgroundColor: '#3b82f6', color: 'white', padding: '8px', textAlign: 'center', fontSize: '14px'}}>
+        🌍 WebPayback - Piattaforma Globale | 🇺🇸 English | 🇮🇹 Italiano | 🇪🇸 Español | 🇫🇷 Français | 🇩🇪 Deutsch | 🇵🇹 Português | 🇷🇺 Русский | 🇨🇳 中文 | + 4 altre lingue
+      </div>
       
       {/* Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-40">
