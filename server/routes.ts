@@ -304,6 +304,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ANTI-FRAUD PROTECTION ROUTES
+  
+  // Get active fraud detection rules
+  app.get('/api/fraud/rules', async (req, res) => {
+    try {
+      const rules = await storage.getActiveFraudDetectionRules();
+      res.json(rules);
+    } catch (error) {
+      console.error('Error fetching fraud rules:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Get fraud alerts
+  app.get('/api/fraud/alerts', async (req, res) => {
+    try {
+      const creatorId = req.query.creatorId ? parseInt(req.query.creatorId as string) : undefined;
+      const alerts = await storage.getFraudDetectionAlerts(creatorId);
+      res.json(alerts);
+    } catch (error) {
+      console.error('Error fetching fraud alerts:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Get fraud detection statistics
+  app.get('/api/fraud/stats', async (req, res) => {
+    try {
+      const totalAlerts = await storage.getTotalFraudAlerts();
+      const activeAlerts = await storage.getActiveFraudAlerts();
+      const bannedCreators = await storage.getBannedCreators();
+      
+      res.json({
+        totalAlerts,
+        activeAlerts,
+        bannedCreators: bannedCreators.length,
+        resolvedAlerts: totalAlerts - activeAlerts
+      });
+    } catch (error) {
+      console.error('Error fetching fraud stats:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Real AI detection endpoint (would be called by monitoring system)
   app.post("/api/monitoring/detect-access", async (req, res) => {
     try {

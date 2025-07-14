@@ -1,11 +1,14 @@
 import { 
   users, creators, blockchainNetworks, aiAgents, agentCommunications, 
   contentTracking, rewardDistributions, poolManagement, complianceRecords,
+  fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns,
   type User, type InsertUser, type Creator, type InsertCreator,
   type BlockchainNetwork, type InsertBlockchainNetwork, type AiAgent, type InsertAiAgent,
   type AgentCommunication, type InsertAgentCommunication, type ContentTracking, type InsertContentTracking,
   type RewardDistribution, type InsertRewardDistribution, type PoolManagement, type InsertPoolManagement,
-  type ComplianceRecord, type InsertComplianceRecord
+  type ComplianceRecord, type InsertComplianceRecord,
+  type FraudDetectionRule, type InsertFraudDetectionRule, type FraudDetectionAlert, type InsertFraudDetectionAlert,
+  type CreatorReputationScore, type InsertCreatorReputationScore, type AccessPattern, type InsertAccessPattern
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -52,6 +55,25 @@ export interface IStorage {
   
   // Compliance methods
   getComplianceRecords(): Promise<ComplianceRecord[]>;
+  
+  // Anti-fraud methods
+  createFraudDetectionRule(insertRule: InsertFraudDetectionRule): Promise<FraudDetectionRule>;
+  getActiveFraudDetectionRules(): Promise<FraudDetectionRule[]>;
+  getFraudDetectionRuleByType(ruleType: string): Promise<FraudDetectionRule | undefined>;
+  createFraudDetectionAlert(insertAlert: InsertFraudDetectionAlert): Promise<FraudDetectionAlert>;
+  getFraudDetectionAlerts(creatorId?: number): Promise<FraudDetectionAlert[]>;
+  getTotalFraudAlerts(): Promise<number>;
+  getActiveFraudAlerts(): Promise<number>;
+  createCreatorReputationScore(insertScore: InsertCreatorReputationScore): Promise<CreatorReputationScore>;
+  getCreatorReputationScore(creatorId: number): Promise<CreatorReputationScore | undefined>;
+  updateCreatorReputationScore(creatorId: number, updates: Partial<CreatorReputationScore>): Promise<void>;
+  getBannedCreators(): Promise<Creator[]>;
+  createAccessPattern(insertPattern: InsertAccessPattern): Promise<AccessPattern>;
+  getAccessPatterns(creatorId: number): Promise<AccessPattern[]>;
+  getAccessPatternByHashes(creatorId: number, domainHash: string, ipHash: string, aiType: string): Promise<AccessPattern | undefined>;
+  updateAccessPattern(patternId: number, updates: Partial<AccessPattern>): Promise<void>;
+  getCreatorRewardsFromDate(creatorId: number, fromDate: Date): Promise<RewardDistribution[]>;
+  getCreator(creatorId: number): Promise<Creator | undefined>;
 }
 
 // rewrite MemStorage to DatabaseStorage
@@ -195,6 +217,115 @@ export class DatabaseStorage implements IStorage {
   // Compliance methods
   async getComplianceRecords(): Promise<ComplianceRecord[]> {
     return await db.select().from(complianceRecords);
+  }
+
+  // Anti-fraud methods
+  async createFraudDetectionRule(insertRule: InsertFraudDetectionRule): Promise<FraudDetectionRule> {
+    const [rule] = await db
+      .insert(fraudDetectionRules)
+      .values(insertRule)
+      .returning();
+    return rule;
+  }
+
+  async getActiveFraudDetectionRules(): Promise<FraudDetectionRule[]> {
+    return await db.select().from(fraudDetectionRules).where(eq(fraudDetectionRules.isActive, true));
+  }
+
+  async getFraudDetectionRuleByType(ruleType: string): Promise<FraudDetectionRule | undefined> {
+    const [rule] = await db.select().from(fraudDetectionRules).where(eq(fraudDetectionRules.ruleType, ruleType));
+    return rule || undefined;
+  }
+
+  async createFraudDetectionAlert(insertAlert: InsertFraudDetectionAlert): Promise<FraudDetectionAlert> {
+    const [alert] = await db
+      .insert(fraudDetectionAlerts)
+      .values(insertAlert)
+      .returning();
+    return alert;
+  }
+
+  async getFraudDetectionAlerts(creatorId?: number): Promise<FraudDetectionAlert[]> {
+    if (creatorId) {
+      return await db.select().from(fraudDetectionAlerts).where(eq(fraudDetectionAlerts.creatorId, creatorId));
+    }
+    return await db.select().from(fraudDetectionAlerts);
+  }
+
+  async getTotalFraudAlerts(): Promise<number> {
+    const alerts = await db.select().from(fraudDetectionAlerts);
+    return alerts.length;
+  }
+
+  async getActiveFraudAlerts(): Promise<number> {
+    const alerts = await db.select().from(fraudDetectionAlerts).where(eq(fraudDetectionAlerts.status, "active"));
+    return alerts.length;
+  }
+
+  async createCreatorReputationScore(insertScore: InsertCreatorReputationScore): Promise<CreatorReputationScore> {
+    const [score] = await db
+      .insert(creatorReputationScores)
+      .values(insertScore)
+      .returning();
+    return score;
+  }
+
+  async getCreatorReputationScore(creatorId: number): Promise<CreatorReputationScore | undefined> {
+    const [score] = await db.select().from(creatorReputationScores).where(eq(creatorReputationScores.creatorId, creatorId));
+    return score || undefined;
+  }
+
+  async updateCreatorReputationScore(creatorId: number, updates: Partial<CreatorReputationScore>): Promise<void> {
+    await db.update(creatorReputationScores).set(updates).where(eq(creatorReputationScores.creatorId, creatorId));
+  }
+
+  async getBannedCreators(): Promise<Creator[]> {
+    const bannedScores = await db.select().from(creatorReputationScores).where(eq(creatorReputationScores.trustLevel, "banned"));
+    const bannedCreatorIds = bannedScores.map(score => score.creatorId);
+    const bannedCreators = [];
+    
+    for (const creatorId of bannedCreatorIds) {
+      const [creator] = await db.select().from(creators).where(eq(creators.id, creatorId));
+      if (creator) bannedCreators.push(creator);
+    }
+    
+    return bannedCreators;
+  }
+
+  async createAccessPattern(insertPattern: InsertAccessPattern): Promise<AccessPattern> {
+    const [pattern] = await db
+      .insert(accessPatterns)
+      .values(insertPattern)
+      .returning();
+    return pattern;
+  }
+
+  async getAccessPatterns(creatorId: number): Promise<AccessPattern[]> {
+    return await db.select().from(accessPatterns).where(eq(accessPatterns.creatorId, creatorId));
+  }
+
+  async getAccessPatternByHashes(creatorId: number, domainHash: string, ipHash: string, aiType: string): Promise<AccessPattern | undefined> {
+    const [pattern] = await db.select().from(accessPatterns)
+      .where(eq(accessPatterns.creatorId, creatorId))
+      .where(eq(accessPatterns.domainHash, domainHash))
+      .where(eq(accessPatterns.ipHash, ipHash))
+      .where(eq(accessPatterns.aiType, aiType));
+    return pattern || undefined;
+  }
+
+  async updateAccessPattern(patternId: number, updates: Partial<AccessPattern>): Promise<void> {
+    await db.update(accessPatterns).set(updates).where(eq(accessPatterns.id, patternId));
+  }
+
+  async getCreatorRewardsFromDate(creatorId: number, fromDate: Date): Promise<RewardDistribution[]> {
+    return await db.select().from(rewardDistributions)
+      .where(eq(rewardDistributions.creatorId, creatorId))
+      .where(eq(rewardDistributions.createdAt, fromDate));
+  }
+
+  async getCreator(creatorId: number): Promise<Creator | undefined> {
+    const [creator] = await db.select().from(creators).where(eq(creators.id, creatorId));
+    return creator || undefined;
   }
 }
 

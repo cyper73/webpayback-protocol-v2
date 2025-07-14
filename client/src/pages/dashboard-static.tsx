@@ -9,10 +9,12 @@ import TokenEconomics from "@/components/blockchain/TokenEconomics";
 import CreatorPortal from "@/components/creators/CreatorPortal";
 import LiveStats from "@/components/analytics/LiveStats";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
+import FraudDetectionRules from "@/components/fraud/FraudDetectionRules";
+import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-import { Box, Wallet, Coins } from "lucide-react";
+import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
@@ -188,6 +190,32 @@ export default function Dashboard() {
         {/* Reward Distribution System */}
         <div className="mb-8">
           <RewardDistribution />
+        </div>
+
+        {/* Anti-Fraud Protection */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <Card className="glass-card rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
+                <Shield className="text-electric-blue" />
+                Sistema Anti-Frode
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FraudDetectionRules />
+            </CardContent>
+          </Card>
+          <Card className="glass-card rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
+                <AlertTriangle className="text-amber-400" />
+                Allerte Frode
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FraudAlerts />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Compliance & Governance */}

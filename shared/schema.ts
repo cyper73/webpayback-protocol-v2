@@ -97,6 +97,57 @@ export const complianceRecords = pgTable("compliance_records", {
   auditedBy: text("audited_by"),
 });
 
+// Anti-fraud system tables
+export const fraudDetectionRules = pgTable("fraud_detection_rules", {
+  id: serial("id").primaryKey(),
+  ruleName: text("rule_name").notNull(),
+  ruleType: text("rule_type").notNull(), // domain_limit, ip_limit, pattern_analysis, threshold_check, reputation_check
+  parameters: jsonb("parameters").default({}),
+  isActive: boolean("is_active").default(true),
+  severity: text("severity").default("medium"), // low, medium, high, critical
+  description: text("description").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const fraudDetectionAlerts = pgTable("fraud_detection_alerts", {
+  id: serial("id").primaryKey(),
+  ruleId: integer("rule_id").references(() => fraudDetectionRules.id),
+  creatorId: integer("creator_id").references(() => creators.id),
+  alertType: text("alert_type").notNull(), // sybil_attack, auto_farming, suspicious_pattern, threshold_breach
+  severity: text("severity").default("medium"), // low, medium, high, critical
+  status: text("status").default("active"), // active, resolved, ignored
+  details: jsonb("details").default({}),
+  evidence: jsonb("evidence").default({}),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const creatorReputationScores = pgTable("creator_reputation_scores", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id).notNull(),
+  overallScore: integer("overall_score").default(100), // 0-100 scale
+  trustLevel: text("trust_level").default("trusted"), // trusted, warning, suspended, banned
+  fraudCount: integer("fraud_count").default(0),
+  positiveActions: integer("positive_actions").default(0),
+  negativeActions: integer("negative_actions").default(0),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  penalties: jsonb("penalties").default({}),
+  notes: text("notes"),
+});
+
+export const accessPatterns = pgTable("access_patterns", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  domainHash: text("domain_hash").notNull(), // hashed domain for privacy
+  ipHash: text("ip_hash").notNull(), // hashed IP for privacy
+  aiType: text("ai_type").notNull(),
+  accessCount: integer("access_count").default(1),
+  lastAccess: timestamp("last_access").defaultNow(),
+  suspicious: boolean("suspicious").default(false),
+  entropy: decimal("entropy", { precision: 10, scale: 6 }).default("0"),
+  metadata: jsonb("metadata").default({}),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   creators: many(creators),
@@ -109,6 +160,9 @@ export const creatorsRelations = relations(creators, ({ one, many }) => ({
   }),
   contentTracking: many(contentTracking),
   rewardDistributions: many(rewardDistributions),
+  fraudAlerts: many(fraudDetectionAlerts),
+  reputationScore: one(creatorReputationScores),
+  accessPatterns: many(accessPatterns),
 }));
 
 export const blockchainNetworksRelations = relations(blockchainNetworks, ({ many }) => ({
@@ -156,6 +210,36 @@ export const poolManagementRelations = relations(poolManagement, ({ one }) => ({
   network: one(blockchainNetworks, {
     fields: [poolManagement.networkId],
     references: [blockchainNetworks.id],
+  }),
+}));
+
+// Anti-fraud relations
+export const fraudDetectionRulesRelations = relations(fraudDetectionRules, ({ many }) => ({
+  alerts: many(fraudDetectionAlerts),
+}));
+
+export const fraudDetectionAlertsRelations = relations(fraudDetectionAlerts, ({ one }) => ({
+  rule: one(fraudDetectionRules, {
+    fields: [fraudDetectionAlerts.ruleId],
+    references: [fraudDetectionRules.id],
+  }),
+  creator: one(creators, {
+    fields: [fraudDetectionAlerts.creatorId],
+    references: [creators.id],
+  }),
+}));
+
+export const creatorReputationScoresRelations = relations(creatorReputationScores, ({ one }) => ({
+  creator: one(creators, {
+    fields: [creatorReputationScores.creatorId],
+    references: [creators.id],
+  }),
+}));
+
+export const accessPatternsRelations = relations(accessPatterns, ({ one }) => ({
+  creator: one(creators, {
+    fields: [accessPatterns.creatorId],
+    references: [creators.id],
   }),
 }));
 
@@ -231,6 +315,48 @@ export const insertComplianceRecordSchema = createInsertSchema(complianceRecords
   auditedBy: true,
 });
 
+// Anti-fraud insert schemas
+export const insertFraudDetectionRuleSchema = createInsertSchema(fraudDetectionRules).pick({
+  ruleName: true,
+  ruleType: true,
+  parameters: true,
+  isActive: true,
+  severity: true,
+  description: true,
+});
+
+export const insertFraudDetectionAlertSchema = createInsertSchema(fraudDetectionAlerts).pick({
+  ruleId: true,
+  creatorId: true,
+  alertType: true,
+  severity: true,
+  status: true,
+  details: true,
+  evidence: true,
+});
+
+export const insertCreatorReputationScoreSchema = createInsertSchema(creatorReputationScores).pick({
+  creatorId: true,
+  overallScore: true,
+  trustLevel: true,
+  fraudCount: true,
+  positiveActions: true,
+  negativeActions: true,
+  penalties: true,
+  notes: true,
+});
+
+export const insertAccessPatternSchema = createInsertSchema(accessPatterns).pick({
+  creatorId: true,
+  domainHash: true,
+  ipHash: true,
+  aiType: true,
+  accessCount: true,
+  suspicious: true,
+  entropy: true,
+  metadata: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -258,3 +384,16 @@ export type PoolManagement = typeof poolManagement.$inferSelect;
 
 export type InsertComplianceRecord = z.infer<typeof insertComplianceRecordSchema>;
 export type ComplianceRecord = typeof complianceRecords.$inferSelect;
+
+// Anti-fraud types
+export type InsertFraudDetectionRule = z.infer<typeof insertFraudDetectionRuleSchema>;
+export type FraudDetectionRule = typeof fraudDetectionRules.$inferSelect;
+
+export type InsertFraudDetectionAlert = z.infer<typeof insertFraudDetectionAlertSchema>;
+export type FraudDetectionAlert = typeof fraudDetectionAlerts.$inferSelect;
+
+export type InsertCreatorReputationScore = z.infer<typeof insertCreatorReputationScoreSchema>;
+export type CreatorReputationScore = typeof creatorReputationScores.$inferSelect;
+
+export type InsertAccessPattern = z.infer<typeof insertAccessPatternSchema>;
+export type AccessPattern = typeof accessPatterns.$inferSelect;

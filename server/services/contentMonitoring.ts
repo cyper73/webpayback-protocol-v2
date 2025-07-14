@@ -1,6 +1,7 @@
 import { InsertContentTracking, ContentTracking } from "@shared/schema";
 import { storage } from "../storage";
 import { web3Service } from "./web3";
+import { fraudDetectionService } from "./fraudDetection";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -230,6 +231,26 @@ class ContentMonitoringService {
         return false;
       }
 
+      // 🔒 ANTI-FRAUD ANALYSIS
+      const fraudAnalysis = await fraudDetectionService.analyzeCreatorAccess(creator.id, {
+        url: detection.url,
+        ipAddress: detection.ipAddress,
+        aiType: detection.aiType,
+        userAgent: detection.userAgent,
+        timestamp: detection.timestamp
+      });
+
+      // Block reward if fraudulent activity detected
+      if (fraudAnalysis.isFraudulent) {
+        console.log(`🚨 FRAUD DETECTED - Blocking reward:
+          Creator: ${creator.name || creator.id}
+          Risk Score: ${fraudAnalysis.riskScore}%
+          Reasons: ${fraudAnalysis.reasons.join(', ')}
+          Action: ${fraudAnalysis.recommendedAction}`);
+        
+        return false; // Block the reward
+      }
+
       // Create content fingerprint
       const fingerprint = await this.createContentFingerprint(detection.url);
       
@@ -243,14 +264,23 @@ class ContentMonitoringService {
         metadata: {
           userAgent: detection.userAgent,
           ipAddress: detection.ipAddress,
-          fingerprint: fingerprint
+          fingerprint: fingerprint,
+          fraudAnalysis: fraudAnalysis
         }
       };
 
       await storage.createContentTracking(trackingData);
       
       // Calculate reward amount based on content type and AI model
-      const rewardAmount = this.calculateReward(detection.aiType, fingerprint);
+      let rewardAmount = this.calculateReward(detection.aiType, fingerprint);
+      
+      // Apply reputation penalty if applicable
+      const reputationScore = await storage.getCreatorReputationScore(creator.id);
+      if (reputationScore && reputationScore.overallScore < 70) {
+        const penaltyMultiplier = Math.max(0.1, reputationScore.overallScore / 100);
+        rewardAmount = (parseFloat(rewardAmount) * penaltyMultiplier).toFixed(8);
+        console.log(`⚠️ Reputation penalty applied: ${penaltyMultiplier.toFixed(2)}x`);
+      }
       
       // Distribute reward to creator
       await web3Service.processRewardDistribution(
@@ -260,12 +290,13 @@ class ContentMonitoringService {
       );
 
       console.log(`✅ AI Access Detected and Rewarded:
-        Creator: ${creator.name}
+        Creator: ${creator.name || creator.id}
         URL: ${detection.url}
         AI Type: ${detection.aiType}
         Confidence: ${(detection.confidence * 100).toFixed(1)}%
         Reward: ${rewardAmount} WPT
-        Wallet: ${creator.walletAddress}`);
+        Wallet: ${creator.walletAddress}
+        Risk Score: ${fraudAnalysis.riskScore}%`);
 
       return true;
       
