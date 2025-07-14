@@ -142,11 +142,11 @@ export default function Dashboard() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium">Creator #{reward.creatorId}</span>
+                          <span className="font-medium">{t('creator')} #{reward.creatorId}</span>
                           <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
                         </div>
                         <div className="flex items-center justify-between text-sm text-gray-400">
-                          <span>Status: {reward.status}</span>
+                          <span>{t('status')} {reward.status}</span>
                           <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
                         </div>
                       </div>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                 
                 <div className="mt-6 pt-4 border-t border-white/10">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Total Rewards Today:</span>
+                    <span className="text-gray-400">{t('totalRewardsToday')}:</span>
                     <span className="font-mono text-neon-green">
                       {rewards.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2)} WPT
                     </span>
@@ -222,7 +222,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
                 <Shield className="text-electric-blue" />
-                Sistema Anti-Frode
+                {t('antiFraudSystem')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -233,7 +233,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
                 <AlertTriangle className="text-amber-400" />
-                Allerte Frode
+                {t('fraudAlerts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -247,7 +247,7 @@ export default function Dashboard() {
           <ComplianceMonitor compliance={compliance} />
           <Card className="glass-card rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-xl font-bold gradient-text">Network Switcher</CardTitle>
+              <CardTitle className="text-xl font-bold gradient-text">{t('networkSwitcher')}</CardTitle>
             </CardHeader>
             <CardContent>
               <NetworkSwitcher />

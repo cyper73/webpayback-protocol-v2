@@ -123,7 +123,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "Caricamento...",
     error: "Errore",
-    success: "Successo"
+    success: "Successo",
+    
+    antiFraudSystem: "Sistema Anti-Frode",
+    fraudAlerts: "Allerte Frode",
+    networkSwitcher: "Cambia Rete"
   },
   
   es: {
@@ -163,7 +167,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "Cargando...",
     error: "Error",
-    success: "Éxito"
+    success: "Éxito",
+    
+    antiFraudSystem: "Sistema Anti-Fraude",
+    fraudAlerts: "Alertas de Fraude",
+    networkSwitcher: "Cambio de Red"
   },
   
   fr: {
@@ -203,7 +211,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "Chargement...",
     error: "Erreur",
-    success: "Succès"
+    success: "Succès",
+    
+    antiFraudSystem: "Système Anti-Fraude",
+    fraudAlerts: "Alertes de Fraude",
+    networkSwitcher: "Changeur de Réseau"
   },
   
   de: {
@@ -243,7 +255,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "Laden...",
     error: "Fehler",
-    success: "Erfolg"
+    success: "Erfolg",
+    
+    antiFraudSystem: "Anti-Betrugssystem",
+    fraudAlerts: "Betrugsalarme",
+    networkSwitcher: "Netzwerk-Umschalter"
   },
   
   pt: {
@@ -283,7 +299,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "Carregando...",
     error: "Erro",
-    success: "Sucesso"
+    success: "Sucesso",
+    
+    antiFraudSystem: "Sistema Anti-Fraude",
+    fraudAlerts: "Alertas de Fraude",
+    networkSwitcher: "Alternador de Rede"
   },
   
   ru: {
@@ -323,7 +343,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "Загрузка...",
     error: "Ошибка",
-    success: "Успех"
+    success: "Успех",
+    
+    antiFraudSystem: "Система против мошенничества",
+    fraudAlerts: "Предупреждения о мошенничестве",
+    networkSwitcher: "Переключатель сети"
   },
   
   zh: {
@@ -363,7 +387,11 @@ export const translations: Record<string, Translation> = {
     
     loading: "加载中...",
     error: "错误",
-    success: "成功"
+    success: "成功",
+    
+    antiFraudSystem: "防欺诈系统",
+    fraudAlerts: "欺诈警报",
+    networkSwitcher: "网络切换器"
   }
 };
 
