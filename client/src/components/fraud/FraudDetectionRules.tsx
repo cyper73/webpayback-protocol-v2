@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Shield, Eye, TrendingUp, Users, Ban } from "lucide-react";
+import { useTranslations } from "@/hooks/use-translations";
 
 interface FraudRule {
   id: number;
@@ -122,19 +123,20 @@ const getRuleIcon = (ruleType: string) => {
 };
 
 export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetectionRulesProps) {
+  const { t } = useTranslations();
+  
   return (
     <div className="space-y-6">
       {/* Warning Banner */}
       <Alert className="border-red-200 bg-red-50 dark:bg-red-900/20">
         <Ban className="h-4 w-4" />
         <AlertDescription className="text-red-800 dark:text-red-200">
-          <strong>AVVISO AI FURBI:</strong> Il sistema WebPayback implementa controlli anti-frode avanzati. 
-          Tentativi di sybil attack, auto-farming o manipolazione del sistema risulteranno in:
+          <strong>{t('fraudWarning')}</strong> {t('fraudWarningText')}
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>Blocco immediato delle ricompense</li>
-            <li>Riduzione permanente del punteggio reputazione</li>
-            <li>Possibile sospensione o ban dell'account</li>
-            <li>Monitoraggio intensivo delle attività future</li>
+            <li>{t('fraudWarning1')}</li>
+            <li>{t('fraudWarning2')}</li>
+            <li>{t('fraudWarning3')}</li>
+            <li>{t('fraudWarning4')}</li>
           </ul>
         </AlertDescription>
       </Alert>
@@ -144,7 +146,7 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Regole Anti-Frode Attive
+            {t('activeFraudRules')}
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Clock, CheckCircle, XCircle, Info } from "lucide-react";
+import { useTranslations } from "@/hooks/use-translations";
 
 interface FraudAlert {
   id: number;
@@ -141,6 +142,7 @@ const formatDate = (dateString: string) => {
 };
 
 export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) {
+  const { t } = useTranslations();
   const activeAlerts = alerts.filter(alert => alert.status === 'active');
   const resolvedAlerts = alerts.filter(alert => alert.status === 'resolved');
 
@@ -152,7 +154,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
               <AlertTriangle className="h-5 w-5" />
-              Allerte Frode Attive ({activeAlerts.length})
+              {t('activeFraudAlerts')} ({activeAlerts.length})
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -83,7 +83,16 @@ export const translations: Record<string, Translation> = {
     
     loading: "Loading...",
     error: "Error",
-    success: "Success"
+    success: "Success",
+    
+    fraudWarning: "SMART GUYS WARNING:",
+    fraudWarningText: "WebPayback system implements advanced anti-fraud controls. Attempts at sybil attacks, auto-farming or system manipulation will result in:",
+    fraudWarning1: "Immediate reward blocking",
+    fraudWarning2: "Permanent reputation score reduction",
+    fraudWarning3: "Possible account suspension or ban",
+    fraudWarning4: "Intensive monitoring of future activities",
+    activeFraudRules: "Active Anti-Fraud Rules",
+    activeFraudAlerts: "Active Fraud Alerts"
   },
   
   it: {
@@ -127,7 +136,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "Sistema Anti-Frode",
     fraudAlerts: "Allerte Frode",
-    networkSwitcher: "Cambia Rete"
+    networkSwitcher: "Cambia Rete",
+    
+    fraudWarning: "AVVISO AI FURBI:",
+    fraudWarningText: "Il sistema WebPayback implementa controlli anti-frode avanzati. Tentativi di sybil attack, auto-farming o manipolazione del sistema risulteranno in:",
+    fraudWarning1: "Blocco immediato delle ricompense",
+    fraudWarning2: "Riduzione permanente del punteggio reputazione",
+    fraudWarning3: "Possibile sospensione o ban dell'account",
+    fraudWarning4: "Monitoraggio intensivo delle attività future",
+    activeFraudRules: "Regole Anti-Frode Attive",
+    activeFraudAlerts: "Allerte Frode Attive"
   },
   
   es: {
@@ -171,7 +189,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "Sistema Anti-Fraude",
     fraudAlerts: "Alertas de Fraude",
-    networkSwitcher: "Cambio de Red"
+    networkSwitcher: "Cambio de Red",
+    
+    fraudWarning: "AVISO A LOS LISTOS:",
+    fraudWarningText: "El sistema WebPayback implementa controles anti-fraude avanzados. Intentos de ataques sybil, auto-farming o manipulación del sistema resultarán en:",
+    fraudWarning1: "Bloqueo inmediato de recompensas",
+    fraudWarning2: "Reducción permanente del puntaje de reputación",
+    fraudWarning3: "Posible suspensión o prohibición de cuenta",
+    fraudWarning4: "Monitoreo intensivo de actividades futuras",
+    activeFraudRules: "Reglas Anti-Fraude Activas",
+    activeFraudAlerts: "Alertas de Fraude Activas"
   },
   
   fr: {
@@ -215,7 +242,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "Système Anti-Fraude",
     fraudAlerts: "Alertes de Fraude",
-    networkSwitcher: "Changeur de Réseau"
+    networkSwitcher: "Changeur de Réseau",
+    
+    fraudWarning: "AVERTISSEMENT AUX MALINS:",
+    fraudWarningText: "Le système WebPayback implémente des contrôles anti-fraude avancés. Les tentatives d'attaques sybil, d'auto-farming ou de manipulation du système entraîneront:",
+    fraudWarning1: "Blocage immédiat des récompenses",
+    fraudWarning2: "Réduction permanente du score de réputation",
+    fraudWarning3: "Suspension ou interdiction possible du compte",
+    fraudWarning4: "Surveillance intensive des activités futures",
+    activeFraudRules: "Règles Anti-Fraude Actives",
+    activeFraudAlerts: "Alertes de Fraude Actives"
   },
   
   de: {
@@ -259,7 +295,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "Anti-Betrugssystem",
     fraudAlerts: "Betrugsalarme",
-    networkSwitcher: "Netzwerk-Umschalter"
+    networkSwitcher: "Netzwerk-Umschalter",
+    
+    fraudWarning: "WARNUNG AN SCHLAUE LEUTE:",
+    fraudWarningText: "Das WebPayback-System implementiert fortschrittliche Anti-Betrugs-Kontrollen. Versuche von Sybil-Angriffen, Auto-Farming oder Systemmanipulation führen zu:",
+    fraudWarning1: "Sofortiges Blockieren von Belohnungen",
+    fraudWarning2: "Permanente Reduzierung des Reputations-Scores",
+    fraudWarning3: "Mögliche Kontosperrung oder -verbot",
+    fraudWarning4: "Intensive Überwachung zukünftiger Aktivitäten",
+    activeFraudRules: "Aktive Anti-Betrugs-Regeln",
+    activeFraudAlerts: "Aktive Betrugsalarme"
   },
   
   pt: {
@@ -303,7 +348,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "Sistema Anti-Fraude",
     fraudAlerts: "Alertas de Fraude",
-    networkSwitcher: "Alternador de Rede"
+    networkSwitcher: "Alternador de Rede",
+    
+    fraudWarning: "AVISO AOS ESPERTOS:",
+    fraudWarningText: "O sistema WebPayback implementa controles anti-fraude avançados. Tentativas de ataques sybil, auto-farming ou manipulação do sistema resultarão em:",
+    fraudWarning1: "Bloqueio imediato de recompensas",
+    fraudWarning2: "Redução permanente do score de reputação",
+    fraudWarning3: "Possível suspensão ou banimento da conta",
+    fraudWarning4: "Monitoramento intensivo de atividades futuras",
+    activeFraudRules: "Regras Anti-Fraude Ativas",
+    activeFraudAlerts: "Alertas de Fraude Ativos"
   },
   
   ru: {
@@ -347,7 +401,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "Система против мошенничества",
     fraudAlerts: "Предупреждения о мошенничестве",
-    networkSwitcher: "Переключатель сети"
+    networkSwitcher: "Переключатель сети",
+    
+    fraudWarning: "ПРЕДУПРЕЖДЕНИЕ УМНИКАМ:",
+    fraudWarningText: "Система WebPayback внедряет передовые средства борьбы с мошенничеством. Попытки сибил-атак, авто-фарминга или манипуляции системой приведут к:",
+    fraudWarning1: "Немедленной блокировке наград",
+    fraudWarning2: "Постоянному снижению рейтинга репутации",
+    fraudWarning3: "Возможной приостановке или запрету аккаунта",
+    fraudWarning4: "Интенсивному мониторингу будущих действий",
+    activeFraudRules: "Активные Правила Борьбы с Мошенничеством",
+    activeFraudAlerts: "Активные Предупреждения о Мошенничестве"
   },
   
   zh: {
@@ -391,7 +454,16 @@ export const translations: Record<string, Translation> = {
     
     antiFraudSystem: "防欺诈系统",
     fraudAlerts: "欺诈警报",
-    networkSwitcher: "网络切换器"
+    networkSwitcher: "网络切换器",
+    
+    fraudWarning: "聪明人警告:",
+    fraudWarningText: "WebPayback系统实施先进的反欺诈控制。尝试女巫攻击、自动刷取或系统操纵将导致：",
+    fraudWarning1: "立即阻止奖励",
+    fraudWarning2: "永久降低声誉分数",
+    fraudWarning3: "可能暂停或禁止账户",
+    fraudWarning4: "密集监控未来活动",
+    activeFraudRules: "活跃反欺诈规则",
+    activeFraudAlerts: "活跃欺诈警报"
   }
 };
 
