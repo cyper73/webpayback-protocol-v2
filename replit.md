@@ -120,3 +120,14 @@ Preferred communication style: Simple, everyday language.
 - **Backup Strategy**: Managed by Neon Database service
 
 The architecture emphasizes modularity, type safety, and real-time capabilities while maintaining a clean separation between frontend presentation, backend logic, and data persistence layers.
+
+## Recent Changes
+
+- Successfully deployed with autoscale infrastructure (4 vCPU/8GB RAM, up to 3 machines)
+- Implemented REAL AI monitoring system that detects actual AI bot access and automatically distributes WPT rewards
+- MAJOR UPDATE: Extended AI detection to support 20+ AI models including DeepSeek, Grok, Mistral, Perplexity, Llama, Cohere, and all major AI platforms
+- Enhanced reward system with differentiated payouts for different AI types and premium bonuses for advanced models
+- Fixed dashboard refresh issues by changing polling intervals from 5/10 seconds to 30 seconds to reduce interruptions
+- Creator Registration Portal positioned at top of dashboard for maximum visibility and user engagement
+- Updated GitHub README with live platform links and comprehensive technical documentation
+- Successfully tested reward distribution with live transactions across multiple AI types
