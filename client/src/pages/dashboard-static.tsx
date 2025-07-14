@@ -14,8 +14,7 @@ import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-// import LanguageBannerSimple from "@/components/ui/language-banner-simple";
-// import { useTranslations } from "@/hooks/use-translations";
+import { useTranslations } from "@/hooks/use-translations";
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
@@ -30,8 +29,8 @@ export default function Dashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('en');
-  // const { t, changeLanguage } = useTranslations(currentLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState('it');
+  const { t, changeLanguage } = useTranslations(currentLanguage);
 
   const fetchDashboardData = async (isRefresh = false) => {
     try {
@@ -71,7 +70,7 @@ export default function Dashboard() {
 
   const handleLanguageChange = (language: { code: string; name: string; flag: string; region: string }) => {
     setCurrentLanguage(language.code);
-    // changeLanguage(language.code);
+    changeLanguage(language.code);
     console.log('Language changed to:', language);
   };
 
@@ -91,7 +90,7 @@ export default function Dashboard() {
               <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
                 <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
                 <span className="text-sm text-gray-300">
-                  {isRefreshing ? 'Syncing...' : 'Level 280 AI Agents Active'}
+                  {isRefreshing ? t('syncing') : t('level_280_agents')}
                 </span>
               </div>
             </div>
@@ -103,7 +102,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center space-x-2 bg-glass-dark px-3 py-1 rounded-lg">
                 <Coins className="text-amber-400" />
-                <span className="font-mono">WPT Token Live</span>
+                <span className="font-mono">{t('wpt_token_live')}</span>
               </div>
             </div>
           </div>
@@ -119,7 +118,7 @@ export default function Dashboard() {
             
             <Card className="glass-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
+                <CardTitle className="text-xl font-bold gradient-text">{t('recent_creator_rewards')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -161,11 +160,11 @@ export default function Dashboard() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold gradient-text">
-                  Multi-Agent Orchestration Command Center
+                  {t('multi_agent_orchestration')}
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
-                  <span className="text-sm text-gray-300">Live</span>
+                  <span className="text-sm text-gray-300">{t('active')}</span>
                 </div>
               </div>
             </CardHeader>

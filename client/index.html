@@ -80,6 +80,10 @@
             
             // Store selection
             localStorage.setItem('webpayback-language', lang);
+            
+            // Trigger React component refresh by dispatching a custom event
+            window.dispatchEvent(new CustomEvent('languageChange', { detail: { code: lang, name: name } }));
+            
             console.log('Language changed to:', lang, name);
           });
           

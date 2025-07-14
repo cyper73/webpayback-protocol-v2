@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export interface TranslationData {
   [key: string]: {
@@ -166,11 +166,105 @@ const TRANSLATIONS: TranslationData = {
     'ko': '연결됨',
     'ar': 'متصل',
     'hi': 'जुड़ा हुआ'
+  },
+  
+  // Additional translations for comprehensive support
+  'wpt_token_live': {
+    'en': 'WPT Token Live',
+    'it': 'Token WPT Live',
+    'es': 'Token WPT En Vivo',
+    'fr': 'Token WPT En Direct',
+    'de': 'WPT Token Live',
+    'pt': 'Token WPT Ao Vivo',
+    'ru': 'Токен WPT Онлайн',
+    'zh': 'WPT代币实时',
+    'ja': 'WPTトークン ライブ',
+    'ko': 'WPT 토큰 라이브',
+    'ar': 'رمز WPT مباشر',
+    'hi': 'WPT टोकन लाइव'
+  },
+  
+  'recent_creator_rewards': {
+    'en': 'Recent Creator Rewards',
+    'it': 'Ricompense Recenti per Creatori',
+    'es': 'Recompensas Recientes de Creadores',
+    'fr': 'Récompenses Récentes des Créateurs',
+    'de': 'Aktuelle Creator-Belohnungen',
+    'pt': 'Recompensas Recentes de Criadores',
+    'ru': 'Недавние Награды Создателей',
+    'zh': '最近创作者奖励',
+    'ja': '最近のクリエイター報酬',
+    'ko': '최근 크리에이터 보상',
+    'ar': 'مكافآت المبدعين الأخيرة',
+    'hi': 'हाल के निर्माता पुरस्कार'
+  },
+  
+  'multi_agent_orchestration': {
+    'en': 'Multi-Agent Orchestration Command Center',
+    'it': 'Centro di Comando Orchestrazione Multi-Agente',
+    'es': 'Centro de Comando de Orquestación Multi-Agente',
+    'fr': 'Centre de Commande d\'Orchestration Multi-Agent',
+    'de': 'Multi-Agent-Orchestrierung Kommandozentrale',
+    'pt': 'Centro de Comando de Orquestração Multi-Agente',
+    'ru': 'Командный Центр Мульти-Агентной Оркестрации',
+    'zh': '多代理编排指挥中心',
+    'ja': 'マルチエージェントオーケストレーションコマンドセンター',
+    'ko': '멀티 에이전트 오케스트레이션 명령 센터',
+    'ar': 'مركز قيادة تنسيق الوكلاء المتعددين',
+    'hi': 'मल्टी-एजेंट आर्केस्ट्रेशन कमांड सेंटर'
+  },
+  
+  'syncing': {
+    'en': 'Syncing...',
+    'it': 'Sincronizzazione...',
+    'es': 'Sincronizando...',
+    'fr': 'Synchronisation...',
+    'de': 'Synchronisierung...',
+    'pt': 'Sincronizando...',
+    'ru': 'Синхронизация...',
+    'zh': '同步中...',
+    'ja': '同期中...',
+    'ko': '동기화 중...',
+    'ar': 'المزامنة...',
+    'hi': 'सिंक हो रहा है...'
+  },
+  
+  'loading': {
+    'en': 'Loading...',
+    'it': 'Caricamento...',
+    'es': 'Cargando...',
+    'fr': 'Chargement...',
+    'de': 'Laden...',
+    'pt': 'Carregando...',
+    'ru': 'Загрузка...',
+    'zh': '加载中...',
+    'ja': '読み込み中...',
+    'ko': '로딩 중...',
+    'ar': 'تحميل...',
+    'hi': 'लोड हो रहा है...'
   }
 };
 
-export const useTranslations = (initialLanguage: string = 'en') => {
+export const useTranslations = (initialLanguage: string = 'it') => {
   const [currentLanguage, setCurrentLanguage] = useState(initialLanguage);
+  
+  // Listen for language changes from HTML dropdown
+  useEffect(() => {
+    const checkLanguageChange = () => {
+      const savedLang = localStorage.getItem('webpayback-language');
+      if (savedLang && savedLang !== currentLanguage) {
+        setCurrentLanguage(savedLang);
+      }
+    };
+    
+    // Check every second for language changes
+    const interval = setInterval(checkLanguageChange, 1000);
+    
+    // Initial check
+    checkLanguageChange();
+    
+    return () => clearInterval(interval);
+  }, [currentLanguage]);
   
   const t = (key: string, fallback?: string): string => {
     const translation = TRANSLATIONS[key]?.[currentLanguage] || 
@@ -182,6 +276,7 @@ export const useTranslations = (initialLanguage: string = 'en') => {
   
   const changeLanguage = (languageCode: string) => {
     setCurrentLanguage(languageCode);
+    localStorage.setItem('webpayback-language', languageCode);
   };
   
   return {
