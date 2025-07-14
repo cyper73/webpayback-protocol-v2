@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { blockchainService } from "./services/blockchain";
 import { agentService } from "./services/agents";
+import { web3Service } from "./services/web3";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -191,6 +192,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rewards,
         pool,
         compliance
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get real token information from Polygon
+  app.get("/api/web3/token-info", async (req, res) => {
+    try {
+      const tokenInfo = await web3Service.getTokenInfo();
+      res.json(tokenInfo);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get pool information for WMATIC/WPT
+  app.get("/api/web3/pool-info", async (req, res) => {
+    try {
+      const poolInfo = await web3Service.getPoolInfo();
+      res.json(poolInfo);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get network status
+  app.get("/api/web3/network-status", async (req, res) => {
+    try {
+      const networkStatus = await web3Service.getNetworkStatus();
+      res.json(networkStatus);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Distribute real rewards to creator wallet
+  app.post("/api/web3/distribute-rewards", async (req, res) => {
+    try {
+      const { creatorId, amount, walletAddress } = req.body;
+      
+      if (!creatorId || !amount || !walletAddress) {
+        return res.status(400).json({ error: "Missing required fields: creatorId, amount, walletAddress" });
+      }
+
+      await web3Service.processRewardDistribution(creatorId, amount, walletAddress);
+      
+      res.json({ 
+        success: true, 
+        message: "Reward distribution initiated successfully",
+        tokenAddress: "0x9077051D318b614F915E8A07861090856FDEC91e",
+        network: "Polygon"
       });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });

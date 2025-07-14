@@ -9,6 +9,8 @@ import TokenEconomics from "@/components/blockchain/TokenEconomics";
 import CreatorPortal from "@/components/creators/CreatorPortal";
 import LiveStats from "@/components/analytics/LiveStats";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
+import TokenInfo from "@/components/web3/TokenInfo";
+import RewardDistribution from "@/components/web3/RewardDistribution";
 import { Box, Wallet, Coins } from "lucide-react";
 
 export default function Dashboard() {
@@ -50,11 +52,11 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm">
                 <Wallet className="text-electric-blue" />
-                <span className="font-mono">0xca5E...508Ba</span>
+                <span className="font-mono">0x9077...91e</span>
               </div>
               <div className="flex items-center space-x-2 bg-glass-dark px-3 py-1 rounded-lg">
                 <Coins className="text-amber-400" />
-                <span className="font-mono">1,000,000 WPT</span>
+                <span className="font-mono">WPT Token Live</span>
               </div>
             </div>
           </div>
@@ -108,6 +110,12 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <TokenEconomics pool={pool} rewards={rewards} />
           <ComplianceMonitor compliance={compliance} />
+        </div>
+
+        {/* Real Blockchain Integration */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <TokenInfo />
+          <RewardDistribution />
         </div>
 
         {/* Revolutionary Innovation Section */}
