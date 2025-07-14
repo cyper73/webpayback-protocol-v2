@@ -5,9 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
   </head>
   <body>
-
+    <!-- Pulsante Language con Dropdown -->
+    <div id="language-dropdown" style="position: fixed; top: 16px; right: 16px; z-index: 10000;">
+      <button id="language-button" style="background-color: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; font-family: system-ui, sans-serif; display: flex; align-items: center; gap: 8px;">
+        🌍 Language
+      </button>
+      <div id="language-menu" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: white; border: 1px solid #d1d5db; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 300px; overflow-y: auto; margin-top: 4px; min-width: 200px;">
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="en">
+          <span>🇺🇸</span> <span>English</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="it">
+          <span>🇮🇹</span> <span>Italiano</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="es">
+          <span>🇪🇸</span> <span>Español</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="fr">
+          <span>🇫🇷</span> <span>Français</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="de">
+          <span>🇩🇪</span> <span>Deutsch</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="pt">
+          <span>🇵🇹</span> <span>Português</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="ru">
+          <span>🇷🇺</span> <span>Русский</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="zh">
+          <span>🇨🇳</span> <span>中文</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="ja">
+          <span>🇯🇵</span> <span>日本語</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="ko">
+          <span>🇰🇷</span> <span>한국어</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="ar">
+          <span>🇸🇦</span> <span>العربية</span>
+        </div>
+        <div class="language-item" style="padding: 12px 16px; cursor: pointer; font-size: 14px; color: #374151; display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;" data-lang="hi">
+          <span>🇮🇳</span> <span>हिंदी</span>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Language dropdown functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const languageButton = document.getElementById('language-button');
+        const languageMenu = document.getElementById('language-menu');
+        const languageItems = document.querySelectorAll('.language-item');
+        
+        // Toggle dropdown menu
+        languageButton.addEventListener('click', function() {
+          const isVisible = languageMenu.style.display === 'block';
+          languageMenu.style.display = isVisible ? 'none' : 'block';
+        });
+        
+        // Handle language selection
+        languageItems.forEach(item => {
+          item.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            const flag = this.querySelector('span:first-child').textContent;
+            const name = this.querySelector('span:last-child').textContent;
+            
+            // Update button text
+            languageButton.innerHTML = `🌍 ${name}`;
+            
+            // Close dropdown
+            languageMenu.style.display = 'none';
+            
+            // Store selection
+            localStorage.setItem('webpayback-language', lang);
+            console.log('Language changed to:', lang, name);
+          });
+          
+          // Hover effects
+          item.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f3f4f6';
+          });
+          
+          item.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = 'white';
+          });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+          if (!languageButton.contains(event.target) && !languageMenu.contains(event.target)) {
+            languageMenu.style.display = 'none';
+          }
+        });
+        
+        // Load saved language
+        const savedLang = localStorage.getItem('webpayback-language');
+        if (savedLang) {
+          const savedItem = document.querySelector(`[data-lang="${savedLang}"]`);
+          if (savedItem) {
+            savedItem.click();
+          }
+        }
+      });
+    </script>
+    
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>

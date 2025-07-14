@@ -113,15 +113,6 @@ function LanguageDropdown() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Language Dropdown - Posizionato sopra tutto */}
-      <div style={{
-        position: 'fixed',
-        top: '16px',
-        right: '16px',
-        zIndex: 10000
-      }}>
-        <LanguageDropdown />
-      </div>
       <TooltipProvider>
         <Router />
         <Toaster />
