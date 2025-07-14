@@ -31,6 +31,8 @@ export default function Dashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('it');
   const { t, changeLanguage } = useTranslations(currentLanguage);
+  
+
 
   const fetchDashboardData = async (isRefresh = false) => {
     try {

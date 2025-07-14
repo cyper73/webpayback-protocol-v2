@@ -257,13 +257,27 @@ export const useTranslations = (initialLanguage: string = 'it') => {
       }
     };
     
-    // Check every second for language changes
+    // Listen for custom language change events
+    const handleLanguageEvent = (event: CustomEvent) => {
+      const { code } = event.detail;
+      if (code !== currentLanguage) {
+        setCurrentLanguage(code);
+      }
+    };
+    
+    // Add event listener for language changes
+    window.addEventListener('languageChange', handleLanguageEvent as EventListener);
+    
+    // Check every second for language changes (fallback)
     const interval = setInterval(checkLanguageChange, 1000);
     
     // Initial check
     checkLanguageChange();
     
-    return () => clearInterval(interval);
+    return () => {
+      window.removeEventListener('languageChange', handleLanguageEvent as EventListener);
+      clearInterval(interval);
+    };
   }, [currentLanguage]);
   
   const t = (key: string, fallback?: string): string => {
