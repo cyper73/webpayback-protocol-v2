@@ -56,8 +56,10 @@ export const agentCommunications = pgTable("agent_communications", {
 export const contentTracking = pgTable("content_tracking", {
   id: serial("id").primaryKey(),
   creatorId: integer("creator_id").references(() => creators.id),
-  aiRequestId: text("ai_request_id").notNull(),
   contentHash: text("content_hash").notNull(),
+  accessType: text("access_type").default("ai_access"), // ai_access, manual_access, crawler_access
+  aiModel: text("ai_model"), // claude, gpt, gemini, bot
+  detectionConfidence: decimal("detection_confidence", { precision: 3, scale: 2 }),
   usageCount: integer("usage_count").default(1),
   rewardAmount: decimal("reward_amount", { precision: 18, scale: 8 }).default("0"),
   timestamp: timestamp("timestamp").defaultNow(),
@@ -196,8 +198,10 @@ export const insertAgentCommunicationSchema = createInsertSchema(agentCommunicat
 
 export const insertContentTrackingSchema = createInsertSchema(contentTracking).pick({
   creatorId: true,
-  aiRequestId: true,
   contentHash: true,
+  accessType: true,
+  aiModel: true,
+  detectionConfidence: true,
   usageCount: true,
   rewardAmount: true,
   metadata: true,

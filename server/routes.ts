@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { blockchainService } from "./services/blockchain";
 import { agentService } from "./services/agents";
 import { web3Service } from "./services/web3";
+import { contentMonitoringService } from "./services/contentMonitoring";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -263,6 +264,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Reward distribution initiated successfully",
         tokenAddress: "0x9077051D318b614F915E8A07861090856FDEC91e",
         network: "Polygon"
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // AI Content Monitoring Routes
+  
+  // Simulate AI access to registered content
+  app.post("/api/monitoring/simulate-ai-access", async (req, res) => {
+    try {
+      const { url, aiType } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ error: "URL is required" });
+      }
+      
+      const success = await contentMonitoringService.simulateAIAccess(url, aiType);
+      
+      res.json({
+        success,
+        message: success ? "AI access detected and reward distributed" : "No creator found for URL or detection failed",
+        url,
+        aiType: aiType || 'claude'
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get monitoring statistics
+  app.get("/api/monitoring/stats", async (req, res) => {
+    try {
+      const stats = await contentMonitoringService.getMonitoringStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Real AI detection endpoint (would be called by monitoring system)
+  app.post("/api/monitoring/detect-access", async (req, res) => {
+    try {
+      const { userAgent, ipAddress, url } = req.body;
+      
+      if (!userAgent || !ipAddress || !url) {
+        return res.status(400).json({ error: "Missing required fields: userAgent, ipAddress, url" });
+      }
+      
+      const detection = await contentMonitoringService.detectAIAccess(userAgent, ipAddress, url);
+      const processed = await contentMonitoringService.processAIAccess(detection);
+      
+      res.json({
+        detection,
+        processed,
+        message: processed ? "AI access processed and reward distributed" : "AI access detected but not processed"
       });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
