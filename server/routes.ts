@@ -198,11 +198,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get real token information from Polygon
+  // Get real token information from current network
   app.get("/api/web3/token-info", async (req, res) => {
     try {
       const tokenInfo = await web3Service.getTokenInfo();
       res.json(tokenInfo);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Switch blockchain network
+  app.post("/api/web3/switch-network", async (req, res) => {
+    try {
+      const { network } = req.body;
+      if (!network || !['polygon', 'ethereum'].includes(network)) {
+        return res.status(400).json({ error: "Invalid network. Use 'polygon' or 'ethereum'" });
+      }
+      
+      web3Service.switchNetwork(network);
+      res.json({ 
+        success: true, 
+        message: `Switched to ${network} network`,
+        network: network 
+      });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }

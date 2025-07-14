@@ -1,13 +1,24 @@
 import { storage } from "../storage";
 import type { InsertRewardDistribution } from "@shared/schema";
 
-// Polygon Network Configuration
+// Multi-Chain Configuration
 const POLYGON_CONFIG = {
   chainId: 137,
   rpcUrl: "https://polygon-rpc.com/",
   explorerUrl: "https://polygonscan.com",
   tokenAddress: "0x9077051D318b614F915E8A07861090856FDEC91e", // Your WPT token
   poolAddress: "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB", // WMATIC/WPT pool
+  symbol: "WPT",
+  decimals: 18
+};
+
+// Ethereum Mainnet Configuration (Ready for WPT mainnet deployment)
+const ETHEREUM_CONFIG = {
+  chainId: 1,
+  rpcUrl: "https://mainnet.infura.io/v3/YOUR_INFURA_KEY",
+  explorerUrl: "https://etherscan.io",
+  tokenAddress: "0x0000000000000000000000000000000000000000", // WPT mainnet address (to be updated)
+  poolAddress: "0x0000000000000000000000000000000000000000", // ETH/WPT pool (to be updated)
   symbol: "WPT",
   decimals: 18
 };
@@ -39,9 +50,18 @@ interface RewardDistributionResult {
 }
 
 class Web3Service {
-  private readonly tokenAddress = POLYGON_CONFIG.tokenAddress;
-  private readonly poolAddress = POLYGON_CONFIG.poolAddress;
-  private readonly rpcUrl = POLYGON_CONFIG.rpcUrl;
+  private currentNetwork = POLYGON_CONFIG; // Default to Polygon
+  
+  // Switch network configuration
+  switchNetwork(networkName: 'polygon' | 'ethereum') {
+    this.currentNetwork = networkName === 'ethereum' ? ETHEREUM_CONFIG : POLYGON_CONFIG;
+  }
+  
+  get tokenAddress() { return this.currentNetwork.tokenAddress; }
+  get poolAddress() { return this.currentNetwork.poolAddress; }
+  get rpcUrl() { return this.currentNetwork.rpcUrl; }
+  get explorerUrl() { return this.currentNetwork.explorerUrl; }
+  get chainId() { return this.currentNetwork.chainId; }
 
   // Get token information from Polygon
   async getTokenInfo(): Promise<TokenInfo> {

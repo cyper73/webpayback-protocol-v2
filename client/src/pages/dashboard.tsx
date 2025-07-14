@@ -11,6 +11,7 @@ import LiveStats from "@/components/analytics/LiveStats";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
+import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { Box, Wallet, Coins } from "lucide-react";
 
 export default function Dashboard() {
@@ -113,9 +114,10 @@ export default function Dashboard() {
         </div>
 
         {/* Real Blockchain Integration */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <TokenInfo />
           <RewardDistribution />
+          <NetworkSwitcher />
         </div>
 
         {/* Revolutionary Innovation Section */}
