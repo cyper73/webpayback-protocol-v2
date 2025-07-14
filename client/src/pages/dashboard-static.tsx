@@ -29,7 +29,9 @@ export default function Dashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [currentLanguage, setCurrentLanguage] = useState(() => {
+    return localStorage.getItem('webpayback-language') || 'en';
+  });
   const { t, changeLanguage } = useTranslations(currentLanguage);
   const [forceRerender, setForceRerender] = useState(0);
   
@@ -84,7 +86,9 @@ export default function Dashboard() {
   const handleLanguageChange = (language: { code: string; name: string; flag: string; region: string }) => {
     setCurrentLanguage(language.code);
     changeLanguage(language.code);
+    setForceRerender(prev => prev + 1);
     console.log('Language changed to:', language);
+    console.log('Force rerender:', forceRerender + 1);
   };
 
   return (

@@ -104,8 +104,15 @@
           }
         });
         
-        // Clear saved language on page load to always start with English
-        localStorage.removeItem('webpayback-language');
+        // Load saved language if available
+        const savedLang = localStorage.getItem('webpayback-language');
+        if (savedLang) {
+          // Update dropdown to show saved language
+          const dropdown = document.getElementById('language-dropdown');
+          if (dropdown) {
+            dropdown.textContent = savedLang.toUpperCase();
+          }
+        }
       });
     </script>
     

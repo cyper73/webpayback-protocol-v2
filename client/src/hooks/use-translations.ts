@@ -247,8 +247,9 @@ const TRANSLATIONS: TranslationData = {
 
 export const useTranslations = (initialLanguage: string = 'en') => {
   const [currentLanguage, setCurrentLanguage] = useState(() => {
-    // Don't use saved language on refresh, always start with English
-    return initialLanguage;
+    // Use saved language if available, otherwise use initial
+    const savedLang = localStorage.getItem('webpayback-language');
+    return savedLang || initialLanguage;
   });
   
   // Listen for language changes from HTML dropdown
@@ -272,7 +273,7 @@ export const useTranslations = (initialLanguage: string = 'en') => {
     window.addEventListener('languageChange', handleLanguageEvent as EventListener);
     
     // Check for language changes more frequently
-    const interval = setInterval(checkLanguageChange, 300);
+    const interval = setInterval(checkLanguageChange, 100);
     
     // Initial check
     checkLanguageChange();
@@ -292,8 +293,14 @@ export const useTranslations = (initialLanguage: string = 'en') => {
   };
   
   const changeLanguage = (languageCode: string) => {
+    console.log('Changing language to:', languageCode);
     setCurrentLanguage(languageCode);
     localStorage.setItem('webpayback-language', languageCode);
+    
+    // Force a page refresh to ensure all components update
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
   
   return {
