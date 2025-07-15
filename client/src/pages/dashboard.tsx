@@ -39,39 +39,48 @@ export default function Dashboard() {
     };
   }, []);
 
+  // Separate queries to ensure data is properly fetched
   const { data: dashboardData, isFetching } = useQuery({
     queryKey: ["/api/analytics/dashboard"],
-    refetchInterval: isUserInteracting ? false : 30000, // Pause during user interaction
-    // Never show loading screen, always show content
+    refetchInterval: isUserInteracting ? false : 30000,
     staleTime: 0,
-    cacheTime: 5 * 60 * 1000, // 5 minutes cache
-    // Provide placeholder data to prevent loading states
-    placeholderData: {
-      agents: [],
-      networks: [],
-      creators: [],
-      stats: { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 },
-      rewards: [],
-      pool: [],
-      compliance: []
-    }
+    cacheTime: 5 * 60 * 1000,
+  });
+
+  const { data: creatorsData } = useQuery({
+    queryKey: ["/api/creators"],
+    refetchInterval: isUserInteracting ? false : 30000,
+    staleTime: 0,
+  });
+
+  const { data: rewardsData } = useQuery({
+    queryKey: ["/api/rewards"],
+    refetchInterval: isUserInteracting ? false : 30000,
+    staleTime: 0,
   });
 
   // Always show content, never loading screen
   // This prevents the initialization message from appearing
 
-  const { agents = [], networks = [], creators = [], stats = {}, rewards = [], pool = [], compliance = [] } = dashboardData || {
+  // Use separate data sources for better reliability
+  const { agents = [], networks = [], stats = {}, pool = [], compliance = [] } = dashboardData || {
     agents: [],
     networks: [],
-    creators: [],
     stats: { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 },
-    rewards: [],
     pool: [],
     compliance: []
   };
 
+  const creators = creatorsData || [];
+  const rewards = rewardsData || [];
+
   // Debug logging to see what data we have
-  console.log('Dashboard data:', { creators: creators.length, rewards: rewards.length, creatorsData: creators.slice(0, 3) });
+  console.log('Dashboard data:', { 
+    creators: creators.length, 
+    rewards: rewards.length, 
+    creatorsData: creators.slice(0, 3),
+    rewardsData: rewards.slice(0, 3)
+  });
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
