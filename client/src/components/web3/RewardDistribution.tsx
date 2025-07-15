@@ -49,11 +49,19 @@ export default function RewardDistribution() {
               
               let displayName = `Creator #${reward.creatorId}`;
               if (creator?.websiteUrl) {
-                displayName = creator.websiteUrl
-                  .replace('https://', '')
-                  .replace('http://', '')
-                  .replace('www.', '')
-                  .split('/')[0];
+                // Extract domain from full URL
+                try {
+                  const url = creator.websiteUrl.startsWith('http') ? creator.websiteUrl : `https://${creator.websiteUrl}`;
+                  const domain = new URL(url).hostname;
+                  displayName = domain.replace('www.', '');
+                } catch (e) {
+                  // Fallback to manual parsing
+                  displayName = creator.websiteUrl
+                    .replace('https://', '')
+                    .replace('http://', '')
+                    .replace('www.', '')
+                    .split('/')[0];
+                }
               }
               
               return (

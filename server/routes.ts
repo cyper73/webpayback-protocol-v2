@@ -97,14 +97,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertCreatorSchema.parse(req.body);
       const creator = await storage.createCreator(validatedData);
-      
-      // Process referral if provided
-      if (req.body.referralCode) {
-        await storage.processReferralSignup(req.body.referralCode, creator.id);
-      }
-      
       res.json(creator);
     } catch (error) {
+      console.error("Creator registration error:", error);
       res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });

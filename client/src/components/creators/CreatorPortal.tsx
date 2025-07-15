@@ -46,11 +46,8 @@ export default function CreatorPortal() {
   const createCreatorMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const { termsAccepted, ...creatorData } = data;
-      return await apiRequest("/api/creators", {
-        method: "POST",
-        body: JSON.stringify(creatorData),
-        headers: { "Content-Type": "application/json" }
-      });
+      const response = await apiRequest("POST", "/api/creators", creatorData);
+      return response;
     },
     onSuccess: () => {
       toast({
