@@ -15,6 +15,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { useTranslations } from "@/hooks/use-translations";
+import LanguageDropdown from "@/components/ui/language-dropdown";
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
@@ -33,7 +34,14 @@ export default function Dashboard() {
     return localStorage.getItem('webpayback-language') || 'en';
   });
   const { t, changeLanguage } = useTranslations(currentLanguage);
+  
   const [forceRerender, setForceRerender] = useState(0);
+  
+  const handleLanguageChange = (newLanguage: string) => {
+    console.log('Changing language to:', newLanguage);
+    setCurrentLanguage(newLanguage);
+    changeLanguage(newLanguage);
+  };
   
   // Debug per vedere se funziona
   useEffect(() => {
@@ -83,17 +91,14 @@ export default function Dashboard() {
 
   const { agents, networks, creators, stats, rewards, pool, compliance } = dashboardData;
 
-  const handleLanguageChange = (language: { code: string; name: string; flag: string; region: string }) => {
-    setCurrentLanguage(language.code);
-    changeLanguage(language.code);
-    setForceRerender(prev => prev + 1);
-    console.log('Language changed to:', language);
-    console.log('Force rerender:', forceRerender + 1);
-  };
+
 
   return (
     <div className="min-h-screen bg-deep-space text-white" key={`lang-${currentLanguage}-${forceRerender}`}>
-
+      <LanguageDropdown 
+        currentLanguage={currentLanguage} 
+        onLanguageChange={handleLanguageChange} 
+      />
       
       {/* Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-40">
