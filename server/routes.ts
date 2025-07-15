@@ -16,6 +16,9 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Initialize blockchain networks on startup
+  await blockchainService.initializeNetworks();
+  
   // Initialize AI agents
   app.post("/api/agents/initialize", async (req, res) => {
     try {

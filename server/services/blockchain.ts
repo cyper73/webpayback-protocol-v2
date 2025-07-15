@@ -123,11 +123,16 @@ class BlockchainService {
     for (const [key, network] of Object.entries(this.networks)) {
       const existing = await storage.getBlockchainNetworkByName(network.name);
       if (!existing) {
+        // Only Polygon has WPT token actually deployed
+        const isPolygon = network.name === "Polygon";
         await storage.createBlockchainNetwork({
           name: network.name,
           chainId: network.chainId,
           rpcUrl: network.rpcUrl,
-          deploymentStatus: "pending"
+          deploymentStatus: isPolygon ? "deployed" : "pending",
+          contractAddress: isPolygon ? "0x9077051D318b614F915E8A0786C91e" : undefined,
+          gasUsed: isPolygon ? "21000" : undefined,
+          deployedAt: isPolygon ? new Date() : undefined
         });
       }
     }
