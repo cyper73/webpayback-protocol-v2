@@ -209,23 +209,25 @@ export default function RewardDistribution() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {rewards?.slice(0, 10).map((reward) => {
+          <div className="space-y-3 max-h-64 overflow-y-auto">
+            {rewards?.slice(0, 3).map((reward) => {
               const creator = creators?.find(c => c.id === reward.creatorId);
               return (
-                <div key={reward.id} className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(reward.status)}
-                    <div>
-                      <p className="font-medium">{reward.amount} WPT</p>
-                      <p className="text-sm text-gray-400">
+                <div key={reward.id} className="flex items-center justify-between p-2 bg-gray-800/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 flex items-center justify-center">
+                      {getStatusIcon(reward.status)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm">{reward.amount} WPT</p>
+                      <p className="text-xs text-gray-400 truncate">
                         To: {creator?.websiteUrl || "Unknown Creator"}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className={getStatusColor(reward.status)}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className={`${getStatusColor(reward.status)} text-xs`}>
                       {reward.status}
                     </Badge>
                     {reward.transactionHash && (
@@ -233,7 +235,7 @@ export default function RewardDistribution() {
                         href={`https://polygonscan.com/tx/${reward.transactionHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 text-sm"
+                        className="text-blue-400 hover:text-blue-300 text-xs"
                       >
                         View on PolygonScan
                       </a>
@@ -242,6 +244,13 @@ export default function RewardDistribution() {
                 </div>
               );
             })}
+            {rewards && rewards.length > 3 && (
+              <div className="text-center py-2">
+                <span className="text-xs text-gray-400">
+                  +{rewards.length - 3} more distributions
+                </span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

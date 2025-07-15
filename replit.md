@@ -169,3 +169,9 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - Added max-height with scroll and "more rewards" indicator
   - Compacted item design with smaller icons and reduced padding
   - Enhanced visual balance between dashboard blocks
+- **UI OPTIMIZATION FOR RECENT DISTRIBUTIONS** (January 15, 2025):
+  - Applied same compact optimization to Recent Distributions block
+  - Reduced from 10 to 3 displayed distributions with scrollable container
+  - Compacted layout with smaller badges and reduced spacing
+  - Added "more distributions" indicator for better UX
+  - Improved overall dashboard balance and visual hierarchy
