@@ -55,7 +55,7 @@ export default function LanguageDropdown({ currentLanguage, onLanguageChange }: 
   const currentLang = getCurrentLanguageData();
 
   return (
-    <div className="language-dropdown fixed top-4 right-4 z-50">
+    <div className="language-dropdown fixed top-4 right-4 z-[10000]">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 border border-blue-500"
@@ -66,7 +66,7 @@ export default function LanguageDropdown({ currentLanguage, onLanguageChange }: 
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 min-w-[200px] max-h-[300px] overflow-y-auto">
+        <div className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 min-w-[200px] max-h-[300px] overflow-y-auto z-[10001]">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}

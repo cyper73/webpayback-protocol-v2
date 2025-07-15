@@ -88,7 +88,7 @@ export default function CreatorPortal() {
               id="websiteUrl"
               type="url"
               placeholder="https://your-website.com"
-              className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none"
+              className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white"
               {...register("websiteUrl")}
             />
             {errors.websiteUrl && (
@@ -101,7 +101,7 @@ export default function CreatorPortal() {
               Content Category
             </Label>
             <Select onValueChange={(value) => setValue("contentCategory", value)}>
-              <SelectTrigger className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none">
+              <SelectTrigger className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
@@ -125,7 +125,7 @@ export default function CreatorPortal() {
               id="walletAddress"
               type="text"
               placeholder="0x..."
-              className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none font-mono"
+              className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none font-mono text-white"
               {...register("walletAddress")}
             />
             {errors.walletAddress && (
