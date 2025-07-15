@@ -179,18 +179,18 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
                   <div className="text-xs text-muted-foreground space-y-1">
                     {rule.ruleType === 'domain_limit' && (
                       <>
-                        <div>• Max accessi giornalieri per dominio: {rule.parameters.maxDailyAccessesPerDomain}</div>
-                        <div>• Max accessi giornalieri per IP: {rule.parameters.maxDailyAccessesPerIP}</div>
-                        <div>• Concentrazione massima dominio: {rule.parameters.maxDomainConcentration}%</div>
-                        <div>• Concentrazione massima IP: {rule.parameters.maxIPConcentration}%</div>
+                        <div>• {t('maxDailyAccessesDomain')}: {rule.parameters.maxDailyAccessesPerDomain}</div>
+                        <div>• {t('maxDailyAccessesIP')}: {rule.parameters.maxDailyAccessesPerIP}</div>
+                        <div>• {t('maxDomainConcentration')}: {rule.parameters.maxDomainConcentration}%</div>
+                        <div>• {t('maxIPConcentration')}: {rule.parameters.maxIPConcentration}%</div>
                       </>
                     )}
                     {rule.ruleType === 'pattern_analysis' && rule.parameters.minAIModelDiversity && (
                       <>
-                        <div>• Min diversità modelli AI: {rule.parameters.minAIModelDiversity}</div>
-                        <div>• Entropy score minimo: {rule.parameters.minEntropyScore}</div>
-                        <div>• Max richieste identiche: {rule.parameters.maxIdenticalRequests}</div>
-                        <div>• Min distribuzione temporale: {rule.parameters.minTimeSpread}s</div>
+                        <div>• {t('minAIModelDiversity')}: {rule.parameters.minAIModelDiversity}</div>
+                        <div>• {t('minEntropyScore')}: {rule.parameters.minEntropyScore}</div>
+                        <div>• {t('maxIdenticalRequests')}: {rule.parameters.maxIdenticalRequests}</div>
+                        <div>• {t('minTimeSpread')}: {rule.parameters.minTimeSpread}s</div>
                       </>
                     )}
                     {rule.ruleType === 'pattern_analysis' && rule.parameters.maxBurstRequests && (

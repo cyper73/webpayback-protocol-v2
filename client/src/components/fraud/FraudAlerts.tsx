@@ -184,7 +184,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
                             Risk Score: {alert.details.riskScore}%
                           </div>
                           <div>
-                            <span className="font-medium">Motivi:</span>
+                            <span className="font-medium">{t('reasons')}:</span>
                             <ul className="list-disc list-inside mt-1 space-y-0.5">
                               {alert.details.reasons.map((reason, idx) => (
                                 <li key={idx}>{reason}</li>
@@ -192,7 +192,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
                             </ul>
                           </div>
                           <div>
-                            <span className="font-medium">Azione Consigliata:</span> {alert.details.recommendedAction}
+                            <span className="font-medium">{t('recommendedAction')}:</span> {alert.details.recommendedAction}
                           </div>
                         </div>
                       </div>
@@ -216,7 +216,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            Storico Allerte Frode
+            {t('fraudAlertsHistory')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -264,7 +264,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
             <div className="text-2xl font-bold text-red-600">
               {activeAlerts.length}
             </div>
-            <p className="text-xs text-muted-foreground">Allerte Attive</p>
+            <p className="text-xs text-muted-foreground">{t('activeAlerts')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -272,7 +272,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
             <div className="text-2xl font-bold text-green-600">
               {resolvedAlerts.length}
             </div>
-            <p className="text-xs text-muted-foreground">Allerte Risolte</p>
+            <p className="text-xs text-muted-foreground">{t('resolvedAlerts')}</p>
           </CardContent>
         </Card>
         <Card>

@@ -92,7 +92,20 @@ export const translations: Record<string, Translation> = {
     fraudWarning3: "Possible account suspension or ban",
     fraudWarning4: "Intensive monitoring of future activities",
     activeFraudRules: "Active Anti-Fraud Rules",
-    activeFraudAlerts: "Active Fraud Alerts"
+    activeFraudAlerts: "Active Fraud Alerts",
+    fraudAlertsHistory: "Fraud Alerts History",
+    activeAlerts: "Active Alerts",
+    resolvedAlerts: "Resolved Alerts",
+    reasons: "Reasons",
+    recommendedAction: "Recommended Action",
+    maxDailyAccessesDomain: "Max daily accesses per domain",
+    maxDailyAccessesIP: "Max daily accesses per IP",
+    maxDomainConcentration: "Max domain concentration",
+    maxIPConcentration: "Max IP concentration",
+    minAIModelDiversity: "Min AI model diversity",
+    minEntropyScore: "Min entropy score",
+    maxIdenticalRequests: "Max identical requests",
+    minTimeSpread: "Min time distribution"
   },
   
   it: {
@@ -145,7 +158,20 @@ export const translations: Record<string, Translation> = {
     fraudWarning3: "Possibile sospensione o ban dell'account",
     fraudWarning4: "Monitoraggio intensivo delle attività future",
     activeFraudRules: "Regole Anti-Frode Attive",
-    activeFraudAlerts: "Allerte Frode Attive"
+    activeFraudAlerts: "Allerte Frode Attive",
+    fraudAlertsHistory: "Storico Allerte Frode",
+    activeAlerts: "Allerte Attive",
+    resolvedAlerts: "Allerte Risolte",
+    reasons: "Motivi",
+    recommendedAction: "Azione Consigliata",
+    maxDailyAccessesDomain: "Max accessi giornalieri per dominio",
+    maxDailyAccessesIP: "Max accessi giornalieri per IP",
+    maxDomainConcentration: "Concentrazione massima dominio",
+    maxIPConcentration: "Concentrazione massima IP",
+    minAIModelDiversity: "Min diversità modelli AI",
+    minEntropyScore: "Entropy score minimo",
+    maxIdenticalRequests: "Max richieste identiche",
+    minTimeSpread: "Min distribuzione temporale"
   },
   
   es: {
@@ -198,7 +224,20 @@ export const translations: Record<string, Translation> = {
     fraudWarning3: "Posible suspensión o prohibición de cuenta",
     fraudWarning4: "Monitoreo intensivo de actividades futuras",
     activeFraudRules: "Reglas Anti-Fraude Activas",
-    activeFraudAlerts: "Alertas de Fraude Activas"
+    activeFraudAlerts: "Alertas de Fraude Activas",
+    fraudAlertsHistory: "Historial de Alertas de Fraude",
+    activeAlerts: "Alertas Activas",
+    resolvedAlerts: "Alertas Resueltas",
+    reasons: "Razones",
+    recommendedAction: "Acción Recomendada",
+    maxDailyAccessesDomain: "Máx accesos diarios por dominio",
+    maxDailyAccessesIP: "Máx accesos diarios por IP",
+    maxDomainConcentration: "Concentración máxima dominio",
+    maxIPConcentration: "Concentración máxima IP",
+    minAIModelDiversity: "Min diversidad modelos AI",
+    minEntropyScore: "Puntuación entropía mínima",
+    maxIdenticalRequests: "Máx solicitudes idénticas",
+    minTimeSpread: "Min distribución temporal"
   },
   
   fr: {
