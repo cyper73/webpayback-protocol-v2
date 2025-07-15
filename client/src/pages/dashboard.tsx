@@ -13,7 +13,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { ReferralSystem } from "@/components/referral/ReferralSystem";
-import { Box, Wallet, Coins } from "lucide-react";
+import { Box, Wallet, Coins, Search } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
@@ -114,24 +114,60 @@ export default function Dashboard() {
                 <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="mb-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search creator websites..."
+                      className="w-full pl-10 pr-4 py-2 bg-glass-dark border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-electric-blue/50"
+                      onChange={(e) => {
+                        // Simple search implementation
+                        const value = e.target.value.toLowerCase();
+                        const items = document.querySelectorAll('[data-creator-search]');
+                        items.forEach(item => {
+                          const text = item.textContent?.toLowerCase() || '';
+                          const parent = item.closest('.reward-item');
+                          if (parent) {
+                            parent.style.display = text.includes(value) ? 'flex' : 'none';
+                          }
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-4">
-                  {rewards.slice(0, 4).map((reward, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
-                      <div className="w-10 h-10 bg-electric-blue/20 rounded-lg flex items-center justify-center">
-                        <i className="fas fa-globe text-electric-blue text-sm"></i>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Creator #{reward.creatorId}</span>
-                          <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
+                  {rewards.slice(0, 4).map((reward, index) => {
+                    const creator = creators.find(c => c.id === reward.creatorId);
+                    const websiteUrl = creator?.websiteUrl || '';
+                    const displayName = websiteUrl ? 
+                      websiteUrl.replace('https://', '').replace('http://', '').replace('www.', '') 
+                      : `Creator #${reward.creatorId}`;
+                    
+                    return (
+                      <div key={index} className="reward-item flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
+                        <div className="w-10 h-10 bg-electric-blue/20 rounded-lg flex items-center justify-center">
+                          <i className="fas fa-globe text-electric-blue text-sm"></i>
                         </div>
-                        <div className="flex items-center justify-between text-sm text-gray-400">
-                          <span>Status: {reward.status}</span>
-                          <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span 
+                              className="font-medium truncate max-w-[180px]" 
+                              title={displayName}
+                              data-creator-search
+                            >
+                              {displayName}
+                            </span>
+                            <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm text-gray-400">
+                            <span>Status: {reward.status}</span>
+                            <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 <div className="mt-6 pt-4 border-t border-white/10">
