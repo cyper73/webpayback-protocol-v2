@@ -4,11 +4,12 @@ import { Progress } from "@/components/ui/progress";
 import { PoolManagement, RewardDistribution } from "@shared/schema";
 
 interface TokenEconomicsProps {
-  pool: PoolManagement[];
-  rewards: RewardDistribution[];
+  stats: any;
+  pool?: PoolManagement[];
+  rewards?: RewardDistribution[];
 }
 
-export default function TokenEconomics({ pool, rewards }: TokenEconomicsProps) {
+export default function TokenEconomics({ stats, pool = [], rewards = [] }: TokenEconomicsProps) {
   const totalPool = pool.reduce((sum, p) => sum + parseFloat(p.totalStaked || "0"), 0);
   const totalRewards = rewards.reduce((sum, r) => sum + parseFloat(r.amount || "0"), 0);
   const avgApy = pool.length > 0 ? pool.reduce((sum, p) => sum + parseFloat(p.apy || "0"), 0) / pool.length : 0;

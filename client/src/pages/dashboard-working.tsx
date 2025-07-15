@@ -1,20 +1,16 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import LiveStats from "@/components/analytics/LiveStats";
 import AgentCard from "@/components/agents/AgentCard";
 import AgentCommunication from "@/components/agents/AgentCommunication";
 import MultiChainDeployment from "@/components/blockchain/MultiChainDeployment";
 import TokenEconomics from "@/components/blockchain/TokenEconomics";
 import CreatorPortal from "@/components/creators/CreatorPortal";
-import LiveStats from "@/components/analytics/LiveStats";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
-import FraudDetectionRules from "@/components/fraud/FraudDetectionRules";
-import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
@@ -53,20 +49,14 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    // Initial load
     fetchDashboardData();
-    
-    // Set up interval for refresh
     const interval = setInterval(() => {
       fetchDashboardData(true);
     }, 30000);
-    
     return () => clearInterval(interval);
   }, []);
 
   const { agents, networks, creators, stats, rewards, pool, compliance } = dashboardData;
-
-
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
@@ -75,7 +65,7 @@ export default function Dashboard() {
       <header className="glass-card border-b border-white/10 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               <div className="flex items-center space-x-2">
                 <Box className="text-electric-blue text-2xl" />
                 <span className="text-xl font-bold gradient-text">WebPayback Protocol</span>
@@ -87,7 +77,6 @@ export default function Dashboard() {
                 </span>
               </div>
             </div>
-            
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm">
                 <Wallet className="text-electric-blue" />
@@ -102,52 +91,54 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Main Dashboard - Always show content */}
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Creator Registration Portal - Priority Section */}
+        
+        {/* Creator Portal Section */}
         <div className="mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <CreatorPortal />
-            
-            <Card className="glass-card rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold gradient-text">Recenti Ricompense Creator</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {rewards.slice(0, 4).map((reward, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
-                      <div className="w-10 h-10 bg-electric-blue/20 rounded-lg flex items-center justify-center">
-                        <i className="fas fa-globe text-electric-blue text-sm"></i>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Creator #{reward.creatorId}</span>
-                          <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-400">
-                          <span>Status: {reward.status}</span>
-                          <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="mt-6 pt-4 border-t border-white/10">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Ricompense Totali Oggi:</span>
-                    <span className="font-mono text-neon-green">
-                      {rewards.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2)} WPT
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <CreatorPortal />
         </div>
 
-        {/* Agent Collaboration Panel */}
+        {/* Recent Creator Rewards */}
+        <div className="mb-8">
+          <Card className="glass-card rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold gradient-text">Recenti Ricompense Creator</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {rewards.slice(0, 4).map((reward, index) => (
+                  <div key={index} className="flex items-center space-x-4 p-4 bg-glass-dark rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <i className="fas fa-globe text-electric-blue text-sm"></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Creator #{reward.creatorId}</span>
+                        <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm text-gray-400">
+                        <span>Status: {reward.status}</span>
+                        <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Ricompense Totali Oggi:</span>
+                  <span className="font-mono text-neon-green">
+                    {rewards.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2)} WPT
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Agent System */}
         <div className="mb-8">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
@@ -162,67 +153,34 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 {agents.map((agent) => (
                   <AgentCard key={agent.id} agent={agent} />
                 ))}
               </div>
-              
-              <div className="mb-8">
-                <AgentCommunication />
-              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Live Analytics & Blockchain Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2">
-            <LiveStats stats={stats} />
-          </div>
-          <div>
-            <TokenInfo />
-          </div>
+        {/* Communications */}
+        <div className="mb-8">
+          <AgentCommunication />
         </div>
 
-        {/* Multi-Chain Deployment & Token Economics */}
+        {/* Blockchain & Token Economics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <MultiChainDeployment networks={networks} />
-          <TokenEconomics pool={pool} rewards={rewards} />
+          <TokenEconomics stats={stats} pool={pool} rewards={rewards} />
         </div>
 
-        {/* Reward Distribution System */}
-        <div className="mb-8">
+        {/* Web3 Components */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <TokenInfo />
           <RewardDistribution />
+          <LiveStats stats={stats} />
         </div>
 
-        {/* Anti-Fraud Protection */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <Card className="glass-card rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
-                <Shield className="text-electric-blue" />
-                Sistema Anti-Frode
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FraudDetectionRules />
-            </CardContent>
-          </Card>
-          <Card className="glass-card rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
-                <AlertTriangle className="text-amber-400" />
-                Avvisi Frode
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FraudAlerts />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Compliance & Governance */}
+        {/* Compliance & Network */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ComplianceMonitor compliance={compliance} />
           <Card className="glass-card rounded-2xl">
@@ -234,6 +192,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
       </main>
     </div>
   );

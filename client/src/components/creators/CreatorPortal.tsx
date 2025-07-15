@@ -32,8 +32,7 @@ export default function CreatorPortal() {
     formState: { errors },
     setValue,
     watch,
-    reset,
-    control
+    reset
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -101,16 +100,16 @@ export default function CreatorPortal() {
             <Label htmlFor="contentCategory" className="block text-sm font-medium mb-2">
               Content Category
             </Label>
-            <Select onValueChange={(value) => setValue("contentCategory", value)} {...register("contentCategory")}>
+            <Select onValueChange={(value) => setValue("contentCategory", value)}>
               <SelectTrigger className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white">
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder="Seleziona categoria" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
-                <SelectItem value="blog" className="text-white">Blog/Articles</SelectItem>
-                <SelectItem value="news" className="text-white">News/Journalism</SelectItem>
-                <SelectItem value="educational" className="text-white">Educational Content</SelectItem>
-                <SelectItem value="technical" className="text-white">Technical Documentation</SelectItem>
-                <SelectItem value="creative" className="text-white">Creative Writing</SelectItem>
+              <SelectContent>
+                <SelectItem value="blog">Blog/Articoli</SelectItem>
+                <SelectItem value="news">Notizie/Giornalismo</SelectItem>
+                <SelectItem value="educational">Contenuti Educativi</SelectItem>
+                <SelectItem value="technical">Documentazione Tecnica</SelectItem>
+                <SelectItem value="creative">Scrittura Creativa</SelectItem>
               </SelectContent>
             </Select>
             {errors.contentCategory && (
@@ -139,7 +138,6 @@ export default function CreatorPortal() {
               id="termsAccepted"
               className="w-4 h-4 text-electric-blue bg-glass-dark border-white/10 rounded focus:ring-electric-blue"
               onCheckedChange={(checked) => setValue("termsAccepted", checked as boolean)}
-              {...register("termsAccepted")}
             />
             <Label htmlFor="termsAccepted" className="text-sm text-gray-300">
               I agree to the WebPayback Protocol Terms
