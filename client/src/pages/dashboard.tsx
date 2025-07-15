@@ -12,6 +12,7 @@ import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
+import { ReferralSystem } from "@/components/referral/ReferralSystem";
 import { Box, Wallet, Coins } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
@@ -238,6 +239,21 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Creator Referral System - Show for early adopters */}
+        {creators.length > 0 && creators.some(c => c.isEarlyAdopter) && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold gradient-text mb-6 text-center">
+              Creator Referral System
+            </h2>
+            <div className="max-w-4xl mx-auto">
+              <ReferralSystem 
+                creatorId={creators.find(c => c.isEarlyAdopter)?.id} 
+                creator={creators.find(c => c.isEarlyAdopter)} 
+              />
+            </div>
+          </div>
+        )}
 
         {/* Revolutionary Innovation Section */}
         <div className="glass-card rounded-2xl p-8 mb-8 border-2 border-gradient-to-r from-electric-blue to-neon-green">

@@ -16,6 +16,12 @@ export const creators = pgTable("creators", {
   walletAddress: text("wallet_address").notNull(),
   contentCategory: text("content_category").notNull(),
   isVerified: boolean("is_verified").default(false),
+  isEarlyAdopter: boolean("is_early_adopter").default(false),
+  earlyAdopterRank: integer("early_adopter_rank"),
+  referralCode: text("referral_code").unique(),
+  referredBy: integer("referred_by").references(() => creators.id),
+  totalReferrals: integer("total_referrals").default(0),
+  referralBonus: decimal("referral_bonus", { precision: 18, scale: 8 }).default("0"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -148,6 +154,18 @@ export const accessPatterns = pgTable("access_patterns", {
   metadata: jsonb("metadata").default({}),
 });
 
+export const referralRewards = pgTable("referral_rewards", {
+  id: serial("id").primaryKey(),
+  referrerId: integer("referrer_id").references(() => creators.id),
+  referredId: integer("referred_id").references(() => creators.id),
+  rewardAmount: decimal("reward_amount", { precision: 18, scale: 8 }).notNull(),
+  rewardType: text("reward_type").notNull(), // signup_bonus, activity_bonus, early_adopter_bonus
+  status: text("status").default("pending"), // pending, completed, failed
+  transactionHash: text("transaction_hash"),
+  createdAt: timestamp("created_at").defaultNow(),
+  processedAt: timestamp("processed_at"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   creators: many(creators),
@@ -163,6 +181,14 @@ export const creatorsRelations = relations(creators, ({ one, many }) => ({
   fraudAlerts: many(fraudDetectionAlerts),
   reputationScore: one(creatorReputationScores),
   accessPatterns: many(accessPatterns),
+  referralsMade: many(referralRewards, { relationName: "referrer" }),
+  referralsReceived: many(referralRewards, { relationName: "referred" }),
+  referredBy: one(creators, {
+    fields: [creators.referredBy],
+    references: [creators.id],
+    relationName: "referrer",
+  }),
+  referrals: many(creators, { relationName: "referrer" }),
 }));
 
 export const blockchainNetworksRelations = relations(blockchainNetworks, ({ many }) => ({
@@ -240,6 +266,19 @@ export const accessPatternsRelations = relations(accessPatterns, ({ one }) => ({
   creator: one(creators, {
     fields: [accessPatterns.creatorId],
     references: [creators.id],
+  }),
+}));
+
+export const referralRewardsRelations = relations(referralRewards, ({ one }) => ({
+  referrer: one(creators, {
+    fields: [referralRewards.referrerId],
+    references: [creators.id],
+    relationName: "referrer",
+  }),
+  referred: one(creators, {
+    fields: [referralRewards.referredId],
+    references: [creators.id],
+    relationName: "referred",
   }),
 }));
 
@@ -357,6 +396,15 @@ export const insertAccessPatternSchema = createInsertSchema(accessPatterns).pick
   metadata: true,
 });
 
+export const insertReferralRewardSchema = createInsertSchema(referralRewards).pick({
+  referrerId: true,
+  referredId: true,
+  rewardAmount: true,
+  rewardType: true,
+  status: true,
+  transactionHash: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -397,3 +445,6 @@ export type CreatorReputationScore = typeof creatorReputationScores.$inferSelect
 
 export type InsertAccessPattern = z.infer<typeof insertAccessPatternSchema>;
 export type AccessPattern = typeof accessPatterns.$inferSelect;
+
+export type InsertReferralReward = z.infer<typeof insertReferralRewardSchema>;
+export type ReferralReward = typeof referralRewards.$inferSelect;

@@ -97,6 +97,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertCreatorSchema.parse(req.body);
       const creator = await storage.createCreator(validatedData);
+      
+      // Process referral if provided
+      if (req.body.referralCode) {
+        await storage.processReferralSignup(req.body.referralCode, creator.id);
+      }
+      
       res.json(creator);
     } catch (error) {
       res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
@@ -108,6 +114,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creators = await storage.getAllCreators();
       res.json(creators);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get creator by referral code
+  app.get("/api/creators/referral/:code", async (req, res) => {
+    try {
+      const creator = await storage.getCreatorByReferralCode(req.params.code);
+      if (!creator) {
+        return res.status(404).json({ error: "Referral code not found" });
+      }
+      res.json(creator);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get referral rewards
+  app.get("/api/referrals/rewards", async (req, res) => {
+    try {
+      const creatorId = req.query.creatorId ? parseInt(req.query.creatorId as string) : undefined;
+      const rewards = await storage.getReferralRewards(creatorId);
+      res.json(rewards);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Generate referral code
+  app.post("/api/referrals/generate", async (req, res) => {
+    try {
+      const code = await storage.generateReferralCode();
+      res.json({ referralCode: code });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }

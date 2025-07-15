@@ -1,14 +1,15 @@
 import { 
   users, creators, blockchainNetworks, aiAgents, agentCommunications, 
   contentTracking, rewardDistributions, poolManagement, complianceRecords,
-  fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns,
+  fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns, referralRewards,
   type User, type InsertUser, type Creator, type InsertCreator,
   type BlockchainNetwork, type InsertBlockchainNetwork, type AiAgent, type InsertAiAgent,
   type AgentCommunication, type InsertAgentCommunication, type ContentTracking, type InsertContentTracking,
   type RewardDistribution, type InsertRewardDistribution, type PoolManagement, type InsertPoolManagement,
   type ComplianceRecord, type InsertComplianceRecord,
   type FraudDetectionRule, type InsertFraudDetectionRule, type FraudDetectionAlert, type InsertFraudDetectionAlert,
-  type CreatorReputationScore, type InsertCreatorReputationScore, type AccessPattern, type InsertAccessPattern
+  type CreatorReputationScore, type InsertCreatorReputationScore, type AccessPattern, type InsertAccessPattern,
+  type ReferralReward, type InsertReferralReward
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -41,6 +42,15 @@ export interface IStorage {
   // Creator methods
   getAllCreators(): Promise<Creator[]>;
   createCreator(insertCreator: InsertCreator): Promise<Creator>;
+  updateCreator(id: number, updates: Partial<Creator>): Promise<void>;
+  getCreatorByReferralCode(referralCode: string): Promise<Creator | undefined>;
+  generateReferralCode(): Promise<string>;
+  
+  // Referral methods
+  createReferralReward(insertReward: InsertReferralReward): Promise<ReferralReward>;
+  getReferralRewards(creatorId?: number): Promise<ReferralReward[]>;
+  updateReferralReward(id: number, updates: Partial<ReferralReward>): Promise<void>;
+  processReferralSignup(referralCode: string, newCreatorId: number): Promise<void>;
   
   // Content tracking methods
   createContentTracking(insertTracking: InsertContentTracking): Promise<ContentTracking>;
@@ -170,11 +180,107 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
+    // Generate referral code if not provided
+    const referralCode = insertCreator.referralCode || await this.generateReferralCode();
+    
+    // Check if this is an early adopter (first 100 creators)
+    const creatorCount = await db.select().from(creators);
+    const isEarlyAdopter = creatorCount.length < 100;
+    const earlyAdopterRank = isEarlyAdopter ? creatorCount.length + 1 : null;
+    
     const [creator] = await db
       .insert(creators)
-      .values(insertCreator)
+      .values({
+        ...insertCreator,
+        referralCode,
+        isEarlyAdopter,
+        earlyAdopterRank,
+      })
       .returning();
     return creator;
+  }
+
+  async updateCreator(id: number, updates: Partial<Creator>): Promise<void> {
+    await db.update(creators).set(updates).where(eq(creators.id, id));
+  }
+
+  async getCreatorByReferralCode(referralCode: string): Promise<Creator | undefined> {
+    const [creator] = await db.select().from(creators).where(eq(creators.referralCode, referralCode));
+    return creator || undefined;
+  }
+
+  async generateReferralCode(): Promise<string> {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code;
+    let exists = true;
+    
+    while (exists) {
+      code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      
+      const existing = await this.getCreatorByReferralCode(code);
+      exists = !!existing;
+    }
+    
+    return code;
+  }
+
+  // Referral methods
+  async createReferralReward(insertReward: InsertReferralReward): Promise<ReferralReward> {
+    const [reward] = await db
+      .insert(referralRewards)
+      .values(insertReward)
+      .returning();
+    return reward;
+  }
+
+  async getReferralRewards(creatorId?: number): Promise<ReferralReward[]> {
+    if (creatorId) {
+      return await db.select().from(referralRewards).where(eq(referralRewards.referrerId, creatorId));
+    }
+    return await db.select().from(referralRewards);
+  }
+
+  async updateReferralReward(id: number, updates: Partial<ReferralReward>): Promise<void> {
+    await db.update(referralRewards).set(updates).where(eq(referralRewards.id, id));
+  }
+
+  async processReferralSignup(referralCode: string, newCreatorId: number): Promise<void> {
+    const referrer = await this.getCreatorByReferralCode(referralCode);
+    if (!referrer) return;
+
+    // Update referrer's referral count
+    await this.updateCreator(referrer.id, {
+      totalReferrals: (referrer.totalReferrals || 0) + 1,
+    });
+
+    // Update new creator's referredBy
+    await this.updateCreator(newCreatorId, {
+      referredBy: referrer.id,
+    });
+
+    // Create referral reward
+    const baseReward = "5.0"; // Base referral reward
+    const earlyAdopterBonus = referrer.isEarlyAdopter ? "2.0" : "0";
+    const totalReward = (parseFloat(baseReward) + parseFloat(earlyAdopterBonus)).toString();
+
+    await this.createReferralReward({
+      referrerId: referrer.id,
+      referredId: newCreatorId,
+      rewardAmount: totalReward,
+      rewardType: referrer.isEarlyAdopter ? "early_adopter_bonus" : "signup_bonus",
+      status: "pending",
+    });
+
+    // Update referrer's total bonus
+    const currentBonus = parseFloat(referrer.referralBonus || "0");
+    const newBonus = (currentBonus + parseFloat(totalReward)).toString();
+    
+    await this.updateCreator(referrer.id, {
+      referralBonus: newBonus,
+    });
   }
 
   // Content tracking methods

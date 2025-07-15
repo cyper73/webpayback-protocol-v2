@@ -12,8 +12,10 @@ import { insertCreatorSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ReferralInput } from "@/components/referral/ReferralInput";
 
 const formSchema = insertCreatorSchema.extend({
+  referralCode: z.string().optional(),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
   })
@@ -40,6 +42,7 @@ export default function CreatorPortal() {
       websiteUrl: "",
       walletAddress: "",
       contentCategory: "",
+      referralCode: "",
       termsAccepted: false
     }
   });
@@ -132,6 +135,12 @@ export default function CreatorPortal() {
               <p className="text-red-400 text-sm mt-1">{errors.walletAddress.message}</p>
             )}
           </div>
+          
+          <ReferralInput
+            value={watch("referralCode") || ""}
+            onChange={(value) => setValue("referralCode", value)}
+            disabled={isSubmitting || createCreatorMutation.isPending}
+          />
           
           <div className="flex items-center space-x-2">
             <Checkbox
