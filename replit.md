@@ -141,20 +141,19 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - System prevents sybil attacks, auto-farming, domain/IP concentration, and bot collusion
   - Reputation scoring system with penalty multipliers and automatic banning
   - All fraud rules visible in dashboard with clear deterrent messaging
-- **MULTILINGUAL DROPDOWN MENU SUCCESSFULLY DEPLOYED** (January 14, 2025):
-  - Successfully implemented elegant Language dropdown button in top-right corner
-  - Removed duplicate banner issues and created clean, professional language selector
-  - Dropdown features: Blue button with Globe icon, vertical scroll menu, hover effects
-  - Languages supported: English, Italian, Spanish, French, German, Portuguese, Russian, Chinese, Japanese, Korean, Arabic, Hindi
-  - Full JavaScript functionality: Click to open/close, language selection, localStorage persistence
-  - Interactive hover effects and smooth user experience
-  - Positioned fixed at top-right (16px from top/right) with z-index 10000
-  - Successfully tested and confirmed working on live deployment
-- **COMPLETE MULTILINGUAL TRANSLATION SYSTEM IMPLEMENTED** (January 14, 2025):
-  - Created comprehensive translation files with 12 languages support
-  - Implemented useTranslations React hook with localStorage synchronization
-  - Connected HTML dropdown with React components via custom events
-  - Applied translations to key dashboard elements (Level 280 agents, WPT Token Live, Creator rewards)
-  - System automatically updates interface text when language is changed
-  - Translation system working with real-time synchronization between HTML and React
-  - Confirmed functional through console testing - displays correct translations per language
+- **MULTILINGUAL SYSTEM REMOVED DUE TO STABILITY ISSUES** (January 15, 2025):
+  - Removed complex multilingual translation system causing form input failures
+  - Restored stable Italian interface with hardcoded text strings
+  - Fixed Creator Portal input fields and dropdown selectors
+  - Eliminated translation errors causing React component crashes
+  - Prioritized functionality over advanced multilingual features
+- **ANTI-FRAUD SYSTEM REFINEMENTS** (January 15, 2025):
+  - Restored beautiful anti-fraud protection UI blocks with Italian text
+  - Adjusted fraud detection thresholds to prevent false positives:
+    - Increased daily access limits (500 per domain, 200 per IP)
+    - Relaxed concentration thresholds (90% domain, 85% IP)
+    - Reduced AI diversity requirements (minimum 2 models)
+    - Extended burst detection window (50 requests per 10 minutes)
+  - Modified reputation scoring to be less aggressive
+  - Reduced ban thresholds to prevent legitimate users from being flagged
+  - System now properly balances security with usability

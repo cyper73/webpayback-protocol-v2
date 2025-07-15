@@ -27,15 +27,15 @@ interface AccessEvent {
 }
 
 export class FraudDetectionService {
-  private readonly MIN_REPUTATION_SCORE = 30;
-  private readonly MAX_DAILY_ACCESSES_PER_DOMAIN = 100;
-  private readonly MAX_DAILY_ACCESSES_PER_IP = 50;
-  private readonly MAX_DOMAIN_CONCENTRATION = 80; // %
-  private readonly MAX_IP_CONCENTRATION = 70; // %
-  private readonly MIN_AI_DIVERSITY = 3;
-  private readonly MIN_ENTROPY_SCORE = 0.5;
-  private readonly MAX_BURST_REQUESTS = 20;
-  private readonly BURST_TIME_WINDOW = 300; // seconds
+  private readonly MIN_REPUTATION_SCORE = 20;
+  private readonly MAX_DAILY_ACCESSES_PER_DOMAIN = 500;
+  private readonly MAX_DAILY_ACCESSES_PER_IP = 200;
+  private readonly MAX_DOMAIN_CONCENTRATION = 90; // %
+  private readonly MAX_IP_CONCENTRATION = 85; // %
+  private readonly MIN_AI_DIVERSITY = 2;
+  private readonly MIN_ENTROPY_SCORE = 0.3;
+  private readonly MAX_BURST_REQUESTS = 50;
+  private readonly BURST_TIME_WINDOW = 600; // seconds
 
   constructor() {
     this.initializeFraudRules();
@@ -221,8 +221,8 @@ export class FraudDetectionService {
       const existing = await storage.getCreatorReputationScore(creatorId);
       
       if (existing) {
-        const newScore = Math.max(0, existing.overallScore - (riskScore * 0.5));
-        const newFraudCount = riskScore >= 70 ? existing.fraudCount + 1 : existing.fraudCount;
+        const newScore = Math.max(0, existing.overallScore - (riskScore * 0.3));
+        const newFraudCount = riskScore >= 80 ? existing.fraudCount + 1 : existing.fraudCount;
         const newTrustLevel = this.calculateTrustLevel(newScore, newFraudCount);
         
         await storage.updateCreatorReputationScore(creatorId, {
@@ -232,8 +232,8 @@ export class FraudDetectionService {
           lastUpdated: new Date()
         });
       } else {
-        const initialScore = Math.max(0, 100 - (riskScore * 0.5));
-        const fraudCount = riskScore >= 70 ? 1 : 0;
+        const initialScore = Math.max(0, 100 - (riskScore * 0.3));
+        const fraudCount = riskScore >= 80 ? 1 : 0;
         const trustLevel = this.calculateTrustLevel(initialScore, fraudCount);
         
         await storage.createCreatorReputationScore({
@@ -251,9 +251,9 @@ export class FraudDetectionService {
   }
 
   private calculateTrustLevel(score: number, fraudCount: number): string {
-    if (fraudCount >= 3 || score < 20) return 'banned';
-    if (score < 40) return 'low';
-    if (score < 70) return 'medium';
+    if (fraudCount >= 5 || score < 10) return 'banned';
+    if (score < 30) return 'low';
+    if (score < 60) return 'medium';
     return 'high';
   }
 

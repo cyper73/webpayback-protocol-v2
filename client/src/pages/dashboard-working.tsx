@@ -8,6 +8,8 @@ import MultiChainDeployment from "@/components/blockchain/MultiChainDeployment";
 import TokenEconomics from "@/components/blockchain/TokenEconomics";
 import CreatorPortal from "@/components/creators/CreatorPortal";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
+import FraudDetectionRules from "@/components/fraud/FraudDetectionRules";
+import FraudAlerts from "@/components/fraud/FraudAlerts";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
@@ -178,6 +180,32 @@ export default function Dashboard() {
           <TokenInfo />
           <RewardDistribution />
           <LiveStats stats={stats} />
+        </div>
+
+        {/* Anti-Fraud Protection */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <Card className="glass-card rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
+                <Shield className="text-electric-blue" />
+                Sistema Anti-Frode
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FraudDetectionRules />
+            </CardContent>
+          </Card>
+          <Card className="glass-card rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
+                <AlertTriangle className="text-amber-400" />
+                Avvisi Frode
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FraudAlerts />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Compliance & Network */}
