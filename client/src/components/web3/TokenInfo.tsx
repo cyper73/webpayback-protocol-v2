@@ -115,38 +115,40 @@ export default function TokenInfo() {
             Real token deployed on Polygon blockchain
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Contract Address</p>
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-mono">{tokenInfo.address.slice(0, 8)}...{tokenInfo.address.slice(-6)}</p>
-                <a 
-                  href={`${networkStatus.explorerUrl}/token/${tokenInfo.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="flex-1 min-w-0 mr-4">
+                <p className="text-sm text-gray-500 mb-2">Contract Address</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-mono truncate">{tokenInfo.address.slice(0, 8)}...{tokenInfo.address.slice(-6)}</p>
+                  <a 
+                    href={`${networkStatus.explorerUrl}/token/${tokenInfo.address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 flex-shrink-0"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-sm text-gray-500 mb-2">Symbol</p>
+                <p className="text-lg font-semibold">{tokenInfo.symbol}</p>
               </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Symbol</p>
-              <p className="text-lg font-semibold">{tokenInfo.symbol}</p>
-            </div>
-          </div>
 
-          <Separator />
+            <Separator />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Total Supply</p>
-              <p className="text-lg font-semibold">{formatNumber(tokenInfo.totalSupply)} WPT</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Decimals</p>
-              <p className="text-lg font-semibold">{tokenInfo.decimals}</p>
+            <div className="flex justify-between items-start">
+              <div className="flex-1 min-w-0 mr-4">
+                <p className="text-sm text-gray-500 mb-2">Total Supply</p>
+                <p className="text-lg font-semibold break-words">{formatNumber(tokenInfo.totalSupply)} WPT</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-sm text-gray-500 mb-2">Decimals</p>
+                <p className="text-lg font-semibold">{tokenInfo.decimals}</p>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -163,42 +165,46 @@ export default function TokenInfo() {
             Live pool data from Polygon DEX
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Pool Address</p>
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-mono">{poolInfo.poolAddress.slice(0, 8)}...{poolInfo.poolAddress.slice(-6)}</p>
-                <a 
-                  href={`${networkStatus.explorerUrl}/address/${poolInfo.poolAddress}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-400 hover:text-purple-300"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="flex-1 min-w-0 mr-4">
+                <p className="text-sm text-gray-500 mb-2">Pool Address</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-mono truncate">{poolInfo.poolAddress.slice(0, 8)}...{poolInfo.poolAddress.slice(-6)}</p>
+                  <a 
+                    href={`${networkStatus.explorerUrl}/address/${poolInfo.poolAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-400 hover:text-purple-300 flex-shrink-0"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-sm text-gray-500 mb-2">Current Price</p>
+                <p className="text-lg font-semibold">{formatPrice(poolInfo.price)} MATIC</p>
               </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Current Price</p>
-              <p className="text-lg font-semibold">{formatPrice(poolInfo.price)} MATIC</p>
-            </div>
-          </div>
 
-          <Separator />
+            <Separator />
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Liquidity</p>
-              <p className="text-lg font-semibold">{formatNumber(poolInfo.liquidity)} WPT</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">24h Volume</p>
-              <p className="text-lg font-semibold">{formatNumber(poolInfo.volume24h)} WPT</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">24h Fees</p>
-              <p className="text-lg font-semibold">{formatNumber(poolInfo.fees24h)} WPT</p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-start">
+                <div className="flex-1 min-w-0 mr-4">
+                  <p className="text-sm text-gray-500 mb-2">Liquidity</p>
+                  <p className="text-lg font-semibold break-words">{formatNumber(poolInfo.liquidity)} WPT</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm text-gray-500 mb-2">24h Fees</p>
+                  <p className="text-lg font-semibold">{formatNumber(poolInfo.fees24h)} WPT</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-500 mb-2">24h Volume</p>
+                <p className="text-lg font-semibold">{formatNumber(poolInfo.volume24h)} WPT</p>
+              </div>
             </div>
           </div>
         </CardContent>
