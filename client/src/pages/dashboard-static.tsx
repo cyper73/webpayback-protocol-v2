@@ -95,10 +95,29 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-deep-space text-white" key={`lang-${currentLanguage}-${forceRerender}`}>
-      <LanguageDropdown 
-        currentLanguage={currentLanguage} 
-        onLanguageChange={handleLanguageChange} 
-      />
+      {/* Simple Language Switcher - Fixed Position */}
+      <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 99999 }}>
+        <select 
+          value={currentLanguage} 
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          style={{
+            backgroundColor: '#2563eb',
+            color: 'white',
+            border: 'none',
+            padding: '8px 12px',
+            borderRadius: '6px',
+            fontSize: '14px',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="en">🇺🇸 EN</option>
+          <option value="it">🇮🇹 IT</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="fr">🇫🇷 FR</option>
+          <option value="de">🇩🇪 DE</option>
+          <option value="pt">🇵🇹 PT</option>
+        </select>
+      </div>
       
       {/* Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-40">

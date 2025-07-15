@@ -293,14 +293,10 @@ export const useTranslations = (initialLanguage: string = 'en') => {
   };
   
   const changeLanguage = (languageCode: string) => {
-    console.log('Changing language to:', languageCode);
     setCurrentLanguage(languageCode);
     localStorage.setItem('webpayback-language', languageCode);
-    
-    // Force a page refresh to ensure all components update
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    // Immediate reload for instant translation change
+    window.location.reload();
   };
   
   return {
