@@ -13,13 +13,12 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { ReferralSystem } from "@/components/referral/ReferralSystem";
-import { Box, Wallet, Coins, Search } from "lucide-react";
+import { Box, Wallet, Coins } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const [isUserInteracting, setIsUserInteracting] = useState(false);
-  const [showAllRewards, setShowAllRewards] = useState(false);
   
   // Disable auto-refresh when user is interacting
   useEffect(() => {
@@ -39,7 +38,6 @@ export default function Dashboard() {
     };
   }, []);
 
-  // Separate queries to ensure data is properly fetched
   const { data: dashboardData, isFetching } = useQuery({
     queryKey: ["/api/analytics/dashboard"],
     refetchInterval: isUserInteracting ? false : 30000,
@@ -47,40 +45,20 @@ export default function Dashboard() {
     cacheTime: 5 * 60 * 1000,
   });
 
-  const { data: creatorsData } = useQuery({
-    queryKey: ["/api/creators"],
-    refetchInterval: isUserInteracting ? false : 30000,
-    staleTime: 0,
-  });
-
-  const { data: rewardsData } = useQuery({
-    queryKey: ["/api/rewards"],
-    refetchInterval: isUserInteracting ? false : 30000,
-    staleTime: 0,
-  });
-
   // Always show content, never loading screen
   // This prevents the initialization message from appearing
 
-  // Use separate data sources for better reliability
-  const { agents = [], networks = [], stats = {}, pool = [], compliance = [] } = dashboardData || {
+  const { agents = [], networks = [], creators = [], stats = {}, rewards = [], pool = [], compliance = [] } = dashboardData || {
     agents: [],
     networks: [],
+    creators: [],
     stats: { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 },
+    rewards: [],
     pool: [],
     compliance: []
   };
 
-  const creators = creatorsData || [];
-  const rewards = rewardsData || [];
 
-  // Debug logging to see what data we have
-  console.log('Dashboard data:', { 
-    creators: creators.length, 
-    rewards: rewards.length, 
-    creatorsData: creators.slice(0, 3),
-    rewardsData: rewards.slice(0, 3)
-  });
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
@@ -122,105 +100,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <CreatorPortal />
             
-            <Card className="glass-card rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search creator websites..."
-                      className="w-full pl-10 pr-4 py-2 bg-glass-dark border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-electric-blue/50"
-                      onChange={(e) => {
-                        // Simple search implementation
-                        const value = e.target.value.toLowerCase();
-                        const items = document.querySelectorAll('[data-creator-search]');
-                        items.forEach(item => {
-                          const text = item.textContent?.toLowerCase() || '';
-                          const parent = item.closest('.reward-item');
-                          if (parent) {
-                            parent.style.display = text.includes(value) ? 'flex' : 'none';
-                          }
-                        });
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {(showAllRewards ? rewards : rewards.slice(0, 4)).map((reward, index) => {
-                    const creator = creators.find(c => c.id === reward.creatorId);
-                    
-                    // Hard-coded creator mapping as fallback
-                    const creatorMap = {
-                      4: 'marcorossi.art',
-                      5: 'elenabianchi.blog', 
-                      6: 'lucaverdi.music',
-                      7: 'github.com/cyper73/webpayback',
-                      8: 'github.com/cyper73/webpayback',
-                      9: 'youtube.com/@claudiobarracu6570'
-                    };
-                    
-                    let displayName = creatorMap[reward.creatorId] || `Creator #${reward.creatorId}`;
-                    
-                    if (creator?.websiteUrl) {
-                      // Clean URL for display
-                      displayName = creator.websiteUrl
-                        .replace('https://', '')
-                        .replace('http://', '')
-                        .replace('www.', '')
-                        .split('/')[0];
-                    }
-                    
-                    return (
-                      <div key={reward.id} className="reward-item flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
-                        <div className="w-10 h-10 bg-electric-blue/20 rounded-lg flex items-center justify-center">
-                          <i className="fas fa-globe text-electric-blue text-sm"></i>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span 
-                              className="font-medium truncate max-w-[180px]" 
-                              title={creator?.websiteUrl || displayName}
-                              data-creator-search
-                            >
-                              {displayName}
-                            </span>
-                            <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm text-gray-400">
-                            <span>Status: {reward.status}</span>
-                            <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  
-                  {rewards.length > 4 && (
-                    <div className="text-center pt-2">
-                      <button
-                        onClick={() => setShowAllRewards(!showAllRewards)}
-                        className="text-sm text-electric-blue hover:text-neon-green transition-colors"
-                      >
-                        {showAllRewards ? 'Show less' : `+${rewards.length - 4} more rewards`}
-                      </button>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-6 pt-4 border-t border-white/10">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Total Rewards Today:</span>
-                    <span className="font-mono text-neon-green">
-                      {rewards.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2)} WPT
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <RewardDistribution />
           </div>
         </div>
 
