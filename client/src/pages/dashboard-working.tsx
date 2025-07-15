@@ -108,24 +108,31 @@ export default function Dashboard() {
               <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {rewards.slice(0, 4).map((reward, index) => (
-                  <div key={index} className="flex items-center space-x-4 p-4 bg-glass-dark rounded-lg">
-                    <div className="flex items-center space-x-2">
-                      <i className="fas fa-globe text-electric-blue text-sm"></i>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {rewards.slice(0, 3).map((reward, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-2 bg-glass-dark rounded-lg">
+                    <div className="w-8 h-8 bg-electric-blue/20 rounded-full flex items-center justify-center">
+                      <i className="fas fa-globe text-electric-blue text-xs"></i>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Creator #{reward.creatorId}</span>
-                        <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
+                        <span className="font-medium text-sm truncate">Creator #{reward.creatorId}</span>
+                        <span className="text-neon-green font-mono text-sm">+{reward.amount} WPT</span>
                       </div>
-                      <div className="flex items-center justify-between text-sm text-gray-400">
+                      <div className="flex items-center justify-between text-xs text-gray-400">
                         <span>Status: {reward.status}</span>
                         <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
                       </div>
                     </div>
                   </div>
                 ))}
+                {rewards.length > 3 && (
+                  <div className="text-center py-2">
+                    <span className="text-xs text-gray-400">
+                      +{rewards.length - 3} more rewards
+                    </span>
+                  </div>
+                )}
               </div>
               
               <div className="mt-6 pt-4 border-t border-white/10">
