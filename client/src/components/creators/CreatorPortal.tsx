@@ -12,10 +12,7 @@ import { insertCreatorSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ReferralInput } from "@/components/referral/ReferralInput";
-
 const formSchema = insertCreatorSchema.extend({
-  referralCode: z.string().optional(),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
   })
@@ -42,7 +39,6 @@ export default function CreatorPortal() {
       websiteUrl: "",
       walletAddress: "",
       contentCategory: "",
-      referralCode: "",
       termsAccepted: false
     }
   });
@@ -50,8 +46,11 @@ export default function CreatorPortal() {
   const createCreatorMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const { termsAccepted, ...creatorData } = data;
-      const response = await apiRequest("POST", "/api/creators", creatorData);
-      return response.json();
+      return await apiRequest("/api/creators", {
+        method: "POST",
+        body: JSON.stringify(creatorData),
+        headers: { "Content-Type": "application/json" }
+      });
     },
     onSuccess: () => {
       toast({
@@ -136,11 +135,6 @@ export default function CreatorPortal() {
             )}
           </div>
           
-          <ReferralInput
-            value={watch("referralCode") || ""}
-            onChange={(value) => setValue("referralCode", value)}
-            disabled={isSubmitting || createCreatorMutation.isPending}
-          />
           
           <div className="flex items-center space-x-2">
             <Checkbox
