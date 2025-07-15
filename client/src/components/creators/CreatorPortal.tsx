@@ -102,14 +102,14 @@ export default function CreatorPortal() {
             </Label>
             <Select onValueChange={(value) => setValue("contentCategory", value)}>
               <SelectTrigger className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white">
-                <SelectValue placeholder="Seleziona categoria" />
+                <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="blog">Blog/Articoli</SelectItem>
-                <SelectItem value="news">Notizie/Giornalismo</SelectItem>
-                <SelectItem value="educational">Contenuti Educativi</SelectItem>
-                <SelectItem value="technical">Documentazione Tecnica</SelectItem>
-                <SelectItem value="creative">Scrittura Creativa</SelectItem>
+                <SelectItem value="blog">Blog/Articles</SelectItem>
+                <SelectItem value="news">News/Journalism</SelectItem>
+                <SelectItem value="educational">Educational Content</SelectItem>
+                <SelectItem value="technical">Technical Documentation</SelectItem>
+                <SelectItem value="creative">Creative Writing</SelectItem>
               </SelectContent>
             </Select>
             {errors.contentCategory && (
