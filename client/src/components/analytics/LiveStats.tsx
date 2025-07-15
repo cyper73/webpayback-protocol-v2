@@ -27,12 +27,12 @@ export default function LiveStats({ stats }: LiveStatsProps) {
 
   return (
     <>
-      <Card className="glass-card rounded-2xl">
-        <CardHeader className="pb-3">
+      <Card className="glass-card rounded-2xl h-fit">
+        <CardHeader className="pb-2">
           <CardTitle className="text-lg font-bold gradient-text">Live Network Stats</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
+        <CardContent className="py-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <div className="text-center">
               <p className="text-xs text-gray-400 mb-1">Total Transactions</p>
               <p className="font-mono text-neon-green text-lg font-bold">{formatNumber(mockStats.totalTransactions)}</p>
@@ -53,12 +53,12 @@ export default function LiveStats({ stats }: LiveStatsProps) {
         </CardContent>
       </Card>
       
-      <Card className="glass-card rounded-2xl">
-        <CardHeader className="pb-3">
+      <Card className="glass-card rounded-2xl h-fit">
+        <CardHeader className="pb-2">
           <CardTitle className="text-lg font-bold gradient-text">AI Content Tracking</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
+        <CardContent className="py-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <div className="text-center">
               <p className="text-xs text-gray-400 mb-1">Sites Monitored</p>
               <p className="font-mono text-neon-green text-lg font-bold">{formatNumber(mockStats.sitesMonitored)}</p>
