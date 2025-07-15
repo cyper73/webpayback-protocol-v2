@@ -111,7 +111,7 @@ export default function Dashboard() {
             
             <Card className="glass-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-xl font-bold gradient-text">Recenti Ricompense Creator</CardTitle>
+                <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -136,7 +136,7 @@ export default function Dashboard() {
                 
                 <div className="mt-6 pt-4 border-t border-white/10">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Ricompense Totali Oggi:</span>
+                    <span className="text-gray-400">Total Rewards Today:</span>
                     <span className="font-mono text-neon-green">
                       {rewards.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2)} WPT
                     </span>
@@ -153,7 +153,7 @@ export default function Dashboard() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold gradient-text">
-                  Orchestrazione Multi-Agente
+                  Multi-Agent Orchestration
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
