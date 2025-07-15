@@ -16,6 +16,7 @@ import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 
 import { Box, Wallet, Coins, Shield, AlertTriangle } from "lucide-react";
+import wptLogo from "@assets/wpt-logo_1752556131899.png";
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
@@ -77,7 +78,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Box className="text-electric-blue text-2xl" />
+                <img src={wptLogo} alt="WPT Logo" className="w-8 h-8" />
                 <span className="text-xl font-bold gradient-text">WebPayback Protocol</span>
               </div>
               <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
