@@ -152,12 +152,22 @@ export default function Dashboard() {
                 <div className="space-y-4">
                   {(showAllRewards ? rewards : rewards.slice(0, 4)).map((reward, index) => {
                     const creator = creators.find(c => c.id === reward.creatorId);
-                    const websiteUrl = creator?.websiteUrl || '';
-                    let displayName = `Creator #${reward.creatorId}`;
                     
-                    if (websiteUrl) {
+                    // Hard-coded creator mapping as fallback
+                    const creatorMap = {
+                      4: 'marcorossi.art',
+                      5: 'elenabianchi.blog', 
+                      6: 'lucaverdi.music',
+                      7: 'github.com/cyper73/webpayback',
+                      8: 'github.com/cyper73/webpayback',
+                      9: 'youtube.com/@claudiobarracu6570'
+                    };
+                    
+                    let displayName = creatorMap[reward.creatorId] || `Creator #${reward.creatorId}`;
+                    
+                    if (creator?.websiteUrl) {
                       // Clean URL for display
-                      displayName = websiteUrl
+                      displayName = creator.websiteUrl
                         .replace('https://', '')
                         .replace('http://', '')
                         .replace('www.', '')
@@ -173,7 +183,7 @@ export default function Dashboard() {
                           <div className="flex items-center justify-between">
                             <span 
                               className="font-medium truncate max-w-[180px]" 
-                              title={websiteUrl || displayName}
+                              title={creator?.websiteUrl || displayName}
                               data-creator-search
                             >
                               {displayName}
