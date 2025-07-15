@@ -31,23 +31,23 @@ export default function LiveStats({ stats }: LiveStatsProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-bold gradient-text">Live Network Stats</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-2 gap-3">
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-xs text-gray-400">Total Transactions</p>
-              <p className="font-mono text-neon-green text-sm">{formatNumber(mockStats.totalTransactions)}</p>
+              <p className="text-xs text-gray-400 mb-1">Total Transactions</p>
+              <p className="font-mono text-neon-green text-lg font-bold">{formatNumber(mockStats.totalTransactions)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">Active Validators</p>
-              <p className="font-mono text-electric-blue text-sm">{formatNumber(mockStats.activeValidators)}</p>
+              <p className="text-xs text-gray-400 mb-1">Active Validators</p>
+              <p className="font-mono text-electric-blue text-lg font-bold">{formatNumber(mockStats.activeValidators)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">Network TVL</p>
-              <p className="font-mono text-amber-400 text-sm">${formatNumber(mockStats.networkTvl)}</p>
+              <p className="text-xs text-gray-400 mb-1">Network TVL</p>
+              <p className="font-mono text-amber-400 text-lg font-bold">${formatNumber(mockStats.networkTvl)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">Creator Rewards</p>
-              <p className="font-mono text-cyber-purple text-sm">{formatNumber(mockStats.creatorRewards)} WPT</p>
+              <p className="text-xs text-gray-400 mb-1">Creator Rewards</p>
+              <p className="font-mono text-cyber-purple text-lg font-bold">{formatNumber(mockStats.creatorRewards)} WPT</p>
             </div>
           </div>
         </CardContent>
@@ -57,23 +57,23 @@ export default function LiveStats({ stats }: LiveStatsProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-bold gradient-text">AI Content Tracking</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-2 gap-3">
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-xs text-gray-400">Sites Monitored</p>
-              <p className="font-mono text-neon-green text-sm">{formatNumber(mockStats.sitesMonitored)}</p>
+              <p className="text-xs text-gray-400 mb-1">Sites Monitored</p>
+              <p className="font-mono text-neon-green text-lg font-bold">{formatNumber(mockStats.sitesMonitored)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">AI Requests/hr</p>
-              <p className="font-mono text-electric-blue text-sm">{formatNumber(mockStats.aiRequestsPerHour)}</p>
+              <p className="text-xs text-gray-400 mb-1">AI Requests/hr</p>
+              <p className="font-mono text-electric-blue text-lg font-bold">{formatNumber(mockStats.aiRequestsPerHour)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">Accuracy Rate</p>
-              <p className="font-mono text-amber-400 text-sm">{mockStats.accuracyRate}%</p>
+              <p className="text-xs text-gray-400 mb-1">Accuracy Rate</p>
+              <p className="font-mono text-amber-400 text-lg font-bold">{mockStats.accuracyRate}%</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">Anti-Fraud Score</p>
-              <p className="font-mono text-cyber-purple text-sm">{mockStats.antiFraudScore}</p>
+              <p className="text-xs text-gray-400 mb-1">Anti-Fraud Score</p>
+              <p className="font-mono text-cyber-purple text-lg font-bold">{mockStats.antiFraudScore}</p>
             </div>
           </div>
         </CardContent>
