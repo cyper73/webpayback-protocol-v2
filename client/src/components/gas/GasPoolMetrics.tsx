@@ -47,7 +47,8 @@ interface GasSystemStatus {
 export function GasPoolMetrics() {
   const { data: gasStatus } = useQuery<GasSystemStatus>({
     queryKey: ["/api/gas/status"],
-    refetchInterval: 5000
+    refetchInterval: 5000,
+    retry: 3
   });
 
   if (!gasStatus) {

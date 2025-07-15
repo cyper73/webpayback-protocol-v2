@@ -39,7 +39,8 @@ interface RewardDistribution {
 export function GasPoolDashboard() {
   const { data: gasStatus, isLoading: gasLoading } = useQuery<GasSystemStatus>({
     queryKey: ["/api/gas/status"],
-    refetchInterval: 5000 // Update every 5 seconds
+    refetchInterval: 5000, // Update every 5 seconds
+    retry: 3
   });
 
   const { data: rewards } = useQuery<RewardDistribution[]>({
