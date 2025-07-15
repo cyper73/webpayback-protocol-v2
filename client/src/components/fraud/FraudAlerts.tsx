@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Clock, CheckCircle, XCircle, Info } from "lucide-react";
-import { useTranslations } from "@/hooks/use-translations";
+// Removed useTranslations import
 
 interface FraudAlert {
   id: number;

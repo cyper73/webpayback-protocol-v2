@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Shield, Eye, TrendingUp, Users, Ban } from "lucide-react";
-import { useTranslations } from "@/hooks/use-translations";
+// Removed useTranslations import
 
 interface FraudRule {
   id: number;
@@ -123,7 +123,6 @@ const getRuleIcon = (ruleType: string) => {
 };
 
 export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetectionRulesProps) {
-  const { t } = useTranslations();
   
   return (
     <div className="space-y-6">
@@ -131,12 +130,12 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
       <Alert className="border-red-200 bg-red-50 dark:bg-red-900/20">
         <Ban className="h-4 w-4" />
         <AlertDescription className="text-red-800 dark:text-red-200">
-          <strong>{t('fraudWarning')}</strong> {t('fraudWarningText')}
+          <strong>ATTENZIONE AI FRODATORI!</strong> Il sistema WebPayback ha protezioni avanzate contro frodi e manipolazioni.
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>{t('fraudWarning1')}</li>
-            <li>{t('fraudWarning2')}</li>
-            <li>{t('fraudWarning3')}</li>
-            <li>{t('fraudWarning4')}</li>
+            <li>Attacchi Sybil e auto-farming verranno bannati automaticamente</li>
+            <li>Concentrazione di traffico da singolo IP/dominio è monitorata</li>
+            <li>Pattern sospetti di bot coordinati sono rilevati in tempo reale</li>
+            <li>Violazioni ripetute comportano esclusione permanente dal sistema</li>
           </ul>
         </AlertDescription>
       </Alert>
