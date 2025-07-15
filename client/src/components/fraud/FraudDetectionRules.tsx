@@ -267,9 +267,9 @@ How the System Works
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-red-500 mt-2"></div>
               <div>
-                <p className="font-medium">Trasparenza Totale</p>
+                <p className="font-medium">Total Transparency</p>
                 <p className="text-muted-foreground">
-                  Tutti i controlli sono visibili e documentati per garantire un sistema equo e trasparente.
+                  All controls are visible and documented to ensure a fair and transparent system.
                 </p>
               </div>
             </div>

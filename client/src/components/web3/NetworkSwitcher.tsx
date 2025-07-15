@@ -22,19 +22,19 @@ export default function NetworkSwitcher() {
     },
     onSuccess: (data) => {
       toast({
-        title: "Network cambiato",
-        description: `Ora utilizzi la rete ${selectedNetwork === 'ethereum' ? 'Ethereum Mainnet' : 'Polygon'}`,
+        title: "Network Changed",
+        description: `Now using ${selectedNetwork === 'ethereum' ? 'Ethereum Mainnet' : 'Polygon'} network`,
       });
       
-      // Invalida tutte le query web3 per aggiornare i dati
+      // Invalidate all web3 queries to update data
       queryClient.invalidateQueries({ queryKey: ['/api/web3/token-info'] });
       queryClient.invalidateQueries({ queryKey: ['/api/web3/pool-info'] });
       queryClient.invalidateQueries({ queryKey: ['/api/web3/network-status'] });
     },
     onError: (error) => {
       toast({
-        title: "Errore",
-        description: "Impossibile cambiare network",
+        title: "Error",
+        description: "Unable to switch network",
         variant: "destructive"
       });
     }
@@ -49,13 +49,13 @@ export default function NetworkSwitcher() {
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Globe className="text-electric-blue" />
-          <span>Network Blockchain</span>
+          <span>Blockchain Network</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Network Attuale</label>
+            <label className="text-sm font-medium">Current Network</label>
             <Badge variant="outline" className="w-full justify-center">
               <Network className="w-4 h-4 mr-2" />
               Polygon
@@ -63,7 +63,7 @@ export default function NetworkSwitcher() {
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium">Cambia Network</label>
+            <label className="text-sm font-medium">Switch Network</label>
             <div className="space-y-2">
               <Button
                 variant={selectedNetwork === 'polygon' ? 'default' : 'outline'}
@@ -89,15 +89,15 @@ export default function NetworkSwitcher() {
             disabled={switchNetworkMutation.isPending}
             className="w-full"
           >
-            {switchNetworkMutation.isPending ? 'Cambiando...' : 'Cambia Network'}
+            {switchNetworkMutation.isPending ? 'Switching...' : 'Switch Network'}
           </Button>
           
           <div className="text-sm text-gray-400">
             <p>
-              <strong>Polygon:</strong> Token WPT attualmente attivo
+              <strong>Polygon:</strong> WPT token currently active
             </p>
             <p>
-              <strong>Ethereum:</strong> Pronto per quando WPT sarà su mainnet
+              <strong>Ethereum:</strong> Ready for when WPT launches on mainnet
             </p>
           </div>
         </div>

@@ -143,7 +143,7 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - All fraud rules visible in dashboard with clear deterrent messaging
 - **MULTILINGUAL SYSTEM REMOVED DUE TO STABILITY ISSUES** (January 15, 2025):
   - Removed complex multilingual translation system causing form input failures
-  - Restored stable Italian interface with hardcoded text strings
+  - Converted entire interface to English for consistency and stability
   - Fixed Creator Portal input fields and dropdown selectors
   - Eliminated translation errors causing React component crashes
   - Prioritized functionality over advanced multilingual features

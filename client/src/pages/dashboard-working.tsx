@@ -150,7 +150,7 @@ export default function Dashboard() {
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
-                  <span className="text-sm text-gray-300">Attivo</span>
+                  <span className="text-sm text-gray-300">Active</span>
                 </div>
               </div>
             </CardHeader>
@@ -188,7 +188,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
                 <Shield className="text-electric-blue" />
-                Sistema Anti-Frode
+                Anti-Fraud System
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -199,7 +199,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="text-xl font-bold gradient-text flex items-center gap-2">
                 <AlertTriangle className="text-amber-400" />
-                Avvisi Frode
+                Fraud Alerts
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -213,7 +213,7 @@ export default function Dashboard() {
           <ComplianceMonitor compliance={compliance} />
           <Card className="glass-card rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-xl font-bold gradient-text">Cambio Rete</CardTitle>
+              <CardTitle className="text-xl font-bold gradient-text">Network Switcher</CardTitle>
             </CardHeader>
             <CardContent>
               <NetworkSwitcher />
