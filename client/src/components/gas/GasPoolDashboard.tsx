@@ -37,7 +37,7 @@ interface RewardDistribution {
 }
 
 export function GasPoolDashboard() {
-  const { data: gasStatus, isLoading: gasLoading } = useQuery<GasSystemStatus>({
+  const { data: gasStatus, isLoading: gasLoading, error: gasError } = useQuery<GasSystemStatus>({
     queryKey: ["/api/gas/status"],
     refetchInterval: 5000, // Update every 5 seconds
     retry: 3
@@ -51,6 +51,14 @@ export function GasPoolDashboard() {
   if (gasLoading || !gasStatus) {
     return (
       <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold gradient-text">Gas Pool Dashboard</h2>
+            <p className="text-gray-400">
+              {gasLoading ? "Loading gas pool data..." : gasError ? "Error loading gas pool data" : "Real-time gas fee management"}
+            </p>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="glass-card rounded-2xl">
