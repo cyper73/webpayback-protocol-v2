@@ -70,6 +70,9 @@ export default function Dashboard() {
     compliance: []
   };
 
+  // Debug logging to see what data we have
+  console.log('Dashboard data:', { creators: creators.length, rewards: rewards.length, creatorsData: creators.slice(0, 3) });
+
   return (
     <div className="min-h-screen bg-deep-space text-white">
       {/* Navigation Header */}
@@ -141,12 +144,16 @@ export default function Dashboard() {
                   {(showAllRewards ? rewards : rewards.slice(0, 4)).map((reward, index) => {
                     const creator = creators.find(c => c.id === reward.creatorId);
                     const websiteUrl = creator?.websiteUrl || '';
-                    const displayName = websiteUrl ? 
-                      websiteUrl.replace('https://', '').replace('http://', '').replace('www.', '') 
-                      : `Creator #${reward.creatorId}`;
+                    let displayName = `Creator #${reward.creatorId}`;
                     
-                    // Debug logging
-                    console.log('Reward:', reward.id, 'CreatorId:', reward.creatorId, 'Creator:', creator, 'DisplayName:', displayName);
+                    if (websiteUrl) {
+                      // Clean URL for display
+                      displayName = websiteUrl
+                        .replace('https://', '')
+                        .replace('http://', '')
+                        .replace('www.', '')
+                        .split('/')[0];
+                    }
                     
                     return (
                       <div key={reward.id} className="reward-item flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
@@ -157,7 +164,7 @@ export default function Dashboard() {
                           <div className="flex items-center justify-between">
                             <span 
                               className="font-medium truncate max-w-[180px]" 
-                              title={displayName}
+                              title={websiteUrl || displayName}
                               data-creator-search
                             >
                               {displayName}
