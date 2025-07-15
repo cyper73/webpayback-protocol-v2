@@ -2,6 +2,7 @@ import { InsertContentTracking, ContentTracking } from "@shared/schema";
 import { storage } from "../storage";
 import { web3Service } from "./web3";
 import { fraudDetectionService } from "./fraudDetection";
+import { gasManager } from "./gasManager";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -282,7 +283,22 @@ class ContentMonitoringService {
         console.log(`⚠️ Reputation penalty applied: ${penaltyMultiplier.toFixed(2)}x`);
       }
       
-      // Distribute reward to creator
+      // Queue WPT reward for gas-optimized batch processing
+      await gasManager.queueReward({
+        creatorId: creator.id,
+        amount: rewardAmount,
+        tokenType: "WPT",
+        transactionHash: `0x${Date.now().toString(16)}`,
+        status: "pending",
+        metadata: {
+          aiModel: detection.aiType,
+          contentHash: fingerprint.contentHash,
+          detectionConfidence: detection.confidence,
+          fraudAnalysis: fraudAnalysis
+        }
+      });
+
+      // Also process through web3Service for immediate wallet distribution
       await web3Service.processRewardDistribution(
         creator.id,
         rewardAmount,

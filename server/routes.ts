@@ -5,6 +5,7 @@ import { blockchainService } from "./services/blockchain";
 import { agentService } from "./services/agents";
 import { web3Service } from "./services/web3";
 import { contentMonitoringService } from "./services/contentMonitoring";
+import { gasManager } from "./services/gasManager";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -179,12 +180,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create reward distribution
+  // Distribute rewards (now uses gas manager)
+  app.post("/api/rewards/distribute", async (req, res) => {
+    try {
+      const validatedData = insertRewardDistributionSchema.parse(req.body);
+      // Queue reward for batch processing instead of immediate distribution
+      await gasManager.queueReward(validatedData);
+      res.json({ success: true, message: "Reward queued for batch processing" });
+    } catch (error) {
+      res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Gas management endpoints
+  app.get("/api/gas/status", async (req, res) => {
+    try {
+      const status = await gasManager.getSystemStatus();
+      res.json(status);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/gas/flush", async (req, res) => {
+    try {
+      const results = await gasManager.flushPendingRewards();
+      res.json({ success: true, results });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Create reward distribution (legacy endpoint - now redirects to gas manager)
   app.post("/api/rewards", async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
-      const reward = await storage.createRewardDistribution(validatedData);
-      res.json(reward);
+      // Use gas manager for new rewards
+      await gasManager.queueReward(validatedData);
+      res.json({ success: true, message: "Reward queued for gas-optimized batch processing" });
     } catch (error) {
       res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }

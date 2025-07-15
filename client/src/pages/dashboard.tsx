@@ -12,6 +12,7 @@ import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
 import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
+import { GasTracker } from "@/components/gas/GasTracker";
 
 import { Box, Wallet, Coins } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -99,8 +100,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <CreatorPortal />
-            
-            <RewardDistribution />
+            <GasTracker />
           </div>
         </div>
 
