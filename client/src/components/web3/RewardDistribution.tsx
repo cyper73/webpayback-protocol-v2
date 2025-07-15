@@ -45,24 +45,7 @@ export default function RewardDistribution() {
         <CardContent>
           <div className="space-y-4">
             {rewards?.slice(0, 3).map((reward) => {
-              const creator = creators?.find(c => c.id === reward.creatorId);
-              
-              let displayName = `Creator #${reward.creatorId}`;
-              if (creator?.websiteUrl) {
-                // Extract domain from full URL
-                try {
-                  const url = creator.websiteUrl.startsWith('http') ? creator.websiteUrl : `https://${creator.websiteUrl}`;
-                  const domain = new URL(url).hostname;
-                  displayName = domain.replace('www.', '');
-                } catch (e) {
-                  // Fallback to manual parsing
-                  displayName = creator.websiteUrl
-                    .replace('https://', '')
-                    .replace('http://', '')
-                    .replace('www.', '')
-                    .split('/')[0];
-                }
-              }
+              const displayName = `Creator #${reward.creatorId}`;
               
               return (
                 <div key={reward.id} className="flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
