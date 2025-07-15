@@ -95,27 +95,24 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-deep-space text-white" key={`lang-${currentLanguage}-${forceRerender}`}>
-      {/* Simple Language Switcher - Fixed Position */}
-      <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 99999 }}>
+      {/* Working Language Selector */}
+      <div className="fixed top-4 right-4 z-[99999]">
         <select 
           value={currentLanguage} 
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          style={{
-            backgroundColor: '#2563eb',
-            color: 'white',
-            border: 'none',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            fontSize: '14px',
-            cursor: 'pointer'
+          onChange={(e) => {
+            const newLang = e.target.value;
+            setCurrentLanguage(newLang);
+            localStorage.setItem('webpayback-language', newLang);
+            window.location.reload();
           }}
+          className="bg-blue-600 text-white border-none px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-blue-700 transition-colors"
         >
-          <option value="en">🇺🇸 EN</option>
-          <option value="it">🇮🇹 IT</option>
-          <option value="es">🇪🇸 ES</option>
-          <option value="fr">🇫🇷 FR</option>
-          <option value="de">🇩🇪 DE</option>
-          <option value="pt">🇵🇹 PT</option>
+          <option value="en">🇺🇸 English</option>
+          <option value="it">🇮🇹 Italiano</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="pt">🇵🇹 Português</option>
         </select>
       </div>
       
