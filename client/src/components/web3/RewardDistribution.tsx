@@ -259,14 +259,16 @@ export default function RewardDistribution() {
       <Card className="border-green-500/20 bg-green-900/5">
         <CardContent className="pt-6">
           <div className="flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-400" />
-            <div>
+            <CheckCircle className="h-5 w-5 text-green-400 shrink-0" />
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-green-400">Blockchain Integration Active</p>
-              <p className="text-sm text-gray-400 mt-1">
-                Connected to your WPT token: 0x9077051D318b614F915E8A07861090856FDEC91e
+              <p className="text-sm text-gray-400 mt-1 break-words">
+                Connected to your WPT token: 
+                <span className="font-mono text-xs block mt-1">0x9077051D318b614F915E8A07861090856FDEC91e</span>
               </p>
-              <p className="text-sm text-gray-400">
-                Pool Address: 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+              <p className="text-sm text-gray-400 mt-2 break-words">
+                Pool Address: 
+                <span className="font-mono text-xs block mt-1">0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB</span>
               </p>
             </div>
           </div>

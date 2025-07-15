@@ -208,10 +208,10 @@ export default function TokenInfo() {
       <Card className="border-amber-500/20 bg-amber-900/5">
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
-            <div className="h-2 w-2 bg-amber-400 rounded-full mt-2"></div>
-            <div>
+            <div className="h-2 w-2 bg-amber-400 rounded-full mt-2 shrink-0"></div>
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-amber-400">Real Blockchain Integration</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-400 mt-1 break-words">
                 This is connected to your actual WPT token on Polygon. All reward distributions will be processed through the real smart contract.
               </p>
             </div>

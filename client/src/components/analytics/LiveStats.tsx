@@ -28,52 +28,52 @@ export default function LiveStats({ stats }: LiveStatsProps) {
   return (
     <>
       <Card className="glass-card rounded-2xl">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="text-lg font-bold gradient-text">Live Network Stats</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Total Transactions</span>
-              <span className="font-mono text-neon-green">{formatNumber(mockStats.totalTransactions)}</span>
+        <CardContent className="space-y-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Total Transactions</p>
+              <p className="font-mono text-neon-green text-sm">{formatNumber(mockStats.totalTransactions)}</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Active Validators</span>
-              <span className="font-mono text-electric-blue">{formatNumber(mockStats.activeValidators)}</span>
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Active Validators</p>
+              <p className="font-mono text-electric-blue text-sm">{formatNumber(mockStats.activeValidators)}</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Network TVL</span>
-              <span className="font-mono text-amber-400">${formatNumber(mockStats.networkTvl)}</span>
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Network TVL</p>
+              <p className="font-mono text-amber-400 text-sm">${formatNumber(mockStats.networkTvl)}</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Creator Rewards</span>
-              <span className="font-mono text-cyber-purple">{formatNumber(mockStats.creatorRewards)} WPT</span>
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Creator Rewards</p>
+              <p className="font-mono text-cyber-purple text-sm">{formatNumber(mockStats.creatorRewards)} WPT</p>
             </div>
           </div>
         </CardContent>
       </Card>
       
       <Card className="glass-card rounded-2xl">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="text-lg font-bold gradient-text">AI Content Tracking</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Sites Monitored</span>
-              <span className="font-mono text-neon-green">{formatNumber(mockStats.sitesMonitored)}</span>
+        <CardContent className="space-y-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Sites Monitored</p>
+              <p className="font-mono text-neon-green text-sm">{formatNumber(mockStats.sitesMonitored)}</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">AI Requests/hr</span>
-              <span className="font-mono text-electric-blue">{formatNumber(mockStats.aiRequestsPerHour)}</span>
+            <div className="text-center">
+              <p className="text-xs text-gray-400">AI Requests/hr</p>
+              <p className="font-mono text-electric-blue text-sm">{formatNumber(mockStats.aiRequestsPerHour)}</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Accuracy Rate</span>
-              <span className="font-mono text-amber-400">{mockStats.accuracyRate}%</span>
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Accuracy Rate</p>
+              <p className="font-mono text-amber-400 text-sm">{mockStats.accuracyRate}%</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Anti-Fraud Score</span>
-              <span className="font-mono text-cyber-purple">{mockStats.antiFraudScore}</span>
+            <div className="text-center">
+              <p className="text-xs text-gray-400">Anti-Fraud Score</p>
+              <p className="font-mono text-cyber-purple text-sm">{mockStats.antiFraudScore}</p>
             </div>
           </div>
         </CardContent>
