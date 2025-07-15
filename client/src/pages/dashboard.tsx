@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const [isUserInteracting, setIsUserInteracting] = useState(false);
+  const [showAllRewards, setShowAllRewards] = useState(false);
   
   // Disable auto-refresh when user is interacting
   useEffect(() => {
@@ -137,15 +138,18 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  {rewards.slice(0, 4).map((reward, index) => {
+                  {(showAllRewards ? rewards : rewards.slice(0, 4)).map((reward, index) => {
                     const creator = creators.find(c => c.id === reward.creatorId);
                     const websiteUrl = creator?.websiteUrl || '';
                     const displayName = websiteUrl ? 
                       websiteUrl.replace('https://', '').replace('http://', '').replace('www.', '') 
                       : `Creator #${reward.creatorId}`;
                     
+                    // Debug logging
+                    console.log('Reward:', reward.id, 'CreatorId:', reward.creatorId, 'Creator:', creator, 'DisplayName:', displayName);
+                    
                     return (
-                      <div key={index} className="reward-item flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
+                      <div key={reward.id} className="reward-item flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
                         <div className="w-10 h-10 bg-electric-blue/20 rounded-lg flex items-center justify-center">
                           <i className="fas fa-globe text-electric-blue text-sm"></i>
                         </div>
@@ -168,6 +172,17 @@ export default function Dashboard() {
                       </div>
                     );
                   })}
+                  
+                  {rewards.length > 4 && (
+                    <div className="text-center pt-2">
+                      <button
+                        onClick={() => setShowAllRewards(!showAllRewards)}
+                        className="text-sm text-electric-blue hover:text-neon-green transition-colors"
+                      >
+                        {showAllRewards ? 'Show less' : `+${rewards.length - 4} more rewards`}
+                      </button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="mt-6 pt-4 border-t border-white/10">
