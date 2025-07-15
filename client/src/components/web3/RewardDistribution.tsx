@@ -37,51 +37,65 @@ export default function RewardDistribution() {
   return (
     <div className="space-y-6">
 
-      {/* Recent Creator Rewards */}
+      {/* Distribution Statistics */}
       <Card className="glass-card rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-xl font-bold gradient-text">Recent Creator Rewards</CardTitle>
+          <CardTitle className="text-xl font-bold gradient-text">Distribution Statistics</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {rewards?.slice(0, 3).map((reward) => {
-              const displayName = `Creator #${reward.creatorId}`;
-              
-              return (
-                <div key={reward.id} className="flex items-center space-x-3 p-3 bg-glass-dark rounded-lg">
-                  <div className="w-10 h-10 bg-electric-blue/20 rounded-lg flex items-center justify-center">
-                    <i className="fas fa-globe text-electric-blue text-sm"></i>
+            
+            {/* Total Rewards */}
+            <div className="bg-glass-dark rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center">
+                    <i className="fas fa-coins text-neon-green text-sm"></i>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium truncate max-w-[180px]">
-                        {displayName}
-                      </span>
-                      <span className="text-neon-green font-mono">+{reward.amount} WPT</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-gray-400">
-                      <span>Status: {reward.status}</span>
-                      <span>{new Date(reward.createdAt).toLocaleTimeString()}</span>
+                  <div>
+                    <div className="text-sm text-gray-400">Total Distributed</div>
+                    <div className="font-bold text-neon-green">
+                      {rewards?.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2) || '0.00'} WPT
                     </div>
                   </div>
                 </div>
-              );
-            })}
-            {rewards && rewards.length > 3 && (
-              <div className="text-center pt-2">
-                <span className="text-sm text-electric-blue">
-                  +{rewards.length - 3} more rewards
-                </span>
               </div>
-            )}
-          </div>
-          
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Total Rewards Today:</span>
-              <span className="font-mono text-neon-green">
-                {rewards?.reduce((sum, r) => sum + parseFloat(r.amount), 0).toFixed(2) || '0.00'} WPT
-              </span>
+            </div>
+
+            {/* Active Creators */}
+            <div className="bg-glass-dark rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-electric-blue/20 rounded-full flex items-center justify-center">
+                    <i className="fas fa-users text-electric-blue text-sm"></i>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">Active Creators</div>
+                    <div className="font-bold text-electric-blue">
+                      {rewards ? [...new Set(rewards.map(r => r.creatorId))].length : 0}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Success Rate */}
+            <div className="bg-glass-dark rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center">
+                    <i className="fas fa-check-circle text-amber-400 text-sm"></i>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">Success Rate</div>
+                    <div className="font-bold text-amber-400">
+                      {rewards ? 
+                        Math.round((rewards.filter(r => r.status === 'completed').length / rewards.length) * 100) 
+                        : 0}%
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
