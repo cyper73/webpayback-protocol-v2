@@ -211,6 +211,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test endpoint to queue multiple rewards for batch processing demo
+  app.post("/api/gas/test-batch", async (req, res) => {
+    try {
+      const { count = 5 } = req.body;
+      const results = [];
+      
+      for (let i = 0; i < count; i++) {
+        const testReward = {
+          creatorId: 4, // Using existing creator
+          amount: (Math.random() * 2 + 0.5).toFixed(8), // Random amount between 0.5-2.5 WPT
+          tokenType: "WPT",
+          transactionHash: `0x${Date.now().toString(16)}${i}`,
+          status: "pending" as const,
+          metadata: {
+            aiModel: ['claude', 'gpt', 'deepseek', 'mistral'][Math.floor(Math.random() * 4)],
+            testBatch: true,
+            batchId: Date.now()
+          }
+        };
+        
+        await gasManager.queueReward(testReward);
+        results.push(testReward);
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Queued ${count} test rewards for batch processing`,
+        rewards: results 
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   // Create reward distribution (legacy endpoint - now redirects to gas manager)
   app.post("/api/rewards", async (req, res) => {
     try {

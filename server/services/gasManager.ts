@@ -206,6 +206,21 @@ export class GasManager {
    */
   async getSystemStatus() {
     const gasPool = await this.getGasPoolStats();
+    const rewards = await storage.getRewardDistributions();
+    
+    // Calculate additional metrics
+    const recentRewards = rewards.filter(r => {
+      const completedAt = new Date(r.completedAt || r.createdAt);
+      const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      return completedAt > hourAgo;
+    });
+    
+    const batchProcessedCount = rewards.filter(r => 
+      r.metadata && typeof r.metadata === 'object' && 'batchProcessed' in r.metadata
+    ).length;
+    
+    const totalValue = rewards.reduce((sum, r) => sum + parseFloat(r.amount), 0);
+    const avgRewardValue = rewards.length > 0 ? totalValue / rewards.length : 0;
     
     return {
       gasPool,
@@ -213,7 +228,20 @@ export class GasManager {
       batchSize: this.BATCH_SIZE,
       batchInterval: this.BATCH_INTERVAL,
       protocolFeePercentage: this.PROTOCOL_FEE_PERCENTAGE * 100, // Convert to percentage
-      isProcessorActive: this.batchTimer !== null
+      isProcessorActive: this.batchTimer !== null,
+      metrics: {
+        totalRewards: rewards.length,
+        recentRewards: recentRewards.length,
+        batchProcessedCount,
+        batchEfficiency: rewards.length > 0 ? (batchProcessedCount / rewards.length) * 100 : 0,
+        totalValue,
+        avgRewardValue,
+        gasEfficiency: {
+          saved: batchProcessedCount * 0.001, // MATIC saved through batching
+          individualCost: rewards.length * 0.001,
+          batchCost: Math.ceil(batchProcessedCount / this.BATCH_SIZE) * 0.05
+        }
+      }
     };
   }
 

@@ -13,6 +13,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { GasTracker } from "@/components/gas/GasTracker";
+import { GasPoolDashboard } from "@/components/gas/GasPoolDashboard";
 
 import { Box, Wallet, Coins } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -102,6 +103,11 @@ export default function Dashboard() {
             <CreatorPortal />
             <GasTracker />
           </div>
+        </div>
+
+        {/* Gas Pool Real-time Dashboard */}
+        <div className="mb-8">
+          <GasPoolDashboard />
         </div>
 
         {/* Agent Collaboration Panel */}
