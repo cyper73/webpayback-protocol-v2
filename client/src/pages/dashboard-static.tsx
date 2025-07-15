@@ -231,7 +231,7 @@ export default function Dashboard() {
         </div>
 
         {/* Compliance & Governance */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <ComplianceMonitor compliance={compliance} />
           <Card className="glass-card rounded-2xl">
             <CardHeader>
@@ -239,6 +239,45 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <NetworkSwitcher />
+            </CardContent>
+          </Card>
+          
+          {/* GitHub Repository Link */}
+          <Card className="glass-card rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold gradient-text flex items-center gap-2">
+                <i className="fab fa-github text-electric-blue"></i>
+                Open Source
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-electric-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fab fa-github text-electric-blue text-2xl"></i>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">WebPayback Protocol</h3>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Complete source code available on GitHub
+                  </p>
+                  <a
+                    href="https://github.com/cyper73/webpayback"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-glass-dark hover:bg-electric-blue/20 text-electric-blue border border-electric-blue/30 rounded-lg transition-all duration-200 hover:scale-105 text-sm font-medium"
+                  >
+                    <i className="fab fa-github"></i>
+                    View on GitHub
+                  </a>
+                </div>
+                
+                <div className="pt-4 border-t border-white/10">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>MIT License</span>
+                    <span>Public Repository</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
