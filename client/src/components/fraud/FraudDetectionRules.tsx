@@ -22,72 +22,72 @@ interface FraudDetectionRulesProps {
 const FRAUD_RULES = [
   {
     id: 1,
-    ruleName: "Limite Dominio/IP",
+    ruleName: "Domain/IP Limits",
     ruleType: "domain_limit",
-    description: "Limiti per prevenire attacchi da singolo dominio o IP",
+    description: "Limits to prevent attacks from single domain or IP",
     severity: "high" as const,
     isActive: true,
     parameters: {
-      maxDailyAccessesPerDomain: 100,
-      maxDailyAccessesPerIP: 50,
-      maxDomainConcentration: 80,
-      maxIPConcentration: 70
+      maxDailyAccessesPerDomain: 500,
+      maxDailyAccessesPerIP: 200,
+      maxDomainConcentration: 90,
+      maxIPConcentration: 85
     }
   },
   {
     id: 2,
     ruleName: "Proof of Personhood",
     ruleType: "pattern_analysis",
-    description: "Verifica diversità e autenticità delle richieste AI",
+    description: "Verifies diversity and authenticity of AI requests",
     severity: "medium" as const,
     isActive: true,
     parameters: {
-      minAIModelDiversity: 3,
-      minEntropyScore: 0.5,
-      maxIdenticalRequests: 10,
+      minAIModelDiversity: 2,
+      minEntropyScore: 0.3,
+      maxIdenticalRequests: 20,
       minTimeSpread: 3600
     }
   },
   {
     id: 3,
-    ruleName: "Analisi Pattern Sospetti",
+    ruleName: "Suspicious Pattern Analysis",
     ruleType: "pattern_analysis",
-    description: "Detecta pattern di auto-farming e bot coordinati",
+    description: "Detects auto-farming and coordinated bot patterns",
     severity: "high" as const,
     isActive: true,
     parameters: {
-      maxBurstRequests: 20,
-      burstTimeWindow: 300,
-      maxRepeatedPatterns: 5,
-      minHumanLikeVariation: 0.3
+      maxBurstRequests: 50,
+      burstTimeWindow: 600,
+      maxRepeatedPatterns: 10,
+      minHumanLikeVariation: 0.2
     }
   },
   {
     id: 4,
-    ruleName: "Soglia Ricompense",
+    ruleName: "Reward Thresholds",
     ruleType: "threshold_check",
-    description: "Controllo soglie per reward legittime",
+    description: "Threshold controls for legitimate rewards",
     severity: "medium" as const,
     isActive: true,
     parameters: {
       minDailyRewardThreshold: 0.1,
-      maxDailyRewardThreshold: 50,
-      minWeeklyEntropy: 0.4,
-      maxSuspiciousScore: 70
+      maxDailyRewardThreshold: 100,
+      minWeeklyEntropy: 0.3,
+      maxSuspiciousScore: 80
     }
   },
   {
     id: 5,
-    ruleName: "Sistema Reputazione",
+    ruleName: "Reputation System",
     ruleType: "reputation_check",
-    description: "Gestione reputazione e penalità per creator",
+    description: "Reputation management and penalties for creators",
     severity: "critical" as const,
     isActive: true,
     parameters: {
-      minReputationScore: 30,
-      maxFraudCount: 3,
-      penaltyMultiplier: 0.5,
-      trustScoreThreshold: 70
+      minReputationScore: 20,
+      maxFraudCount: 5,
+      penaltyMultiplier: 0.3,
+      trustScoreThreshold: 60
     }
   }
 ];
@@ -130,12 +130,12 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
       <Alert className="border-red-200 bg-red-50 dark:bg-red-900/20">
         <Ban className="h-4 w-4" />
         <AlertDescription className="text-red-800 dark:text-red-200">
-          <strong>ATTENZIONE AI FRODATORI!</strong> Il sistema WebPayback ha protezioni avanzate contro frodi e manipolazioni.
+          <strong>WARNING TO FRAUDSTERS!</strong> WebPayback system has advanced protections against fraud and manipulation.
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>Attacchi Sybil e auto-farming verranno bannati automaticamente</li>
-            <li>Concentrazione di traffico da singolo IP/dominio è monitorata</li>
-            <li>Pattern sospetti di bot coordinati sono rilevati in tempo reale</li>
-            <li>Violazioni ripetute comportano esclusione permanente dal sistema</li>
+            <li>Sybil attacks and auto-farming will be banned automatically</li>
+            <li>Traffic concentration from single IP/domain is monitored</li>
+            <li>Suspicious patterns of coordinated bots are detected in real-time</li>
+            <li>Repeated violations result in permanent system exclusion</li>
           </ul>
         </AlertDescription>
       </Alert>
@@ -145,7 +145,7 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            {t('activeFraudRules')}
+            Active Fraud Rules
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -178,42 +178,42 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
                   <div className="text-xs text-muted-foreground space-y-1">
                     {rule.ruleType === 'domain_limit' && (
                       <>
-                        <div>• {t('maxDailyAccessesDomain')}: {rule.parameters.maxDailyAccessesPerDomain}</div>
-                        <div>• {t('maxDailyAccessesIP')}: {rule.parameters.maxDailyAccessesPerIP}</div>
-                        <div>• {t('maxDomainConcentration')}: {rule.parameters.maxDomainConcentration}%</div>
-                        <div>• {t('maxIPConcentration')}: {rule.parameters.maxIPConcentration}%</div>
+                        <div>• Max daily accesses per domain: {rule.parameters.maxDailyAccessesPerDomain}</div>
+                        <div>• Max daily accesses per IP: {rule.parameters.maxDailyAccessesPerIP}</div>
+                        <div>• Max domain concentration: {rule.parameters.maxDomainConcentration}%</div>
+                        <div>• Max IP concentration: {rule.parameters.maxIPConcentration}%</div>
                       </>
                     )}
                     {rule.ruleType === 'pattern_analysis' && rule.parameters.minAIModelDiversity && (
                       <>
-                        <div>• {t('minAIModelDiversity')}: {rule.parameters.minAIModelDiversity}</div>
-                        <div>• {t('minEntropyScore')}: {rule.parameters.minEntropyScore}</div>
-                        <div>• {t('maxIdenticalRequests')}: {rule.parameters.maxIdenticalRequests}</div>
-                        <div>• {t('minTimeSpread')}: {rule.parameters.minTimeSpread}s</div>
+                        <div>• Min AI model diversity: {rule.parameters.minAIModelDiversity}</div>
+                        <div>• Min entropy score: {rule.parameters.minEntropyScore}</div>
+                        <div>• Max identical requests: {rule.parameters.maxIdenticalRequests}</div>
+                        <div>• Min time spread: {rule.parameters.minTimeSpread}s</div>
                       </>
                     )}
                     {rule.ruleType === 'pattern_analysis' && rule.parameters.maxBurstRequests && (
                       <>
-                        <div>• Max richieste in burst: {rule.parameters.maxBurstRequests}</div>
-                        <div>• Finestra temporale burst: {rule.parameters.burstTimeWindow}s</div>
-                        <div>• Max pattern ripetuti: {rule.parameters.maxRepeatedPatterns}</div>
-                        <div>• Min variazione human-like: {rule.parameters.minHumanLikeVariation}</div>
+                        <div>• Max burst requests: {rule.parameters.maxBurstRequests}</div>
+                        <div>• Burst time window: {rule.parameters.burstTimeWindow}s</div>
+                        <div>• Max repeated patterns: {rule.parameters.maxRepeatedPatterns}</div>
+                        <div>• Min human-like variation: {rule.parameters.minHumanLikeVariation}</div>
                       </>
                     )}
                     {rule.ruleType === 'threshold_check' && (
                       <>
-                        <div>• Min reward giornaliero: {rule.parameters.minDailyRewardThreshold} WPT</div>
-                        <div>• Max reward giornaliero: {rule.parameters.maxDailyRewardThreshold} WPT</div>
-                        <div>• Min entropy settimanale: {rule.parameters.minWeeklyEntropy}</div>
-                        <div>• Max punteggio sospetto: {rule.parameters.maxSuspiciousScore}%</div>
+                        <div>• Min daily reward threshold: {rule.parameters.minDailyRewardThreshold} WPT</div>
+                        <div>• Max daily reward threshold: {rule.parameters.maxDailyRewardThreshold} WPT</div>
+                        <div>• Min weekly entropy: {rule.parameters.minWeeklyEntropy}</div>
+                        <div>• Max suspicious score: {rule.parameters.maxSuspiciousScore}%</div>
                       </>
                     )}
                     {rule.ruleType === 'reputation_check' && (
                       <>
-                        <div>• Min punteggio reputazione: {rule.parameters.minReputationScore}</div>
-                        <div>• Max frodi prima del ban: {rule.parameters.maxFraudCount}</div>
-                        <div>• Moltiplicatore penalità: {rule.parameters.penaltyMultiplier}x</div>
-                        <div>• Soglia trust score: {rule.parameters.trustScoreThreshold}</div>
+                        <div>• Min reputation score: {rule.parameters.minReputationScore}</div>
+                        <div>• Max fraud count before ban: {rule.parameters.maxFraudCount}</div>
+                        <div>• Penalty multiplier: {rule.parameters.penaltyMultiplier}x</div>
+                        <div>• Trust score threshold: {rule.parameters.trustScoreThreshold}</div>
                       </>
                     )}
                   </div>
@@ -229,7 +229,7 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
-            Come Funziona il Sistema
+How the System Works
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -237,9 +237,9 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
               <div>
-                <p className="font-medium">Monitoraggio in Tempo Reale</p>
+                <p className="font-medium">Real-time Monitoring</p>
                 <p className="text-muted-foreground">
-                  Ogni accesso AI viene analizzato per pattern sospetti, concentrazione IP/dominio e diversità delle richieste.
+                  Every AI access is analyzed for suspicious patterns, IP/domain concentration and request diversity.
                 </p>
               </div>
             </div>
@@ -247,9 +247,9 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
               <div>
-                <p className="font-medium">Scoring Intelligente</p>
+                <p className="font-medium">Intelligent Scoring</p>
                 <p className="text-muted-foreground">
-                  Il sistema calcola un punteggio di rischio basato su multiple metriche e comportamenti anomali.
+                  The system calculates a risk score based on multiple metrics and anomalous behaviors.
                 </p>
               </div>
             </div>
@@ -257,9 +257,9 @@ export default function FraudDetectionRules({ rules = FRAUD_RULES }: FraudDetect
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-yellow-500 mt-2"></div>
               <div>
-                <p className="font-medium">Azioni Automatiche</p>
+                <p className="font-medium">Automatic Actions</p>
                 <p className="text-muted-foreground">
-                  Reward bloccate, penalità reputazione e allerte generate automaticamente per attività sospette.
+                  Rewards blocked, reputation penalties and alerts generated automatically for suspicious activities.
                 </p>
               </div>
             </div>

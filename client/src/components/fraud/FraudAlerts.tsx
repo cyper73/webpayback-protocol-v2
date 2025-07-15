@@ -32,8 +32,8 @@ const MOCK_ALERTS: FraudAlert[] = [
     createdAt: "2025-01-14T22:00:00Z",
     details: {
       riskScore: 75,
-      reasons: ["Traffico concentrato da singolo dominio", "Superato limite giornaliero"],
-      recommendedAction: "Monitoraggio intensivo"
+      reasons: ["Traffic concentrated from single domain", "Daily limit exceeded"],
+      recommendedAction: "Intensive monitoring"
     },
     creatorId: 1
   },
@@ -45,8 +45,8 @@ const MOCK_ALERTS: FraudAlert[] = [
     createdAt: "2025-01-14T21:30:00Z",
     details: {
       riskScore: 45,
-      reasons: ["Bassa diversità di modelli AI", "Solo 2 AI models utilizzati"],
-      recommendedAction: "Verifica pattern di utilizzo"
+      reasons: ["Low AI model diversity", "Only 2 AI models used"],
+      recommendedAction: "Verify usage patterns"
     },
     creatorId: 2
   },
@@ -58,8 +58,8 @@ const MOCK_ALERTS: FraudAlert[] = [
     createdAt: "2025-01-14T20:15:00Z",
     details: {
       riskScore: 95,
-      reasons: ["Pattern di auto-farming detectato", "Richieste coordinate in burst"],
-      recommendedAction: "Sospensione immediata account"
+      reasons: ["Auto-farming pattern detected", "Coordinated burst requests"],
+      recommendedAction: "Immediate account suspension"
     },
     creatorId: 3
   }
@@ -109,21 +109,21 @@ const getStatusIcon = (status: string) => {
 const getAlertTypeLabel = (alertType: string) => {
   switch (alertType) {
     case 'domain_concentration':
-      return 'Concentrazione Dominio';
+      return 'Domain Concentration';
     case 'ip_concentration':
-      return 'Concentrazione IP';
+      return 'IP Concentration';
     case 'low_ai_diversity':
-      return 'Bassa Diversità AI';
+      return 'Low AI Diversity';
     case 'repetitive_pattern':
-      return 'Pattern Ripetitivo';
+      return 'Repetitive Pattern';
     case 'suspicious_pattern':
-      return 'Pattern Sospetto';
+      return 'Suspicious Pattern';
     case 'reward_threshold_breach':
-      return 'Superamento Soglia Reward';
+      return 'Reward Threshold Breach';
     case 'low_reputation':
-      return 'Bassa Reputazione';
+      return 'Low Reputation';
     case 'sybil_attack':
-      return 'Attacco Sybil';
+      return 'Sybil Attack';
     case 'auto_farming':
       return 'Auto-Farming';
     default:
@@ -132,7 +132,7 @@ const getAlertTypeLabel = (alertType: string) => {
 };
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString('it-IT', {
+  return new Date(dateString).toLocaleString('en-US', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -142,7 +142,6 @@ const formatDate = (dateString: string) => {
 };
 
 export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) {
-  const { t } = useTranslations();
   const activeAlerts = alerts.filter(alert => alert.status === 'active');
   const resolvedAlerts = alerts.filter(alert => alert.status === 'resolved');
 
@@ -154,7 +153,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
               <AlertTriangle className="h-5 w-5" />
-              {t('activeFraudAlerts')} ({activeAlerts.length})
+              Active Fraud Alerts ({activeAlerts.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -184,7 +183,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
                             Risk Score: {alert.details.riskScore}%
                           </div>
                           <div>
-                            <span className="font-medium">{t('reasons')}:</span>
+                            <span className="font-medium">Reasons:</span>
                             <ul className="list-disc list-inside mt-1 space-y-0.5">
                               {alert.details.reasons.map((reason, idx) => (
                                 <li key={idx}>{reason}</li>
@@ -192,7 +191,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
                             </ul>
                           </div>
                           <div>
-                            <span className="font-medium">{t('recommendedAction')}:</span> {alert.details.recommendedAction}
+                            <span className="font-medium">Recommended Action:</span> {alert.details.recommendedAction}
                           </div>
                         </div>
                       </div>
@@ -216,7 +215,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            {t('fraudAlertsHistory')}
+            Fraud Alerts History
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -264,7 +263,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
             <div className="text-2xl font-bold text-red-600">
               {activeAlerts.length}
             </div>
-            <p className="text-xs text-muted-foreground">{t('activeAlerts')}</p>
+            <p className="text-xs text-muted-foreground">Active Alerts</p>
           </CardContent>
         </Card>
         <Card>
@@ -272,7 +271,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
             <div className="text-2xl font-bold text-green-600">
               {resolvedAlerts.length}
             </div>
-            <p className="text-xs text-muted-foreground">{t('resolvedAlerts')}</p>
+            <p className="text-xs text-muted-foreground">Resolved Alerts</p>
           </CardContent>
         </Card>
         <Card>
@@ -280,7 +279,7 @@ export default function FraudAlerts({ alerts = MOCK_ALERTS }: FraudAlertsProps) 
             <div className="text-2xl font-bold text-blue-600">
               {alerts.filter(a => a.severity === 'critical').length}
             </div>
-            <p className="text-xs text-muted-foreground">Allerte Critiche</p>
+            <p className="text-xs text-muted-foreground">Critical Alerts</p>
           </CardContent>
         </Card>
       </div>
