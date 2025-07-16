@@ -41,7 +41,15 @@ class DomainVerificationService {
   private extractDomain(url: string): string {
     try {
       console.log(`🔍 Extracting domain from URL: ${url}`);
-      const urlObj = new URL(url);
+      
+      // Auto-add https:// if no protocol is present
+      let normalizedUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        normalizedUrl = `https://${url}`;
+        console.log(`🔧 Auto-added https:// - normalized URL: ${normalizedUrl}`);
+      }
+      
+      const urlObj = new URL(normalizedUrl);
       const domain = urlObj.hostname.toLowerCase();
       console.log(`🔍 Extracted domain: ${domain}`);
       return domain;
