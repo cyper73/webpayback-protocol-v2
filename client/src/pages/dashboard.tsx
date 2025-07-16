@@ -68,7 +68,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <img src={wptLogo} alt="WPT Logo" className="w-8 h-8" />
-                <span className="text-xl font-bold gradient-text">WebPayback Protocol</span>
+                <span className="text-xl font-bold gradient-text">🔧 WebPayback Protocol - Infrastructure Active</span>
               </div>
               <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
                 <div className={`w-2 h-2 rounded-full ${isFetching ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
@@ -95,8 +95,8 @@ export default function Dashboard() {
       {/* Main Dashboard */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
-        <div className="mb-8">
-          <Card className="glass-card rounded-2xl shadow-neon-blue">
+        <div className="mb-8 infrastructure-debug">
+          <Card className="glass-card rounded-2xl shadow-neon-blue infrastructure-debug">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold gradient-text">
