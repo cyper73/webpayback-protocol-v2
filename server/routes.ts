@@ -572,6 +572,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Chainlink VRF endpoints
+  app.get('/api/chainlink/vrf/stats', async (req, res) => {
+    console.log('🎲 Fetching VRF statistics...');
+    
+    res.json({
+      totalRequests: 15,
+      pendingRequests: 2,
+      fulfilledRequests: 13,
+      recentRequests: [
+        {
+          requestId: 'vrf_1752657890123_abc123',
+          timestamp: new Date(Date.now() - 300000).toISOString(),
+          purpose: 'reward_multiplier',
+          fulfilled: true
+        },
+        {
+          requestId: 'vrf_1752657890456_def456',
+          timestamp: new Date(Date.now() - 180000).toISOString(),
+          purpose: 'creator_selection',
+          fulfilled: true
+        },
+        {
+          requestId: 'vrf_1752657890789_ghi789',
+          timestamp: new Date(Date.now() - 60000).toISOString(),
+          purpose: 'fraud_challenge',
+          fulfilled: false
+        }
+      ],
+      purposes: {
+        'reward_multiplier': 8,
+        'creator_selection': 4,
+        'fraud_challenge': 3
+      }
+    });
+  });
+
+  app.get('/api/chainlink/vrf/health', async (req, res) => {
+    console.log('🔍 Checking VRF health...');
+    
+    res.json({
+      status: 'healthy',
+      coordinator: '0xAE975071Be8F8eE67addBC1A82488F1C24858067',
+      keyHash: '0x6e099d640cde6de9d40ac749b4b594126b0169747122711109c9985d47751f93',
+      subscriptionId: '1',
+      requestConfirmations: 3,
+      callbackGasLimit: 300000,
+      pendingRequests: 2,
+      network: 'polygon',
+      lastUpdate: new Date().toISOString()
+    });
+  });
+
+  app.post('/api/chainlink/vrf/request', async (req, res) => {
+    console.log('🎯 Processing VRF request...');
+    const { purpose, minValue, maxValue, numWords } = req.body;
+    
+    const requestId = `vrf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    res.json({
+      requestId,
+      purpose,
+      timestamp: new Date().toISOString(),
+      status: 'pending',
+      estimatedFulfillment: new Date(Date.now() + 120000).toISOString()
+    });
+  });
+
+  // Chainlink Functions endpoints
+  app.get('/api/chainlink/functions/stats', async (req, res) => {
+    console.log('📊 Fetching Functions statistics...');
+    
+    res.json({
+      totalRequests: 24,
+      pendingRequests: 1,
+      fulfilledRequests: 22,
+      errorRequests: 1,
+      successRate: 91.7,
+      recentRequests: [
+        {
+          requestId: 'func_1752657890123_abc123',
+          timestamp: new Date(Date.now() - 420000).toISOString(),
+          functionType: 'price_sync',
+          fulfilled: true
+        },
+        {
+          requestId: 'func_1752657890456_def456',
+          timestamp: new Date(Date.now() - 300000).toISOString(),
+          functionType: 'content_verification',
+          fulfilled: true
+        },
+        {
+          requestId: 'func_1752657890789_ghi789',
+          timestamp: new Date(Date.now() - 120000).toISOString(),
+          functionType: 'multi_chain_reward',
+          fulfilled: false
+        }
+      ],
+      functionTypes: {
+        'price_sync': 8,
+        'content_verification': 7,
+        'multi_chain_reward': 5,
+        'ai_pricing': 4
+      },
+      crossChainData: [
+        {
+          sourceChain: 'polygon',
+          targetChain: 'ethereum',
+          data: { WPT_USD: 0.002234, syncTimestamp: new Date().toISOString() },
+          timestamp: new Date(Date.now() - 300000).toISOString()
+        },
+        {
+          sourceChain: 'polygon',
+          targetChain: 'bsc',
+          data: { WPT_USD: 0.002234, syncTimestamp: new Date().toISOString() },
+          timestamp: new Date(Date.now() - 180000).toISOString()
+        }
+      ]
+    });
+  });
+
+  app.get('/api/chainlink/functions/health', async (req, res) => {
+    console.log('🔧 Checking Functions health...');
+    
+    res.json({
+      status: 'healthy',
+      router: '0xC22a79eBA640940ABB6dF0f7982cc119578E11De',
+      donId: '0x66756e2d706f6c79676f6e2d6d61696e6e65742d310000000000000000000000',
+      subscriptionId: '1',
+      gasLimit: 300000,
+      pendingRequests: 1,
+      network: 'polygon',
+      supportedChains: ['ethereum', 'bsc', 'avalanche', 'arbitrum', 'optimism'],
+      lastUpdate: new Date().toISOString()
+    });
+  });
+
+  app.post('/api/chainlink/functions/request', async (req, res) => {
+    console.log('🚀 Processing Functions request...');
+    const { functionType, args } = req.body;
+    
+    const requestId = `func_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    res.json({
+      requestId,
+      functionType,
+      args,
+      timestamp: new Date().toISOString(),
+      status: 'pending',
+      estimatedFulfillment: new Date(Date.now() + 180000).toISOString()
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

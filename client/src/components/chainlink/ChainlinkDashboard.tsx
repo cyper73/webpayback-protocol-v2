@@ -3,7 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw, TrendingUp, Activity, Zap } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, RefreshCw, TrendingUp, Activity, Zap, Dices, Network, Globe } from 'lucide-react';
+import { ChainlinkVRFDashboard } from './ChainlinkVRFDashboard';
+import { ChainlinkFunctionsDashboard } from './ChainlinkFunctionsDashboard';
 
 interface ChainlinkPrices {
   prices: {
@@ -108,7 +111,7 @@ export default function ChainlinkDashboard() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Chainlink Integration</h2>
           <p className="text-muted-foreground">
-            Real-time data feeds and automated batch processing
+            Enterprise-grade oracle services: Data Feeds, VRF, and Functions
           </p>
         </div>
         <Button 
@@ -121,6 +124,65 @@ export default function ChainlinkDashboard() {
         </Button>
       </div>
 
+      {/* Tabbed Interface */}
+      <Tabs defaultValue="data-feeds" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="data-feeds" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Data Feeds
+          </TabsTrigger>
+          <TabsTrigger value="vrf" className="flex items-center gap-2">
+            <Dices className="h-4 w-4" />
+            VRF
+          </TabsTrigger>
+          <TabsTrigger value="functions" className="flex items-center gap-2">
+            <Network className="h-4 w-4" />
+            Functions
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="data-feeds" className="space-y-6 mt-6">
+          <DataFeedsTab 
+            prices={prices}
+            automation={automation}
+            health={health}
+            pricesLoading={pricesLoading}
+            automationLoading={automationLoading}
+            healthLoading={healthLoading}
+            handleTriggerAutomation={handleTriggerAutomation}
+            refetchAutomation={refetchAutomation}
+            formatCurrency={formatCurrency}
+            formatDate={formatDate}
+          />
+        </TabsContent>
+
+        <TabsContent value="vrf" className="space-y-6 mt-6">
+          <ChainlinkVRFDashboard />
+        </TabsContent>
+
+        <TabsContent value="functions" className="space-y-6 mt-6">
+          <ChainlinkFunctionsDashboard />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// Data Feeds Tab Component
+function DataFeedsTab({ 
+  prices, 
+  automation, 
+  health, 
+  pricesLoading, 
+  automationLoading, 
+  healthLoading, 
+  handleTriggerAutomation, 
+  refetchAutomation, 
+  formatCurrency, 
+  formatDate 
+}: any) {
+  return (
+    <div className="space-y-6">
       {/* Price Feeds */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -269,7 +331,7 @@ export default function ChainlinkDashboard() {
             </div>
           ) : (
             <div className="space-y-3">
-              {health?.feeds.map((feed) => (
+              {health?.feeds.map((feed: any) => (
                 <div key={feed.feed} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
                     <Badge variant={feed.status === 'healthy' ? 'default' : 'destructive'}>
