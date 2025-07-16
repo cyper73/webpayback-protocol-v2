@@ -109,6 +109,8 @@ export default function CreatorPortal() {
                 <SelectItem value="educational">Educational Content</SelectItem>
                 <SelectItem value="technical">Technical Documentation</SelectItem>
                 <SelectItem value="creative">Creative Writing</SelectItem>
+                <SelectItem value="art">Art/Visual Content</SelectItem>
+                <SelectItem value="music">Music/Audio Content</SelectItem>
               </SelectContent>
             </Select>
             {errors.contentCategory && (
