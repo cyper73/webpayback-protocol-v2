@@ -12,7 +12,7 @@ import { insertCreatorSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Copy } from "lucide-react";
+import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Copy, Code } from "lucide-react";
 
 const formSchema = insertCreatorSchema.extend({
   termsAccepted: z.boolean().refine(val => val === true, {
@@ -219,7 +219,71 @@ export default function CreatorPortal() {
             </div>
           )}
           
-          {!isVerified && !needsManualReview && (
+          {domainVerification.requiresMetaTag && (
+            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Code className="w-4 h-4 text-blue-500" />
+                <span className="text-sm font-semibold text-blue-400">META TAG VERIFICATION REQUIRED</span>
+              </div>
+              <p className="text-sm text-blue-300 mb-3">
+                This specific page requires meta tag verification. Add the following meta tag to your page:
+              </p>
+              <div className="bg-black/40 p-2 rounded border border-blue-500/30">
+                <code className="text-xs text-blue-200 font-mono">
+                  {domainVerification.metaTagInstruction}
+                </code>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <Button
+                  onClick={() => navigator.clipboard.writeText(domainVerification.metaTagInstruction)}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Copy className="w-3 h-3 mr-1" />
+                  Copy
+                </Button>
+                <Button
+                  onClick={() => {
+                    // Verify meta tag
+                    if (domainVerification.verificationToken) {
+                      apiRequest("POST", "/api/domain/chainlink/verify-meta-tag", {
+                        websiteUrl: watch("websiteUrl"),
+                        verificationToken: domainVerification.verificationToken
+                      }).then((result) => {
+                        if (result.verified) {
+                          toast({
+                            title: "Meta Tag Verified",
+                            description: "Your page has been successfully verified!",
+                            variant: "default",
+                          });
+                          setDomainVerification(prev => ({ ...prev, isVerified: true }));
+                        } else {
+                          toast({
+                            title: "Meta Tag Not Found",
+                            description: "Please ensure the meta tag is properly placed on your page.",
+                            variant: "destructive",
+                          });
+                        }
+                      }).catch(error => {
+                        toast({
+                          title: "Verification Failed",
+                          description: error.message,
+                          variant: "destructive",
+                        });
+                      });
+                    }
+                  }}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Shield className="w-3 h-3 mr-1" />
+                  Verify Meta Tag
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {!isVerified && !needsManualReview && !domainVerification.requiresMetaTag && (
             <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <AlertTriangle className="w-4 h-4 text-red-500" />

@@ -3,11 +3,16 @@ import { InsertDomainVerification, DomainVerification } from '@shared/schema';
 
 interface ChainlinkDomainCheckResult {
   domain: string;
+  fullUrl: string;
+  isSpecificPage: boolean;
   isVerified: boolean;
   securityLevel: 'low' | 'medium' | 'high';
   requiresManualReview: boolean;
+  requiresMetaTag: boolean;
   verificationScore: number;
   riskFactors: string[];
+  verificationToken?: string;
+  metaTagInstruction?: string;
   chainlinkData: {
     domainAge: number;
     sslCertificate: boolean;
@@ -49,6 +54,27 @@ class ChainlinkDomainVerificationService {
       console.error('❌ Invalid URL format:', normalizedUrl);
       throw new Error('Invalid URL format');
     }
+  }
+
+  private isSpecificPage(url: string): boolean {
+    let normalizedUrl = url.toLowerCase().trim();
+    
+    if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
+    
+    try {
+      const urlObj = new URL(normalizedUrl);
+      const path = urlObj.pathname;
+      // It's a specific page if it has a path beyond just '/'
+      return path !== '/' && path !== '' && path.length > 1;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  private generateVerificationToken(): string {
+    return 'wpt-verify-' + Math.random().toString(36).substr(2, 16);
   }
 
   private isFamousDomain(domain: string): boolean {
@@ -114,6 +140,14 @@ class ChainlinkDomainVerificationService {
     console.log('🔗 Starting Chainlink domain verification for:', websiteUrl);
     
     const domain = this.extractDomain(websiteUrl);
+    const isSpecificPage = this.isSpecificPage(websiteUrl);
+    
+    // Check for duplicates
+    const existingCreator = await storage.getCreatorByWebsiteUrl(websiteUrl);
+    if (existingCreator) {
+      throw new Error('This website URL is already registered by another creator');
+    }
+    
     const chainlinkData = await this.simulateChainlinkDataFeed(domain);
     
     const verificationScore = this.calculateVerificationScore(domain, chainlinkData);
@@ -122,8 +156,12 @@ class ChainlinkDomainVerificationService {
     
     const riskFactors: string[] = [];
     
-    if (isFamous) {
+    if (isFamous && !isSpecificPage) {
       riskFactors.push('Famous domain requiring manual verification');
+    }
+    
+    if (isFamous && isSpecificPage) {
+      riskFactors.push('Specific page on famous domain - requires meta tag verification');
     }
     
     if (isHighRisk) {
@@ -146,25 +184,82 @@ class ChainlinkDomainVerificationService {
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
-    const requiresManualReview = isFamous || verificationScore < 40;
+    const requiresManualReview = isFamous && !isSpecificPage;
+    const requiresMetaTag = isFamous && isSpecificPage;
+    
+    let verificationToken;
+    let metaTagInstruction;
+    
+    if (requiresMetaTag) {
+      verificationToken = this.generateVerificationToken();
+      metaTagInstruction = `<meta name="wpt-verification" content="${verificationToken}">`;
+    }
 
     console.log('🔗 Chainlink verification result:', {
       domain,
+      fullUrl: websiteUrl,
+      isSpecificPage,
       verificationScore,
       securityLevel,
       requiresManualReview,
+      requiresMetaTag,
       riskFactors
     });
 
     return {
       domain,
-      isVerified: verificationScore >= 70 && !requiresManualReview,
+      fullUrl: websiteUrl,
+      isSpecificPage,
+      isVerified: verificationScore >= 70 && !requiresManualReview && !requiresMetaTag,
       securityLevel,
       requiresManualReview,
+      requiresMetaTag,
       verificationScore,
       riskFactors,
+      verificationToken,
+      metaTagInstruction,
       chainlinkData
     };
+  }
+
+  async verifyMetaTag(websiteUrl: string, verificationToken: string): Promise<boolean> {
+    console.log('🔗 Verifying meta tag for:', websiteUrl, 'with token:', verificationToken);
+    
+    try {
+      // In production, this would use Chainlink to make HTTP request to the page
+      // For now, we simulate the meta tag verification
+      console.log('🔗 Simulating meta tag verification...');
+      
+      // Simulate HTTP request to fetch page content
+      const pageContent = await this.simulatePageContentFetch(websiteUrl);
+      
+      // Check if verification token exists in meta tag
+      const metaTagPattern = new RegExp(`<meta\\s+name=["']wpt-verification["']\\s+content=["']${verificationToken}["']\\s*/?>`);
+      const isVerified = metaTagPattern.test(pageContent);
+      
+      console.log('🔗 Meta tag verification result:', isVerified);
+      return isVerified;
+    } catch (error) {
+      console.error('❌ Meta tag verification failed:', error);
+      return false;
+    }
+  }
+
+  private async simulatePageContentFetch(url: string): Promise<string> {
+    // In production, this would use Chainlink Functions to fetch actual page content
+    // For demo purposes, we return a mock HTML with the verification meta tag
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta name="wpt-verification" content="wpt-verify-demo123">
+        <title>Demo Page</title>
+      </head>
+      <body>
+        <h1>Demo content</h1>
+      </body>
+      </html>
+    `;
   }
 
   async startChainlinkVerification(creatorId: number, websiteUrl: string): Promise<{

@@ -44,6 +44,7 @@ export interface IStorage {
   createCreator(insertCreator: InsertCreator): Promise<Creator>;
   updateCreator(id: number, updates: Partial<Creator>): Promise<void>;
   getCreatorByReferralCode(referralCode: string): Promise<Creator | undefined>;
+  getCreatorByWebsiteUrl(websiteUrl: string): Promise<Creator | undefined>;
   generateReferralCode(): Promise<string>;
   
   // Referral methods
@@ -213,6 +214,11 @@ export class DatabaseStorage implements IStorage {
 
   async getCreatorByReferralCode(referralCode: string): Promise<Creator | undefined> {
     const [creator] = await db.select().from(creators).where(eq(creators.referralCode, referralCode));
+    return creator || undefined;
+  }
+
+  async getCreatorByWebsiteUrl(websiteUrl: string): Promise<Creator | undefined> {
+    const [creator] = await db.select().from(creators).where(eq(creators.websiteUrl, websiteUrl));
     return creator || undefined;
   }
 

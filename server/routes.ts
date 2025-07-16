@@ -886,6 +886,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Meta tag verification endpoint
+  app.post('/api/domain/chainlink/verify-meta-tag', async (req, res) => {
+    try {
+      const { websiteUrl, verificationToken } = req.body;
+      
+      if (!websiteUrl || !verificationToken) {
+        return res.status(400).json({ error: 'Website URL and verification token are required' });
+      }
+      
+      const isVerified = await chainlinkDomainVerificationService.verifyMetaTag(websiteUrl, verificationToken);
+      
+      if (isVerified) {
+        res.json({ 
+          success: true, 
+          message: 'Meta tag verification successful',
+          verified: true 
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: 'Meta tag verification failed. Please ensure the meta tag is properly placed on your page.',
+          verified: false 
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   // Force cache bypass test
   app.get("/api/test/cache-bypass", (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
