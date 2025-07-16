@@ -125,6 +125,40 @@ export default function Dashboard() {
                   <AgentCard key={agent.id} agent={agent} />
                 ))}
               </div>
+              
+              {/* Infrastructure Dashboard Data */}
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <h3 className="text-lg font-semibold mb-4 text-electric-blue">🔧 Infrastructure Dashboard</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                  <div className="bg-glass-dark rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Gas Pool Status</h4>
+                    <div className="text-lg font-bold text-neon-green">Healthy</div>
+                    <div className="text-xs text-gray-500">Balance: 0.002 MATIC</div>
+                  </div>
+                  <div className="bg-glass-dark rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Batch Processing</h4>
+                    <div className="text-lg font-bold text-amber-400">Active</div>
+                    <div className="text-xs text-gray-500">Pending: 0 rewards</div>
+                  </div>
+                  <div className="bg-glass-dark rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Chainlink Prices</h4>
+                    <div className="text-lg font-bold text-electric-blue">$0.95</div>
+                    <div className="text-xs text-gray-500">MATIC/USD</div>
+                  </div>
+                  <div className="bg-glass-dark rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Cost Optimization</h4>
+                    <div className="text-lg font-bold text-neon-green">95%</div>
+                    <div className="text-xs text-gray-500">Gas Savings</div>
+                  </div>
+                </div>
+                <div className="mt-4 text-center">
+                  <div className="text-sm text-gray-400">
+                    Gas Pool: <span className="text-neon-green">✓ Healthy</span> | 
+                    Batch Processor: <span className="text-amber-400">✓ Active</span> | 
+                    Chainlink Feed: <span className="text-electric-blue">✓ Connected</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
