@@ -178,6 +178,12 @@ export default function CreatorPortal() {
     const isHighSecurity = domainVerification.securityLevel === 'high';
     const needsVerification = domainVerification.requiresVerification;
     const hasInstructions = domainVerification.verification?.instructions;
+    
+    // Debug log to see what we're getting
+    console.log('Domain verification data:', domainVerification);
+    console.log('Needs verification:', needsVerification);
+    console.log('Is verified:', isDomainVerified);
+    console.log('Security level:', domainVerification.securityLevel);
 
     return (
       <div className="mt-4 p-4 rounded-lg border border-white/10 bg-glass-dark">
@@ -190,10 +196,12 @@ export default function CreatorPortal() {
           <div className="flex items-center gap-2">
             {needsVerification && !isDomainVerified ? (
               <AlertTriangle className="w-4 h-4 text-red-500" />
-            ) : isHighSecurity ? (
-              <AlertTriangle className="w-4 h-4 text-yellow-500" />
-            ) : (
+            ) : isDomainVerified ? (
               <CheckCircle className="w-4 h-4 text-green-500" />
+            ) : !needsVerification ? (
+              <CheckCircle className="w-4 h-4 text-green-500" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-yellow-500" />
             )}
             <span className="text-sm text-gray-300">
               Security Level: <span className="font-semibold text-white">{domainVerification.securityLevel?.toUpperCase()}</span>
