@@ -97,6 +97,145 @@ export default function Dashboard() {
 
       {/* Main Dashboard */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Infrastructure Dashboard - Gas Pool & Chainlink */}
+        <div className="mb-8">
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold gradient-text">🔧 Infrastructure Dashboard</h2>
+                <p className="text-gray-400">Gas Pool Management & Chainlink Integration</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
+                <span className="text-sm text-gray-300">Systems Active</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              <div className="bg-glass-dark rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-electric-blue/20 rounded-full flex items-center justify-center">
+                    <span className="text-electric-blue font-bold text-sm">GP</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Gas Pool Status</h3>
+                    <p className="text-xs text-gray-400">Real-time monitoring</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Health</span>
+                    <span className="text-sm font-medium text-neon-green">Healthy</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Balance</span>
+                    <span className="text-sm font-mono">0.002 MATIC</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Fees Collected</span>
+                    <span className="text-sm font-mono">0.019 MATIC</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-glass-dark rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center">
+                    <span className="text-amber-400 font-bold text-sm">BP</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Batch Processing</h3>
+                    <p className="text-xs text-gray-400">Automated rewards</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Status</span>
+                    <span className="text-sm font-medium text-amber-400">Active</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Pending</span>
+                    <span className="text-sm font-mono">0 rewards</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Batch Size</span>
+                    <span className="text-sm font-mono">50</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-glass-dark rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-purple-400/20 rounded-full flex items-center justify-center">
+                    <span className="text-purple-400 font-bold text-sm">CL</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Chainlink Prices</h3>
+                    <p className="text-xs text-gray-400">Live price feeds</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">MATIC/USD</span>
+                    <span className="text-sm font-mono text-electric-blue">$0.95</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">ETH/USD</span>
+                    <span className="text-sm font-mono text-purple-400">$3,241</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">WPT/USD</span>
+                    <span className="text-sm font-mono text-amber-400">$0.0022</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-glass-dark rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center">
+                    <span className="text-neon-green font-bold text-sm">CO</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Cost Optimization</h3>
+                    <p className="text-xs text-gray-400">Gas savings</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-neon-green">95%</div>
+                    <div className="text-xs text-gray-400">Gas Savings</div>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Individual</span>
+                    <span className="text-sm font-mono">0.017 MATIC</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-400">Batch</span>
+                    <span className="text-sm font-mono">0.0008 MATIC</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-glass-dark rounded-lg">
+              <div className="flex items-center justify-center space-x-8">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-neon-green rounded-full"></div>
+                  <span className="text-sm text-gray-300">Gas Pool Healthy</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+                  <span className="text-sm text-gray-300">Batch Processor Active</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-electric-blue rounded-full"></div>
+                  <span className="text-sm text-gray-300">Chainlink Connected</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Creator Registration Portal - Priority Section */}
         <div className="mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
