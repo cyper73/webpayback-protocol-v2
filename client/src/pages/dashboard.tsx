@@ -105,18 +105,13 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Test Infrastructure Section */}
-        <div className="mb-8">
-          <TestSection />
-        </div>
-
         {/* Agent Collaboration Panel */}
         <div className="mb-8">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold gradient-text">
-                  Multi-Agent Orchestration Command Center
+                  🔧 Test Infrastructure Section
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
