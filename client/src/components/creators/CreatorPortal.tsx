@@ -383,10 +383,21 @@ export default function CreatorPortal() {
     }
     
     // If domain verification is required but not completed, block registration
-    if (domainVerification?.requiresVerification && !isDomainVerified) {
+    if (domainVerification?.requiresManualReview) {
       toast({
         title: "Domain Verification Required",
-        description: "Please complete domain verification before registration.",
+        description: "Please complete manual domain verification before registration.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // If meta tag verification is required but not completed, block registration
+    if (domainVerification?.requiresMetaTag && !isDomainVerified) {
+      toast({
+        title: "Meta Tag Verification Required",
+        description: "Please complete meta tag verification before registration.",
         variant: "destructive",
       });
       setIsSubmitting(false);
