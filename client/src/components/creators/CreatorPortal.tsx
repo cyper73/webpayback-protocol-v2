@@ -18,7 +18,7 @@ const formSchema = insertCreatorSchema.extend({
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
   })
-});
+}).omit({ userId: true });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -40,7 +40,6 @@ export default function CreatorPortal() {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userId: 1, // Default user ID for demo
       websiteUrl: "",
       walletAddress: "",
       contentCategory: "",
@@ -98,7 +97,7 @@ export default function CreatorPortal() {
   });
 
   const createCreatorMutation = useMutation({
-    mutationFn: async (data: FormData) => {
+    mutationFn: async (data: any) => {
       const { termsAccepted, ...creatorData } = data;
       const response = await apiRequest("POST", "/api/creators", creatorData);
       return response;
@@ -222,9 +221,57 @@ export default function CreatorPortal() {
     );
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    createCreatorMutation.mutate(data);
+    
+    // Always check domain before registration
+    if (!domainVerification) {
+      setIsCheckingDomain(true);
+      try {
+        const domainCheckResult = await apiRequest("POST", "/api/domain/check", { websiteUrl: data.websiteUrl });
+        setDomainVerification(domainCheckResult);
+        
+        if (domainCheckResult.requiresVerification) {
+          toast({
+            title: "Domain Verification Required",
+            description: domainCheckResult.reason || "This domain requires verification for security purposes.",
+            variant: "default",
+          });
+          setIsSubmitting(false);
+          setIsCheckingDomain(false);
+          return;
+        }
+      } catch (error: any) {
+        toast({
+          title: "Domain Check Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        setIsCheckingDomain(false);
+        return;
+      }
+      setIsCheckingDomain(false);
+    }
+    
+    // If domain verification is required but not completed, block registration
+    if (domainVerification?.requiresVerification && !isDomainVerified) {
+      toast({
+        title: "Domain Verification Required",
+        description: "Please complete domain verification before registration.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Add userId to the data
+    const creatorData = {
+      ...data,
+      userId: 1 // Demo user ID
+    };
+    
+    createCreatorMutation.mutate(creatorData);
     setIsSubmitting(false);
   };
 
