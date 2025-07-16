@@ -4,12 +4,12 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard-working";
+import Dashboard from "@/pages/dashboard";
 import TestConnectivity from "@/pages/test-connectivity";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={TestConnectivity} />
+      <Route path="/" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -95,8 +95,8 @@ export default function Dashboard() {
       {/* Main Dashboard */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
-        <div className="mb-8 infrastructure-debug">
-          <Card className="glass-card rounded-2xl shadow-neon-blue infrastructure-debug">
+        <div className="mb-8">
+          <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold gradient-text">

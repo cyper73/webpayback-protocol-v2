@@ -6,7 +6,7 @@ interface ComplianceMonitorProps {
   compliance: ComplianceRecord[];
 }
 
-export default function ComplianceMonitor({ compliance }: ComplianceMonitorProps) {
+export default function ComplianceMonitor({ compliance = [] }: ComplianceMonitorProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "compliant":
