@@ -13,8 +13,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { GasTracker } from "@/components/gas/GasTracker";
-import { GasPoolDashboard } from "@/components/gas/GasPoolDashboard";
-import ChainlinkDashboard from "@/components/chainlink/ChainlinkDashboard";
+import UnifiedDashboard from "@/components/unified/UnifiedDashboard";
 
 import { Box, Wallet, Coins, Link } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -106,14 +105,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Gas Pool Real-time Dashboard */}
+        {/* Infrastructure Dashboard - Gas Pool & Chainlink */}
         <div className="mb-8">
-          <GasPoolDashboard />
-        </div>
-
-        {/* Chainlink Integration Dashboard */}
-        <div className="mb-8">
-          <ChainlinkDashboard />
+          <UnifiedDashboard />
         </div>
 
         {/* Agent Collaboration Panel */}
