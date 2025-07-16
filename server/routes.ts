@@ -724,6 +724,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Force cache bypass test
+  app.get("/api/test/cache-bypass", (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.json({
+      message: "CACHE BYPASS TEST - If you see this, the server is working",
+      timestamp: new Date().toISOString(),
+      randomNumber: Math.random()
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
