@@ -132,6 +132,38 @@ export default function CreatorPortal() {
     startVerificationMutation.mutate({ websiteUrl, verificationMethod: method });
   };
 
+  const verifyDomainMutation = useMutation({
+    mutationFn: async (verificationId: number) => {
+      return await apiRequest("POST", `/api/domain/verify/${verificationId}`);
+    },
+    onSuccess: (data: any) => {
+      if (data.success) {
+        setIsDomainVerified(true);
+        toast({
+          title: "Domain Verified!",
+          description: "Your domain has been successfully verified.",
+        });
+      } else {
+        toast({
+          title: "Verification Failed",
+          description: data.error || "Domain verification failed. Please check your setup.",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Verification Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleVerifyDomain = (verificationId: number) => {
+    verifyDomainMutation.mutate(verificationId);
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -156,7 +188,9 @@ export default function CreatorPortal() {
         
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            {isHighSecurity ? (
+            {needsVerification && !isDomainVerified ? (
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+            ) : isHighSecurity ? (
               <AlertTriangle className="w-4 h-4 text-yellow-500" />
             ) : (
               <CheckCircle className="w-4 h-4 text-green-500" />
@@ -165,6 +199,16 @@ export default function CreatorPortal() {
               Security Level: <span className="font-semibold text-white">{domainVerification.securityLevel?.toUpperCase()}</span>
             </span>
           </div>
+          
+          {needsVerification && !isDomainVerified && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-red-500" />
+                <span className="text-sm font-semibold text-red-400">VERIFICATION REQUIRED</span>
+              </div>
+              <p className="text-sm text-red-300">This domain must be verified before registration can proceed.</p>
+            </div>
+          )}
           
           {domainVerification.reason && (
             <p className="text-sm text-gray-300">{domainVerification.reason}</p>
@@ -213,6 +257,16 @@ export default function CreatorPortal() {
               <div className="text-sm text-gray-300">
                 <p className="mb-1">Instructions:</p>
                 <p className="whitespace-pre-line">{domainVerification.verification.instructions}</p>
+              </div>
+              <div className="mt-4">
+                <Button
+                  onClick={() => handleVerifyDomain(domainVerification.verification.id)}
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={verifyDomainMutation.isPending}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  {verifyDomainMutation.isPending ? "Verifying..." : "Verify Domain"}
+                </Button>
               </div>
             </div>
           )}

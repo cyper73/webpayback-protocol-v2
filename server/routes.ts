@@ -791,6 +791,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Verify domain with ID in URL
+  app.post('/api/domain/verify/:id', async (req, res) => {
+    try {
+      const verificationId = parseInt(req.params.id);
+      
+      if (isNaN(verificationId)) {
+        return res.status(400).json({ error: 'Invalid verification ID' });
+      }
+      
+      const result = await domainVerificationService.verifyDomain(verificationId);
+      
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   // Get domain verification status for a creator
   app.get('/api/domain/status/:creatorId', async (req, res) => {
     try {

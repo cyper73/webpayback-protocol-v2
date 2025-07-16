@@ -256,9 +256,6 @@ Then provide the URL of your social media post for manual verification.`;
   }
 
   private async performVerification(verification: DomainVerification): Promise<boolean> {
-    // In a real implementation, this would check DNS records, HTTP responses, etc.
-    // For now, we'll simulate verification logic
-    
     try {
       switch (verification.verificationMethod) {
         case 'dns_txt':
@@ -289,19 +286,110 @@ Then provide the URL of your social media post for manual verification.`;
   }
 
   private async verifyHTMLMeta(domain: string, token: string): Promise<boolean> {
-    // In production, this would fetch the homepage and check for meta tag
     console.log(`🔍 Verifying HTML meta tag for ${domain} with token ${token}`);
     
-    // Simulate HTTP verification
-    return !this.isFamousDomain(domain); // Famous domains fail without proper meta tag
+    try {
+      // Try both HTTP and HTTPS
+      const urls = [
+        `https://${domain}/`,
+        `http://${domain}/`
+      ];
+      
+      for (const url of urls) {
+        try {
+          console.log(`🔍 Checking HTML meta tag at: ${url}`);
+          
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'User-Agent': 'WebPayback-Verification-Bot/1.0'
+            },
+            timeout: 10000 // 10 second timeout
+          });
+          
+          if (response.ok) {
+            const html = await response.text();
+            
+            // Look for the meta tag
+            const metaTagRegex = new RegExp(`<meta\\s+name=["']webpayback-verification["']\\s+content=["']${token.trim()}["']`, 'i');
+            const metaTagRegexAlt = new RegExp(`<meta\\s+content=["']${token.trim()}["']\\s+name=["']webpayback-verification["']`, 'i');
+            
+            console.log(`📄 Searching for meta tag with token: ${token.trim()}`);
+            
+            if (metaTagRegex.test(html) || metaTagRegexAlt.test(html)) {
+              console.log(`✅ HTML meta tag verification successful for ${domain}`);
+              return true;
+            } else {
+              console.log(`❌ Meta tag not found in HTML for ${domain}`);
+            }
+          } else {
+            console.log(`❌ HTTP ${response.status} for ${url}`);
+          }
+        } catch (fetchError) {
+          console.log(`❌ Error fetching ${url}:`, fetchError);
+        }
+      }
+      
+      console.log(`❌ HTML meta tag verification failed for ${domain} - meta tag not found`);
+      return false;
+      
+    } catch (error) {
+      console.error(`❌ Error during HTML meta verification for ${domain}:`, error);
+      return false;
+    }
   }
 
   private async verifyFileUpload(domain: string, token: string): Promise<boolean> {
-    // In production, this would fetch the verification file
     console.log(`🔍 Verifying file upload for ${domain} with token ${token}`);
     
-    // Simulate file verification
-    return !this.isFamousDomain(domain); // Famous domains fail without proper file
+    try {
+      // Try both HTTP and HTTPS
+      const urls = [
+        `https://${domain}/webpayback-verification.txt`,
+        `http://${domain}/webpayback-verification.txt`
+      ];
+      
+      for (const url of urls) {
+        try {
+          console.log(`🔍 Checking verification file at: ${url}`);
+          
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'User-Agent': 'WebPayback-Verification-Bot/1.0'
+            },
+            timeout: 10000 // 10 second timeout
+          });
+          
+          if (response.ok) {
+            const content = await response.text();
+            const cleanContent = content.trim();
+            const cleanToken = token.trim();
+            
+            console.log(`📄 File content: "${cleanContent}"`);
+            console.log(`🔑 Expected token: "${cleanToken}"`);
+            
+            if (cleanContent === cleanToken) {
+              console.log(`✅ Domain verification successful for ${domain}`);
+              return true;
+            } else {
+              console.log(`❌ Token mismatch for ${domain}`);
+            }
+          } else {
+            console.log(`❌ HTTP ${response.status} for ${url}`);
+          }
+        } catch (fetchError) {
+          console.log(`❌ Error fetching ${url}:`, fetchError);
+        }
+      }
+      
+      console.log(`❌ Domain verification failed for ${domain} - file not found or token mismatch`);
+      return false;
+      
+    } catch (error) {
+      console.error(`❌ Error during file verification for ${domain}:`, error);
+      return false;
+    }
   }
 
   async getDomainVerificationStatus(creatorId: number): Promise<DomainVerification[]> {
