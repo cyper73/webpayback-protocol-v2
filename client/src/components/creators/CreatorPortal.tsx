@@ -12,6 +12,8 @@ import { insertCreatorSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Copy } from "lucide-react";
+
 const formSchema = insertCreatorSchema.extend({
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
@@ -24,6 +26,9 @@ export default function CreatorPortal() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [domainVerification, setDomainVerification] = useState<any>(null);
+  const [isCheckingDomain, setIsCheckingDomain] = useState(false);
+  const [isDomainVerified, setIsDomainVerified] = useState(false);
 
   const {
     register,
@@ -43,6 +48,55 @@ export default function CreatorPortal() {
     }
   });
 
+  const checkDomainMutation = useMutation({
+    mutationFn: async (websiteUrl: string) => {
+      return await apiRequest("POST", "/api/domain/check", { websiteUrl });
+    },
+    onSuccess: (data: any) => {
+      setDomainVerification(data);
+      if (data.requiresVerification) {
+        toast({
+          title: "Domain Verification Required",
+          description: data.reason || "This domain requires verification for security purposes.",
+          variant: "default",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Domain Check Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const startVerificationMutation = useMutation({
+    mutationFn: async (data: { websiteUrl: string; verificationMethod: string }) => {
+      return await apiRequest("POST", "/api/domain/verify/start", {
+        creatorId: 1, // Demo user ID
+        websiteUrl: data.websiteUrl,
+        verificationMethod: data.verificationMethod
+      });
+    },
+    onSuccess: (data: any) => {
+      if (data.success) {
+        setDomainVerification(data);
+        toast({
+          title: "Verification Started",
+          description: "Follow the instructions to verify your domain ownership.",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Verification Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const createCreatorMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const { termsAccepted, ...creatorData } = data;
@@ -56,6 +110,8 @@ export default function CreatorPortal() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/dashboard"] });
       reset();
+      setDomainVerification(null);
+      setIsDomainVerified(false);
     },
     onError: (error) => {
       toast({
@@ -65,6 +121,106 @@ export default function CreatorPortal() {
       });
     },
   });
+
+  const handleDomainCheck = async (websiteUrl: string) => {
+    if (!websiteUrl) return;
+    setIsCheckingDomain(true);
+    checkDomainMutation.mutate(websiteUrl);
+    setIsCheckingDomain(false);
+  };
+
+  const handleStartVerification = (websiteUrl: string, method: string) => {
+    startVerificationMutation.mutate({ websiteUrl, verificationMethod: method });
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Token copied to clipboard",
+    });
+  };
+
+  const renderDomainVerificationStatus = () => {
+    if (!domainVerification) return null;
+
+    const isHighSecurity = domainVerification.securityLevel === 'high';
+    const needsVerification = domainVerification.requiresVerification;
+    const hasInstructions = domainVerification.verification?.instructions;
+
+    return (
+      <div className="mt-4 p-4 rounded-lg border border-white/10 bg-glass-dark">
+        <div className="flex items-center gap-2 mb-3">
+          <Shield className="w-5 h-5 text-electric-blue" />
+          <h3 className="font-semibold text-white">Domain Security Check</h3>
+        </div>
+        
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            {isHighSecurity ? (
+              <AlertTriangle className="w-4 h-4 text-yellow-500" />
+            ) : (
+              <CheckCircle className="w-4 h-4 text-green-500" />
+            )}
+            <span className="text-sm text-gray-300">
+              Security Level: <span className="font-semibold text-white">{domainVerification.securityLevel?.toUpperCase()}</span>
+            </span>
+          </div>
+          
+          {domainVerification.reason && (
+            <p className="text-sm text-gray-300">{domainVerification.reason}</p>
+          )}
+          
+          {needsVerification && !hasInstructions && (
+            <div className="space-y-2">
+              <p className="text-sm text-yellow-400">Domain verification required</p>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => handleStartVerification(watch("websiteUrl"), "file_upload")}
+                  className="bg-electric-blue hover:bg-electric-blue/80"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  File Upload
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleStartVerification(watch("websiteUrl"), "dns_txt")}
+                  className="bg-electric-blue hover:bg-electric-blue/80"
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  DNS TXT
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {hasInstructions && (
+            <div className="space-y-2">
+              <p className="text-sm text-green-400">✓ Verification in progress</p>
+              <div className="p-3 bg-black/20 rounded text-sm font-mono">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-300">Verification Token:</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(domainVerification.verification.verificationToken)}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-white break-all">{domainVerification.verification.verificationToken}</p>
+              </div>
+              <div className="text-sm text-gray-300">
+                <p className="mb-1">Instructions:</p>
+                <p className="whitespace-pre-line">{domainVerification.verification.instructions}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const onSubmit = (data: FormData) => {
     setIsSubmitting(true);
@@ -83,16 +239,28 @@ export default function CreatorPortal() {
             <Label htmlFor="websiteUrl" className="block text-sm font-medium mb-2">
               Website URL
             </Label>
-            <Input
-              id="websiteUrl"
-              type="url"
-              placeholder="https://your-website.com"
-              className="w-full bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white"
-              {...register("websiteUrl")}
-            />
+            <div className="flex gap-2">
+              <Input
+                id="websiteUrl"
+                type="url"
+                placeholder="https://your-website.com"
+                className="flex-1 bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white"
+                {...register("websiteUrl")}
+              />
+              <Button
+                type="button"
+                onClick={() => handleDomainCheck(watch("websiteUrl"))}
+                disabled={isCheckingDomain || !watch("websiteUrl")}
+                className="bg-electric-blue hover:bg-electric-blue/80 px-4"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                {isCheckingDomain ? "Checking..." : "Check Domain"}
+              </Button>
+            </div>
             {errors.websiteUrl && (
               <p className="text-red-400 text-sm mt-1">{errors.websiteUrl.message}</p>
             )}
+            {renderDomainVerificationStatus()}
           </div>
           
           <div>

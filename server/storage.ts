@@ -1,7 +1,7 @@
 import { 
   users, creators, blockchainNetworks, aiAgents, agentCommunications, 
   contentTracking, rewardDistributions, poolManagement, complianceRecords,
-  fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns, referralRewards,
+  fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns, referralRewards, domainVerifications,
   type User, type InsertUser, type Creator, type InsertCreator,
   type BlockchainNetwork, type InsertBlockchainNetwork, type AiAgent, type InsertAiAgent,
   type AgentCommunication, type InsertAgentCommunication, type ContentTracking, type InsertContentTracking,
@@ -9,7 +9,7 @@ import {
   type ComplianceRecord, type InsertComplianceRecord,
   type FraudDetectionRule, type InsertFraudDetectionRule, type FraudDetectionAlert, type InsertFraudDetectionAlert,
   type CreatorReputationScore, type InsertCreatorReputationScore, type AccessPattern, type InsertAccessPattern,
-  type ReferralReward, type InsertReferralReward
+  type ReferralReward, type InsertReferralReward, type DomainVerification, type InsertDomainVerification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -84,6 +84,13 @@ export interface IStorage {
   updateAccessPattern(patternId: number, updates: Partial<AccessPattern>): Promise<void>;
   getCreatorRewardsFromDate(creatorId: number, fromDate: Date): Promise<RewardDistribution[]>;
   getCreator(creatorId: number): Promise<Creator | undefined>;
+  
+  // Domain verification methods
+  createDomainVerification(insertVerification: InsertDomainVerification): Promise<DomainVerification>;
+  getDomainVerification(id: number): Promise<DomainVerification | undefined>;
+  getDomainVerificationByDomain(domain: string): Promise<DomainVerification | undefined>;
+  getDomainVerificationsByCreator(creatorId: number): Promise<DomainVerification[]>;
+  updateDomainVerification(id: number, updates: Partial<DomainVerification>): Promise<void>;
 }
 
 // rewrite MemStorage to DatabaseStorage
@@ -432,6 +439,49 @@ export class DatabaseStorage implements IStorage {
   async getCreator(creatorId: number): Promise<Creator | undefined> {
     const [creator] = await db.select().from(creators).where(eq(creators.id, creatorId));
     return creator || undefined;
+  }
+
+  // Domain verification methods
+  async createDomainVerification(insertVerification: InsertDomainVerification): Promise<DomainVerification> {
+    const [verification] = await db
+      .insert(domainVerifications)
+      .values({
+        ...insertVerification,
+        verificationStatus: 'pending',
+        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days
+      })
+      .returning();
+    return verification;
+  }
+
+  async getDomainVerification(id: number): Promise<DomainVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(domainVerifications)
+      .where(eq(domainVerifications.id, id));
+    return verification || undefined;
+  }
+
+  async getDomainVerificationByDomain(domain: string): Promise<DomainVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(domainVerifications)
+      .where(eq(domainVerifications.domain, domain));
+    return verification || undefined;
+  }
+
+  async getDomainVerificationsByCreator(creatorId: number): Promise<DomainVerification[]> {
+    return await db
+      .select()
+      .from(domainVerifications)
+      .where(eq(domainVerifications.creatorId, creatorId));
+  }
+
+  async updateDomainVerification(id: number, updates: Partial<DomainVerification>): Promise<void> {
+    await db
+      .update(domainVerifications)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(domainVerifications.id, id));
   }
 }
 

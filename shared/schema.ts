@@ -166,6 +166,27 @@ export const referralRewards = pgTable("referral_rewards", {
   processedAt: timestamp("processed_at"),
 });
 
+// Domain verification system to prevent fraudulent site registration
+export const domainVerifications = pgTable("domain_verifications", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id).notNull(),
+  domain: text("domain").notNull(), // extracted domain from websiteUrl
+  verificationMethod: text("verification_method").notNull(), // dns_txt, html_meta, file_upload, social_proof
+  verificationToken: text("verification_token").notNull(), // unique token for verification
+  verificationStatus: text("verification_status").default("pending"), // pending, verified, failed, expired
+  verificationProof: text("verification_proof"), // DNS TXT record, HTML meta tag, file content, social post URL
+  verifiedAt: timestamp("verified_at"),
+  expiresAt: timestamp("expires_at"), // verification expires after 90 days
+  attemptCount: integer("attempt_count").default(0),
+  lastAttempt: timestamp("last_attempt"),
+  failureReason: text("failure_reason"),
+  isManualReview: boolean("is_manual_review").default(false),
+  reviewedBy: text("reviewed_by"),
+  reviewNotes: text("review_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   creators: many(creators),
@@ -189,6 +210,7 @@ export const creatorsRelations = relations(creators, ({ one, many }) => ({
     relationName: "referrer",
   }),
   referrals: many(creators, { relationName: "referrer" }),
+  domainVerifications: many(domainVerifications),
 }));
 
 export const blockchainNetworksRelations = relations(blockchainNetworks, ({ many }) => ({
@@ -279,6 +301,13 @@ export const referralRewardsRelations = relations(referralRewards, ({ one }) => 
     fields: [referralRewards.referredId],
     references: [creators.id],
     relationName: "referred",
+  }),
+}));
+
+export const domainVerificationsRelations = relations(domainVerifications, ({ one }) => ({
+  creator: one(creators, {
+    fields: [domainVerifications.creatorId],
+    references: [creators.id],
   }),
 }));
 
@@ -405,6 +434,15 @@ export const insertReferralRewardSchema = createInsertSchema(referralRewards).pi
   transactionHash: true,
 });
 
+export const insertDomainVerificationSchema = createInsertSchema(domainVerifications).pick({
+  creatorId: true,
+  domain: true,
+  verificationMethod: true,
+  verificationToken: true,
+  verificationProof: true,
+  reviewNotes: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -448,3 +486,6 @@ export type AccessPattern = typeof accessPatterns.$inferSelect;
 
 export type InsertReferralReward = z.infer<typeof insertReferralRewardSchema>;
 export type ReferralReward = typeof referralRewards.$inferSelect;
+
+export type InsertDomainVerification = z.infer<typeof insertDomainVerificationSchema>;
+export type DomainVerification = typeof domainVerifications.$inferSelect;

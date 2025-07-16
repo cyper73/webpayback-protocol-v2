@@ -6,6 +6,7 @@ import { agentService } from "./services/agents";
 import { web3Service } from "./services/web3";
 import { contentMonitoringService } from "./services/contentMonitoring";
 import { gasManager } from "./services/gasManager";
+import { domainVerificationService } from "./services/domainVerification";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -722,6 +723,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: 'pending',
       estimatedFulfillment: new Date(Date.now() + 180000).toISOString()
     });
+  });
+
+  // DOMAIN VERIFICATION ENDPOINTS
+  
+  // Check domain availability and security requirements
+  app.post('/api/domain/check', async (req, res) => {
+    try {
+      const { websiteUrl } = req.body;
+      
+      if (!websiteUrl) {
+        return res.status(400).json({ error: 'Website URL is required' });
+      }
+      
+      const result = await domainVerificationService.checkDomainAvailability(websiteUrl);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Start domain verification process
+  app.post('/api/domain/verify/start', async (req, res) => {
+    try {
+      const { creatorId, websiteUrl, verificationMethod } = req.body;
+      
+      if (!creatorId || !websiteUrl || !verificationMethod) {
+        return res.status(400).json({ 
+          error: 'Creator ID, website URL, and verification method are required' 
+        });
+      }
+      
+      const result = await domainVerificationService.startVerification({
+        creatorId,
+        websiteUrl,
+        verificationMethod
+      });
+      
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Complete domain verification
+  app.post('/api/domain/verify/complete', async (req, res) => {
+    try {
+      const { verificationId } = req.body;
+      
+      if (!verificationId) {
+        return res.status(400).json({ error: 'Verification ID is required' });
+      }
+      
+      const result = await domainVerificationService.verifyDomain(verificationId);
+      
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Get domain verification status for a creator
+  app.get('/api/domain/status/:creatorId', async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      
+      if (isNaN(creatorId)) {
+        return res.status(400).json({ error: 'Invalid creator ID' });
+      }
+      
+      const verifications = await domainVerificationService.getDomainVerificationStatus(creatorId);
+      res.json(verifications);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
   });
 
   // Force cache bypass test
