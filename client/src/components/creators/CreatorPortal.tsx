@@ -166,12 +166,7 @@ export default function CreatorPortal() {
     const verificationScore = domainVerification.verificationScore;
     const riskFactors = domainVerification.riskFactors || [];
     
-    // Debug log to see what we're getting
-    console.log('Chainlink domain verification data:', domainVerification);
-    console.log('Needs manual review:', needsManualReview);
-    console.log('Is verified:', isVerified);
-    console.log('Security level:', domainVerification.securityLevel);
-    console.log('Verification score:', verificationScore);
+
 
     return (
       <div className="mt-4 p-4 rounded-lg border border-white/10 bg-glass-dark">
