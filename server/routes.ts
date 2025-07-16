@@ -7,6 +7,7 @@ import { web3Service } from "./services/web3";
 import { contentMonitoringService } from "./services/contentMonitoring";
 import { gasManager } from "./services/gasManager";
 import { domainVerificationService } from "./services/domainVerification";
+import { chainlinkDomainVerificationService } from "./services/chainlinkDomainVerification";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -822,6 +823,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const verifications = await domainVerificationService.getDomainVerificationStatus(creatorId);
+      res.json(verifications);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // CHAINLINK DOMAIN VERIFICATION ENDPOINTS
+
+  // Check domain with Chainlink
+  app.post('/api/domain/chainlink/check', async (req, res) => {
+    try {
+      const { websiteUrl } = req.body;
+      
+      if (!websiteUrl) {
+        return res.status(400).json({ error: 'Website URL is required' });
+      }
+      
+      const result = await chainlinkDomainVerificationService.checkDomainWithChainlink(websiteUrl);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Start Chainlink domain verification
+  app.post('/api/domain/chainlink/verify', async (req, res) => {
+    try {
+      const { creatorId, websiteUrl } = req.body;
+      
+      if (!creatorId || !websiteUrl) {
+        return res.status(400).json({ 
+          error: 'Creator ID and website URL are required' 
+        });
+      }
+      
+      const result = await chainlinkDomainVerificationService.startChainlinkVerification(creatorId, websiteUrl);
+      
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Get Chainlink verification status
+  app.get('/api/domain/chainlink/status/:creatorId', async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      
+      if (isNaN(creatorId)) {
+        return res.status(400).json({ error: 'Invalid creator ID' });
+      }
+      
+      const verifications = await chainlinkDomainVerificationService.getChainlinkVerificationStatus(creatorId);
       res.json(verifications);
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });

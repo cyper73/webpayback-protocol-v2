@@ -49,47 +49,64 @@ export default function CreatorPortal() {
 
   const checkDomainMutation = useMutation({
     mutationFn: async (websiteUrl: string) => {
-      return await apiRequest("POST", "/api/domain/check", { websiteUrl });
+      return await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
     },
     onSuccess: (data: any) => {
       setDomainVerification(data);
-      if (data.requiresVerification) {
+      if (data.requiresManualReview) {
         toast({
-          title: "Domain Verification Required",
-          description: data.reason || "This domain requires verification for security purposes.",
+          title: "Domain Requires Manual Review",
+          description: `Risk factors: ${data.riskFactors.join(', ')}`,
           variant: "default",
+        });
+      } else if (data.isVerified) {
+        toast({
+          title: "Domain Automatically Verified",
+          description: `Verification score: ${data.verificationScore}/100`,
+        });
+        setIsDomainVerified(true);
+      } else {
+        toast({
+          title: "Domain Verification Failed",
+          description: `Score: ${data.verificationScore}/100. Issues: ${data.riskFactors.join(', ')}`,
+          variant: "destructive",
         });
       }
     },
     onError: (error) => {
       toast({
-        title: "Domain Check Failed",
+        title: "Chainlink Domain Check Failed",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const startVerificationMutation = useMutation({
-    mutationFn: async (data: { websiteUrl: string; verificationMethod: string }) => {
-      return await apiRequest("POST", "/api/domain/verify/start", {
+  const chainlinkVerificationMutation = useMutation({
+    mutationFn: async (websiteUrl: string) => {
+      return await apiRequest("POST", "/api/domain/chainlink/verify", {
         creatorId: 1, // Demo user ID
-        websiteUrl: data.websiteUrl,
-        verificationMethod: data.verificationMethod
+        websiteUrl: websiteUrl
       });
     },
     onSuccess: (data: any) => {
       if (data.success) {
-        setDomainVerification(data);
+        setIsDomainVerified(true);
         toast({
-          title: "Verification Started",
-          description: "Follow the instructions to verify your domain ownership.",
+          title: "Chainlink Verification Complete",
+          description: "Your domain has been automatically verified by Chainlink!",
+        });
+      } else {
+        toast({
+          title: "Chainlink Verification Failed",
+          description: data.error || "Domain verification failed.",
+          variant: "destructive",
         });
       }
     },
     onError: (error) => {
       toast({
-        title: "Verification Failed",
+        title: "Chainlink Verification Error",
         description: error.message,
         variant: "destructive",
       });
@@ -128,40 +145,8 @@ export default function CreatorPortal() {
     setIsCheckingDomain(false);
   };
 
-  const handleStartVerification = (websiteUrl: string, method: string) => {
-    startVerificationMutation.mutate({ websiteUrl, verificationMethod: method });
-  };
-
-  const verifyDomainMutation = useMutation({
-    mutationFn: async (verificationId: number) => {
-      return await apiRequest("POST", `/api/domain/verify/${verificationId}`);
-    },
-    onSuccess: (data: any) => {
-      if (data.success) {
-        setIsDomainVerified(true);
-        toast({
-          title: "Domain Verified!",
-          description: "Your domain has been successfully verified.",
-        });
-      } else {
-        toast({
-          title: "Verification Failed",
-          description: data.error || "Domain verification failed. Please check your setup.",
-          variant: "destructive",
-        });
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: "Verification Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleVerifyDomain = (verificationId: number) => {
-    verifyDomainMutation.mutate(verificationId);
+  const handleChainlinkVerification = (websiteUrl: string) => {
+    chainlinkVerificationMutation.mutate(websiteUrl);
   };
 
   const copyToClipboard = (text: string) => {
@@ -176,106 +161,122 @@ export default function CreatorPortal() {
     if (!domainVerification) return null;
 
     const isHighSecurity = domainVerification.securityLevel === 'high';
-    const needsVerification = domainVerification.requiresVerification;
-    const hasInstructions = domainVerification.verification?.instructions;
+    const needsManualReview = domainVerification.requiresManualReview;
+    const isVerified = domainVerification.isVerified || isDomainVerified;
+    const verificationScore = domainVerification.verificationScore;
+    const riskFactors = domainVerification.riskFactors || [];
     
     // Debug log to see what we're getting
-    console.log('Domain verification data:', domainVerification);
-    console.log('Needs verification:', needsVerification);
-    console.log('Is verified:', isDomainVerified);
+    console.log('Chainlink domain verification data:', domainVerification);
+    console.log('Needs manual review:', needsManualReview);
+    console.log('Is verified:', isVerified);
     console.log('Security level:', domainVerification.securityLevel);
+    console.log('Verification score:', verificationScore);
 
     return (
       <div className="mt-4 p-4 rounded-lg border border-white/10 bg-glass-dark">
         <div className="flex items-center gap-2 mb-3">
           <Shield className="w-5 h-5 text-electric-blue" />
-          <h3 className="font-semibold text-white">Domain Security Check</h3>
+          <h3 className="font-semibold text-white">Chainlink Domain Verification</h3>
         </div>
         
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            {needsVerification && !isDomainVerified ? (
-              <AlertTriangle className="w-4 h-4 text-red-500" />
-            ) : isDomainVerified ? (
-              <CheckCircle className="w-4 h-4 text-green-500" />
-            ) : !needsVerification ? (
-              <CheckCircle className="w-4 h-4 text-green-500" />
-            ) : (
-              <AlertTriangle className="w-4 h-4 text-yellow-500" />
-            )}
-            <span className="text-sm text-gray-300">
-              Security Level: <span className="font-semibold text-white">{domainVerification.securityLevel?.toUpperCase()}</span>
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isVerified ? (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              ) : needsManualReview ? (
+                <AlertTriangle className="w-4 h-4 text-yellow-500" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 text-red-500" />
+              )}
+              <span className="text-sm text-gray-300">
+                Security Level: <span className="font-semibold text-white">{domainVerification.securityLevel?.toUpperCase()}</span>
+              </span>
+            </div>
+            <div className="text-sm text-gray-300">
+              Score: <span className="font-semibold text-white">{verificationScore}/100</span>
+            </div>
           </div>
           
-          {needsVerification && !isDomainVerified && (
+          {isVerified && (
+            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                <span className="text-sm font-semibold text-green-400">AUTOMATICALLY VERIFIED BY CHAINLINK</span>
+              </div>
+              <p className="text-sm text-green-300">Domain passed all security checks and is ready for registration.</p>
+            </div>
+          )}
+          
+          {needsManualReview && !isVerified && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-semibold text-yellow-400">MANUAL REVIEW REQUIRED</span>
+              </div>
+              <p className="text-sm text-yellow-300">This domain requires manual verification by our team (24-48 hours).</p>
+            </div>
+          )}
+          
+          {!isVerified && !needsManualReview && (
             <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <AlertTriangle className="w-4 h-4 text-red-500" />
-                <span className="text-sm font-semibold text-red-400">VERIFICATION REQUIRED</span>
+                <span className="text-sm font-semibold text-red-400">VERIFICATION FAILED</span>
               </div>
-              <p className="text-sm text-red-300">This domain must be verified before registration can proceed.</p>
+              <p className="text-sm text-red-300">Domain does not meet security requirements for automatic verification.</p>
             </div>
           )}
           
-          {domainVerification.reason && (
-            <p className="text-sm text-gray-300">{domainVerification.reason}</p>
-          )}
-          
-          {needsVerification && !hasInstructions && (
+          {riskFactors.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm text-yellow-400">Domain verification required</p>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => handleStartVerification(watch("websiteUrl"), "file_upload")}
-                  className="bg-electric-blue hover:bg-electric-blue/80"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  File Upload
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => handleStartVerification(watch("websiteUrl"), "dns_txt")}
-                  className="bg-electric-blue hover:bg-electric-blue/80"
-                >
-                  <Globe className="w-4 h-4 mr-2" />
-                  DNS TXT
-                </Button>
-              </div>
+              <p className="text-sm text-gray-300 font-semibold">Risk Factors:</p>
+              <ul className="text-sm text-gray-400 space-y-1">
+                {riskFactors.map((factor, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <div className="w-1 h-1 bg-red-400 rounded-full" />
+                    {factor}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
           
-          {hasInstructions && (
-            <div className="space-y-2">
-              <p className="text-sm text-green-400">✓ Verification in progress</p>
-              <div className="p-3 bg-black/20 rounded text-sm font-mono">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-300">Verification Token:</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => copyToClipboard(domainVerification.verification.verificationToken)}
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
+          {domainVerification.chainlinkData && (
+            <div className="mt-4 p-3 bg-black/20 rounded-lg">
+              <p className="text-sm text-gray-300 font-semibold mb-2">Chainlink Data:</p>
+              <div className="space-y-1 text-xs text-gray-400">
+                <div className="flex justify-between">
+                  <span>Domain Age:</span>
+                  <span>{Math.floor(domainVerification.chainlinkData.domainAge)} days</span>
                 </div>
-                <p className="text-white break-all">{domainVerification.verification.verificationToken}</p>
+                <div className="flex justify-between">
+                  <span>SSL Certificate:</span>
+                  <span>{domainVerification.chainlinkData.sslCertificate ? '✓' : '✗'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>DNS Records:</span>
+                  <span>{domainVerification.chainlinkData.dnsRecords ? '✓' : '✗'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Reputation Score:</span>
+                  <span>{domainVerification.chainlinkData.reputationScore}</span>
+                </div>
               </div>
-              <div className="text-sm text-gray-300">
-                <p className="mb-1">Instructions:</p>
-                <p className="whitespace-pre-line">{domainVerification.verification.instructions}</p>
-              </div>
-              <div className="mt-4">
-                <Button
-                  onClick={() => handleVerifyDomain(domainVerification.verification.id)}
-                  className="bg-green-600 hover:bg-green-700"
-                  disabled={verifyDomainMutation.isPending}
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  {verifyDomainMutation.isPending ? "Verifying..." : "Verify Domain"}
-                </Button>
-              </div>
+            </div>
+          )}
+          
+          {!isVerified && !needsManualReview && (
+            <div className="mt-4">
+              <Button
+                onClick={() => chainlinkVerificationMutation.mutate(watch("websiteUrl"))}
+                className="bg-electric-blue hover:bg-electric-blue/80"
+                disabled={chainlinkVerificationMutation.isPending}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                {chainlinkVerificationMutation.isPending ? "Verifying with Chainlink..." : "Retry Chainlink Verification"}
+              </Button>
             </div>
           )}
         </div>
