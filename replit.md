@@ -155,6 +155,8 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - Added getCreatorByWebsiteUrl method to storage interface for URL uniqueness checking
   - Meta tag verification simulates Chainlink Functions for HTTP page content fetching
   - System properly handles verification flow: token generation → meta tag placement → Chainlink verification
+  - Extended famous domains list to include Patreon, Twitch, Discord, Telegram, WhatsApp, Spotify, SoundCloud, Vimeo, DailyMotion, DeviantArt
+  - Fixed domain recognition logic to properly handle famous domains vs specific pages (patreon.com blocked, patreon.com/StateAzure meta tag verification)
 - **MAJOR ANTI-FRAUD INTEGRATION COMPLETED** (January 14, 2025):
   - Added comprehensive fraud detection database tables (fraudDetectionRules, fraudDetectionAlerts, accessPatterns, creatorReputationScores)
   - Implemented FraudDetectionService with real-time pattern analysis and risk scoring

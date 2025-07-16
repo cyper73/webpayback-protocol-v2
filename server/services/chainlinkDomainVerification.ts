@@ -27,7 +27,9 @@ class ChainlinkDomainVerificationService {
     'google.com', 'facebook.com', 'youtube.com', 'twitter.com', 'instagram.com',
     'linkedin.com', 'tiktok.com', 'netflix.com', 'amazon.com', 'apple.com',
     'microsoft.com', 'github.com', 'stackoverflow.com', 'reddit.com', 'wikipedia.org',
-    'medium.com', 'wordpress.com', 'blogger.com', 'tumblr.com', 'pinterest.com'
+    'medium.com', 'wordpress.com', 'blogger.com', 'tumblr.com', 'pinterest.com',
+    'patreon.com', 'twitch.tv', 'discord.com', 'telegram.org', 'whatsapp.com',
+    'spotify.com', 'soundcloud.com', 'vimeo.com', 'dailymotion.com', 'deviantart.com'
   ];
 
   private readonly HIGH_RISK_TLDS = [
@@ -129,7 +131,7 @@ class ChainlinkDomainVerificationService {
       dnsRecords: isFamous ? true : Math.random() > 0.1,
       whoisData: {
         registrar: isFamous ? 'MarkMonitor Inc.' : 'Generic Registrar',
-        registrationDate: new Date(Date.now() - (isFamous ? 3650 : 365) * 24 * 60 * 60 * 1000),
+        registrationDate: new Date(Date.now() - (isFamous ? 3650 : Math.random() * 365) * 24 * 60 * 60 * 1000),
         expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
       },
       reputationScore: isFamous ? 25 : (isHighRisk ? -20 : Math.random() * 10)
@@ -184,6 +186,7 @@ class ChainlinkDomainVerificationService {
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
+    // Force correct logic for famous domains
     const requiresManualReview = isFamous && !isSpecificPage;
     const requiresMetaTag = isFamous && isSpecificPage;
     
