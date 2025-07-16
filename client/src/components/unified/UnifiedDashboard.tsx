@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { Loader2, RefreshCw, Fuel, TrendingUp, Activity, Zap, Dices, Network, Globe, AlertTriangle, CheckCircle } from 'lucide-react';
 
 // Types for Gas Pool
@@ -393,10 +392,12 @@ export default function UnifiedDashboard() {
                       </div>
                       <div className="mt-4">
                         <div className="text-sm text-gray-400 mb-2">Success Rate</div>
-                        <Progress 
-                          value={vrfStats ? (vrfStats.fulfilledRequests / vrfStats.totalRequests * 100) : 0} 
-                          className="h-2"
-                        />
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-neon-green h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${vrfStats ? (vrfStats.fulfilledRequests / vrfStats.totalRequests * 100) : 0}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -452,10 +453,12 @@ export default function UnifiedDashboard() {
                       </div>
                       <div className="mt-4">
                         <div className="text-sm text-gray-400 mb-2">Performance</div>
-                        <Progress 
-                          value={functionsStats?.successRate || 0} 
-                          className="h-2"
-                        />
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-electric-blue h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${functionsStats?.successRate || 0}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
