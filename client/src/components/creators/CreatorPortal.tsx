@@ -59,6 +59,12 @@ export default function CreatorPortal() {
           description: `Risk factors: ${data.riskFactors.join(', ')}`,
           variant: "default",
         });
+      } else if (data.requiresMetaTag) {
+        toast({
+          title: "Meta Tag Verification Required",
+          description: "Please add the meta tag to your page to verify ownership.",
+          variant: "default",
+        });
       } else if (data.isVerified) {
         toast({
           title: "Domain Automatically Verified",
