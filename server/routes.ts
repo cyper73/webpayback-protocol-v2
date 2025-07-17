@@ -9,6 +9,7 @@ import { gasManager } from "./services/gasManager";
 import { domainVerificationService } from "./services/domainVerification";
 import { chainlinkDomainVerificationService } from "./services/chainlinkDomainVerification";
 import { channelMonitoringService } from "./services/channelMonitoring";
+import { aiKnowledgeTrackingService } from "./services/aiKnowledgeTracking";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -567,6 +568,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         processed,
         message: processed ? "AI access processed and reward distributed" : "AI access detected but not processed"
       });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // AI Knowledge Base Usage Tracking
+  app.post("/api/content/ai-knowledge-usage", async (req, res) => {
+    try {
+      const { aiModel, userQuery, aiResponse, source } = req.body;
+      
+      if (!aiModel || !userQuery || !aiResponse) {
+        return res.status(400).json({ 
+          error: "Missing required fields: aiModel, userQuery, aiResponse" 
+        });
+      }
+      
+      const result = await aiKnowledgeTrackingService.reportAIKnowledgeUsage({
+        aiModel,
+        userQuery,
+        aiResponse,
+        source
+      });
+      
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get AI Knowledge Usage Stats
+  app.get("/api/content/ai-knowledge-stats", async (req, res) => {
+    try {
+      const stats = await aiKnowledgeTrackingService.getKnowledgeUsageStats();
+      res.json(stats);
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
