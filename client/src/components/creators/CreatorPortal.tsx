@@ -233,13 +233,10 @@ export default function CreatorPortal() {
                 <Code className="w-4 h-4 text-blue-500" />
                 <span className="text-sm font-semibold text-blue-400">META TAG VERIFICATION REQUIRED</span>
               </div>
-              <p className="text-sm text-blue-300 mb-3">
-                This specific page requires meta tag verification. Add the following meta tag to your page:
-              </p>
-              <div className="bg-black/40 p-2 rounded border border-blue-500/30">
-                <code className="text-xs text-blue-200 font-mono">
+              <div className="bg-black/40 p-3 rounded border border-blue-500/30">
+                <pre className="text-xs text-blue-200 font-mono whitespace-pre-wrap">
                   {domainVerification.metaTagInstruction}
-                </code>
+                </pre>
               </div>
               <div className="mt-3 flex gap-2">
                 <Button
