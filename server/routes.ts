@@ -8,6 +8,7 @@ import { contentMonitoringService } from "./services/contentMonitoring";
 import { gasManager } from "./services/gasManager";
 import { domainVerificationService } from "./services/domainVerification";
 import { chainlinkDomainVerificationService } from "./services/chainlinkDomainVerification";
+import { channelMonitoringService } from "./services/channelMonitoring";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -99,8 +100,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/creators", async (req, res) => {
     try {
       const validatedData = insertCreatorSchema.parse(req.body);
-      const creator = await storage.createCreator(validatedData);
-      res.json(creator);
+      
+      // Extract channel information from the URL
+      const channelInfo = channelMonitoringService.extractChannelInfo(validatedData.websiteUrl);
+      
+      // Enhanced creator data with channel information
+      const creatorData = {
+        ...validatedData,
+        platformType: channelInfo?.platformType || 'single_page',
+        channelId: channelInfo?.channelId || null,
+        channelName: channelInfo?.channelName || null,
+        channelVerificationUrl: validatedData.websiteUrl,
+        monitoringScope: channelInfo ? 'full_channel' : 'single_url'
+      };
+      
+      const creator = await storage.createCreator(creatorData);
+      
+      // If it's a channel, create the channel content mapping
+      if (channelInfo) {
+        await channelMonitoringService.createChannelMapping(creator.id, validatedData.websiteUrl);
+        console.log(`Channel-level monitoring enabled for creator ${creator.id}: ${channelInfo.platformType}`);
+      }
+      
+      res.json({
+        ...creator,
+        channelMonitoring: channelInfo ? {
+          enabled: true,
+          platformType: channelInfo.platformType,
+          channelId: channelInfo.channelId,
+          channelName: channelInfo.channelName,
+          urlPattern: channelInfo.urlPattern,
+          instructions: channelMonitoringService.getPlatformMonitoringInstructions(channelInfo.platformType)
+        } : {
+          enabled: false
+        }
+      });
     } catch (error) {
       console.error("Creator registration error:", error);
       res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
@@ -112,6 +146,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creators = await storage.getAllCreators();
       res.json(creators);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get channel monitoring info for a creator
+  app.get("/api/creators/:id/channels", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.id);
+      const mappings = await channelMonitoringService.getCreatorChannelMappings(creatorId);
+      res.json(mappings);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Check if URL is channel content
+  app.post("/api/channel/check", async (req, res) => {
+    try {
+      const { url } = req.body;
+      const result = await channelMonitoringService.isChannelContent(url);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Extract channel info from URL
+  app.post("/api/channel/extract", async (req, res) => {
+    try {
+      const { url } = req.body;
+      const channelInfo = channelMonitoringService.extractChannelInfo(url);
+      res.json(channelInfo);
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }

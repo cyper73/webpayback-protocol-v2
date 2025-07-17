@@ -22,8 +22,25 @@ export const creators = pgTable("creators", {
   referredBy: integer("referred_by").references(() => creators.id),
   totalReferrals: integer("total_referrals").default(0),
   referralBonus: decimal("referral_bonus", { precision: 18, scale: 8 }).default("0"),
+  // Channel-level monitoring fields
+  platformType: text("platform_type").default("single_page"), // single_page, youtube_channel, instagram_profile, etc.
+  channelId: text("channel_id"), // YouTube channel ID, Instagram username, etc.
+  channelName: text("channel_name"), // Display name of the channel
+  channelVerificationUrl: text("channel_verification_url"), // URL used for verification
+  monitoringScope: text("monitoring_scope").default("single_url"), // single_url, full_channel, domain_wide
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// New table to track channel content mappings
+export const channelContentMappings = pgTable("channel_content_mappings", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  originalUrl: text("original_url").notNull(), // The specific URL that was verified
+  channelBaseUrl: text("channel_base_url").notNull(), // The base channel URL
+  urlPattern: text("url_pattern").notNull(), // Pattern to match all URLs in this channel
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const blockchainNetworks = pgTable("blockchain_networks", {
@@ -211,6 +228,14 @@ export const creatorsRelations = relations(creators, ({ one, many }) => ({
   }),
   referrals: many(creators, { relationName: "referrer" }),
   domainVerifications: many(domainVerifications),
+  channelContentMappings: many(channelContentMappings),
+}));
+
+export const channelContentMappingsRelations = relations(channelContentMappings, ({ one }) => ({
+  creator: one(creators, {
+    fields: [channelContentMappings.creatorId],
+    references: [creators.id],
+  }),
 }));
 
 export const blockchainNetworksRelations = relations(blockchainNetworks, ({ many }) => ({
@@ -322,6 +347,19 @@ export const insertCreatorSchema = createInsertSchema(creators).pick({
   websiteUrl: true,
   walletAddress: true,
   contentCategory: true,
+  platformType: true,
+  channelId: true,
+  channelName: true,
+  channelVerificationUrl: true,
+  monitoringScope: true,
+});
+
+export const insertChannelContentMappingSchema = createInsertSchema(channelContentMappings).pick({
+  creatorId: true,
+  originalUrl: true,
+  channelBaseUrl: true,
+  urlPattern: true,
+  isActive: true,
 });
 
 export const insertBlockchainNetworkSchema = createInsertSchema(blockchainNetworks).pick({
@@ -489,3 +527,6 @@ export type ReferralReward = typeof referralRewards.$inferSelect;
 
 export type InsertDomainVerification = z.infer<typeof insertDomainVerificationSchema>;
 export type DomainVerification = typeof domainVerifications.$inferSelect;
+
+export type InsertChannelContentMapping = z.infer<typeof insertChannelContentMappingSchema>;
+export type ChannelContentMapping = typeof channelContentMappings.$inferSelect;

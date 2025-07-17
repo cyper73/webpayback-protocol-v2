@@ -3,6 +3,7 @@ import { storage } from "../storage";
 import { web3Service } from "./web3";
 import { fraudDetectionService } from "./fraudDetection";
 import { gasManager } from "./gasManager";
+import { channelMonitoringService } from "./channelMonitoring";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -217,9 +218,19 @@ class ContentMonitoringService {
 
   async processAIAccess(detection: AIAccessDetection): Promise<boolean> {
     try {
-      // Find the creator by website URL
-      const creators = await storage.getAllCreators();
-      const creator = creators.find(c => detection.url.includes(c.websiteUrl) || c.websiteUrl.includes(detection.url));
+      // Check if URL belongs to a channel (priority check)
+      const channelResult = await channelMonitoringService.isChannelContent(detection.url);
+      let creator = null;
+      
+      if (channelResult.isChannelContent && channelResult.creatorId) {
+        // URL belongs to a registered channel
+        creator = await storage.getCreator(channelResult.creatorId);
+        console.log(`Channel content detected for creator ${channelResult.creatorId}, URL: ${detection.url}`);
+      } else {
+        // Fallback to single URL lookup
+        const creators = await storage.getAllCreators();
+        creator = creators.find(c => detection.url.includes(c.websiteUrl) || c.websiteUrl.includes(detection.url));
+      }
       
       if (!creator) {
         console.log(`No creator found for URL: ${detection.url}`);
@@ -266,7 +277,9 @@ class ContentMonitoringService {
           userAgent: detection.userAgent,
           ipAddress: detection.ipAddress,
           fingerprint: fingerprint,
-          fraudAnalysis: fraudAnalysis
+          fraudAnalysis: fraudAnalysis,
+          isChannelContent: channelResult.isChannelContent,
+          channelMapping: channelResult.channelMapping
         }
       };
 

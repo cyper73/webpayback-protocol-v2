@@ -2,6 +2,7 @@ import {
   users, creators, blockchainNetworks, aiAgents, agentCommunications, 
   contentTracking, rewardDistributions, poolManagement, complianceRecords,
   fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns, referralRewards, domainVerifications,
+  channelContentMappings,
   type User, type InsertUser, type Creator, type InsertCreator,
   type BlockchainNetwork, type InsertBlockchainNetwork, type AiAgent, type InsertAiAgent,
   type AgentCommunication, type InsertAgentCommunication, type ContentTracking, type InsertContentTracking,
@@ -9,7 +10,8 @@ import {
   type ComplianceRecord, type InsertComplianceRecord,
   type FraudDetectionRule, type InsertFraudDetectionRule, type FraudDetectionAlert, type InsertFraudDetectionAlert,
   type CreatorReputationScore, type InsertCreatorReputationScore, type AccessPattern, type InsertAccessPattern,
-  type ReferralReward, type InsertReferralReward, type DomainVerification, type InsertDomainVerification
+  type ReferralReward, type InsertReferralReward, type DomainVerification, type InsertDomainVerification,
+  type ChannelContentMapping, type InsertChannelContentMapping
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -92,6 +94,12 @@ export interface IStorage {
   getDomainVerificationByDomain(domain: string): Promise<DomainVerification | undefined>;
   getDomainVerificationsByCreator(creatorId: number): Promise<DomainVerification[]>;
   updateDomainVerification(id: number, updates: Partial<DomainVerification>): Promise<void>;
+  
+  // Channel content mapping methods
+  createChannelContentMapping(insertMapping: InsertChannelContentMapping): Promise<ChannelContentMapping>;
+  getChannelContentMappings(): Promise<ChannelContentMapping[]>;
+  getChannelContentMappingsByCreator(creatorId: number): Promise<ChannelContentMapping[]>;
+  updateChannelContentMapping(id: number, updates: Partial<ChannelContentMapping>): Promise<boolean>;
 }
 
 // rewrite MemStorage to DatabaseStorage
@@ -488,6 +496,43 @@ export class DatabaseStorage implements IStorage {
       .update(domainVerifications)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(domainVerifications.id, id));
+  }
+
+  // Channel content mapping methods
+  async createChannelContentMapping(insertMapping: InsertChannelContentMapping): Promise<ChannelContentMapping> {
+    const [mapping] = await db
+      .insert(channelContentMappings)
+      .values(insertMapping)
+      .returning();
+    return mapping;
+  }
+
+  async getChannelContentMappings(): Promise<ChannelContentMapping[]> {
+    return await db
+      .select()
+      .from(channelContentMappings)
+      .where(eq(channelContentMappings.isActive, true));
+  }
+
+  async getChannelContentMappingsByCreator(creatorId: number): Promise<ChannelContentMapping[]> {
+    return await db
+      .select()
+      .from(channelContentMappings)
+      .where(eq(channelContentMappings.creatorId, creatorId))
+      .where(eq(channelContentMappings.isActive, true));
+  }
+
+  async updateChannelContentMapping(id: number, updates: Partial<ChannelContentMapping>): Promise<boolean> {
+    try {
+      await db
+        .update(channelContentMappings)
+        .set(updates)
+        .where(eq(channelContentMappings.id, id));
+      return true;
+    } catch (error) {
+      console.error('Error updating channel content mapping:', error);
+      return false;
+    }
   }
 }
 
