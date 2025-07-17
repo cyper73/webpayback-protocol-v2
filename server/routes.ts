@@ -314,6 +314,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { count = 5 } = req.body;
       const results = [];
+      const failures = [];
       
       for (let i = 0; i < count; i++) {
         const testReward = {
@@ -329,14 +330,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         };
         
-        await gasManager.queueReward(testReward);
-        results.push(testReward);
+        const result = await gasManager.queueReward(testReward);
+        if (result.success) {
+          results.push(testReward);
+        } else {
+          failures.push({ reward: testReward, error: result.message });
+        }
       }
       
       res.json({ 
-        success: true, 
-        message: `Queued ${count} test rewards for batch processing`,
-        rewards: results 
+        success: results.length > 0, 
+        message: `Processed ${results.length}/${count} rewards. ${failures.length} failed.`,
+        rewards: results,
+        failures: failures
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Emergency gas pool recharge endpoint
+  app.post("/api/gas/emergency-recharge", async (req, res) => {
+    try {
+      const { amount = 10 } = req.body; // Default 10 MATIC
+      
+      const result = await gasManager.emergencyRecharge(amount);
+      
+      res.json({
+        success: result.success,
+        message: `Gas pool ricaricato con ${amount} MATIC`,
+        newBalance: result.newBalance,
+        status: result.status,
+        emergencyMode: result.status === 'emergency'
       });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
@@ -347,9 +372,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/rewards", async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
-      // Use gas manager for new rewards
-      await gasManager.queueReward(validatedData);
-      res.json({ success: true, message: "Reward queued for gas-optimized batch processing" });
+      // Use gas manager for new rewards with protection
+      const result = await gasManager.queueReward(validatedData);
+      
+      if (result.success) {
+        res.json({ success: true, message: result.message });
+      } else {
+        res.status(503).json({ 
+          success: false, 
+          error: "Gas pool depleted", 
+          message: result.message 
+        });
+      }
     } catch (error) {
       res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
