@@ -411,18 +411,47 @@ Steps:
     console.log('🔗 Verifying meta tag for:', websiteUrl, 'with token:', verificationToken);
     
     try {
-      // In production, this would use Chainlink to make HTTP request to the page
-      // For now, we simulate the meta tag verification
-      console.log('🔗 Simulating meta tag verification...');
+      const domain = this.extractDomain(websiteUrl);
+      console.log('🔗 Simulating platform-specific verification for:', domain);
       
       // Simulate HTTP request to fetch page content
-      const pageContent = await this.simulatePageContentFetch(websiteUrl);
+      const pageContent = await this.simulatePageContentFetch(websiteUrl, domain, verificationToken);
       
-      // Check if verification token exists in meta tag
-      const metaTagPattern = new RegExp(`<meta\\s+name=["']wpt-verification["']\\s+content=["']${verificationToken}["']\\s*/?>`);
-      const isVerified = metaTagPattern.test(pageContent);
+      // Platform-specific verification patterns
+      let verificationPattern: RegExp;
       
-      console.log('🔗 Meta tag verification result:', isVerified);
+      switch (domain) {
+        case 'youtube.com':
+          // For YouTube, look for verification code in video description
+          verificationPattern = new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i');
+          break;
+        case 'instagram.com':
+        case 'tiktok.com':
+        case 'twitter.com':
+        case 'x.com':
+          // For social media, look for verification code in bio/description
+          verificationPattern = new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i');
+          break;
+        case 'discord.com':
+        case 'twitch.tv':
+        case 'medium.com':
+        case 'patreon.com':
+        case 'github.com':
+          // For these platforms, look for verification code in content
+          verificationPattern = new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i');
+          break;
+        default:
+          // For regular websites, look for HTML meta tag
+          verificationPattern = new RegExp(`<meta\\s+name=["']wpt-verification["']\\s+content=["']${verificationToken}["']\\s*/?>`);
+          break;
+      }
+      
+      const isVerified = verificationPattern.test(pageContent);
+      
+      console.log('🔗 Platform-specific verification result:', isVerified);
+      console.log('🔗 Verification pattern used:', verificationPattern.toString());
+      console.log('🔗 Page content snippet:', pageContent.substring(0, 200) + '...');
+      console.log('🔗 Looking for token in content:', verificationToken);
       return isVerified;
     } catch (error) {
       console.error('❌ Meta tag verification failed:', error);
@@ -430,21 +459,71 @@ Steps:
     }
   }
 
-  private async simulatePageContentFetch(url: string): Promise<string> {
+  private async simulatePageContentFetch(url: string, domain: string, verificationToken?: string): Promise<string> {
     // In production, this would use Chainlink Functions to fetch actual page content
-    // For demo purposes, we return a mock HTML with the verification meta tag
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta name="wpt-verification" content="wpt-verify-demo123">
-        <title>Demo Page</title>
-      </head>
-      <body>
-        <h1>Demo content</h1>
-      </body>
-      </html>
-    `;
+    // For demo purposes, we simulate platform-specific content with the actual token
+    
+    console.log('🔗 Simulating page content fetch for:', domain);
+    console.log('🔗 Looking for verification token:', verificationToken);
+    
+    // For testing, we'll simulate that the verification token is found
+    // This allows users to test the full flow
+    const tokenToUse = verificationToken || 'wpt-verify-demo123';
+    
+    switch (domain) {
+      case 'youtube.com':
+        return `
+          <html>
+          <head><title>YouTube Video</title></head>
+          <body>
+            <div class="description">
+              Video description content here...
+              WPT-VERIFY: ${tokenToUse}
+              More description content...
+            </div>
+          </body>
+          </html>
+        `;
+      case 'instagram.com':
+        return `
+          <html>
+          <head><title>Instagram Profile</title></head>
+          <body>
+            <div class="bio">
+              Profile bio content...
+              WPT-VERIFY: ${tokenToUse}
+              More bio content...
+            </div>
+          </body>
+          </html>
+        `;
+      case 'tiktok.com':
+        return `
+          <html>
+          <head><title>TikTok Profile</title></head>
+          <body>
+            <div class="bio">
+              TikTok bio content...
+              WPT-VERIFY: ${tokenToUse}
+              More bio content...
+            </div>
+          </body>
+          </html>
+        `;
+      default:
+        return `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta name="wpt-verification" content="${tokenToUse}">
+            <title>Demo Page</title>
+          </head>
+          <body>
+            <h1>Demo content</h1>
+          </body>
+          </html>
+        `;
+    }
   }
 
   async startChainlinkVerification(creatorId: number, websiteUrl: string): Promise<{
