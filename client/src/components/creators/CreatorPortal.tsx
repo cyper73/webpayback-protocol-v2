@@ -446,11 +446,27 @@ export default function CreatorPortal() {
             <Label htmlFor="websiteUrl" className="block text-sm font-medium mb-2">
               Website URL
             </Label>
+            <div className="p-3 mb-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-yellow-300">
+                  <p className="font-semibold mb-1">Important: Use specific content URLs</p>
+                  <ul className="space-y-1 text-xs">
+                    <li>• <strong>YouTube:</strong> Link to specific video (youtube.com/watch?v=xxx)</li>
+                    <li>• <strong>Instagram:</strong> Link to specific post (instagram.com/p/xxx)</li>
+                    <li>• <strong>TikTok:</strong> Link to specific video (tiktok.com/@user/video/xxx)</li>
+                    <li>• <strong>Discord:</strong> Link to specific channel (discord.com/channels/xxx)</li>
+                    <li>• <strong>GitHub:</strong> Link to specific repository (github.com/user/repo)</li>
+                    <li>• <strong>Personal sites:</strong> Your website homepage is fine</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
             <div className="flex gap-2">
               <Input
                 id="websiteUrl"
                 type="url"
-                placeholder="https://your-website.com"
+                placeholder="https://youtube.com/watch?v=abc123 or https://your-website.com"
                 className="flex-1 bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white"
                 {...register("websiteUrl")}
               />
