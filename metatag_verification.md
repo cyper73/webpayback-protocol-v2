@@ -1,179 +1,179 @@
 # WebPayback Protocol - Meta Tag Verification System
 
-## Meta Tag di Verifica
+## Verification Meta Tag
 
-Il WebPayback Protocol utilizza un sistema di meta tag per verificare la proprietà dei domini e dei contenuti. I creator devono aggiungere un meta tag specifico alle loro pagine per confermare la proprietà e abilitare il monitoraggio AI.
+The WebPayback Protocol uses a meta tag system to verify domain and content ownership. Creators must add a specific meta tag to their pages to confirm ownership and enable AI monitoring.
 
 ## Meta Tag Standard
 
-### Formato Base
+### Basic Format
 ```html
 <meta name="webpayback-verification" content="WPT-VERIFY-{TOKEN}" />
 ```
 
-### Esempio Completo
+### Complete Example
 ```html
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="webpayback-verification" content="WPT-VERIFY-abc123def456" />
-  <title>Il Mio Sito</title>
+  <title>My Website</title>
 </head>
 <body>
-  <!-- Contenuto della pagina -->
+  <!-- Page content -->
 </body>
 </html>
 ```
 
-## Istruzioni per Piattaforma
+## Platform Instructions
 
 ### YouTube
-Per i video YouTube, aggiungi il token nella descrizione:
+For YouTube videos, add the token in the description:
 ```
 🎯 WebPayback Protocol Verification: WPT-VERIFY-abc123def456
 ```
 
 ### Instagram
-Nel profilo Instagram, aggiungi il token nella bio:
+In your Instagram profile, add the token in the bio:
 ```
 🎯 WPT-VERIFY-abc123def456
 ```
 
 ### TikTok
-Nel profilo TikTok, aggiungi il token nella bio:
+In your TikTok profile, add the token in the bio:
 ```
 🎯 WPT-VERIFY-abc123def456
 ```
 
 ### Discord
-Nel canale Discord, aggiungi il token nella descrizione del canale:
+In your Discord channel, add the token in the channel description:
 ```
 🎯 WebPayback Protocol: WPT-VERIFY-abc123def456
 ```
 
 ### X/Twitter
-Nel profilo X/Twitter, aggiungi il token nella bio:
+In your X/Twitter profile, add the token in the bio:
 ```
 🎯 WPT-VERIFY-abc123def456
 ```
 
 ### Medium/Substack
-Nell'articolo o profilo, aggiungi il token:
+In your article or profile, add the token:
 ```
 🎯 WebPayback Protocol Verification: WPT-VERIFY-abc123def456
 ```
 
 ### GitHub
-Nel README del repository, aggiungi:
+In your repository README, add:
 ```markdown
 <!-- WebPayback Protocol Verification -->
 🎯 WPT-VERIFY-abc123def456
 ```
 
-### Siti Web Personali
-Aggiungi il meta tag nell'`<head>` della pagina:
+### Personal Websites
+Add the meta tag in the `<head>` of the page:
 ```html
 <meta name="webpayback-verification" content="WPT-VERIFY-abc123def456" />
 ```
 
-## Processo di Verifica
+## Verification Process
 
-### 1. Registrazione Creator
-- Vai su [webpayback.replit.app](https://webpayback.replit.app)
-- Registra il tuo URL/canale
-- Ricevi il token di verifica unico
+### 1. Creator Registration
+- Go to [webpayback.replit.app](https://webpayback.replit.app)
+- Register your URL/channel
+- Receive unique verification token
 
-### 2. Inserimento Token
-- Copia il token fornito
-- Aggiungi il token secondo le istruzioni della tua piattaforma
-- Salva le modifiche
+### 2. Token Insertion
+- Copy the provided token
+- Add the token according to your platform instructions
+- Save the changes
 
-### 3. Verifica Automatica
-- Il sistema Chainlink verifica automaticamente il token
-- Ricevi conferma entro 60 secondi
-- Monitoraggio AI attivato immediatamente
+### 3. Automatic Verification
+- The Chainlink system automatically verifies the token
+- Receive confirmation within 60 seconds
+- AI monitoring activated immediately
 
-## Sicurezza e Validazione
+## Security and Validation
 
-### Token Unici
-- Ogni creator riceve un token univoco
-- I token sono legati al specific URL/canale
-- Validità illimitata una volta verificato
+### Unique Tokens
+- Each creator receives a unique token
+- Tokens are linked to specific URL/channel
+- Unlimited validity once verified
 
-### Verifica Chainlink
-- Utilizzo di Chainlink Functions per validazione
-- Verifica cross-chain sicura
-- Prevenzione frodi e duplicazioni
+### Chainlink Verification
+- Using Chainlink Functions for validation
+- Secure cross-chain verification
+- Fraud prevention and duplicate detection
 
-### Monitoraggio Continuo
-- Verifica periodica della presenza del token
-- Alert automatici se il token viene rimosso
-- Riattivazione automatica al ripristino
+### Continuous Monitoring
+- Periodic verification of token presence
+- Automatic alerts if token is removed
+- Automatic reactivation upon restoration
 
-## Esempi Pratici
+## Practical Examples
 
-### Esempio 1: Canale YouTube
+### Example 1: YouTube Channel
 ```
 URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
 Token: WPT-VERIFY-yt789xyz123
-Posizione: Descrizione video
-Formato: "🎯 WebPayback Protocol Verification: WPT-VERIFY-yt789xyz123"
+Location: Video description
+Format: "🎯 WebPayback Protocol Verification: WPT-VERIFY-yt789xyz123"
 ```
 
-### Esempio 2: Profilo Instagram
+### Example 2: Instagram Profile
 ```
 URL: https://instagram.com/mycreator
 Token: WPT-VERIFY-ig456abc789
-Posizione: Bio profilo
-Formato: "🎯 WPT-VERIFY-ig456abc789"
+Location: Profile bio
+Format: "🎯 WPT-VERIFY-ig456abc789"
 ```
 
-### Esempio 3: Repository GitHub
+### Example 3: GitHub Repository
 ```
 URL: https://github.com/user/repo
 Token: WPT-VERIFY-gh123xyz456
-Posizione: README.md
-Formato: "🎯 WPT-VERIFY-gh123xyz456"
+Location: README.md
+Format: "🎯 WPT-VERIFY-gh123xyz456"
 ```
 
-### Esempio 4: Sito Web Personale
+### Example 4: Personal Website
 ```html
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="webpayback-verification" content="WPT-VERIFY-web789abc123" />
   <meta charset="UTF-8">
-  <title>Il Mio Portfolio</title>
+  <title>My Portfolio</title>
 </head>
 <body>
-  <h1>Benvenuto nel mio sito</h1>
-  <!-- Contenuto... -->
+  <h1>Welcome to my website</h1>
+  <!-- Content... -->
 </body>
 </html>
 ```
 
 ## Troubleshooting
 
-### Token Non Rilevato
-- Verifica che il token sia esattamente come fornito
-- Controlla la posizione corretta per la tua piattaforma
-- Assicurati che il contenuto sia pubblico
-- Attendi fino a 60 secondi per la verifica
+### Token Not Detected
+- Verify that the token is exactly as provided
+- Check the correct location for your platform
+- Ensure the content is public
+- Wait up to 60 seconds for verification
 
-### Verifica Fallita
-- Controlla che l'URL sia corretto
-- Verifica che il token sia visibile pubblicamente
-- Riprova la verifica dal dashboard
-- Contatta il supporto se il problema persiste
+### Verification Failed
+- Check that the URL is correct
+- Verify that the token is publicly visible
+- Retry verification from the dashboard
+- Contact support if the problem persists
 
-### Rimozione Accidentale
-- Reinserisci il token nella posizione corretta
-- La verifica si riattiva automaticamente
-- Nessuna perdita di dati o reward accumulate
+### Accidental Removal
+- Re-insert the token in the correct position
+- Verification reactivates automatically
+- No loss of data or accumulated rewards
 
-## API per Sviluppatori
+## API for Developers
 
-### Endpoint di Verifica
+### Verification Endpoint
 ```bash
 POST /api/domain/chainlink/verify-meta-tag
 Content-Type: application/json
@@ -184,7 +184,7 @@ Content-Type: application/json
 }
 ```
 
-### Risposta di Successo
+### Success Response
 ```json
 {
   "success": true,
@@ -200,18 +200,18 @@ Content-Type: application/json
 }
 ```
 
-### Controllo Stato
+### Status Check
 ```bash
 GET /api/domain/chainlink/status?url=https://example.com
 ```
 
-## Supporto
+## Support
 
-Per assistenza con la verifica del meta tag:
+For assistance with meta tag verification:
 - **Dashboard**: [webpayback.replit.app](https://webpayback.replit.app)
 - **GitHub**: [github.com/cyper73/webpayback](https://github.com/cyper73/webpayback)
 - **Discord**: [Community Discord](https://discord.gg/webpayback)
 
 ---
 
-**WebPayback Protocol** - Verifica la proprietà dei tuoi contenuti e inizia a guadagnare WPT token quando AI utilizza il tuo lavoro.
+**WebPayback Protocol** - Verify ownership of your content and start earning WPT tokens when AI uses your work.
