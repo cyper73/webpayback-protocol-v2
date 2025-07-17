@@ -52,6 +52,7 @@ export default function CreatorPortal() {
       return await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
     },
     onSuccess: (data: any) => {
+      console.log("Domain check result:", data);
       setDomainVerification(data);
       if (data.requiresManualReview) {
         toast({
@@ -359,7 +360,11 @@ export default function CreatorPortal() {
         const domainCheckResult = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl: data.websiteUrl });
         setDomainVerification(domainCheckResult);
         
+        console.log("Domain check result in onSubmit:", domainCheckResult);
+        console.log("isDomainVerified:", isDomainVerified);
+        
         if (domainCheckResult.requiresManualReview) {
+          console.log("Blocking: requires manual review");
           toast({
             title: "Domain Verification Required",
             description: "This domain requires manual review for security purposes.",
@@ -371,6 +376,7 @@ export default function CreatorPortal() {
         }
         
         if (domainCheckResult.requiresMetaTag && !isDomainVerified) {
+          console.log("Blocking: requires meta tag verification");
           toast({
             title: "Meta Tag Verification Required",
             description: "Please complete meta tag verification before registration.",
