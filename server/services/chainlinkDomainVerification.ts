@@ -93,23 +93,18 @@ class ChainlinkDomainVerificationService {
   ];
 
   private extractDomain(url: string): string {
-    console.log('🔍 Extracting domain from URL:', url);
-    
     let normalizedUrl = url.toLowerCase().trim();
     
     // Auto-add https:// if no protocol is present
     if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
       normalizedUrl = 'https://' + normalizedUrl;
-      console.log('🔧 Auto-added https:// - normalized URL:', normalizedUrl);
     }
     
     try {
       const urlObj = new URL(normalizedUrl);
       const domain = urlObj.hostname.replace(/^www\./, '');
-      console.log('🔍 Extracted domain:', domain);
       return domain;
     } catch (error) {
-      console.error('❌ Invalid URL format:', normalizedUrl);
       throw new Error('Invalid URL format');
     }
   }
@@ -123,8 +118,24 @@ class ChainlinkDomainVerificationService {
     
     try {
       const urlObj = new URL(normalizedUrl);
+      const domain = urlObj.hostname.replace('www.', '');
       const path = urlObj.pathname;
-      // It's a specific page if it has a path beyond just '/'
+      const searchParams = urlObj.search;
+      
+      // Special handling for YouTube
+      if (domain === 'youtube.com') {
+        // Channel URLs are NOT specific pages for verification
+        if (path.startsWith('/@') || path.startsWith('/channel/') || path.startsWith('/c/') || path.startsWith('/user/')) {
+          return false; // Channel URL, not a specific video
+        }
+        // Video URLs are specific pages
+        if (path.startsWith('/watch') && searchParams.includes('v=')) {
+          return true; // Video URL, this is what we want
+        }
+        return false; // Other YouTube URLs
+      }
+      
+      // For other platforms, use the general rule
       return path !== '/' && path !== '' && path.length > 1;
     } catch (error) {
       return false;
@@ -319,10 +330,27 @@ Steps:
   }
 
   async checkDomainWithChainlink(websiteUrl: string): Promise<ChainlinkDomainCheckResult> {
-    console.log('🔗 Starting Chainlink domain verification for:', websiteUrl);
-    
     const domain = this.extractDomain(websiteUrl);
     const isSpecificPage = this.isSpecificPage(websiteUrl);
+    
+    // Special check for YouTube channel URLs
+    if (domain === 'youtube.com' && !isSpecificPage) {
+      const riskFactors = ['Please use a specific video URL (youtube.com/watch?v=xxx) instead of a channel URL'];
+      return {
+        domain,
+        fullUrl: websiteUrl,
+        isSpecificPage: false,
+        isVerified: false,
+        securityLevel: 'high',
+        requiresManualReview: false,
+        requiresMetaTag: false,
+        verificationScore: 0,
+        riskFactors,
+        verificationToken: undefined,
+        metaTagInstruction: '❌ YOUTUBE CHANNEL URL NOT SUPPORTED:\n\nYou have entered a YouTube channel URL, but verification requires a specific video URL.\n\nPlease:\n1. Go to one of your YouTube videos\n2. Copy the video URL (youtube.com/watch?v=xxx)\n3. Use that URL instead of your channel URL',
+        chainlinkData: undefined
+      };
+    }
     
     // Check for duplicates
     const existingCreator = await storage.getCreatorByWebsiteUrl(websiteUrl);
