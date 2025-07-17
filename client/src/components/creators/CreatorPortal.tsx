@@ -49,10 +49,14 @@ export default function CreatorPortal() {
 
   const checkDomainMutation = useMutation({
     mutationFn: async (websiteUrl: string) => {
-      return await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
+      const result = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
+      console.log("Raw API response:", result);
+      return result;
     },
     onSuccess: (data: any) => {
       console.log("Domain check result:", data);
+      console.log("verificationScore:", data.verificationScore);
+      console.log("riskFactors:", data.riskFactors);
       setDomainVerification(data);
       if (data.requiresManualReview) {
         toast({
