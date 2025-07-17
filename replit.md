@@ -156,6 +156,7 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - Meta tag verification simulates Chainlink Functions for HTTP page content fetching
   - System properly handles verification flow: token generation → meta tag placement → Chainlink verification
   - Extended famous domains list to include 100+ platforms: Facebook, Instagram, TikTok, X/Twitter, Discord, Medium, Substack, YouTube, Twitch, LinkedIn, Patreon, OnlyFans, Spotify, SoundCloud, GitHub, Steam, and all major social media, blogging, creator, and content platforms
+  - **PLATFORM-SPECIFIC VERIFICATION INSTRUCTIONS IMPLEMENTED** (January 17, 2025): Added custom verification instructions for each platform type (YouTube: video description, Instagram: profile bio, TikTok: profile bio, Discord: channel description, etc.) with step-by-step guides for each social media platform
   - Fixed domain recognition logic to properly handle famous domains vs specific pages (patreon.com blocked, patreon.com/StateAzure meta tag verification)
   - **FIXED CRITICAL API PARSING BUG** (January 17, 2025): Resolved JavaScript error where apiRequest wasn't parsing JSON responses, causing "riskFactors is undefined" crashes. System now properly displays meta tag verification UI for specific URLs instead of blocking.
 - **MAJOR ANTI-FRAUD INTEGRATION COMPLETED** (January 14, 2025):
