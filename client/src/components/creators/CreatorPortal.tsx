@@ -49,7 +49,8 @@ export default function CreatorPortal() {
 
   const checkDomainMutation = useMutation({
     mutationFn: async (websiteUrl: string) => {
-      const result = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
+      const response = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
+      const result = await response.json();
       console.log("Raw API response:", result);
       return result;
     },
@@ -95,10 +96,11 @@ export default function CreatorPortal() {
 
   const chainlinkVerificationMutation = useMutation({
     mutationFn: async (websiteUrl: string) => {
-      return await apiRequest("POST", "/api/domain/chainlink/verify", {
+      const response = await apiRequest("POST", "/api/domain/chainlink/verify", {
         creatorId: 1, // Demo user ID
         websiteUrl: websiteUrl
       });
+      return await response.json();
     },
     onSuccess: (data: any) => {
       if (data.success) {
@@ -361,7 +363,8 @@ export default function CreatorPortal() {
     if (!domainVerification) {
       setIsCheckingDomain(true);
       try {
-        const domainCheckResult = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl: data.websiteUrl });
+        const response = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl: data.websiteUrl });
+        const domainCheckResult = await response.json();
         setDomainVerification(domainCheckResult);
         
         console.log("Domain check result in onSubmit:", domainCheckResult);
