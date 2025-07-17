@@ -55,10 +55,6 @@ export default function CreatorPortal() {
       return result;
     },
     onSuccess: (data: any) => {
-      console.log("Domain check result:", data);
-      console.log("verificationScore:", data.verificationScore);
-      console.log("riskFactors:", data.riskFactors);
-      console.log("metaTagInstruction:", data.metaTagInstruction);
       setDomainVerification(data);
       if (data.requiresManualReview) {
         toast({
@@ -236,10 +232,7 @@ export default function CreatorPortal() {
               </div>
               <div className="bg-black/40 p-3 rounded border border-blue-500/30">
                 <pre className="text-xs text-blue-200 font-mono whitespace-pre-wrap">
-                  {(() => {
-                    console.log("Rendering metaTagInstruction:", domainVerification.metaTagInstruction);
-                    return domainVerification.metaTagInstruction;
-                  })()}
+                  {domainVerification.metaTagInstruction}
                 </pre>
               </div>
               <div className="mt-3 flex gap-2">
