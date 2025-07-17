@@ -57,7 +57,7 @@ export default function CreatorPortal() {
       if (data.requiresManualReview) {
         toast({
           title: "Domain Requires Manual Review",
-          description: `Risk factors: ${data.riskFactors.join(', ')}`,
+          description: `Risk factors: ${data.riskFactors ? data.riskFactors.join(', ') : 'Security review required'}`,
           variant: "default",
         });
       } else if (data.requiresMetaTag) {
@@ -75,7 +75,7 @@ export default function CreatorPortal() {
       } else {
         toast({
           title: "Domain Verification Failed",
-          description: `Score: ${data.verificationScore}/100. Issues: ${data.riskFactors.join(', ')}`,
+          description: `Score: ${data.verificationScore}/100. Issues: ${data.riskFactors ? data.riskFactors.join(', ') : 'Unknown issues'}`,
           variant: "destructive",
         });
       }
