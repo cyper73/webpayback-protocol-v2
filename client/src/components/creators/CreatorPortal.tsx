@@ -356,13 +356,24 @@ export default function CreatorPortal() {
     if (!domainVerification) {
       setIsCheckingDomain(true);
       try {
-        const domainCheckResult = await apiRequest("POST", "/api/domain/check", { websiteUrl: data.websiteUrl });
+        const domainCheckResult = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl: data.websiteUrl });
         setDomainVerification(domainCheckResult);
         
-        if (domainCheckResult.requiresVerification) {
+        if (domainCheckResult.requiresManualReview) {
           toast({
             title: "Domain Verification Required",
-            description: domainCheckResult.reason || "This domain requires verification for security purposes.",
+            description: "This domain requires manual review for security purposes.",
+            variant: "default",
+          });
+          setIsSubmitting(false);
+          setIsCheckingDomain(false);
+          return;
+        }
+        
+        if (domainCheckResult.requiresMetaTag && !isDomainVerified) {
+          toast({
+            title: "Meta Tag Verification Required",
+            description: "Please complete meta tag verification before registration.",
             variant: "default",
           });
           setIsSubmitting(false);
