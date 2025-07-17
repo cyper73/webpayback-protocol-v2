@@ -248,13 +248,16 @@ export default function CreatorPortal() {
                   Copy
                 </Button>
                 <Button
-                  onClick={() => {
+                  onClick={async () => {
                     // Verify meta tag
                     if (domainVerification.verificationToken) {
-                      apiRequest("POST", "/api/domain/chainlink/verify-meta-tag", {
-                        websiteUrl: watch("websiteUrl"),
-                        verificationToken: domainVerification.verificationToken
-                      }).then((result) => {
+                      try {
+                        const response = await apiRequest("POST", "/api/domain/chainlink/verify-meta-tag", {
+                          websiteUrl: watch("websiteUrl"),
+                          verificationToken: domainVerification.verificationToken
+                        });
+                        const result = await response.json();
+                        
                         if (result.verified) {
                           toast({
                             title: "Meta Tag Verified",
@@ -262,6 +265,7 @@ export default function CreatorPortal() {
                             variant: "default",
                           });
                           setDomainVerification(prev => ({ ...prev, isVerified: true }));
+                          setIsDomainVerified(true);
                         } else {
                           toast({
                             title: "Meta Tag Not Found",
@@ -269,13 +273,13 @@ export default function CreatorPortal() {
                             variant: "destructive",
                           });
                         }
-                      }).catch(error => {
+                      } catch (error) {
                         toast({
                           title: "Verification Failed",
                           description: error.message,
                           variant: "destructive",
                         });
-                      });
+                      }
                     }
                   }}
                   size="sm"
