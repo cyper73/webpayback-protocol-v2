@@ -24,12 +24,68 @@ interface ChainlinkDomainCheckResult {
 
 class ChainlinkDomainVerificationService {
   private readonly FAMOUS_DOMAINS = [
-    'google.com', 'facebook.com', 'youtube.com', 'twitter.com', 'instagram.com',
-    'linkedin.com', 'tiktok.com', 'netflix.com', 'amazon.com', 'apple.com',
-    'microsoft.com', 'github.com', 'stackoverflow.com', 'reddit.com', 'wikipedia.org',
-    'medium.com', 'wordpress.com', 'blogger.com', 'tumblr.com', 'pinterest.com',
-    'patreon.com', 'twitch.tv', 'discord.com', 'telegram.org', 'whatsapp.com',
-    'spotify.com', 'soundcloud.com', 'vimeo.com', 'dailymotion.com', 'deviantart.com'
+    // Social Media Platforms
+    'facebook.com', 'instagram.com', 'twitter.com', 'x.com', 'linkedin.com',
+    'tiktok.com', 'snapchat.com', 'pinterest.com', 'discord.com', 'telegram.org',
+    'whatsapp.com', 'reddit.com', 'tumblr.com', 'mastodon.social', 'threads.net',
+    'clubhouse.com', 'signal.org', 'wechat.com', 'line.me', 'viber.com',
+    
+    // Content & Video Platforms
+    'youtube.com', 'twitch.tv', 'vimeo.com', 'dailymotion.com', 'rumble.com',
+    'bitchute.com', 'brighteon.com', 'odysee.com', 'peertube.tv', 'dtube.video',
+    'netflix.com', 'hulu.com', 'amazon.com', 'disney.com', 'hbo.com',
+    
+    // Blogging & Publishing Platforms
+    'medium.com', 'wordpress.com', 'blogger.com', 'substack.com', 'ghost.org',
+    'wix.com', 'squarespace.com', 'webflow.com', 'notion.so', 'gitbook.com',
+    'dev.to', 'hashnode.com', 'mirror.xyz', 'beehiiv.com', 'convertkit.com',
+    
+    // Creator & Monetization Platforms
+    'patreon.com', 'onlyfans.com', 'ko-fi.com', 'buymeacoffee.com', 'gumroad.com',
+    'etsy.com', 'fiverr.com', 'upwork.com', 'freelancer.com', 'cameo.com',
+    'fanhouse.app', 'fansly.com', 'justforfans.com', 'manyvideos.com',
+    
+    // Music & Audio Platforms
+    'spotify.com', 'soundcloud.com', 'bandcamp.com', 'mixcloud.com', 'audiomack.com',
+    'anchor.fm', 'podcast.com', 'spreaker.com', 'castbox.fm', 'podbean.com',
+    'apple.com', 'deezer.com', 'tidal.com', 'pandora.com', 'last.fm',
+    
+    // Gaming & Streaming Platforms
+    'steam.com', 'twitch.tv', 'kick.com', 'dlive.tv', 'trovo.live',
+    'facebook.com', 'youtube.com', 'mixer.com', 'caffeine.tv', 'streamlabs.com',
+    'obs.live', 'restream.io', 'streamyard.com', 'riverside.fm',
+    
+    // Art & Creative Platforms
+    'deviantart.com', 'artstation.com', 'behance.net', 'dribbble.com', 'unsplash.com',
+    'flickr.com', 'imgur.com', '500px.com', 'shutterstock.com', 'getty.com',
+    'pixiv.net', 'newgrounds.com', 'furaffinity.net', 'wattpad.com',
+    
+    // Professional & Business Platforms
+    'github.com', 'gitlab.com', 'bitbucket.org', 'stackoverflow.com', 'stackblitz.com',
+    'replit.com', 'codepen.io', 'codesandbox.io', 'glitch.com', 'heroku.com',
+    'vercel.com', 'netlify.com', 'aws.amazon.com', 'cloud.google.com', 'azure.microsoft.com',
+    
+    // Educational & Knowledge Platforms
+    'wikipedia.org', 'coursera.org', 'udemy.com', 'khan.academy.org', 'edx.org',
+    'skillshare.com', 'masterclass.com', 'pluralsight.com', 'lynda.com', 'udacity.com',
+    'codecademy.com', 'freecodecamp.org', 'w3schools.com', 'mdn.mozilla.org',
+    
+    // E-commerce & Marketplaces
+    'amazon.com', 'ebay.com', 'shopify.com', 'etsy.com', 'alibaba.com',
+    'aliexpress.com', 'wish.com', 'mercadolibre.com', 'olx.com', 'craigslist.org',
+    
+    // News & Media Platforms
+    'cnn.com', 'bbc.com', 'nytimes.com', 'reuters.com', 'ap.org',
+    'buzzfeed.com', 'vox.com', 'vice.com', 'techcrunch.com', 'engadget.com',
+    
+    // Tech Giants & Search Engines
+    'google.com', 'microsoft.com', 'apple.com', 'meta.com', 'amazon.com',
+    'yahoo.com', 'bing.com', 'duckduckgo.com', 'yandex.com', 'baidu.com',
+    
+    // Communication & Productivity Tools
+    'slack.com', 'discord.com', 'zoom.us', 'teams.microsoft.com', 'webex.com',
+    'skype.com', 'telegram.org', 'signal.org', 'whatsapp.com', 'messenger.com',
+    'notion.so', 'airtable.com', 'trello.com', 'asana.com', 'monday.com'
   ];
 
   private readonly HIGH_RISK_TLDS = [
