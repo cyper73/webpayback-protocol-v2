@@ -135,6 +135,130 @@ class ChainlinkDomainVerificationService {
     return 'wpt-verify-' + Math.random().toString(36).substr(2, 16);
   }
 
+  private generatePlatformSpecificInstructions(domain: string, token: string): string {
+    switch (domain) {
+      case 'youtube.com':
+        return `📹 YOUTUBE VERIFICATION:
+Add this verification code to your video description:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to YouTube Studio
+2. Edit your video description
+3. Add the verification code above anywhere in the description
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'tiktok.com':
+        return `🎵 TIKTOK VERIFICATION:
+Add this verification code to your profile bio:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your TikTok profile
+2. Click "Edit profile"
+3. Add the verification code above to your bio
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'instagram.com':
+        return `📸 INSTAGRAM VERIFICATION:
+Add this verification code to your profile bio:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your Instagram profile
+2. Click "Edit profile"
+3. Add the verification code above to your bio
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'twitter.com':
+      case 'x.com':
+        return `🐦 X/TWITTER VERIFICATION:
+Add this verification code to your profile bio:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your X/Twitter profile
+2. Click "Edit profile"
+3. Add the verification code above to your bio
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'discord.com':
+        return `💬 DISCORD VERIFICATION:
+Add this verification code to your server/channel description:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your Discord server/channel
+2. Right-click and select "Edit Channel" or "Server Settings"
+3. Add the verification code above to the description
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'twitch.tv':
+        return `🎮 TWITCH VERIFICATION:
+Add this verification code to your channel description:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your Twitch Creator Dashboard
+2. Click "Settings" → "Channel"
+3. Add the verification code above to your channel description
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'medium.com':
+        return `📝 MEDIUM VERIFICATION:
+Add this verification code to your profile bio:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your Medium profile
+2. Click "Edit profile"
+3. Add the verification code above to your bio
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'patreon.com':
+        return `💰 PATREON VERIFICATION:
+Add this verification code to your page description:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your Patreon creator page
+2. Click "Edit page"
+3. Add the verification code above to your page description
+4. Save changes
+5. Click "Verify Meta Tag" button below`;
+
+      case 'github.com':
+        return `💻 GITHUB VERIFICATION:
+Add this verification code to your repository README:
+WPT-VERIFY: ${token}
+
+Steps:
+1. Go to your GitHub repository
+2. Edit the README.md file
+3. Add the verification code above anywhere in the file
+4. Commit changes
+5. Click "Verify Meta Tag" button below`;
+
+      default:
+        return `🔧 WEBSITE VERIFICATION:
+Add this meta tag to your website's <head> section:
+<meta name="wpt-verification" content="${token}">
+
+Steps:
+1. Access your website's HTML source
+2. Add the meta tag above to the <head> section
+3. Save and publish changes
+4. Click "Verify Meta Tag" button below`;
+    }
+  }
+
   private isFamousDomain(domain: string): boolean {
     return this.FAMOUS_DOMAINS.some(famous => 
       domain === famous || domain.endsWith('.' + famous)
@@ -251,7 +375,9 @@ class ChainlinkDomainVerificationService {
     
     if (requiresMetaTag) {
       verificationToken = this.generateVerificationToken();
-      metaTagInstruction = `<meta name="wpt-verification" content="${verificationToken}">`;
+      metaTagInstruction = this.generatePlatformSpecificInstructions(domain, verificationToken);
+      console.log('🔧 Generated platform-specific instructions for:', domain);
+      console.log('📝 Instructions:', metaTagInstruction);
     }
 
     console.log('🔗 Chainlink verification result:', {
