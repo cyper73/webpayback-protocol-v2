@@ -1,58 +1,58 @@
-# WebPayback Protocol - Sistema di Protezione Gas Pool & AI Knowledge Tracking
+# WebPayback Protocol - Gas Pool Protection & AI Knowledge Tracking
 
-## Panoramica
+## Overview
 
-Il WebPayback Protocol implementa un sistema avanzato di protezione del gas pool e tracking della knowledge base AI per garantire la continuità del servizio e rilevare utilizzi AI anche quando non avvengono accessi diretti HTTP.
+The WebPayback Protocol implements an advanced gas pool protection system and AI knowledge base tracking to ensure service continuity and detect AI usage even when direct HTTP access doesn't occur.
 
-## 🔥 Funzionalità Principali
+## 🔥 Key Features
 
-### 1. Sistema di Protezione Gas Pool
+### 1. Gas Pool Protection System
 
-Il sistema monitora costantemente il balance del gas pool e implementa protezioni automatiche per prevenire l'esaurimento completo dei fondi.
+The system continuously monitors gas pool balance and implements automatic protections to prevent complete fund depletion.
 
-#### Stati di Monitoraggio
+#### Monitoring States
 
 ```typescript
-// Stati del gas pool
+// Gas pool states
 enum GasPoolStatus {
-  HEALTHY = "healthy",     // >= 1.0 MATIC - Funzionamento normale
-  WARNING = "warning",     // >= 0.1 MATIC - Basso ma funzionante
-  CRITICAL = "critical",   // >= 0.01 MATIC - Critico ma processa
-  EMERGENCY = "emergency"  // < 0.01 MATIC - Reward bloccate
+  HEALTHY = "healthy",     // >= 1.0 MATIC - Normal operation
+  WARNING = "warning",     // >= 0.1 MATIC - Low but functional
+  CRITICAL = "critical",   // >= 0.01 MATIC - Critical but processing
+  EMERGENCY = "emergency"  // < 0.01 MATIC - Rewards blocked
 }
 ```
 
-#### Protezioni Automatiche
+#### Automatic Protections
 
-- **Blocking delle Reward**: Quando il balance scende sotto 0.01 MATIC
-- **Alert di Emergenza**: Notifiche automatiche agli amministratori
-- **Calcolo Transazioni Rimanenti**: Stima precisa delle transazioni possibili
-- **Ripristino Automatico**: Riattivazione quando il balance viene ricaricato
+- **Reward Blocking**: When balance drops below 0.01 MATIC
+- **Emergency Alerts**: Automatic notifications to administrators
+- **Transaction Calculation**: Precise estimation of possible transactions
+- **Auto Recovery**: Reactivation when balance is recharged
 
 ### 2. AI Knowledge Base Tracking
 
-Sistema che rileva quando AI utilizzano informazioni preesistenti sui creator senza accessi diretti HTTP.
+System that detects when AI uses pre-existing information about creators without direct HTTP access.
 
-#### Rilevamento Multiplo
+#### Multiple Detection
 
 ```typescript
 interface AIKnowledgeUsage {
   aiModel: string;        // chatgpt, claude, gemini, etc.
-  userQuery: string;      // Domanda dell'utente
-  aiResponse: string;     // Risposta dell'AI
-  confidence: number;     // Livello di confidenza
-  source: string;         // Origine del rilevamento
+  userQuery: string;      // User's question
+  aiResponse: string;     // AI's response
+  confidence: number;     // Confidence level
+  source: string;         // Detection source
 }
 ```
 
-#### Pattern di Rilevamento
+#### Detection Patterns
 
-- **Menzioni Canali YouTube**: `@channelname`, `youtube.com/@channel`
-- **Informazioni Specifiche**: Dettagli su subscriber, video, attività recenti
-- **Analisi Contextuale**: Calcolo della confidenza basato sul contenuto
-- **Mapping Creator**: Associazione automatica con creator registrati
+- **YouTube Channel Mentions**: `@channelname`, `youtube.com/@channel`
+- **Specific Information**: Details about subscribers, videos, recent activity
+- **Contextual Analysis**: Confidence calculation based on content
+- **Creator Mapping**: Automatic association with registered creators
 
-## 🚀 Implementazione
+## 🚀 Implementation
 
 ### Gas Pool Manager
 
@@ -68,18 +68,18 @@ export class GasManager {
   }> {
     const gasStats = await this.getGasPoolStats();
     
-    // Blocco in caso di emergenza
+    // Block in case of emergency
     if (!gasStats.canProcessRewards) {
       this.sendEmergencyAlert();
       return {
         success: false,
-        message: `⚠️ EMERGENZA GAS POOL: Balance troppo basso`
+        message: `⚠️ GAS POOL EMERGENCY: Balance too low`
       };
     }
     
-    // Processa la reward
+    // Process the reward
     this.pendingRewards.push(reward);
-    return { success: true, message: "Reward processata" };
+    return { success: true, message: "Reward processed" };
   }
   
   async emergencyRecharge(amount: number): Promise<{
@@ -158,7 +158,7 @@ export class AIKnowledgeTrackingService {
 ### Gas Pool Management
 
 #### GET /api/gas/status
-Stato completo del gas pool con metriche avanzate.
+Complete gas pool status with advanced metrics.
 
 ```json
 {
@@ -176,7 +176,7 @@ Stato completo del gas pool con metriche avanzate.
 ```
 
 #### POST /api/gas/emergency-recharge
-Ricarica emergenza del gas pool.
+Emergency gas pool recharge.
 
 ```bash
 curl -X POST /api/gas/emergency-recharge \
@@ -185,7 +185,7 @@ curl -X POST /api/gas/emergency-recharge \
 ```
 
 #### POST /api/gas/test-batch
-Test del sistema di batch processing con protezioni.
+Test batch processing system with protections.
 
 ```bash
 curl -X POST /api/gas/test-batch \
@@ -196,7 +196,7 @@ curl -X POST /api/gas/test-batch \
 ### AI Knowledge Tracking
 
 #### POST /api/content/ai-knowledge-usage
-Tracciamento utilizzo knowledge base AI.
+AI knowledge base usage tracking.
 
 ```bash
 curl -X POST /api/content/ai-knowledge-usage \
@@ -210,7 +210,7 @@ curl -X POST /api/content/ai-knowledge-usage \
 ```
 
 #### GET /api/content/ai-knowledge-stats
-Statistiche utilizzo knowledge base.
+Knowledge base usage statistics.
 
 ```json
 {
@@ -222,19 +222,19 @@ Statistiche utilizzo knowledge base.
 }
 ```
 
-## 🛡️ Sicurezza e Protezioni
+## 🛡️ Security and Protections
 
-### Protezione Gas Pool
+### Gas Pool Protection
 
-1. **Monitoraggio Continuo**: Check ogni 5 secondi dello stato del pool
-2. **Soglie Multiple**: 4 livelli di allerta per intervento graduale
-3. **Blocking Automatico**: Prevenzione esaurimento completo
-4. **Ricarica Immediata**: Ripristino istantaneo del servizio
+1. **Continuous Monitoring**: Pool status check every 5 seconds
+2. **Multiple Thresholds**: 4 alert levels for gradual intervention
+3. **Automatic Blocking**: Prevention of complete depletion
+4. **Immediate Recharge**: Instant service restoration
 
-### Anti-Fraud per Knowledge Tracking
+### Anti-Fraud for Knowledge Tracking
 
 ```typescript
-// Verifica legittimità utilizzo knowledge base
+// Verify legitimacy of knowledge base usage
 const fraudAnalysis = await fraudDetectionService.analyzeKnowledgeUsage({
   aiModel: data.aiModel,
   userQuery: data.userQuery,
@@ -248,25 +248,25 @@ if (fraudAnalysis.isFraudulent) {
 }
 ```
 
-## 📈 Metriche e Monitoring
+## 📈 Metrics and Monitoring
 
-### Dashboard Gas Pool
+### Gas Pool Dashboard
 
-- **Balance Real-time**: Monitoraggio continuo del balance
-- **Transazioni Rimanenti**: Calcolo preciso delle transazioni possibili
-- **Efficienza Batch**: Statistiche di ottimizzazione (95% risparmio gas)
-- **Status Alerts**: Indicatori visivi dello stato del pool
+- **Real-time Balance**: Continuous balance monitoring
+- **Remaining Transactions**: Precise calculation of possible transactions
+- **Batch Efficiency**: Optimization statistics (95% gas savings)
+- **Status Alerts**: Visual indicators of pool state
 
-### Analytics AI Knowledge
+### AI Knowledge Analytics
 
-- **Utilizzo per Modello**: Statistiche per ChatGPT, Claude, Gemini
-- **Canali Più Menzionati**: Ranking dei creator più referenziati
-- **Confidenza Media**: Qualità del rilevamento AI
-- **Trend Temporali**: Evoluzione dell'utilizzo knowledge base
+- **Usage by Model**: Statistics for ChatGPT, Claude, Gemini
+- **Most Mentioned Channels**: Ranking of most referenced creators
+- **Average Confidence**: Quality of AI detection
+- **Temporal Trends**: Evolution of knowledge base usage
 
-## 🔧 Deployment e Configurazione
+## 🔧 Deployment and Configuration
 
-### Variabili d'Ambiente
+### Environment Variables
 
 ```bash
 # Database
@@ -282,14 +282,14 @@ KNOWLEDGE_TRACKING_ENABLED=true
 AI_CONFIDENCE_THRESHOLD=0.3
 ```
 
-### Inizializzazione
+### Initialization
 
 ```typescript
-// Avvio servizi
+// Service startup
 const gasManager = new GasManager();
 const aiKnowledgeTrackingService = new AIKnowledgeTrackingService();
 
-// Monitoraggio continuo
+// Continuous monitoring
 setInterval(async () => {
   const gasStats = await gasManager.getGasPoolStats();
   if (gasStats.status === 'emergency') {
@@ -298,36 +298,36 @@ setInterval(async () => {
 }, 5000);
 ```
 
-## 🎯 Utilizzo in Produzione
+## 🎯 Production Usage
 
-### Scenario 1: Picco di Traffico AI
+### Scenario 1: AI Traffic Spike
 
 ```typescript
-// Sistema rileva 1000 richieste simultanee
-// Gas pool passa da "healthy" a "warning" a "critical"
-// Alert automatici agli amministratori
-// Batching ottimizzato riduce costi del 95%
-// Nessuna interruzione del servizio
+// System detects 1000 simultaneous requests
+// Gas pool transitions from "healthy" to "warning" to "critical"
+// Automatic alerts to administrators
+// Optimized batching reduces costs by 95%
+// No service interruption
 ```
 
-### Scenario 2: Emergenza Gas Pool
+### Scenario 2: Gas Pool Emergency
 
 ```typescript
-// Balance scende sotto 0.01 MATIC
-// Tutte le nuove reward vengono bloccate
-// Alert di emergenza ogni ora
-// Ricarica manuale via API
-// Ripristino automatico del servizio
+// Balance drops below 0.01 MATIC
+// All new rewards are blocked
+// Emergency alerts every hour
+// Manual recharge via API
+// Automatic service restoration
 ```
 
 ### Scenario 3: AI Knowledge Detection
 
 ```typescript
-// ChatGPT menziona canale YouTube registrato
-// Sistema rileva automaticamente la menzione
-// Calcola confidenza basata sul contenuto
-// Distribuisce reward al creator
-// Traccia utilizzo per analytics
+// ChatGPT mentions registered YouTube channel
+// System automatically detects the mention
+// Calculates confidence based on content
+// Distributes reward to creator
+// Tracks usage for analytics
 ```
 
 ## 📝 Testing
@@ -335,20 +335,20 @@ setInterval(async () => {
 ### Test Gas Pool Protection
 
 ```bash
-# Test stato normale
+# Test normal state
 curl -s http://localhost:5000/api/gas/status
 
-# Test emergenza
+# Test emergency
 curl -X POST http://localhost:5000/api/gas/test-batch -d '{"count": 100}'
 
-# Test ricarica
+# Test recharge
 curl -X POST http://localhost:5000/api/gas/emergency-recharge -d '{"amount": 10}'
 ```
 
 ### Test AI Knowledge Tracking
 
 ```bash
-# Test rilevamento ChatGPT
+# Test ChatGPT detection
 curl -X POST http://localhost:5000/api/content/ai-knowledge-usage \
   -H "Content-Type: application/json" \
   -d '{
@@ -358,25 +358,25 @@ curl -X POST http://localhost:5000/api/content/ai-knowledge-usage \
     "source": "chatgpt-web"
   }'
 
-# Verifica reward distribuite
+# Verify distributed rewards
 curl -s http://localhost:5000/api/rewards | tail -3
 ```
 
 ## 🚀 Roadmap
 
-### Fase 1: Completata ✅
-- [x] Sistema protezione gas pool
+### Phase 1: Completed ✅
+- [x] Gas pool protection system
 - [x] AI knowledge tracking
-- [x] API endpoints completi
+- [x] Complete API endpoints
 - [x] Dashboard monitoring
 
-### Fase 2: In Sviluppo 🔄
-- [ ] Machine learning per confidence scoring
-- [ ] Integrazione Chainlink VRF per randomness
-- [ ] Analytics predittive utilizzo gas
+### Phase 2: In Development 🔄
+- [ ] Machine learning for confidence scoring
+- [ ] Chainlink VRF integration for randomness
+- [ ] Predictive gas usage analytics
 - [ ] Auto-scaling gas pool
 
-### Fase 3: Pianificata 📋
+### Phase 3: Planned 📋
 - [ ] Multi-chain gas pool management
 - [ ] AI model-specific reward multipliers
 - [ ] Advanced fraud detection patterns
@@ -384,7 +384,7 @@ curl -s http://localhost:5000/api/rewards | tail -3
 
 ---
 
-**WebPayback Protocol** - Rivoluzionando il modo in cui i creator vengono remunerati per l'utilizzo AI dei loro contenuti.
+**WebPayback Protocol** - Revolutionizing how creators are compensated for AI usage of their content.
 
 🌐 **Live Demo**: [webpayback.replit.app](https://webpayback.replit.app)  
 📖 **GitHub**: [github.com/cyper73/webpayback](https://github.com/cyper73/webpayback)  
