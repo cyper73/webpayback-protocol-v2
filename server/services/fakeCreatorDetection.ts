@@ -323,10 +323,10 @@ export class FakeCreatorDetectionService {
         totalBlocked: 4,
         recentAlerts: 4,
         topSuspiciousUrls: [
-          { url: 'facebo0k.com', similarityScore: 91.7, count: 1 },
-          { url: 'youtub3.com', similarityScore: 90.9, count: 1 },
-          { url: 'twitt3r.com', similarityScore: 95.0, count: 1 },
-          { url: 'g00gle.com', similarityScore: 80.0, count: 1 }
+          { url: 'facebo0k.com', similarityScore: 91.7, alerts: 1 },
+          { url: 'youtub3.com', similarityScore: 90.9, alerts: 1 },
+          { url: 'twitt3r.com', similarityScore: 95.0, alerts: 1 },
+          { url: 'g00gle.com', similarityScore: 80.0, alerts: 1 }
         ],
         protectionHealth: {
           blacklistMatches: 1,
