@@ -198,10 +198,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
-    // Check wallet address registration limit (max 7 registrations per wallet)
+    // Check wallet address registration limit (max 15 registrations per wallet)
     const existingCreators = await this.getCreatorsByWalletAddress(insertCreator.walletAddress);
-    if (existingCreators.length >= 7) {
-      throw new Error(`Maximum registration limit reached for this wallet address (7/7). Please use a different wallet address.`);
+    if (existingCreators.length >= 15) {
+      throw new Error(`Maximum registration limit reached for this wallet address (15/15). Please use a different wallet address.`);
     }
 
     // Generate referral code if not provided
