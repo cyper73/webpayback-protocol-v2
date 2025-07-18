@@ -142,7 +142,7 @@ export class FakeCreatorDetectionService {
       }
     }
 
-    // Fuzzy matching con domini famosi
+    // Fuzzy matching con domini famosi (soglie ridotte per maggiore sicurezza)
     let maxSimilarity = 0;
     let matchedDomain = '';
     
@@ -154,14 +154,14 @@ export class FakeCreatorDetectionService {
       }
     }
 
-    // Soglia di similarità per considerare sospetto
-    if (maxSimilarity >= 75 && cleanDomain !== matchedDomain) {
+    // Soglia di similarità per considerare sospetto (ridotta da 75% a 70%)
+    if (maxSimilarity >= 70 && cleanDomain !== matchedDomain) {
       return {
         isSuspicious: true,
         type: 'fuzzy_match',
         similarity: maxSimilarity,
         matchedDomain,
-        evidence: `${maxSimilarity.toFixed(1)}% similar to ${matchedDomain}`
+        evidence: `${maxSimilarity.toFixed(1)}% similar to ${matchedDomain} - TYPOSQUATTING ATTACK DETECTED`
       };
     }
 
@@ -242,11 +242,11 @@ export class FakeCreatorDetectionService {
       if (suspiciousCheck.isSuspicious) {
         riskScore = suspiciousCheck.similarity;
         
-        // Determina l'azione basata sul rischio
-        if (riskScore >= 90) {
+        // Determina l'azione basata sul rischio (soglie più aggressive)
+        if (riskScore >= 75) {
           actionTaken = 'blocked';
           shouldBlock = true;
-        } else if (riskScore >= 75) {
+        } else if (riskScore >= 65) {
           actionTaken = 'flagged';
         } else {
           actionTaken = 'monitored';
@@ -427,7 +427,7 @@ export class FakeCreatorDetectionService {
       // Genera domini di test basati sul tipo di simulazione
       switch (simulationType) {
         case 'typosquatting':
-          testDomain = 'g00gle.com';
+          testDomain = testUrl || 'g00gle.com';
           break;
         case 'homograph':
           testDomain = 'microsοft.com'; // o greca al posto di o
@@ -460,7 +460,7 @@ export class FakeCreatorDetectionService {
           riskLevel: suspiciousCheck.similarity >= 90 ? 'critical' : 
                      suspiciousCheck.similarity >= 75 ? 'high' : 
                      suspiciousCheck.similarity >= 50 ? 'medium' : 'low',
-          wouldBlock: suspiciousCheck.similarity >= 90
+          wouldBlock: suspiciousCheck.similarity >= 75
         },
         timestamp: new Date().toISOString()
       };
