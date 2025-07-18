@@ -165,13 +165,17 @@ For complete API documentation, see [docs/api/](./docs/api/)
 - **TikTok**: Video and profile analysis
 - **Twitter/X**: Tweet and profile monitoring
 - **Discord**: Server and channel tracking
+- **LinkedIn**: Professional content and networking
+- **Reddit**: Community and discussion monitoring
+- **Telegram**: Channel and group tracking
 
 ### Professional Platforms
 
 - **GitHub**: Repository and code monitoring
-- **LinkedIn**: Professional content tracking
 - **Medium**: Article and publication analysis
 - **Substack**: Newsletter and subscription tracking
+- **Stack Overflow**: Q&A and technical content
+- **Dev.to**: Developer articles and tutorials
 
 ### Creator Platforms
 
