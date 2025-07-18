@@ -4,6 +4,7 @@ import { web3Service } from "./web3";
 import { fraudDetectionService } from "./fraudDetection";
 import { gasManager } from "./gasManager";
 import { channelMonitoringService } from "./channelMonitoring";
+import { mevProtectionService } from "./mevProtection";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -296,20 +297,61 @@ class ContentMonitoringService {
         console.log(`⚠️ Reputation penalty applied: ${penaltyMultiplier.toFixed(2)}x`);
       }
       
-      // Queue WPT reward for gas-optimized batch processing
-      await gasManager.queueReward({
-        creatorId: creator.id,
-        amount: rewardAmount,
-        tokenType: "WPT",
-        transactionHash: `0x${Date.now().toString(16)}`,
-        status: "pending",
-        metadata: {
-          aiModel: detection.aiType,
-          contentHash: fingerprint.contentHash,
-          detectionConfidence: detection.confidence,
-          fraudAnalysis: fraudAnalysis
-        }
-      });
+      // 🔒 MEV-PROTECTED REWARD PROCESSING
+      console.log(`🔒 Initiating MEV-protected reward for creator ${creator.id}`);
+      
+      // Phase 1: Commit the reward (hidden beneficiary)
+      const commitResult = await mevProtectionService.commitReward(creator.id, rewardAmount);
+      
+      if (commitResult.success) {
+        console.log(`✅ MEV Protection Active - Reward committed with hash: ${commitResult.commitHash}`);
+        
+        // Schedule reveal phase after commit delay
+        setTimeout(async () => {
+          try {
+            // This would normally be called by the blockchain or external system
+            // For now, we simulate the reveal process
+            console.log(`🔓 Revealing reward for creator ${creator.id}`);
+            
+            // The actual reveal would happen through a secure process
+            // For demo purposes, we'll still queue through gasManager but with anti-MEV hash
+            await gasManager.queueReward({
+              creatorId: creator.id,
+              amount: rewardAmount,
+              tokenType: "WPT",
+              transactionHash: `mev-protected-${commitResult.commitHash.slice(0, 16)}`,
+              status: "pending",
+              metadata: {
+                aiModel: detection.aiType,
+                contentHash: fingerprint.contentHash,
+                detectionConfidence: detection.confidence,
+                fraudAnalysis: fraudAnalysis,
+                mevProtected: true,
+                commitHash: commitResult.commitHash
+              }
+            });
+          } catch (error) {
+            console.error("MEV-protected reveal failed:", error);
+          }
+        }, 10000); // 10 second delay for demo (normally 5 minutes)
+      } else {
+        // Fallback to regular processing if MEV protection fails
+        console.warn("MEV protection failed, falling back to regular processing");
+        await gasManager.queueReward({
+          creatorId: creator.id,
+          amount: rewardAmount,
+          tokenType: "WPT",
+          transactionHash: `0x${Date.now().toString(16)}`,
+          status: "pending",
+          metadata: {
+            aiModel: detection.aiType,
+            contentHash: fingerprint.contentHash,
+            detectionConfidence: detection.confidence,
+            fraudAnalysis: fraudAnalysis,
+            mevProtected: false
+          }
+        });
+      }
 
       // Also process through web3Service for immediate wallet distribution
       await web3Service.processRewardDistribution(

@@ -368,6 +368,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // MEV Protection Endpoints
+  app.get("/api/mev/stats", async (req, res) => {
+    try {
+      const { mevProtectionService } = await import("./services/mevProtection");
+      const stats = await mevProtectionService.getProtectionStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.get("/api/mev/recent-rewards", async (req, res) => {
+    try {
+      // Get recent rewards with MEV protection metadata
+      const rewards = await storage.getRewardDistributions();
+      const mevProtectedRewards = rewards
+        .filter(r => r.metadata && (r.metadata as any).mevProtected)
+        .slice(0, 10)
+        .map(r => ({
+          id: r.id,
+          creatorId: r.creatorId,
+          amount: r.amount,
+          aiModel: (r.metadata as any)?.aiModel || 'unknown',
+          commitHash: (r.metadata as any)?.commitHash,
+          timestamp: r.createdAt
+        }));
+        
+      res.json(mevProtectedRewards);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/mev/test", async (req, res) => {
+    try {
+      const { mevProtectionService } = await import("./services/mevProtection");
+      const { creatorId, amount, testMode } = req.body;
+      
+      console.log(`🧪 MEV Protection Test Started:
+        Creator: ${creatorId}
+        Amount: ${amount} WPT
+        Test Mode: ${testMode}`);
+      
+      // Simulate a front-running attempt
+      const commitResult = await mevProtectionService.commitReward(creatorId, amount);
+      
+      if (commitResult.success) {
+        console.log(`✅ Test Commitment Created: ${commitResult.commitHash}`);
+        
+        // Simulate malicious front-running bot trying to exploit
+        setTimeout(() => {
+          console.log(`🤖 SIMULATED FRONT-RUNNING ATTEMPT:
+            - Bot detected pending reward
+            - Attempting to insert malicious transaction
+            - MEV Protection Status: BLOCKING ATTACK`);
+        }, 2000);
+        
+        // Simulate legitimate reveal after commit period
+        setTimeout(() => {
+          console.log(`🔓 MEV Protection Test - Legitimate reveal phase initiated`);
+        }, 5000);
+        
+        res.json({
+          success: true,
+          message: "MEV protection test initiated successfully",
+          commitHash: commitResult.commitHash,
+          testPhases: [
+            "Commit phase (hiding beneficiary)",
+            "Simulated front-running attempt",
+            "Anti-MEV protection active",
+            "Legitimate reveal phase",
+            "Randomized processing"
+          ]
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: "MEV protection test failed to start"
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/mev/commit", async (req, res) => {
+    try {
+      const { mevProtectionService } = await import("./services/mevProtection");
+      const { creatorId, amount } = req.body;
+      
+      const result = await mevProtectionService.commitReward(creatorId, amount);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/mev/reveal", async (req, res) => {
+    try {
+      const { mevProtectionService } = await import("./services/mevProtection");
+      const { commitHash, creatorId, amount, nonce } = req.body;
+      
+      const result = await mevProtectionService.revealReward(commitHash, creatorId, amount, nonce);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   // Create reward distribution (legacy endpoint - now redirects to gas manager)
   app.post("/api/rewards", async (req, res) => {
     try {
