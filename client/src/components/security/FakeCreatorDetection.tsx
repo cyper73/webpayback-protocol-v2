@@ -314,31 +314,37 @@ const FakeCreatorDetection: React.FC = () => {
       </Card>
 
       {/* Top Suspicious URLs */}
-      {stats?.topSuspiciousUrls && stats.topSuspiciousUrls.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Search className="h-4 w-4 mr-2" />
-              Top Suspicious URLs
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Search className="h-4 w-4 mr-2" />
+            Top Suspicious URLs
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {stats && stats.topSuspiciousUrls && stats.topSuspiciousUrls.length > 0 ? (
             <div className="space-y-2">
               {stats.topSuspiciousUrls.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
                   <span className="font-mono text-sm truncate flex-1">{item.url}</span>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-semibold">{item.similarityScore.toFixed(1)}%</span>
+                    <span className="text-sm font-semibold text-red-600">{item.similarityScore.toFixed(1)}%</span>
                     <Badge variant="outline" className="text-xs">
-                      {item.alerts} alerts
+                      {item.alerts} alert{item.alerts !== 1 ? 's' : ''}
                     </Badge>
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No suspicious URLs detected</p>
+              <p className="text-sm">Protection systems are monitoring for threats</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent Alerts */}
       {alerts.length > 0 && (
