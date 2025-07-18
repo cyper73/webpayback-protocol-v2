@@ -1,8 +1,12 @@
 # WebPayback Protocol - Gas Pool Protection & AI Knowledge Tracking
 
+---
+
 ## Overview
 
 The WebPayback Protocol implements an advanced gas pool protection system and AI knowledge base tracking to ensure service continuity and detect AI usage even when direct HTTP access doesn't occur.
+
+---
 
 ## 🔥 Key Features
 
@@ -51,6 +55,8 @@ interface AIKnowledgeUsage {
 - **Specific Information**: Details about subscribers, videos, recent activity
 - **Contextual Analysis**: Confidence calculation based on content
 - **Creator Mapping**: Automatic association with registered creators
+
+---
 
 ## 🚀 Implementation
 
@@ -130,7 +136,7 @@ export class AIKnowledgeTrackingService {
       if (creator) {
         const confidence = this.calculateKnowledgeConfidence(data.aiResponse, mention);
         
-        // Simula accesso AI per reward processing
+        // Simulates AI access for reward processing
         const simulatedAccess = {
           url: creator.websiteUrl,
           userAgent: `${data.aiModel}-Knowledge-Base/1.0`,
@@ -153,11 +159,14 @@ export class AIKnowledgeTrackingService {
 }
 ```
 
+---
+
 ## 📊 API Endpoints
 
 ### Gas Pool Management
 
 #### GET /api/gas/status
+
 Complete gas pool status with advanced metrics.
 
 ```json
@@ -176,6 +185,7 @@ Complete gas pool status with advanced metrics.
 ```
 
 #### POST /api/gas/emergency-recharge
+
 Emergency gas pool recharge.
 
 ```bash
@@ -185,6 +195,7 @@ curl -X POST /api/gas/emergency-recharge \
 ```
 
 #### POST /api/gas/test-batch
+
 Test batch processing system with protections.
 
 ```bash
@@ -196,6 +207,7 @@ curl -X POST /api/gas/test-batch \
 ### AI Knowledge Tracking
 
 #### POST /api/content/ai-knowledge-usage
+
 AI knowledge base usage tracking.
 
 ```bash
@@ -204,12 +216,13 @@ curl -X POST /api/content/ai-knowledge-usage \
   -d '{
     "aiModel": "chatgpt",
     "userQuery": "Tell me about YouTube channel @MrCyper73",
-    "aiResponse": "The YouTube channel @MrCyper73 focuses on technology and programming content...",
+    "aiResponse": "The channel @MrCyper73 creates tech content...",
     "source": "chatgpt-web"
   }'
 ```
 
 #### GET /api/content/ai-knowledge-stats
+
 Knowledge base usage statistics.
 
 ```json
@@ -221,6 +234,8 @@ Knowledge base usage statistics.
   "topAIModels": ["chatgpt", "claude", "gemini"]
 }
 ```
+
+---
 
 ## 🛡️ Security and Protections
 
@@ -248,6 +263,8 @@ if (fraudAnalysis.isFraudulent) {
 }
 ```
 
+---
+
 ## 📈 Metrics and Monitoring
 
 ### Gas Pool Dashboard
@@ -263,6 +280,8 @@ if (fraudAnalysis.isFraudulent) {
 - **Most Mentioned Channels**: Ranking of most referenced creators
 - **Average Confidence**: Quality of AI detection
 - **Temporal Trends**: Evolution of knowledge base usage
+
+---
 
 ## 🔧 Deployment and Configuration
 
@@ -298,6 +317,8 @@ setInterval(async () => {
 }, 5000);
 ```
 
+---
+
 ## 🎯 Production Usage
 
 ### Scenario 1: AI Traffic Spike
@@ -329,6 +350,8 @@ setInterval(async () => {
 // Distributes reward to creator
 // Tracks usage for analytics
 ```
+
+---
 
 ## 📝 Testing
 
@@ -362,21 +385,26 @@ curl -X POST http://localhost:5000/api/content/ai-knowledge-usage \
 curl -s http://localhost:5000/api/rewards | tail -3
 ```
 
+---
+
 ## 🚀 Roadmap
 
 ### Phase 1: Completed ✅
+
 - [x] Gas pool protection system
 - [x] AI knowledge tracking
 - [x] Complete API endpoints
 - [x] Dashboard monitoring
 
 ### Phase 2: In Development 🔄
+
 - [ ] Machine learning for confidence scoring
 - [ ] Chainlink VRF integration for randomness
 - [ ] Predictive gas usage analytics
 - [ ] Auto-scaling gas pool
 
 ### Phase 3: Planned 📋
+
 - [ ] Multi-chain gas pool management
 - [ ] AI model-specific reward multipliers
 - [ ] Advanced fraud detection patterns

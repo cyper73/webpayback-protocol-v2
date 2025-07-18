@@ -14,12 +14,10 @@ This directory contains comprehensive documentation for the WebPayback Protocol.
 - **[AI Agents](./ai-agents.md)** - Level 280 AI agents system documentation
 - **[Chainlink Integration](./chainlink.md)** - Chainlink services implementation
 - **[Gas Pool Protection](./gas-pool-protection.md)** - Gas optimization system
-- **[Gas Pool Protection Optimized](./gas-pool-protection-optimized.md)** - Enhanced gas management
 
 ### Platform Integration
 - **[Platforms](./platforms.md)** - Complete list of 100+ supported platforms
 - **[Meta Tag Verification](./metatag-verification.md)** - Domain verification system
-- **[Meta Tag Verification Optimized](./metatag-verification-optimized.md)** - Enhanced verification
 
 ### API Documentation
 - **[API Reference](./api/)** - Complete API documentation
