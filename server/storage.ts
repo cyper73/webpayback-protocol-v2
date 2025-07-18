@@ -47,6 +47,7 @@ export interface IStorage {
   updateCreator(id: number, updates: Partial<Creator>): Promise<void>;
   getCreatorByReferralCode(referralCode: string): Promise<Creator | undefined>;
   getCreatorByWebsiteUrl(websiteUrl: string): Promise<Creator | undefined>;
+  getCreatorByWalletAddress(walletAddress: string): Promise<Creator | undefined>;
   generateReferralCode(): Promise<string>;
   
   // Referral methods
@@ -196,6 +197,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
+    // Check if wallet address is already registered
+    const existingCreator = await this.getCreatorByWalletAddress(insertCreator.walletAddress);
+    if (existingCreator) {
+      throw new Error(`Wallet address ${insertCreator.walletAddress} is already registered by another creator`);
+    }
+
     // Generate referral code if not provided
     const referralCode = insertCreator.referralCode || await this.generateReferralCode();
     

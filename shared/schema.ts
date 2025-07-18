@@ -13,7 +13,7 @@ export const creators = pgTable("creators", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   websiteUrl: text("website_url").notNull(),
-  walletAddress: text("wallet_address").notNull(),
+  walletAddress: text("wallet_address").notNull().unique(),
   contentCategory: text("content_category").notNull(),
   isVerified: boolean("is_verified").default(false),
   isEarlyAdopter: boolean("is_early_adopter").default(false),
