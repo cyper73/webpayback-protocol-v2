@@ -325,9 +325,9 @@ const FakeCreatorDetection: React.FC = () => {
           {stats && stats.topSuspiciousUrls && stats.topSuspiciousUrls.length > 0 ? (
             <div className="space-y-3">
               {stats.topSuspiciousUrls.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                   <div className="flex-1 min-w-0">
-                    <div className="font-mono text-base font-bold text-gray-900 dark:text-white mb-1">
+                    <div className="font-mono text-base font-bold text-black dark:text-white mb-1" style={{color: '#000000'}}>
                       {item.url}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">
