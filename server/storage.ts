@@ -48,6 +48,7 @@ export interface IStorage {
   getCreatorByReferralCode(referralCode: string): Promise<Creator | undefined>;
   getCreatorByWebsiteUrl(websiteUrl: string): Promise<Creator | undefined>;
   getCreatorByWalletAddress(walletAddress: string): Promise<Creator | undefined>;
+  getCreatorsByWalletAddress(walletAddress: string): Promise<Creator[]>;
   generateReferralCode(): Promise<string>;
   
   // Referral methods
@@ -197,10 +198,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
-    // Check if wallet address is already registered
-    const existingCreator = await this.getCreatorByWalletAddress(insertCreator.walletAddress);
-    if (existingCreator) {
-      throw new Error(`Wallet address ${insertCreator.walletAddress} is already registered by another creator`);
+    // Check wallet address registration limit (max 30 registrations per wallet)
+    const existingCreators = await this.getCreatorsByWalletAddress(insertCreator.walletAddress);
+    if (existingCreators.length >= 30) {
+      throw new Error(`Maximum registration limit reached for this wallet address (30/30). Please use a different wallet address.`);
     }
 
     // Generate referral code if not provided
@@ -235,6 +236,15 @@ export class DatabaseStorage implements IStorage {
   async getCreatorByWebsiteUrl(websiteUrl: string): Promise<Creator | undefined> {
     const [creator] = await db.select().from(creators).where(eq(creators.websiteUrl, websiteUrl));
     return creator || undefined;
+  }
+
+  async getCreatorByWalletAddress(walletAddress: string): Promise<Creator | undefined> {
+    const [creator] = await db.select().from(creators).where(eq(creators.walletAddress, walletAddress));
+    return creator || undefined;
+  }
+
+  async getCreatorsByWalletAddress(walletAddress: string): Promise<Creator[]> {
+    return await db.select().from(creators).where(eq(creators.walletAddress, walletAddress));
   }
 
   async generateReferralCode(): Promise<string> {
