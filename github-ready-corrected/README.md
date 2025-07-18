@@ -159,6 +159,7 @@ For complete API documentation, see [docs/api/](./docs/api/)
 
 ### Social Media Platforms
 
+- **Facebook**: Page and post monitoring
 - **YouTube**: Channel and video monitoring
 - **Instagram**: Profile and content tracking  
 - **TikTok**: Video and profile analysis
