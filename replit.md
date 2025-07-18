@@ -173,8 +173,10 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
     - System showing 4 typosquatting attacks successfully blocked with detailed evidence
     - Protection Health status: HEALTHY with complete multi-layer security operational
     - **FIXED TOP SUSPICIOUS URLS DISPLAY**: Resolved frontend rendering issue preventing "Top Suspicious URLs" list from showing blocked domains
+    - **FIXED CSS VISIBILITY BUG**: Resolved text color invisibility issue where domain names only appeared on mouse hover
     - Dashboard now correctly displays all typosquatting domains: facebo0k.com (91.7%), youtub3.com (90.9%), twitt3r.com (95%), g00gle.com (80%)
-    - Enhanced UI with improved conditional rendering, dark mode support, and colored similarity percentage badges
+    - Enhanced UI with improved conditional rendering, dark mode support, forced text visibility, and colored similarity percentage badges
+    - All domain names now permanently visible with black text on white background for maximum contrast
     - WebPayback Protocol now offers complete enterprise-grade protection against all major attack vectors
 - **FAKE CREATOR DETECTION SYSTEM IMPLEMENTED** (January 18, 2025):
   - Created comprehensive fake creator detection service with advanced fuzzy matching algorithms
