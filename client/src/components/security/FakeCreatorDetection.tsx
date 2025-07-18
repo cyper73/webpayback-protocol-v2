@@ -323,13 +323,23 @@ const FakeCreatorDetection: React.FC = () => {
         </CardHeader>
         <CardContent>
           {stats && stats.topSuspiciousUrls && stats.topSuspiciousUrls.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {stats.topSuspiciousUrls.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                  <span className="font-mono text-sm truncate flex-1">{item.url}</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-semibold text-red-600">{item.similarityScore.toFixed(1)}%</span>
-                    <Badge variant="outline" className="text-xs">
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-mono text-base font-bold text-gray-900 dark:text-white mb-1">
+                      {item.url}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      Typosquatting domain detected
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 ml-4">
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-red-600">{item.similarityScore.toFixed(1)}%</div>
+                      <div className="text-xs text-gray-500">similarity</div>
+                    </div>
+                    <Badge variant="destructive" className="text-xs">
                       {item.alerts} alert{item.alerts !== 1 ? 's' : ''}
                     </Badge>
                   </div>
