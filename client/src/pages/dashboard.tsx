@@ -13,6 +13,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { GasTracker } from "@/components/gas/GasTracker";
+import PoolDrainProtection from "@/components/pool/PoolDrainProtection";
 
 import { Box, Wallet, Coins, Link } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -295,6 +296,11 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <RewardDistribution />
           <ComplianceMonitor />
+        </div>
+
+        {/* Pool Drain Protection */}
+        <div className="mb-8">
+          <PoolDrainProtection />
         </div>
 
         {/* Network Switcher */}

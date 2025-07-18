@@ -5,6 +5,7 @@ import { fraudDetectionService } from "./fraudDetection";
 import { gasManager } from "./gasManager";
 import { channelMonitoringService } from "./channelMonitoring";
 import { mevProtectionService } from "./mevProtection";
+import { poolDrainProtectionService } from "./poolDrainProtection";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -297,6 +298,24 @@ class ContentMonitoringService {
         console.log(`⚠️ Reputation penalty applied: ${penaltyMultiplier.toFixed(2)}x`);
       }
       
+      // 🛡️ POOL DRAIN PROTECTION CHECK
+      console.log(`🛡️ Checking pool drain protection for creator ${creator.id}`);
+      
+      const poolProtectionStatus = await poolDrainProtectionService.canDistributeReward(
+        creator.walletAddress,
+        parseFloat(rewardAmount)
+      );
+      
+      if (!poolProtectionStatus.canDistributeReward) {
+        console.log(`🚨 POOL DRAIN PROTECTION TRIGGERED - Reward blocked for creator ${creator.id}`);
+        console.log(`   Risk Score: ${poolProtectionStatus.riskScore}%`);
+        console.log(`   Alerts: ${poolProtectionStatus.securityAlerts.join(', ')}`);
+        
+        return false; // Block the reward distribution
+      }
+      
+      console.log(`✅ Pool protection passed - Risk Score: ${poolProtectionStatus.riskScore}%`);
+      
       // 🔒 MEV-PROTECTED REWARD PROCESSING
       console.log(`🔒 Initiating MEV-protected reward for creator ${creator.id}`);
       
@@ -327,7 +346,8 @@ class ContentMonitoringService {
                 detectionConfidence: detection.confidence,
                 fraudAnalysis: fraudAnalysis,
                 mevProtected: true,
-                commitHash: commitResult.commitHash
+                commitHash: commitResult.commitHash,
+                poolProtection: poolProtectionStatus
               }
             });
           } catch (error) {
@@ -348,7 +368,8 @@ class ContentMonitoringService {
             contentHash: fingerprint.contentHash,
             detectionConfidence: detection.confidence,
             fraudAnalysis: fraudAnalysis,
-            mevProtected: false
+            mevProtected: false,
+            poolProtection: poolProtectionStatus
           }
         });
       }

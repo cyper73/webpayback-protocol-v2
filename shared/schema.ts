@@ -120,6 +120,44 @@ export const complianceRecords = pgTable("compliance_records", {
   auditedBy: text("audited_by"),
 });
 
+// Reward Pool Protection Tables
+export const rewardPoolLimits = pgTable("reward_pool_limits", {
+  id: serial("id").primaryKey(),
+  walletAddress: text("wallet_address").notNull(),
+  timeframeType: text("timeframe_type").notNull(), // hourly, daily, weekly, monthly
+  maxRewardAmount: decimal("max_reward_amount", { precision: 18, scale: 8 }).notNull(),
+  currentPeriodAmount: decimal("current_period_amount", { precision: 18, scale: 8 }).default("0"),
+  periodStart: timestamp("period_start").defaultNow(),
+  periodEnd: timestamp("period_end").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const poolDrainProtection = pgTable("pool_drain_protection", {
+  id: serial("id").primaryKey(),
+  walletAddress: text("wallet_address").notNull(),
+  timeframe: text("timeframe").notNull(), // hourly, daily, weekly, monthly
+  amountDistributed: decimal("amount_distributed", { precision: 18, scale: 8 }).default("0"),
+  maxRewardAmount: decimal("max_reward_amount", { precision: 18, scale: 8 }).default("100.0"),
+  lastDistributionAt: timestamp("last_distribution_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const rewardPoolSecurity = pgTable("reward_pool_security", {
+  id: serial("id").primaryKey(),
+  walletAddress: text("wallet_address").notNull(),
+  suspiciousActivity: text("suspicious_activity").notNull(), // high_frequency, large_amounts, exploit_attempt
+  riskScore: decimal("risk_score", { precision: 5, scale: 2 }).notNull(),
+  alertLevel: text("alert_level").notNull(), // low, medium, high, critical
+  actionTaken: text("action_taken"), // throttled, blocked, flagged, investigated
+  evidence: jsonb("evidence").default({}),
+  isResolved: boolean("is_resolved").default(false),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Anti-fraud system tables
 export const fraudDetectionRules = pgTable("fraud_detection_rules", {
   id: serial("id").primaryKey(),
@@ -481,6 +519,37 @@ export const insertDomainVerificationSchema = createInsertSchema(domainVerificat
   reviewNotes: true,
 });
 
+// Reward Pool Protection insert schemas
+export const insertRewardPoolLimitsSchema = createInsertSchema(rewardPoolLimits).pick({
+  walletAddress: true,
+  timeframeType: true,
+  maxRewardAmount: true,
+  currentPeriodAmount: true,
+  periodStart: true,
+  periodEnd: true,
+  isActive: true,
+});
+
+export const insertPoolDrainProtectionSchema = createInsertSchema(poolDrainProtection).pick({
+  protectionType: true,
+  threshold: true,
+  currentValue: true,
+  timeWindow: true,
+  windowStart: true,
+  isTriggered: true,
+  metadata: true,
+});
+
+export const insertRewardPoolSecuritySchema = createInsertSchema(rewardPoolSecurity).pick({
+  walletAddress: true,
+  suspiciousActivity: true,
+  riskScore: true,
+  alertLevel: true,
+  actionTaken: true,
+  evidence: true,
+  isResolved: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -530,3 +599,13 @@ export type DomainVerification = typeof domainVerifications.$inferSelect;
 
 export type InsertChannelContentMapping = z.infer<typeof insertChannelContentMappingSchema>;
 export type ChannelContentMapping = typeof channelContentMappings.$inferSelect;
+
+// Reward Pool Protection types
+export type InsertRewardPoolLimits = z.infer<typeof insertRewardPoolLimitsSchema>;
+export type RewardPoolLimits = typeof rewardPoolLimits.$inferSelect;
+
+export type InsertPoolDrainProtection = z.infer<typeof insertPoolDrainProtectionSchema>;
+export type PoolDrainProtection = typeof poolDrainProtection.$inferSelect;
+
+export type InsertRewardPoolSecurity = z.infer<typeof insertRewardPoolSecuritySchema>;
+export type RewardPoolSecurity = typeof rewardPoolSecurity.$inferSelect;

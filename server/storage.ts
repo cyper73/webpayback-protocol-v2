@@ -2,7 +2,7 @@ import {
   users, creators, blockchainNetworks, aiAgents, agentCommunications, 
   contentTracking, rewardDistributions, poolManagement, complianceRecords,
   fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns, referralRewards, domainVerifications,
-  channelContentMappings,
+  channelContentMappings, rewardPoolLimits, poolDrainProtection, rewardPoolSecurity,
   type User, type InsertUser, type Creator, type InsertCreator,
   type BlockchainNetwork, type InsertBlockchainNetwork, type AiAgent, type InsertAiAgent,
   type AgentCommunication, type InsertAgentCommunication, type ContentTracking, type InsertContentTracking,
@@ -11,7 +11,9 @@ import {
   type FraudDetectionRule, type InsertFraudDetectionRule, type FraudDetectionAlert, type InsertFraudDetectionAlert,
   type CreatorReputationScore, type InsertCreatorReputationScore, type AccessPattern, type InsertAccessPattern,
   type ReferralReward, type InsertReferralReward, type DomainVerification, type InsertDomainVerification,
-  type ChannelContentMapping, type InsertChannelContentMapping
+  type ChannelContentMapping, type InsertChannelContentMapping,
+  type RewardPoolLimits, type InsertRewardPoolLimits, type PoolDrainProtection, type InsertPoolDrainProtection,
+  type RewardPoolSecurity, type InsertRewardPoolSecurity
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -102,6 +104,22 @@ export interface IStorage {
   getChannelContentMappings(): Promise<ChannelContentMapping[]>;
   getChannelContentMappingsByCreator(creatorId: number): Promise<ChannelContentMapping[]>;
   updateChannelContentMapping(id: number, updates: Partial<ChannelContentMapping>): Promise<boolean>;
+
+  // Pool drain protection methods
+  createRewardPoolLimits(insertLimits: InsertRewardPoolLimits): Promise<RewardPoolLimits>;
+  getRewardPoolLimits(): Promise<RewardPoolLimits[]>;
+  getRewardPoolLimitsByWallet(walletAddress: string, timeframeType: string): Promise<RewardPoolLimits[]>;
+  updateRewardPoolLimits(id: number, updates: Partial<RewardPoolLimits>): Promise<void>;
+  
+  createPoolDrainProtection(insertProtection: InsertPoolDrainProtection): Promise<PoolDrainProtection>;
+  getPoolDrainProtection(): Promise<PoolDrainProtection[]>;
+  getPoolDrainProtectionByType(protectionType: string): Promise<PoolDrainProtection[]>;
+  updatePoolDrainProtection(id: number, updates: Partial<PoolDrainProtection>): Promise<void>;
+  
+  createRewardPoolSecurity(insertSecurity: InsertRewardPoolSecurity): Promise<RewardPoolSecurity>;
+  getRewardPoolSecurity(): Promise<RewardPoolSecurity[]>;
+  getRewardPoolSecurityByWallet(walletAddress: string): Promise<RewardPoolSecurity[]>;
+  updateRewardPoolSecurity(id: number, updates: Partial<RewardPoolSecurity>): Promise<void>;
 }
 
 // rewrite MemStorage to DatabaseStorage
@@ -550,6 +568,87 @@ export class DatabaseStorage implements IStorage {
       console.error('Error updating channel content mapping:', error);
       return false;
     }
+  }
+
+  // Pool drain protection methods
+  async createRewardPoolLimits(insertLimits: InsertRewardPoolLimits): Promise<RewardPoolLimits> {
+    const [limits] = await db
+      .insert(rewardPoolLimits)
+      .values(insertLimits)
+      .returning();
+    return limits;
+  }
+
+  async getRewardPoolLimits(): Promise<RewardPoolLimits[]> {
+    return await db.select().from(rewardPoolLimits);
+  }
+
+  async getRewardPoolLimitsByWallet(walletAddress: string, timeframeType: string): Promise<RewardPoolLimits[]> {
+    return await db
+      .select()
+      .from(rewardPoolLimits)
+      .where(eq(rewardPoolLimits.walletAddress, walletAddress))
+      .where(eq(rewardPoolLimits.timeframeType, timeframeType))
+      .where(eq(rewardPoolLimits.isActive, true));
+  }
+
+  async updateRewardPoolLimits(id: number, updates: Partial<RewardPoolLimits>): Promise<void> {
+    await db
+      .update(rewardPoolLimits)
+      .set(updates)
+      .where(eq(rewardPoolLimits.id, id));
+  }
+
+  async createPoolDrainProtection(insertProtection: InsertPoolDrainProtection): Promise<PoolDrainProtection> {
+    const [protection] = await db
+      .insert(poolDrainProtection)
+      .values(insertProtection)
+      .returning();
+    return protection;
+  }
+
+  async getPoolDrainProtection(): Promise<PoolDrainProtection[]> {
+    return await db.select().from(poolDrainProtection);
+  }
+
+  async getPoolDrainProtectionByType(protectionType: string): Promise<PoolDrainProtection[]> {
+    return await db
+      .select()
+      .from(poolDrainProtection)
+      .where(eq(poolDrainProtection.protectionType, protectionType));
+  }
+
+  async updatePoolDrainProtection(id: number, updates: Partial<PoolDrainProtection>): Promise<void> {
+    await db
+      .update(poolDrainProtection)
+      .set(updates)
+      .where(eq(poolDrainProtection.id, id));
+  }
+
+  async createRewardPoolSecurity(insertSecurity: InsertRewardPoolSecurity): Promise<RewardPoolSecurity> {
+    const [security] = await db
+      .insert(rewardPoolSecurity)
+      .values(insertSecurity)
+      .returning();
+    return security;
+  }
+
+  async getRewardPoolSecurity(): Promise<RewardPoolSecurity[]> {
+    return await db.select().from(rewardPoolSecurity);
+  }
+
+  async getRewardPoolSecurityByWallet(walletAddress: string): Promise<RewardPoolSecurity[]> {
+    return await db
+      .select()
+      .from(rewardPoolSecurity)
+      .where(eq(rewardPoolSecurity.walletAddress, walletAddress));
+  }
+
+  async updateRewardPoolSecurity(id: number, updates: Partial<RewardPoolSecurity>): Promise<void> {
+    await db
+      .update(rewardPoolSecurity)
+      .set(updates)
+      .where(eq(rewardPoolSecurity.id, id));
   }
 }
 

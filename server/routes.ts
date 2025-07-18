@@ -10,6 +10,7 @@ import { domainVerificationService } from "./services/domainVerification";
 import { chainlinkDomainVerificationService } from "./services/chainlinkDomainVerification";
 import { channelMonitoringService } from "./services/channelMonitoring";
 import { aiKnowledgeTrackingService } from "./services/aiKnowledgeTracking";
+import { poolDrainProtectionService } from "./services/poolDrainProtection";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -1155,6 +1156,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
           verified: false 
         });
       }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // POOL DRAIN PROTECTION ENDPOINTS
+  
+  // Check if a reward can be distributed to a wallet
+  app.post('/api/pool/drain-protection/check', async (req, res) => {
+    try {
+      const { walletAddress, rewardAmount } = req.body;
+      
+      if (!walletAddress || !rewardAmount) {
+        return res.status(400).json({ error: 'Wallet address and reward amount are required' });
+      }
+      
+      const protection = await poolDrainProtectionService.canDistributeReward(walletAddress, parseFloat(rewardAmount));
+      
+      res.json({
+        success: true,
+        canDistribute: protection.canDistributeReward,
+        riskScore: protection.riskScore,
+        remainingQuota: protection.remainingQuota,
+        securityAlerts: protection.securityAlerts,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Get pool protection statistics
+  app.get('/api/pool/drain-protection/stats', async (req, res) => {
+    try {
+      const stats = await poolDrainProtectionService.getProtectionStats();
+      
+      res.json({
+        success: true,
+        stats: {
+          totalBlocked: stats.totalBlocked,
+          recentAlerts: stats.recentAlerts,
+          topRiskWallets: stats.topRiskWallets,
+          poolHealth: stats.poolHealth
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Get pool protection limits for a specific wallet
+  app.get('/api/pool/drain-protection/limits/:walletAddress', async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ error: 'Wallet address is required' });
+      }
+      
+      const limits = await storage.getRewardPoolLimitsByWallet(walletAddress, 'daily');
+      
+      res.json({
+        success: true,
+        limits,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Get pool security events
+  app.get('/api/pool/drain-protection/security-events', async (req, res) => {
+    try {
+      const events = await storage.getRewardPoolSecurity();
+      
+      res.json({
+        success: true,
+        events: events.map(event => ({
+          id: event.id,
+          walletAddress: event.walletAddress,
+          suspiciousActivity: event.suspiciousActivity,
+          riskScore: parseFloat(event.riskScore),
+          alertLevel: event.alertLevel,
+          actionTaken: event.actionTaken,
+          isResolved: event.isResolved,
+          createdAt: event.createdAt
+        })),
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Test pool drain protection with simulation
+  app.post('/api/pool/drain-protection/test', async (req, res) => {
+    try {
+      const { walletAddress, rewardAmount, simulationType } = req.body;
+      
+      if (!walletAddress || !rewardAmount || !simulationType) {
+        return res.status(400).json({ error: 'Wallet address, reward amount, and simulation type are required' });
+      }
+      
+      // Simulate different attack scenarios
+      let testAmount = parseFloat(rewardAmount);
+      
+      switch (simulationType) {
+        case 'high_frequency':
+          // Simulate 20 requests in short time
+          testAmount = testAmount * 20;
+          break;
+        case 'large_amount':
+          // Simulate extremely large reward
+          testAmount = testAmount * 1000;
+          break;
+        case 'drain_attempt':
+          // Simulate pool drain attempt
+          testAmount = testAmount * 10000;
+          break;
+        default:
+          // Normal test
+          break;
+      }
+      
+      const protection = await poolDrainProtectionService.canDistributeReward(walletAddress, testAmount);
+      
+      res.json({
+        success: true,
+        simulationType,
+        testAmount,
+        originalAmount: parseFloat(rewardAmount),
+        protection: {
+          canDistribute: protection.canDistributeReward,
+          riskScore: protection.riskScore,
+          remainingQuota: protection.remainingQuota,
+          securityAlerts: protection.securityAlerts
+        },
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }
