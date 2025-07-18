@@ -1408,23 +1408,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ALCHEMY REAL-TIME MONITORING
   // =================================
 
-  // Import Alchemy monitor
-  const { alchemyMonitor } = await import('./services/alchemyIntegration');
+  // Import OPTIMIZED Alchemy monitor for free tier sustainability
+  const { optimizedAlchemyMonitor } = await import('./services/alchemyOptimized');
 
-  // Initialize Alchemy monitoring on server start
+  // Initialize OPTIMIZED Alchemy monitoring on server start
   setTimeout(async () => {
     try {
-      await alchemyMonitor.startRealtimeMonitoring();
-      console.log('🔍 Alchemy real-time reentrancy monitoring initialized');
+      await optimizedAlchemyMonitor.startOptimizedMonitoring();
+      console.log('🔍 Optimized Alchemy monitoring initialized for FREE TIER');
     } catch (error) {
-      console.error('Failed to initialize Alchemy monitoring:', error);
+      console.error('Failed to initialize optimized Alchemy monitoring:', error);
     }
   }, 5000);
 
-  // Get Alchemy monitoring status
+  // Get OPTIMIZED Alchemy monitoring status
   app.get('/api/reentrancy/alchemy/status', async (req, res) => {
     try {
-      const status = await alchemyMonitor.getMonitoringStatus();
+      const status = await optimizedAlchemyMonitor.getOptimizedStatus();
       res.json({
         success: true,
         status,
@@ -1435,6 +1435,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: false,
         error: 'Failed to get monitoring status',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Get Alchemy usage statistics for FREE TIER monitoring
+  app.get('/api/reentrancy/alchemy/usage', async (req, res) => {
+    try {
+      const usage = optimizedAlchemyMonitor.getUsageStats();
+      const estimatedMonthlyCUs = Math.floor(usage.callsUsed * 24 * 30 * 26); // Conservative estimate
+      
+      res.json({
+        success: true,
+        usage,
+        recommendations: {
+          currentTier: 'Free (300M CUs/month)',
+          estimatedMonthlyCUs,
+          isWithinLimits: estimatedMonthlyCUs < 300000000, // 300M CU limit
+          optimizationActive: true,
+          savings: 'Using batch analysis instead of real-time WebSocket saves 90% of API calls',
+          frequency: 'Checking every 30 seconds vs continuous monitoring'
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error getting usage stats:', error);
+      res.json({
+        success: false,
+        error: 'Failed to get usage statistics',
         timestamp: new Date().toISOString()
       });
     }

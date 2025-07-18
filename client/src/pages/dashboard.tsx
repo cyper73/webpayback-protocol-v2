@@ -16,6 +16,7 @@ import { GasTracker } from "@/components/gas/GasTracker";
 import PoolDrainProtection from "@/components/pool/PoolDrainProtection";
 import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
+import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
 
 import { Box, Wallet, Coins, Link } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -313,6 +314,11 @@ export default function Dashboard() {
         {/* Reentrancy Protection */}
         <div className="mb-8">
           <ReentrancyProtection />
+        </div>
+
+        {/* Alchemy API Usage Monitoring */}
+        <div className="mb-8">
+          <AlchemyUsageMonitor />
         </div>
 
         {/* Network Switcher */}
