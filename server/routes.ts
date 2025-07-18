@@ -1405,6 +1405,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // =================================
+  // ALCHEMY REAL-TIME MONITORING
+  // =================================
+
+  // Import Alchemy monitor
+  const { alchemyMonitor } = await import('./services/alchemyIntegration');
+
+  // Initialize Alchemy monitoring on server start
+  setTimeout(async () => {
+    try {
+      await alchemyMonitor.startRealtimeMonitoring();
+      console.log('🔍 Alchemy real-time reentrancy monitoring initialized');
+    } catch (error) {
+      console.error('Failed to initialize Alchemy monitoring:', error);
+    }
+  }, 5000);
+
+  // Get Alchemy monitoring status
+  app.get('/api/reentrancy/alchemy/status', async (req, res) => {
+    try {
+      const status = await alchemyMonitor.getMonitoringStatus();
+      res.json({
+        success: true,
+        status,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error getting Alchemy status:', error);
+      res.json({
+        success: false,
+        error: 'Failed to get monitoring status',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Get recent blockchain activity
+  app.get('/api/reentrancy/alchemy/activity', async (req, res) => {
+    try {
+      const activity = await alchemyMonitor.getRecentBlockchainActivity();
+      res.json({
+        success: true,
+        activity,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error getting blockchain activity:', error);
+      res.json({
+        success: false,
+        error: 'Failed to get blockchain activity',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Start real-time monitoring
+  app.post('/api/reentrancy/alchemy/start', async (req, res) => {
+    try {
+      await alchemyMonitor.startRealtimeMonitoring();
+      res.json({
+        success: true,
+        message: 'Real-time monitoring started',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error starting monitoring:', error);
+      res.json({
+        success: false,
+        error: 'Failed to start monitoring',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Stop real-time monitoring
+  app.post('/api/reentrancy/alchemy/stop', async (req, res) => {
+    try {
+      await alchemyMonitor.stopMonitoring();
+      res.json({
+        success: true,
+        message: 'Real-time monitoring stopped',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error stopping monitoring:', error);
+      res.json({
+        success: false,
+        error: 'Failed to stop monitoring',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // =================================
   // REENTRANCY PROTECTION ENDPOINTS
   // =================================
 
