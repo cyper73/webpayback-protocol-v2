@@ -75,18 +75,21 @@ Thank you for your interest in contributing to WebPayback Protocol! This documen
 
 ```
 webpayback/
-├── client/              # React frontend application
-│   ├── src/
-│   │   ├── components/  # Reusable UI components
-│   │   ├── pages/       # Page components
-│   │   ├── lib/         # Utilities and configurations
-│   │   └── hooks/       # Custom React hooks
-├── server/              # Node.js/Express backend
-│   ├── routes/          # API route handlers
-│   ├── services/        # Business logic services
-│   └── db.ts           # Database configuration
-├── shared/              # Shared TypeScript schemas
-└── docs/               # Documentation files
+├── src/                     # Source code
+│   ├── client/              # React frontend application
+│   │   ├── src/
+│   │   │   ├── components/  # Reusable UI components
+│   │   │   ├── pages/       # Page components
+│   │   │   ├── lib/         # Utilities and configurations
+│   │   │   └── hooks/       # Custom React hooks
+│   ├── server/              # Node.js/Express backend
+│   │   ├── routes/          # API route handlers
+│   │   ├── services/        # Business logic services
+│   │   └── db.ts           # Database configuration
+│   └── shared/              # Shared TypeScript schemas
+├── docs/                   # Documentation files
+├── contracts/              # Smart contracts
+└── artifacts/              # Compiled contracts
 ```
 
 ## 📝 Development Guidelines

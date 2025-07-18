@@ -117,17 +117,20 @@ The application will be available at `http://localhost:5000`
 
 ```
 webpayback/
-├── client/              # React frontend
-│   ├── src/
-│   │   ├── components/  # UI components
-│   │   ├── pages/       # Application pages
-│   │   └── lib/         # Utilities and hooks
-├── server/              # Node.js backend
-│   ├── routes/          # API endpoints
-│   ├── services/        # Business logic
-│   └── db.ts           # Database connection
-├── shared/              # Shared TypeScript schemas
-└── docs/               # Documentation
+├── src/                     # Source code
+│   ├── client/              # React frontend
+│   │   ├── src/
+│   │   │   ├── components/  # UI components
+│   │   │   ├── pages/       # Application pages
+│   │   │   └── lib/         # Utilities and hooks
+│   ├── server/              # Node.js backend
+│   │   ├── routes/          # API endpoints
+│   │   ├── services/        # Business logic
+│   │   └── db.ts           # Database connection
+│   └── shared/              # Shared TypeScript schemas
+├── docs/                   # Documentation
+├── contracts/              # Smart contracts
+└── artifacts/              # Compiled contracts
 ```
 
 ### Key Scripts
