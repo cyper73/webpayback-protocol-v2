@@ -158,6 +158,22 @@ export const rewardPoolSecurity = pgTable("reward_pool_security", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Fake Creator Detection Schema
+export const fakeCreatorDetection = pgTable("fake_creator_detection", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id).notNull(),
+  suspiciousUrl: text("suspicious_url").notNull(),
+  suspiciousType: text("suspicious_type").notNull(), // pattern_match, fuzzy_match, suspicious_chars
+  similarityScore: decimal("similarity_score", { precision: 5, scale: 2 }).notNull(),
+  alertLevel: text("alert_level").notNull(), // low, medium, high, critical
+  actionTaken: text("action_taken").notNull(), // none, monitored, flagged, blocked
+  isResolved: boolean("is_resolved").default(false).notNull(),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  evidence: text("evidence"),
+});
+
 // Anti-fraud system tables
 export const fraudDetectionRules = pgTable("fraud_detection_rules", {
   id: serial("id").primaryKey(),

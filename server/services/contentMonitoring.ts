@@ -6,6 +6,7 @@ import { gasManager } from "./gasManager";
 import { channelMonitoringService } from "./channelMonitoring";
 import { mevProtectionService } from "./mevProtection";
 import { poolDrainProtectionService } from "./poolDrainProtection";
+import { fakeCreatorDetection } from "./fakeCreatorDetection";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -263,6 +264,28 @@ class ContentMonitoringService {
           Action: ${fraudAnalysis.recommendedAction}`);
         
         return false; // Block the reward
+      }
+
+      // 🔍 FAKE CREATOR DETECTION CHECK
+      console.log(`🔍 Checking for fake creator: ${creator.websiteUrl}`);
+      try {
+        const fakeCreatorCheck = await fakeCreatorDetection.detectFakeCreator(creator.id, creator.websiteUrl);
+        
+        if (fakeCreatorCheck.isSuspicious) {
+          console.log(`🚨 FAKE CREATOR DETECTED - Blocking reward:
+            Creator: ${creator.name || creator.id}
+            URL: ${creator.websiteUrl}
+            Similarity Score: ${fakeCreatorCheck.similarity}%
+            Risk Level: ${fakeCreatorCheck.riskLevel}
+            Matched Domain: ${fakeCreatorCheck.matchedDomain}
+            Evidence: ${fakeCreatorCheck.evidence}`);
+          return false; // Block the reward
+        }
+
+        console.log(`✅ Creator legitimacy verified: ${creator.websiteUrl}`);
+      } catch (error) {
+        console.error(`❌ Error checking fake creator: ${error}`);
+        // Continue with reward process if fake detection fails
       }
 
       // Create content fingerprint

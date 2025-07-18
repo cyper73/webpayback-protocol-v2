@@ -11,6 +11,7 @@ import { chainlinkDomainVerificationService } from "./services/chainlinkDomainVe
 import { channelMonitoringService } from "./services/channelMonitoring";
 import { aiKnowledgeTrackingService } from "./services/aiKnowledgeTracking";
 import { poolDrainProtectionService } from "./services/poolDrainProtection";
+import { fakeCreatorDetection } from "./services/fakeCreatorDetection";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -1312,6 +1313,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
       timestamp: new Date().toISOString(),
       randomNumber: Math.random()
     });
+  });
+
+  // =================================
+  // FAKE CREATOR DETECTION ENDPOINTS
+  // =================================
+
+  // Check if a creator URL is fake/suspicious
+  app.post('/api/fake-creator/check', async (req, res) => {
+    try {
+      const { creatorId, websiteUrl } = req.body;
+      
+      if (!creatorId || !websiteUrl) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: creatorId, websiteUrl' 
+        });
+      }
+
+      const detection = await fakeCreatorDetection.detectFakeCreator(creatorId, websiteUrl);
+      
+      res.json({
+        success: true,
+        detection,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error checking fake creator:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Get fake creator detection statistics
+  app.get('/api/fake-creator/stats', async (req, res) => {
+    try {
+      const stats = await fakeCreatorDetection.getStats();
+      
+      res.json({
+        success: true,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error getting fake creator stats:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Get fake creator detection alerts
+  app.get('/api/fake-creator/alerts', async (req, res) => {
+    try {
+      const alerts = await fakeCreatorDetection.getAlerts();
+      
+      res.json({
+        success: true,
+        alerts,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error getting fake creator alerts:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Test fake creator detection system
+  app.post('/api/fake-creator/test', async (req, res) => {
+    try {
+      const { testUrl, simulationType } = req.body;
+      
+      if (!simulationType) {
+        return res.status(400).json({ 
+          error: 'Missing required field: simulationType' 
+        });
+      }
+
+      const testResult = await fakeCreatorDetection.testDetection(testUrl || '', simulationType);
+      
+      res.json(testResult);
+    } catch (error) {
+      console.error('Error testing fake creator detection:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
   });
 
   const httpServer = createServer(app);

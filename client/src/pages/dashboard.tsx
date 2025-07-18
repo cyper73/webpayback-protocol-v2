@@ -14,6 +14,7 @@ import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { GasTracker } from "@/components/gas/GasTracker";
 import PoolDrainProtection from "@/components/pool/PoolDrainProtection";
+import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 
 import { Box, Wallet, Coins, Link } from "lucide-react";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -301,6 +302,11 @@ export default function Dashboard() {
         {/* Pool Drain Protection */}
         <div className="mb-8">
           <PoolDrainProtection />
+        </div>
+
+        {/* Fake Creator Detection */}
+        <div className="mb-8">
+          <FakeCreatorDetection />
         </div>
 
         {/* Network Switcher */}
