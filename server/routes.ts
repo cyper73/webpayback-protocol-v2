@@ -12,6 +12,7 @@ import { channelMonitoringService } from "./services/channelMonitoring";
 import { aiKnowledgeTrackingService } from "./services/aiKnowledgeTracking";
 import { poolDrainProtectionService } from "./services/poolDrainProtection";
 import { fakeCreatorDetection } from "./services/fakeCreatorDetection";
+import { reentrancyProtection } from "./services/reentrancyProtection";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -1397,6 +1398,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(testResult);
     } catch (error) {
       console.error('Error testing fake creator detection:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // =================================
+  // REENTRANCY PROTECTION ENDPOINTS
+  // =================================
+
+  // Analyze transaction for reentrancy attacks
+  app.post('/api/reentrancy/analyze', async (req, res) => {
+    try {
+      const { contractAddress, functionSelector, callDepth, gasUsed, blockNumber, transactionHash } = req.body;
+      
+      if (!contractAddress || !functionSelector || !callDepth || !gasUsed || !blockNumber || !transactionHash) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: contractAddress, functionSelector, callDepth, gasUsed, blockNumber, transactionHash' 
+        });
+      }
+
+      const analysis = await reentrancyProtection.analyzeTransaction({
+        contractAddress,
+        functionSelector,
+        callDepth,
+        gasUsed,
+        timestamp: new Date(),
+        blockNumber,
+        transactionHash
+      });
+      
+      res.json({
+        success: true,
+        analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error analyzing transaction for reentrancy:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Get reentrancy protection statistics
+  app.get('/api/reentrancy/stats', async (req, res) => {
+    try {
+      const stats = await reentrancyProtection.getStats();
+      
+      res.json({
+        success: true,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error getting reentrancy stats:', error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Test reentrancy protection system
+  app.post('/api/reentrancy/test', async (req, res) => {
+    try {
+      const { simulationType } = req.body;
+      
+      if (!simulationType) {
+        return res.status(400).json({ 
+          error: 'Missing required field: simulationType' 
+        });
+      }
+
+      const testResult = await reentrancyProtection.testProtection(simulationType);
+      
+      res.json(testResult);
+    } catch (error) {
+      console.error('Error testing reentrancy protection:', error);
       res.status(500).json({ 
         error: error instanceof Error ? error.message : 'Unknown error' 
       });

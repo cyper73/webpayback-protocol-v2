@@ -625,3 +625,27 @@ export type PoolDrainProtection = typeof poolDrainProtection.$inferSelect;
 
 export type InsertRewardPoolSecurity = z.infer<typeof insertRewardPoolSecuritySchema>;
 export type RewardPoolSecurity = typeof rewardPoolSecurity.$inferSelect;
+
+// Reentrancy Protection Schema
+export const reentrancyProtectionLogs = pgTable("reentrancy_protection_logs", {
+  id: serial("id").primaryKey(),
+  contractAddress: text("contract_address").notNull(),
+  functionSelector: text("function_selector").notNull(),
+  callDepth: integer("call_depth").notNull(),
+  gasUsed: integer("gas_used").notNull(),
+  riskScore: integer("risk_score").notNull(),
+  isReentrancyDetected: boolean("is_reentrancy_detected").notNull(),
+  suspiciousPatterns: text("suspicious_patterns"),
+  recommendedAction: text("recommended_action").notNull(), // allow, flag, block
+  evidence: text("evidence"),
+  blockNumber: integer("block_number").notNull(),
+  transactionHash: text("transaction_hash").notNull(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export const insertReentrancyProtectionLogSchema = createInsertSchema(reentrancyProtectionLogs);
+export type InsertReentrancyProtectionLog = z.infer<typeof insertReentrancyProtectionLogSchema>;
+export type ReentrancyProtectionLog = typeof reentrancyProtectionLogs.$inferSelect;
+
+export type FakeCreatorDetection = typeof fakeCreatorDetection.$inferSelect;
+export type InsertFakeCreatorDetection = typeof fakeCreatorDetection.$inferInsert;
