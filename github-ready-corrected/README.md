@@ -304,7 +304,7 @@ This project is licensed under the **MIT License with Commercial Restrictions**.
 - Listing on commercial platforms or marketplaces
 - Monetization of the protocol or derivatives
 
-For commercial licensing inquiries, contact: licensing@webpayback.com
+For commercial licensing inquiries, contact: claudiob73@hotmail.com
 
 See the [LICENSE](./LICENSE) file for full details.
 
@@ -328,10 +328,10 @@ See the [LICENSE](./LICENSE) file for full details.
 
 ### Business Inquiries
 
-- **Partnerships**: partnerships@webpayback.com
-- **Enterprise**: enterprise@webpayback.com
-- **Press**: press@webpayback.com
-- **General**: hello@webpayback.com
+- **Partnerships**: claudiob73@hotmail.com
+- **Enterprise**: claudiob73@hotmail.com
+- **Press**: claudiob73@hotmail.com
+- **General**: claudiob73@hotmail.com
 
 ---
 
@@ -364,7 +364,7 @@ Special thanks to:
 
 🚀 **Live Demo**: [webpayback.replit.app](https://webpayback.replit.app)  
 📖 **Documentation**: [Full Docs](./docs/)  
-💼 **Business**: partnerships@webpayback.com  
+💼 **Business**: claudiob73@hotmail.com  
 🔧 **Development**: [GitHub](https://github.com/cyper73/webpayback)
 
 ---

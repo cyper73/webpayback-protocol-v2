@@ -373,4 +373,4 @@ Thank you for contributing to WebPayback Protocol! Your contributions help make 
 
 ---
 
-**Questions?** Contact us at contributors@webpayback.com or join our Discord community.
+**Questions?** Contact us at claudiob73@hotmail.com or join our Discord community.
