@@ -34,6 +34,8 @@ interface PoolDrainStatus {
 }
 
 class PoolDrainProtectionService {
+  private readonly FOUNDER_WALLET = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'; // Wallet del founder - NON BLOCCARE MAI
+  
   private config: PoolProtectionConfig = {
     // Individual wallet limits (WPT amounts)
     hourlyLimit: 50.0,      // 50 WPT per hour max
@@ -60,6 +62,23 @@ class PoolDrainProtectionService {
     walletAddress: string, 
     rewardAmount: number
   ): Promise<PoolDrainStatus> {
+    // WHITELIST: Il wallet del founder non viene mai bloccato
+    if (walletAddress.toLowerCase() === this.FOUNDER_WALLET.toLowerCase()) {
+      console.log(`🔓 FOUNDER WALLET DETECTED: Skipping pool drain checks for ${this.FOUNDER_WALLET}`);
+      return {
+        isProtected: true,
+        canDistributeReward: true,
+        remainingQuota: {
+          hourly: 999999,
+          daily: 999999,
+          weekly: 999999,
+          monthly: 999999
+        },
+        securityAlerts: ['Founder wallet - exempt from pool drain protection'],
+        riskScore: 0
+      };
+    }
+
     const now = new Date();
     
     // Check individual wallet limits

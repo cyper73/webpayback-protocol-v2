@@ -44,6 +44,7 @@ interface ReentrancyStats {
 }
 
 class ReentrancyProtectionService {
+  private readonly FOUNDER_WALLET = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'; // Wallet del founder - NON BLOCCARE MAI
   private readonly MAX_SAFE_CALL_DEPTH = 10;
   private readonly SUSPICIOUS_CALL_DEPTH = 5;
   private readonly HIGH_RISK_CALL_DEPTH = 8;
@@ -78,6 +79,21 @@ class ReentrancyProtectionService {
   async analyzeTransaction(check: ReentrancyCheck): Promise<ReentrancyResult> {
     console.log(`🔍 Analyzing transaction for reentrancy: ${check.transactionHash}`);
     
+    // WHITELIST: Il wallet del founder non viene mai bloccato
+    if (check.contractAddress.toLowerCase() === this.FOUNDER_WALLET.toLowerCase()) {
+      console.log(`🔓 FOUNDER WALLET DETECTED: Skipping reentrancy checks for ${this.FOUNDER_WALLET}`);
+      return {
+        isReentrancyDetected: false,
+        riskScore: 0,
+        callDepth: check.callDepth,
+        suspiciousPatterns: ['Founder wallet - exempt from reentrancy checks'],
+        recommendedAction: 'allow',
+        evidence: 'Founder wallet exemption applied',
+        maxCallDepth: check.callDepth,
+        callFrequency: 0
+      };
+    }
+
     let riskScore = 0;
     const suspiciousPatterns: string[] = [];
     

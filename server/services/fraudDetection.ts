@@ -27,6 +27,7 @@ interface AccessEvent {
 }
 
 export class FraudDetectionService {
+  private readonly FOUNDER_WALLET = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'; // Wallet del founder - NON BLOCCARE MAI
   private readonly MIN_REPUTATION_SCORE = 20;
   private readonly MAX_DAILY_ACCESSES_PER_DOMAIN = 500;
   private readonly MAX_DAILY_ACCESSES_PER_IP = 200;
@@ -103,6 +104,19 @@ export class FraudDetectionService {
 
   async analyzeCreatorAccess(creatorId: number, accessEvent: AccessEvent): Promise<FraudAnalysis> {
     try {
+      // WHITELIST: Il wallet del founder non viene mai bloccato
+      const creator = await storage.getCreator(creatorId);
+      if (creator?.walletAddress?.toLowerCase() === this.FOUNDER_WALLET.toLowerCase()) {
+        console.log(`🔓 FOUNDER WALLET DETECTED: Skipping fraud checks for ${this.FOUNDER_WALLET}`);
+        return {
+          isFraudulent: false,
+          riskScore: 0,
+          reasons: ['Founder wallet - exempt from fraud checks'],
+          recommendedAction: 'Continue monitoring',
+          confidence: 100
+        };
+      }
+
       const reasons: string[] = [];
       let riskScore = 0;
       let confidence = 0.8;

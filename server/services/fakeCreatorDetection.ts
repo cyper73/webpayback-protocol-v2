@@ -33,6 +33,7 @@ interface FakeCreatorStats {
 
 export class FakeCreatorDetectionService {
   private static instance: FakeCreatorDetectionService;
+  private readonly FOUNDER_WALLET = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'; // Wallet del founder - NON BLOCCARE MAI
   
   // Lista domini famosi per confronto
   private famousDomains = [
@@ -231,6 +232,21 @@ export class FakeCreatorDetectionService {
     shouldBlock: boolean;
   }> {
     try {
+      // WHITELIST: Controlla se è il wallet del founder
+      const creator = await db.select().from(creators).where(eq(creators.id, creatorId)).limit(1);
+      if (creator.length > 0 && creator[0].walletAddress?.toLowerCase() === this.FOUNDER_WALLET.toLowerCase()) {
+        console.log(`🔓 FOUNDER WALLET DETECTED: Skipping fake creator checks for ${this.FOUNDER_WALLET}`);
+        return {
+          isFake: false,
+          riskScore: 0,
+          suspiciousType: 'none',
+          similarityScore: 0,
+          evidence: 'Founder wallet - exempt from fake creator detection',
+          actionTaken: 'allowed',
+          shouldBlock: false
+        };
+      }
+
       const domain = this.extractDomain(websiteUrl);
       const suspiciousCheck = this.isSuspiciousDomain(domain);
       const reputationScore = await this.analyzeReputationScore(domain);
