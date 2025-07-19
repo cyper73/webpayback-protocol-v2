@@ -8,6 +8,7 @@ import Dashboard from "@/pages/dashboard";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import TestConnectivity from "@/pages/test-connectivity";
+import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
     <Switch>
@@ -25,6 +26,7 @@ function App() {
       <TooltipProvider>
         <Router />
         <Toaster />
+        <CookieConsentBanner />
       </TooltipProvider>
     </QueryClientProvider>
   );
