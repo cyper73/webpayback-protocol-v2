@@ -5,10 +5,10 @@
 
 #### Server-side (Backend)
 - `src/server/services/alchemyOptimized.ts` - **NEW** Sistema ottimizzato per piano FREE Alchemy
-- `src/client/src/components/monitoring/AlchemyUsageMonitor.tsx` - **NEW** Dashboard monitoraggio API
 
-#### Frontend (React Components)  
-- `src/client/src/pages/dashboard.tsx` - **UPDATED** Integrazione nuovo monitoraggio Alchemy
+#### Frontend (React Components)
+- `src/client/components/monitoring/AlchemyUsageMonitor.tsx` - **NEW** Dashboard monitoraggio API
+- `src/client/pages/dashboard.tsx` - **UPDATED** Integrazione nuovo monitoraggio Alchemy
 
 ### 📝 FILE AGGIORNATI
 
@@ -19,7 +19,7 @@
 - `src/server/services/reentrancyProtection.ts` - **UPDATED** Protezione reentrancy completa
 
 #### Frontend (React Components)
-- `src/client/src/components/security/FakeCreatorDetection.tsx` - **UPDATED** Fix CSS visibilità
+- `src/client/components/security/FakeCreatorDetection.tsx` - **UPDATED** Fix CSS visibilità
 
 #### Documentation
 - `replit.md` - **UPDATED** Documentazione ottimizzazioni Alchemy
@@ -39,8 +39,8 @@ cp github-ready-corrected/src/server/services/fakeCreatorDetection.ts → server
 cp github-ready-corrected/src/server/services/reentrancyProtection.ts → server/services/
 
 # Frontend files  
-cp github-ready-corrected/src/client/src/pages/dashboard.tsx → client/src/pages/
-cp github-ready-corrected/src/client/src/components/security/FakeCreatorDetection.tsx → client/src/components/security/
+cp github-ready-corrected/src/client/pages/dashboard.tsx → client/src/pages/
+cp github-ready-corrected/src/client/components/security/FakeCreatorDetection.tsx → client/src/components/security/
 
 # Documentation
 cp github-ready-corrected/replit.md → ./
@@ -54,7 +54,7 @@ cp github-ready-corrected/src/server/services/alchemyOptimized.ts → server/ser
 
 # New monitoring component
 mkdir -p client/src/components/monitoring/
-cp github-ready-corrected/src/client/src/components/monitoring/AlchemyUsageMonitor.tsx → client/src/components/monitoring/
+cp github-ready-corrected/src/client/components/monitoring/AlchemyUsageMonitor.tsx → client/src/components/monitoring/
 
 # New documentation
 cp github-ready-corrected/CHANGELOG.md → ./
