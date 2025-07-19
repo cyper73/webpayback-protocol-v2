@@ -7,13 +7,27 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Globe, Flag } from 'lucide-react';
+import { Shield, Globe, Flag, MapPin } from 'lucide-react';
 import CookieConsentBanner from '@/components/gdpr/CookieConsentBanner';
 import GDPRDataRequest from '@/components/gdpr/GDPRDataRequest';
 import CCPACompliance from '@/components/ccpa/CCPACompliance';
+import { useGeolocation, usePrivacyMessage } from '@/hooks/useGeolocation';
 
 const Privacy: React.FC = () => {
+  const { privacyConfig, isLoading, isEU, isUS } = useGeolocation();
+  const { jurisdictionMessage } = usePrivacyMessage();
   const [activeRegion, setActiveRegion] = useState<string>('overview');
+
+  // Auto-switch to appropriate tab based on detected jurisdiction
+  React.useEffect(() => {
+    if (privacyConfig && !isLoading) {
+      if (isEU && activeRegion === 'overview') {
+        setActiveRegion('gdpr');
+      } else if (isUS && activeRegion === 'overview') {
+        setActiveRegion('ccpa');
+      }
+    }
+  }, [privacyConfig, isLoading, isEU, isUS, activeRegion]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -27,6 +41,27 @@ const Privacy: React.FC = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Manage your privacy rights and data protection preferences across different jurisdictions
           </p>
+
+          {/* Geolocation Detection Status */}
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 animate-pulse" />
+              Detecting your location for compliance...
+            </div>
+          ) : privacyConfig && (
+            <div className="flex items-center justify-center gap-2">
+              <MapPin className="h-4 w-4 text-green-500" />
+              <span className="text-sm">
+                Detected location: <strong>{privacyConfig.location.country}</strong>
+              </span>
+              <Badge 
+                variant={privacyConfig.privacyLaw === 'GDPR' ? 'secondary' : privacyConfig.privacyLaw === 'CCPA' ? 'destructive' : 'outline'}
+                className="ml-2"
+              >
+                {privacyConfig.privacyLaw || 'Standard'}
+              </Badge>
+            </div>
+          )}
         </div>
 
         {/* Regional Compliance Tabs */}

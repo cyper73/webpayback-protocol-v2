@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Cookie, Settings, X } from "lucide-react";
 import { Link as RouterLink } from "wouter";
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 const COOKIE_CONSENT_KEY = 'webpayback_cookie_consent';
 const CONSENT_VERSION = '1.0';
@@ -17,6 +18,7 @@ interface CookieConsentState {
 }
 
 const CookieConsentBanner: React.FC = () => {
+  const { showCookieBanner, isEU, isLoading, privacyConfig } = useGeolocation();
   const [showBanner, setShowBanner] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [consent, setConsent] = useState<CookieConsentState>({
@@ -28,6 +30,11 @@ const CookieConsentBanner: React.FC = () => {
   });
 
   useEffect(() => {
+    // Only show cookie banner if user is in EU jurisdiction
+    if (isLoading || !showCookieBanner) {
+      return;
+    }
+
     const savedConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
     if (savedConsent) {
       try {
@@ -44,7 +51,7 @@ const CookieConsentBanner: React.FC = () => {
     // Show banner after 1 second to not interrupt page load
     const timer = setTimeout(() => setShowBanner(true), 1000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading, showCookieBanner]);
 
   const saveConsent = (consentState: CookieConsentState) => {
     localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consentState));
@@ -90,7 +97,13 @@ const CookieConsentBanner: React.FC = () => {
     saveConsent(customConsent);
   };
 
-  if (!showBanner) return null;
+  // Don't render if:
+  // - Banner shouldn't be shown
+  // - Still loading geolocation
+  // - User not in EU (cookie consent not required)
+  if (!showBanner || isLoading || !showCookieBanner) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center p-4">

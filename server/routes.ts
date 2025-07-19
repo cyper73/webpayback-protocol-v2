@@ -1875,6 +1875,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const ccpaRoutes = await import('./routes/ccpa');
   app.use('/api/ccpa', ccpaRoutes.default);
 
+  // Auto-detect user jurisdiction for privacy compliance
+  app.get('/api/privacy/detect-jurisdiction', async (req, res) => {
+    try {
+      const { getGeolocationFromIP, getPrivacyConfig } = await import('./services/geolocation');
+      const geoData = await getGeolocationFromIP(req);
+      const privacyConfig = getPrivacyConfig(geoData);
+      
+      res.json({
+        success: true,
+        ...privacyConfig,
+        debug: {
+          detectedIP: req.ip,
+          userAgent: req.get('User-Agent'),
+          acceptLanguage: req.get('Accept-Language')
+        }
+      });
+    } catch (error) {
+      console.error('Jurisdiction detection failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Geolocation detection failed',
+        fallback: {
+          jurisdiction: 'OTHER',
+          privacyLaw: 'NONE',
+          features: {
+            cookieBanner: true, // Show by default for safety
+            doNotSellButton: true,
+            gdprRights: true,
+            ccpaRights: true
+          }
+        }
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
