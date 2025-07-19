@@ -43,14 +43,31 @@ import {
   isUserAdmin,
   logIDORAttempt
 } from "./security/idorProtection";
+import {
+  authRateLimit,
+  csrfTokenRateLimit,
+  creatorRegistrationRateLimit,
+  domainVerificationRateLimit,
+  financialRateLimit,
+  generalRateLimit,
+  contentTrackingRateLimit,
+  adaptiveRateLimit,
+  ipAbuseProtection,
+  emergencyRateLimit,
+  getRateLimitStats
+} from "./security/rateLimiting";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Apply emergency rate limiting and IP abuse protection globally
+  app.use(ipAbuseProtection);
+  app.use(emergencyRateLimit);
   
   // Initialize blockchain networks on startup
   await blockchainService.initializeNetworks();
   
-  // CSRF Token Generation Endpoint
-  app.get("/api/csrf/token", async (req, res) => {
+  // CSRF Token Generation with Rate Limiting
+  app.get("/api/csrf/token", csrfTokenRateLimit, async (req, res) => {
     try {
       const sessionId = getSessionId(req);
       
@@ -74,7 +91,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // IDOR Testing and Debug Endpoints
+  // Security Testing and Debug Endpoints
   app.get("/api/idor/test", (req, res) => {
     const ownedCreators = getUserOwnedCreators(req);
     const isAdmin = isUserAdmin(req);
@@ -89,6 +106,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "Normal user access": "Use header 'x-session-id: session_user_1' to access creator 4",
         "Admin access": "Use header 'User-Agent: admin-browser' for admin access",
         "Unauthorized access": "Try accessing creator 7 with session_user_1 (should be blocked)"
+      }
+    });
+  });
+
+  // Rate Limiting Statistics and Testing
+  app.get("/api/security/rate-limit/stats", (req, res) => {
+    const stats = getRateLimitStats();
+    res.json({
+      message: "Rate Limiting Statistics",
+      stats,
+      testEndpoints: {
+        "High frequency test": "POST /api/security/rate-limit/test multiple times rapidly",
+        "CSRF token generation": "GET /api/csrf/token (limited to 10/hour)",
+        "Creator registration": "POST /api/creators (limited to 3/hour)", 
+        "Domain verification": "POST /api/domain/verify/start (limited to 10/30min)"
+      }
+    });
+  });
+
+  // Rate limiting test endpoint
+  app.post("/api/security/rate-limit/test", generalRateLimit, (req, res) => {
+    res.json({
+      message: "Rate limit test successful",
+      timestamp: new Date().toISOString(),
+      rateLimitHeaders: {
+        limit: res.get('X-RateLimit-Limit'),
+        remaining: res.get('X-RateLimit-Remaining'),
+        reset: res.get('X-RateLimit-Reset'),
+        window: res.get('X-RateLimit-Window')
       }
     });
   });
@@ -166,8 +212,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Register creator with XSS and CSRF protection
-  app.post("/api/creators", csrfProtection, async (req, res) => {
+  // Register creator with XSS, CSRF and Rate Limiting protection
+  app.post("/api/creators", csrfProtection, creatorRegistrationRateLimit, async (req, res) => {
     try {
       // XSS Prevention: Sanitize request body first
       const sanitizedBody = sanitizeRequestBody(req.body);
@@ -318,8 +364,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track content usage with CSRF protection
-  app.post("/api/content/track", csrfProtection, async (req, res) => {
+  // Track content usage with CSRF and Rate Limiting protection
+  app.post("/api/content/track", csrfProtection, contentTrackingRateLimit, async (req, res) => {
     try {
       const validatedData = insertContentTrackingSchema.parse(req.body);
       const tracking = await storage.createContentTracking(validatedData);
@@ -349,8 +395,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Distribute rewards with enhanced CSRF and IDOR protection (CRITICAL FINANCIAL OPERATION)
-  app.post("/api/rewards/distribute", enhancedCSRFProtection, authorizeBulkCreatorAccess, async (req, res) => {
+  // Distribute rewards with enhanced CSRF, IDOR and Rate Limiting protection (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards/distribute", enhancedCSRFProtection, authorizeBulkCreatorAccess, financialRateLimit, async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Queue reward for batch processing instead of immediate distribution
@@ -1088,8 +1134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start domain verification with CSRF and IDOR protection
-  app.post('/api/domain/verify/start', csrfProtection, authorizeBulkCreatorAccess, async (req, res) => {
+  // Start domain verification with CSRF, IDOR and Rate Limiting protection
+  app.post('/api/domain/verify/start', csrfProtection, authorizeBulkCreatorAccess, domainVerificationRateLimit, async (req, res) => {
     try {
       const { creatorId, websiteUrl, verificationMethod } = req.body;
       
@@ -1191,8 +1237,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start Chainlink domain verification with CSRF and IDOR protection
-  app.post('/api/domain/chainlink/verify', csrfProtection, authorizeBulkCreatorAccess, async (req, res) => {
+  // Start Chainlink domain verification with CSRF, IDOR and Rate Limiting protection
+  app.post('/api/domain/chainlink/verify', csrfProtection, authorizeBulkCreatorAccess, domainVerificationRateLimit, async (req, res) => {
     try {
       const { creatorId, websiteUrl } = req.body;
       
