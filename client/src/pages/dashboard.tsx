@@ -18,7 +18,7 @@ import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
 import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
 
-import { Box, Wallet, Coins, Link, Shield } from "lucide-react";
+import { Box, Wallet, Coins, Link, Shield, FileText } from "lucide-react";
 import { Link as RouterLink } from "wouter";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
@@ -340,6 +340,10 @@ export default function Dashboard() {
               <RouterLink href="/privacy" className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors">
                 <Shield className="h-4 w-4" />
                 <span>Privacy Policy</span>
+              </RouterLink>
+              <RouterLink href="/terms" className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors">
+                <FileText className="h-4 w-4" />
+                <span>Terms & Conditions</span>
               </RouterLink>
               <a 
                 href="https://github.com/cyper73/webpayback" 
