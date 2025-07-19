@@ -27,11 +27,44 @@ import {
   sanitizeRequestBody, 
   validateApiParams 
 } from "./security/inputValidation";
+import { 
+  csrfProtection, 
+  enhancedCSRFProtection,
+  generateCSRFToken,
+  storeCSRFToken,
+  getSessionId,
+  rateLimitTokenGeneration
+} from "./security/csrfProtection";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Initialize blockchain networks on startup
   await blockchainService.initializeNetworks();
+  
+  // CSRF Token Generation Endpoint
+  app.get("/api/csrf/token", async (req, res) => {
+    try {
+      const sessionId = getSessionId(req);
+      
+      // Rate limiting
+      if (!rateLimitTokenGeneration(sessionId)) {
+        return res.status(429).json({ 
+          error: "Too many token requests",
+          code: "CSRF_RATE_LIMIT"
+        });
+      }
+      
+      const token = generateCSRFToken();
+      storeCSRFToken(sessionId, token);
+      
+      res.json({ 
+        csrfToken: token,
+        expires: Date.now() + (24 * 60 * 60 * 1000)
+      });
+    } catch (error) {
+      res.status(500).json({ error: sanitizeErrorMessage(error instanceof Error ? error.message : "Unknown error") });
+    }
+  });
   
   // Initialize AI agents
   app.post("/api/agents/initialize", async (req, res) => {
@@ -63,8 +96,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Send agent communication
-  app.post("/api/agents/communicate", async (req, res) => {
+  // Send agent communication with CSRF protection
+  app.post("/api/agents/communicate", csrfProtection, async (req, res) => {
     try {
       const validatedData = insertAgentCommunicationSchema.parse(req.body);
       const communication = await storage.createAgentCommunication(validatedData);
@@ -84,8 +117,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Deploy token to blockchain
-  app.post("/api/blockchain/deploy", async (req, res) => {
+  // Deploy token to blockchain with enhanced CSRF protection
+  app.post("/api/blockchain/deploy", enhancedCSRFProtection, async (req, res) => {
     try {
       const validatedData = insertBlockchainNetworkSchema.parse(req.body);
       const deployment = await blockchainService.deployToken(validatedData);
@@ -106,8 +139,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Register creator with XSS protection
-  app.post("/api/creators", async (req, res) => {
+  // Register creator with XSS and CSRF protection
+  app.post("/api/creators", csrfProtection, async (req, res) => {
     try {
       // XSS Prevention: Sanitize request body first
       const sanitizedBody = sanitizeRequestBody(req.body);
@@ -234,8 +267,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate referral code
-  app.post("/api/referrals/generate", async (req, res) => {
+  // Generate referral code with CSRF protection
+  app.post("/api/referrals/generate", csrfProtection, async (req, res) => {
     try {
       const code = await storage.generateReferralCode();
       res.json({ referralCode: code });
@@ -244,8 +277,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track content usage
-  app.post("/api/content/track", async (req, res) => {
+  // Track content usage with CSRF protection
+  app.post("/api/content/track", csrfProtection, async (req, res) => {
     try {
       const validatedData = insertContentTrackingSchema.parse(req.body);
       const tracking = await storage.createContentTracking(validatedData);
@@ -275,8 +308,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Distribute rewards (now uses gas manager)
-  app.post("/api/rewards/distribute", async (req, res) => {
+  // Distribute rewards with enhanced CSRF protection (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards/distribute", enhancedCSRFProtection, async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Queue reward for batch processing instead of immediate distribution
@@ -374,8 +407,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Emergency gas pool recharge endpoint
-  app.post("/api/gas/emergency-recharge", async (req, res) => {
+  // Emergency gas pool recharge endpoint with enhanced CSRF protection
+  app.post("/api/gas/emergency-recharge", enhancedCSRFProtection, async (req, res) => {
     try {
       const { amount = 10 } = req.body; // Default 10 MATIC
       
@@ -426,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/mev/test", async (req, res) => {
+  app.post("/api/mev/test", csrfProtection, async (req, res) => {
     try {
       const { mevProtectionService } = await import("./services/mevProtection");
       const { creatorId, amount, testMode } = req.body;
@@ -478,7 +511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/mev/commit", async (req, res) => {
+  app.post("/api/mev/commit", enhancedCSRFProtection, async (req, res) => {
     try {
       const { mevProtectionService } = await import("./services/mevProtection");
       const { creatorId, amount } = req.body;
@@ -490,7 +523,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/mev/reveal", async (req, res) => {
+  app.post("/api/mev/reveal", enhancedCSRFProtection, async (req, res) => {
     try {
       const { mevProtectionService } = await import("./services/mevProtection");
       const { commitHash, creatorId, amount, nonce } = req.body;
@@ -502,8 +535,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create reward distribution (legacy endpoint - now redirects to gas manager)
-  app.post("/api/rewards", async (req, res) => {
+  // Create reward distribution with enhanced CSRF protection (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards", enhancedCSRFProtection, async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Use gas manager for new rewards with protection
@@ -580,8 +613,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Switch blockchain network
-  app.post("/api/web3/switch-network", async (req, res) => {
+  // Switch blockchain network with CSRF protection
+  app.post("/api/web3/switch-network", csrfProtection, async (req, res) => {
     try {
       const { network } = req.body;
       if (!network || !['polygon', 'ethereum'].includes(network)) {
@@ -643,8 +676,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Content Monitoring Routes
   
-  // Simulate AI access to registered content
-  app.post("/api/monitoring/simulate-ai-access", async (req, res) => {
+  // Simulate AI access with CSRF protection
+  app.post("/api/monitoring/simulate-ai-access", csrfProtection, async (req, res) => {
     try {
       const { url, aiType } = req.body;
       
@@ -719,8 +752,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Real AI detection endpoint (would be called by monitoring system)
-  app.post("/api/monitoring/detect-access", async (req, res) => {
+  // Real AI detection endpoint with CSRF protection
+  app.post("/api/monitoring/detect-access", csrfProtection, async (req, res) => {
     try {
       const { userAgent, ipAddress, url } = req.body;
       
@@ -741,8 +774,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Knowledge Base Usage Tracking
-  app.post("/api/content/ai-knowledge-usage", async (req, res) => {
+  // AI Knowledge Base Usage Tracking with CSRF protection
+  app.post("/api/content/ai-knowledge-usage", csrfProtection, async (req, res) => {
     try {
       const { aiModel, userQuery, aiResponse, source } = req.body;
       
@@ -896,7 +929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.post('/api/chainlink/vrf/request', async (req, res) => {
+  app.post('/api/chainlink/vrf/request', csrfProtection, async (req, res) => {
     console.log('🎯 Processing VRF request...');
     const { purpose, minValue, maxValue, numWords } = req.body;
     
@@ -980,7 +1013,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.post('/api/chainlink/functions/request', async (req, res) => {
+  app.post('/api/chainlink/functions/request', csrfProtection, async (req, res) => {
     console.log('🚀 Processing Functions request...');
     const { functionType, args } = req.body;
     
@@ -998,8 +1031,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // DOMAIN VERIFICATION ENDPOINTS
   
-  // Check domain availability and security requirements
-  app.post('/api/domain/check', async (req, res) => {
+  // Check domain availability with CSRF protection
+  app.post('/api/domain/check', csrfProtection, async (req, res) => {
     try {
       const { websiteUrl } = req.body;
       
@@ -1014,8 +1047,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start domain verification process
-  app.post('/api/domain/verify/start', async (req, res) => {
+  // Start domain verification with CSRF protection
+  app.post('/api/domain/verify/start', csrfProtection, async (req, res) => {
     try {
       const { creatorId, websiteUrl, verificationMethod } = req.body;
       
@@ -1041,8 +1074,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Complete domain verification
-  app.post('/api/domain/verify/complete', async (req, res) => {
+  // Complete domain verification with CSRF protection
+  app.post('/api/domain/verify/complete', csrfProtection, async (req, res) => {
     try {
       const { verificationId } = req.body;
       
@@ -1062,8 +1095,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Verify domain with ID in URL
-  app.post('/api/domain/verify/:id', async (req, res) => {
+  // Verify domain with CSRF protection
+  app.post('/api/domain/verify/:id', csrfProtection, async (req, res) => {
     try {
       const verificationId = parseInt(req.params.id);
       
@@ -1101,8 +1134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // CHAINLINK DOMAIN VERIFICATION ENDPOINTS
 
-  // Check domain with Chainlink
-  app.post('/api/domain/chainlink/check', async (req, res) => {
+  // Check domain with Chainlink and CSRF protection
+  app.post('/api/domain/chainlink/check', csrfProtection, async (req, res) => {
     try {
       const { websiteUrl } = req.body;
       
@@ -1117,8 +1150,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start Chainlink domain verification
-  app.post('/api/domain/chainlink/verify', async (req, res) => {
+  // Start Chainlink domain verification with CSRF protection
+  app.post('/api/domain/chainlink/verify', csrfProtection, async (req, res) => {
     try {
       const { creatorId, websiteUrl } = req.body;
       
