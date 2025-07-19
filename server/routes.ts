@@ -1871,6 +1871,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gdprRoutes = await import('./routes/gdpr');
   app.use('/api/gdpr', gdprRoutes.default);
 
+  // CCPA Compliance routes (USA market)
+  const ccpaRoutes = await import('./routes/ccpa');
+  app.use('/api/ccpa', ccpaRoutes.default);
+
   const httpServer = createServer(app);
   return httpServer;
 }
