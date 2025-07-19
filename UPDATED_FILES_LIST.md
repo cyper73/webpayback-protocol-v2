@@ -23,7 +23,8 @@
 
 #### Documentation
 - `replit.md` - **UPDATED** Documentazione ottimizzazioni Alchemy
-- `README.md` - **UPDATED** Features API optimization
+- `README.md` - **UPDATED** Features API optimization completo
+- `src/README.md` - **UPDATED** Documentazione source code aggiornata
 - `CHANGELOG.md` - **NEW** Cronologia aggiornamenti
 
 ---
