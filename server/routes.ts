@@ -1879,12 +1879,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/privacy/detect-jurisdiction', async (req, res) => {
     try {
       const { getGeolocationFromIP, getPrivacyConfig } = await import('./services/geolocation');
+      const { transparentAgent } = await import('./services/transparentAgent');
+      
       const geoData = await getGeolocationFromIP(req);
       const privacyConfig = getPrivacyConfig(geoData);
+      
+      // Log compliance check with TransparentAgent
+      await transparentAgent.monitorPrivacyCompliance(req);
       
       res.json({
         success: true,
         ...privacyConfig,
+        transparentAgent: {
+          monitoringActive: true,
+          complianceScore: transparentAgent.getTransparencyScore(),
+          lastCheck: new Date().toISOString()
+        },
         debug: {
           detectedIP: req.ip,
           userAgent: req.get('User-Agent'),
@@ -1907,6 +1917,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       });
+    }
+  });
+
+  // TransparentAgent transparency reporting
+  app.get('/api/transparency/report', async (req, res) => {
+    try {
+      const { transparentAgent } = await import('./services/transparentAgent');
+      const report = await transparentAgent.generateTransparencyReport();
+      res.json({ success: true, report });
+    } catch (error) {
+      console.error('Transparency report generation failed:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // TransparentAgent compliance statistics
+  app.get('/api/transparency/stats', async (req, res) => {
+    try {
+      const { transparentAgent } = await import('./services/transparentAgent');
+      const stats = await transparentAgent.getComplianceStats();
+      res.json({ success: true, stats });
+    } catch (error) {
+      console.error('Compliance stats retrieval failed:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
