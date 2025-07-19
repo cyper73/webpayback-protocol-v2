@@ -35,6 +35,14 @@ import {
   getSessionId,
   rateLimitTokenGeneration
 } from "./security/csrfProtection";
+import { 
+  authorizeCreatorAccess,
+  authorizeBulkCreatorAccess,
+  authorizeResourceAccess,
+  getUserOwnedCreators,
+  isUserAdmin,
+  logIDORAttempt
+} from "./security/idorProtection";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -64,6 +72,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ error: sanitizeErrorMessage(error instanceof Error ? error.message : "Unknown error") });
     }
+  });
+
+  // IDOR Testing and Debug Endpoints
+  app.get("/api/idor/test", (req, res) => {
+    const ownedCreators = getUserOwnedCreators(req);
+    const isAdmin = isUserAdmin(req);
+    
+    res.json({
+      message: "IDOR Protection Test Endpoint",
+      userSession: {
+        isAdmin,
+        ownedCreatorIds: ownedCreators
+      },
+      testInstructions: {
+        "Normal user access": "Use header 'x-session-id: session_user_1' to access creator 4",
+        "Admin access": "Use header 'User-Agent: admin-browser' for admin access",
+        "Unauthorized access": "Try accessing creator 7 with session_user_1 (should be blocked)"
+      }
+    });
   });
   
   // Initialize AI agents
@@ -192,18 +219,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all creators
+  // Get all creators (filtered by user access for non-admins)
   app.get("/api/creators", async (req, res) => {
     try {
       const creators = await storage.getAllCreators();
-      res.json(creators);
+      
+      // Apply IDOR filtering for non-admin users
+      const ownedCreatorIds = getUserOwnedCreators(req);
+      const isAdmin = isUserAdmin(req);
+      
+      if (isAdmin) {
+        console.log("IDOR: Admin user accessing all creators");
+        res.json(creators);
+      } else {
+        const filteredCreators = creators.filter(creator => 
+          ownedCreatorIds.includes(creator.id)
+        );
+        console.log(`IDOR: Filtered creators for user - showing ${filteredCreators.length}/${creators.length} creators`);
+        res.json(filteredCreators);
+      }
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
-  // Get channel monitoring info for a creator
-  app.get("/api/creators/:id/channels", async (req, res) => {
+  // Get channel monitoring info with IDOR protection
+  app.get("/api/creators/:id/channels", authorizeCreatorAccess, async (req, res) => {
     try {
       const creatorId = parseInt(req.params.id);
       const mappings = await channelMonitoringService.getCreatorChannelMappings(creatorId);
@@ -308,8 +349,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Distribute rewards with enhanced CSRF protection (CRITICAL FINANCIAL OPERATION)
-  app.post("/api/rewards/distribute", enhancedCSRFProtection, async (req, res) => {
+  // Distribute rewards with enhanced CSRF and IDOR protection (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards/distribute", enhancedCSRFProtection, authorizeBulkCreatorAccess, async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Queue reward for batch processing instead of immediate distribution
@@ -1047,8 +1088,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start domain verification with CSRF protection
-  app.post('/api/domain/verify/start', csrfProtection, async (req, res) => {
+  // Start domain verification with CSRF and IDOR protection
+  app.post('/api/domain/verify/start', csrfProtection, authorizeBulkCreatorAccess, async (req, res) => {
     try {
       const { creatorId, websiteUrl, verificationMethod } = req.body;
       
@@ -1116,8 +1157,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get domain verification status for a creator
-  app.get('/api/domain/status/:creatorId', async (req, res) => {
+  // Get domain verification status with IDOR protection
+  app.get('/api/domain/status/:creatorId', authorizeCreatorAccess, async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
       
@@ -1150,8 +1191,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start Chainlink domain verification with CSRF protection
-  app.post('/api/domain/chainlink/verify', csrfProtection, async (req, res) => {
+  // Start Chainlink domain verification with CSRF and IDOR protection
+  app.post('/api/domain/chainlink/verify', csrfProtection, authorizeBulkCreatorAccess, async (req, res) => {
     try {
       const { creatorId, websiteUrl } = req.body;
       
@@ -1173,8 +1214,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get Chainlink verification status
-  app.get('/api/domain/chainlink/status/:creatorId', async (req, res) => {
+  // Get Chainlink verification status with IDOR protection
+  app.get('/api/domain/chainlink/status/:creatorId', authorizeCreatorAccess, async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
       
