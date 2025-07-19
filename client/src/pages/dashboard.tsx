@@ -18,7 +18,8 @@ import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
 import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
 
-import { Box, Wallet, Coins, Link } from "lucide-react";
+import { Box, Wallet, Coins, Link, Shield } from "lucide-react";
+import { Link as RouterLink } from "wouter";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
@@ -326,6 +327,39 @@ export default function Dashboard() {
           <NetworkSwitcher />
         </div>
       </main>
+
+      {/* Footer with Privacy Policy */}
+      <footer className="glass-card border-t border-white/10 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <img src={wptLogo} alt="WPT Logo" className="w-6 h-6" />
+              <span className="text-sm text-gray-400">WebPayback Protocol - Where AI meets fair compensation for creators</span>
+            </div>
+            <div className="flex items-center space-x-6">
+              <RouterLink href="/privacy" className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors">
+                <Shield className="h-4 w-4" />
+                <span>Privacy Policy</span>
+              </RouterLink>
+              <a 
+                href="https://github.com/cyper73/webpayback" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                <Link className="h-4 w-4" />
+                <span>GitHub</span>
+              </a>
+              <a 
+                href="mailto:cyper73@gmail.com" 
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -247,6 +247,20 @@ We welcome contributions! Please see our [Contributing Guide](./docs/contributin
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## 🔒 Privacy Policy
+
+WebPayback Protocol respects your privacy and protects your data. We collect only necessary information to provide our services and never sell your personal information to third parties.
+
+**Key Privacy Commitments:**
+- Your data is used exclusively for WebPayback services and AI reward distribution
+- We never sell or share your personal information with third parties
+- Blockchain transactions are public, but personal data remains protected
+- You can request data deletion at any time
+
+**Contact for Privacy Requests**: [cyper73@gmail.com](mailto:cyper73@gmail.com)
+
+**Full Privacy Policy**: [privacy.md](./privacy.md)
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -260,10 +274,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Email**: support@webpayback.com
-- **Discord**: [Join our community](https://discord.gg/webpayback)
+- **Business Contact**: [claudiob73@hotmail.com](mailto:claudiob73@hotmail.com)
+- **Technical Support**: [cyper73@gmail.com](mailto:cyper73@gmail.com)
 - **GitHub Issues**: [Report bugs and request features](https://github.com/cyper73/webpayback/issues)
-- **Documentation**: [Full documentation](https://docs.webpayback.com)
+- **Privacy Requests**: [cyper73@gmail.com](mailto:cyper73@gmail.com)
+- **Documentation**: [Full documentation](./docs/README.md)
 
 ---
 
