@@ -1944,6 +1944,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Qloo Cultural Intelligence Integration Routes
+  app.post('/api/cultural/analyze', async (req, res) => {
+    try {
+      const { culturalRewardEngine } = await import('./services/culturalRewardEngine');
+      const { creatorId, contentUrl, contentText, aiModelUsed, userLocation, userDemographics } = req.body;
+      
+      const result = await culturalRewardEngine.processCulturalReward({
+        creatorId: parseInt(creatorId),
+        contentUrl,
+        contentText,
+        aiModelUsed,
+        userLocation,
+        userDemographics
+      });
+      
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error('Cultural analysis failed:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  app.get('/api/cultural/trending', async (req, res) => {
+    try {
+      const { culturalRewardEngine } = await import('./services/culturalRewardEngine');
+      const opportunities = await culturalRewardEngine.getTrendingCulturalOpportunities();
+      res.json({ success: true, opportunities });
+    } catch (error) {
+      console.error('Failed to fetch trending cultural opportunities:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  app.get('/api/cultural/stats', async (req, res) => {
+    try {
+      const { culturalRewardEngine } = await import('./services/culturalRewardEngine');
+      const stats = await culturalRewardEngine.getCulturalRewardStats();
+      res.json({ success: true, stats });
+    } catch (error) {
+      console.error('Failed to fetch cultural reward stats:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Enhanced reward distribution with cultural intelligence
+  app.post('/api/rewards/distribute-cultural', async (req, res) => {
+    try {
+      const { culturalRewardEngine } = await import('./services/culturalRewardEngine');
+      const { requests } = req.body;
+      
+      if (!Array.isArray(requests)) {
+        return res.status(400).json({ success: false, error: 'Requests must be an array' });
+      }
+      
+      const results = await culturalRewardEngine.batchProcessCulturalRewards(requests);
+      res.json({ success: true, results });
+    } catch (error) {
+      console.error('Cultural reward distribution failed:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -17,6 +17,7 @@ import PoolDrainProtection from "@/components/pool/PoolDrainProtection";
 import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
 import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
+import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
 
 import { Box, Wallet, Coins, Link, Shield, FileText } from "lucide-react";
 import { Link as RouterLink } from "wouter";
@@ -300,6 +301,27 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <RewardDistribution />
           <ComplianceMonitor />
+        </div>
+
+        {/* Qloo Cultural Intelligence Dashboard */}
+        <div className="mb-8">
+          <Card className="glass-card rounded-2xl shadow-neon-purple border-purple-500/30">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-bold gradient-text">
+                  🧠 Qloo Cultural Intelligence System
+                </CardTitle>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-purple-400 rounded-full pulse-animation"></div>
+                  <span className="text-sm text-gray-300">LLM → Qloo → WebPayback Active</span>
+                </div>
+              </div>
+              <p className="text-gray-400">Taste-aware WPT rewards powered by cultural AI intelligence</p>
+            </CardHeader>
+            <CardContent>
+              <QlooCulturalDashboard />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Pool Drain Protection */}
