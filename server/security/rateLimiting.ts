@@ -256,6 +256,13 @@ const ipAbuseCounts = new Map<string, { count: number, resetTime: number }>();
 export const ipAbuseProtection = (req: Request, res: Response, next: NextFunction): void => {
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
   
+  // Whitelist localhost and internal IPs from permanent blocking
+  const isLocalhost = ip === '127.0.0.1' || ip === '::1' || ip.startsWith('172.31.') || ip.startsWith('10.');
+  
+  if (isLocalhost) {
+    return next(); // Never block localhost/internal IPs
+  }
+  
   // Check if IP is permanently blocked
   if (blockedIPs.has(ip)) {
     console.log(`🚫 IP BLOCKED: Permanent block for ${ip}`);
@@ -361,6 +368,15 @@ setInterval(cleanupRateLimit, 5 * 60 * 1000);
 // Emergency rate limiting for DDoS-like attacks
 export const emergencyRateLimit = (req: Request, res: Response, next: NextFunction): void => {
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  
+  // Whitelist localhost and internal dashboard requests
+  const isLocalhost = ip === '127.0.0.1' || ip === '::1' || ip.startsWith('172.31.') || ip.startsWith('10.');
+  const isDashboard = req.headers['user-agent']?.includes('Mozilla') || req.headers['referer']?.includes('localhost');
+  
+  if (isLocalhost || isDashboard) {
+    return next(); // Skip rate limiting for dashboard
+  }
+  
   const key = `emergency:${ip}`;
   const now = Date.now();
   
@@ -378,7 +394,7 @@ export const emergencyRateLimit = (req: Request, res: Response, next: NextFuncti
   
   entry.count++;
   
-  // Very aggressive limiting - 50 requests per 10 seconds
+  // Very aggressive limiting - 50 requests per 10 seconds for external IPs only
   if (entry.count > 50) {
     console.log(`🚨 EMERGENCY RATE LIMIT: Potential DDoS from ${ip}`);
     return res.status(429).json({

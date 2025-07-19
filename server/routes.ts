@@ -56,6 +56,14 @@ import {
   emergencyRateLimit,
   getRateLimitStats
 } from "./security/rateLimiting";
+import {
+  reentrancyProtection,
+  rewardReentrancyProtection,
+  getReentrancyStats,
+  detectReentrancyPattern,
+  getSuspiciousAddresses,
+  clearSuspiciousAddress
+} from "./security/reentrancyProtection";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -136,6 +144,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reset: res.get('X-RateLimit-Reset'),
         window: res.get('X-RateLimit-Window')
       }
+    });
+  });
+
+  // Reentrancy Protection Testing and Monitoring Endpoints
+  app.get("/api/security/reentrancy/stats", (req, res) => {
+    const stats = getReentrancyStats();
+    res.json({
+      message: "Reentrancy Protection Statistics",
+      stats,
+      protectedEndpoints: [
+        "POST /api/rewards/distribute - Reward distribution with reentrancy protection",
+        "POST /api/gas/emergency-recharge - Gas operations with smart contract protection",
+        "POST /api/security/reentrancy/test - Test reentrancy detection"
+      ]
+    });
+  });
+
+  // Test reentrancy detection with various attack patterns
+  app.post("/api/security/reentrancy/test", reentrancyProtection, (req, res) => {
+    const testScenarios = req.body.scenario || 'normal';
+    
+    // Simulate different contract call scenarios
+    const scenarios = {
+      normal: {
+        userAddress: "0x1234567890123456789012345678901234567890",
+        contractAddress: "0x9876543210987654321098765432109876543210",
+        functionName: "transfer",
+        gasLimit: "21000",
+        value: "1.0",
+        data: "0x"
+      },
+      high_gas: {
+        userAddress: "0x1234567890123456789012345678901234567890",
+        contractAddress: "0x9876543210987654321098765432109876543210", 
+        functionName: "complexOperation",
+        gasLimit: "800000",
+        value: "0",
+        data: "0x" + "a".repeat(2000)
+      },
+      withdraw_attack: {
+        userAddress: "0x1234567890123456789012345678901234567890",
+        contractAddress: "0x9876543210987654321098765432109876543210",
+        functionName: "emergencyWithdraw",
+        gasLimit: "500000",
+        value: "10000",
+        data: "0xcallback" + "f".repeat(1000)
+      },
+      deep_calls: {
+        userAddress: "0x1234567890123456789012345678901234567890",
+        contractAddress: "0x9876543210987654321098765432109876543210",
+        functionName: "withdraw",
+        gasLimit: "300000",
+        value: "0",
+        data: "0x" + "b".repeat(500)
+      }
+    };
+
+    const testData = scenarios[testScenarios] || scenarios.normal;
+    const pattern = detectReentrancyPattern(testData);
+    
+    res.json({
+      message: `Reentrancy test completed for scenario: ${testScenarios}`,
+      scenario: testScenarios,
+      testData: {
+        ...testData,
+        userAddress: testData.userAddress.slice(0, 6) + '...' + testData.userAddress.slice(-4)
+      },
+      detectionResult: pattern,
+      reentrancyHeaders: {
+        warning: res.get('X-Reentrancy-Warning'),
+        riskScore: res.get('X-Risk-Score'),
+        callDepth: res.get('X-Call-Depth')
+      },
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Get suspicious addresses (admin endpoint)
+  app.get("/api/security/reentrancy/suspicious", (req, res) => {
+    const addresses = getSuspiciousAddresses();
+    res.json({
+      message: "Suspicious addresses detected by reentrancy protection",
+      count: addresses.length,
+      addresses: addresses.map(addr => addr.slice(0, 6) + '...' + addr.slice(-4)), // Privacy protection
+      note: "These addresses have triggered reentrancy protection warnings"
     });
   });
   
@@ -395,8 +488,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Distribute rewards with enhanced CSRF, IDOR and Rate Limiting protection (CRITICAL FINANCIAL OPERATION)
-  app.post("/api/rewards/distribute", enhancedCSRFProtection, authorizeBulkCreatorAccess, financialRateLimit, async (req, res) => {
+  // Distribute rewards with CSRF, IDOR, Rate Limiting and Reentrancy protection (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards/distribute", enhancedCSRFProtection, authorizeBulkCreatorAccess, financialRateLimit, rewardReentrancyProtection, async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Queue reward for batch processing instead of immediate distribution
