@@ -1867,6 +1867,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GDPR Compliance routes
+  const gdprRoutes = await import('./routes/gdpr');
+  app.use('/api/gdpr', gdprRoutes.default);
+
   const httpServer = createServer(app);
   return httpServer;
 }
