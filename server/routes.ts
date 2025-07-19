@@ -21,6 +21,12 @@ import {
   insertBlockchainNetworkSchema
 } from "@shared/schema";
 import { z } from "zod";
+import { 
+  sanitizeErrorMessage, 
+  validateCreatorInput, 
+  sanitizeRequestBody, 
+  validateApiParams 
+} from "./security/inputValidation";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -100,21 +106,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Register creator
+  // Register creator with XSS protection
   app.post("/api/creators", async (req, res) => {
     try {
-      const validatedData = insertCreatorSchema.parse(req.body);
+      // XSS Prevention: Sanitize request body first
+      const sanitizedBody = sanitizeRequestBody(req.body);
+      
+      // XSS Prevention: Enhanced validation with security checks
+      const validatedData = validateCreatorInput(sanitizedBody);
+      
+      // Additional schema validation
+      const schemaValidatedData = insertCreatorSchema.parse(validatedData);
       
       // Extract channel information from the URL
-      const channelInfo = channelMonitoringService.extractChannelInfo(validatedData.websiteUrl);
+      const channelInfo = channelMonitoringService.extractChannelInfo(schemaValidatedData.websiteUrl);
       
       // Enhanced creator data with channel information
       const creatorData = {
-        ...validatedData,
+        ...schemaValidatedData,
         platformType: channelInfo?.platformType || 'single_page',
         channelId: channelInfo?.channelId || null,
         channelName: channelInfo?.channelName || null,
-        channelVerificationUrl: validatedData.websiteUrl,
+        channelVerificationUrl: schemaValidatedData.websiteUrl,
         monitoringScope: channelInfo ? 'full_channel' : 'single_url'
       };
       
@@ -122,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If it's a channel, create the channel content mapping
       if (channelInfo) {
-        await channelMonitoringService.createChannelMapping(creator.id, validatedData.websiteUrl);
+        await channelMonitoringService.createChannelMapping(creator.id, schemaValidatedData.websiteUrl);
         console.log(`Channel-level monitoring enabled for creator ${creator.id}: ${channelInfo.platformType}`);
       }
       
@@ -141,7 +154,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Creator registration error:", error);
-      res.status(400).json({ error: error instanceof Error ? error.message : "Unknown error" });
+      // XSS Prevention: Sanitize error messages
+      res.status(400).json({ error: sanitizeErrorMessage(error instanceof Error ? error.message : "Unknown error") });
     }
   });
 
@@ -166,14 +180,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Check if URL is channel content
+  // Check if URL is channel content with XSS protection
   app.post("/api/channel/check", async (req, res) => {
     try {
-      const { url } = req.body;
+      // XSS Prevention: Sanitize request body
+      const sanitizedBody = sanitizeRequestBody(req.body);
+      const { url } = sanitizedBody;
+      
+      if (!url || typeof url !== 'string') {
+        throw new Error('Invalid URL parameter');
+      }
+      
       const result = await channelMonitoringService.isChannelContent(url);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+      // XSS Prevention: Sanitize error messages
+      res.status(500).json({ error: sanitizeErrorMessage(error instanceof Error ? error.message : "Unknown error") });
     }
   });
 

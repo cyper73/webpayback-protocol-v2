@@ -247,19 +247,27 @@ We welcome contributions! Please see our [Contributing Guide](./docs/contributin
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 🔒 Privacy Policy
+## 🔒 Privacy & Security
 
-WebPayback Protocol respects your privacy and protects your data. We collect only necessary information to provide our services and never sell your personal information to third parties.
+WebPayback Protocol respects your privacy and protects your data with enterprise-grade security measures.
 
-**Key Privacy Commitments:**
+**Privacy Commitments:**
 - Your data is used exclusively for WebPayback services and AI reward distribution
 - We never sell or share your personal information with third parties
 - Blockchain transactions are public, but personal data remains protected
 - You can request data deletion at any time
 
+**Security Features:**
+- ✅ XSS (Cross-Site Scripting) protection with comprehensive input sanitization
+- ✅ SQL injection prevention with parameterized queries
+- ✅ Input validation and output encoding for all user data
+- ✅ Content Security Policy (CSP) implementation
+- ✅ Secure error handling and message sanitization
+
 **Contact for Privacy Requests**: [cyper73@gmail.com](mailto:cyper73@gmail.com)
 
-**Full Privacy Policy**: [privacy.md](./privacy.md)
+**Full Privacy Policy**: [privacy.md](./privacy.md)  
+**Security Audit Report**: [SECURITY_AUDIT_XSS.md](./SECURITY_AUDIT_XSS.md)
 
 ## 📄 License
 

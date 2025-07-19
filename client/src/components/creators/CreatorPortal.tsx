@@ -13,6 +13,7 @@ import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Copy, Code } from "lucide-react";
+import { sanitizeUrl, sanitizeWalletAddress, sanitizeToastContent, validateDomain, sanitizeContentCategory } from "@/lib/security";
 
 const formSchema = insertCreatorSchema.extend({
   termsAccepted: z.boolean().refine(val => val === true, {
@@ -49,43 +50,72 @@ export default function CreatorPortal() {
 
   const checkDomainMutation = useMutation({
     mutationFn: async (websiteUrl: string) => {
-      const response = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl });
+      // XSS Prevention: Validate and sanitize URL before API call
+      const sanitizedUrl = sanitizeUrl(websiteUrl);
+      if (!sanitizedUrl || !validateDomain(websiteUrl)) {
+        throw new Error('Invalid domain URL provided');
+      }
+      
+      const response = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl: sanitizedUrl });
       const result = await response.json();
-      console.log("Raw API response:", result);
       return result;
     },
     onSuccess: (data: any) => {
       setDomainVerification(data);
       if (data.requiresManualReview) {
-        toast({
+        // XSS Prevention: Sanitize toast content
+        const safeToast = sanitizeToastContent({
           title: "Domain Requires Manual Review",
-          description: `Risk factors: ${data.riskFactors ? data.riskFactors.join(', ') : 'Security review required'}`,
+          description: `Risk factors: ${Array.isArray(data.riskFactors) ? data.riskFactors.join(', ') : 'Security review required'}`
+        });
+        toast({
+          title: safeToast.title,
+          description: safeToast.description,
           variant: "default",
         });
       } else if (data.requiresMetaTag) {
-        toast({
+        const safeToast = sanitizeToastContent({
           title: "Meta Tag Verification Required",
-          description: "Please add the meta tag to your page to verify ownership.",
+          description: "Please add the meta tag to your page to verify ownership."
+        });
+        toast({
+          title: safeToast.title,
+          description: safeToast.description,
           variant: "default",
         });
       } else if (data.isVerified) {
-        toast({
+        const score = typeof data.verificationScore === 'number' ? Math.floor(data.verificationScore) : 0;
+        const safeToast = sanitizeToastContent({
           title: "Domain Automatically Verified",
-          description: `Verification score: ${data.verificationScore}/100`,
+          description: `Verification score: ${score}/100`
+        });
+        toast({
+          title: safeToast.title,
+          description: safeToast.description,
         });
         setIsDomainVerified(true);
       } else {
-        toast({
+        const score = typeof data.verificationScore === 'number' ? Math.floor(data.verificationScore) : 0;
+        const safeToast = sanitizeToastContent({
           title: "Domain Verification Failed",
-          description: `Score: ${data.verificationScore}/100. Issues: ${data.riskFactors ? data.riskFactors.join(', ') : 'Unknown issues'}`,
+          description: `Score: ${score}/100. Issues: ${Array.isArray(data.riskFactors) ? data.riskFactors.join(', ') : 'Unknown issues'}`
+        });
+        toast({
+          title: safeToast.title,
+          description: safeToast.description,
           variant: "destructive",
         });
       }
     },
     onError: (error) => {
-      toast({
+      // XSS Prevention: Sanitize error message
+      const safeToast = sanitizeToastContent({
         title: "Chainlink Domain Check Failed",
-        description: error.message,
+        description: error.message || 'An error occurred'
+      });
+      toast({
+        title: safeToast.title,
+        description: safeToast.description,
         variant: "destructive",
       });
     },

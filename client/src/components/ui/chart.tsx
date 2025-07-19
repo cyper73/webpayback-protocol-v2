@@ -67,6 +67,30 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// XSS Prevention: CSS Value Sanitization
+const sanitizeCSSValue = (value: string): string => {
+  if (typeof value !== 'string') return '';
+  
+  // Remove potentially dangerous characters and patterns
+  return value
+    .replace(/[<>'"]/g, '') // Remove HTML/JS injection chars
+    .replace(/javascript:/gi, '') // Remove javascript: URLs
+    .replace(/data:/gi, '') // Remove data: URLs
+    .replace(/expression\(/gi, '') // Remove CSS expressions
+    .replace(/url\(/gi, '') // Remove CSS url() functions
+    .replace(/[@\\]/g, '') // Remove @ and backslash
+    .trim();
+}
+
+// XSS Prevention: Validate color values
+const isValidCSSColor = (color: string): boolean => {
+  if (!color || typeof color !== 'string') return false;
+  
+  // Allow only safe CSS color formats
+  const colorRegex = /^(#[0-9a-fA-F]{3,8}|rgb\([0-9, ]+\)|rgba\([0-9, .]+\)|hsl\([0-9, %]+\)|hsla\([0-9, %.]+\)|[a-zA-Z]+)$/;
+  return colorRegex.test(color.trim()) && color.length <= 50;
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -76,25 +100,40 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // XSS Prevention: Sanitize chart ID
+  const sanitizedId = sanitizeCSSValue(id);
+  
+  // XSS Prevention: Generate safe CSS with validation
+  const safeCSSRules = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      // Sanitize theme prefix
+      const safePrefix = sanitizeCSSValue(prefix);
+      
+      const colorRules = colorConfig
+        .map(([key, itemConfig]) => {
+          const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+          
+          // XSS Prevention: Validate color values
+          if (!color || !isValidCSSColor(color)) return null;
+          
+          const safeKey = sanitizeCSSValue(key);
+          const safeColor = sanitizeCSSValue(color);
+          
+          return safeKey && safeColor ? `  --color-${safeKey}: ${safeColor};` : null;
+        })
+        .filter(Boolean)
+        .join('\n');
+      
+      return colorRules ? `${safePrefix} [data-chart="${sanitizedId}"] {\n${colorRules}\n}` : '';
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  // XSS Prevention: Use dangerouslySetInnerHTML only with sanitized content
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
+        __html: safeCSSRules,
       }}
     />
   )
