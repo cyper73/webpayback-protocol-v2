@@ -123,6 +123,14 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
 
 ## Recent Changes
 
+- **POL/WPT POOL DISPLAY BUG FIXED** (January 20, 2025):
+  - Fixed critical Liquidity Pool component showing NaN values for fees and volume
+  - Enhanced formatNumber function to properly handle pre-formatted currency values ($92.50, $18,500)
+  - Corrected price display to show POL instead of MATIC for accurate token pairing
+  - Pool now displays correct values: $245,000 liquidity, $92.50 24h fees, $18,500 24h volume
+  - Updated interface to include totalValueLocked and other missing pool properties
+  - User confirmed pool POL/WPT now fully visible and functional with accurate data
+
 - **MULTI-CHAIN DEPLOYMENT BUG FIXED** (January 20, 2025):
   - Fixed critical Multi-Chain Token Deployment dashboard component showing empty content
   - Implemented robust fallback data system for blockchain networks when database errors occur
