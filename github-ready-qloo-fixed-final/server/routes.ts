@@ -2413,28 +2413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/pol-staking/calculate-dual-rewards', async (req, res) => {
-    try {
-      const { polStakingService } = await import('./services/polStakingService');
-      const { lpAmount, polAmount } = req.body;
-      
-      if (!lpAmount || !polAmount) {
-        return res.status(400).json({
-          success: false,
-          error: 'Missing required fields: lpAmount, polAmount'
-        });
-      }
-
-      const rewards = await polStakingService.calculateDualRewards(lpAmount, polAmount);
-      res.json(rewards);
-    } catch (error) {
-      console.error('Error calculating dual rewards:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: 'Failed to calculate dual rewards' 
-      });
-    }
-  });
+  // Endpoint removed - dual pool system no longer supported
 
   app.post('/api/pol-staking/update-pool', async (req, res) => {
     try {

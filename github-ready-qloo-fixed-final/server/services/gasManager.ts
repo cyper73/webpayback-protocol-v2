@@ -342,7 +342,7 @@ export class GasManager {
         avgRewardValue,
         gasEfficiency: {
           saved: batchProcessedCount * 0.001, // MATIC saved through batching
-          individualCost: rewards.length * 0.001,
+          indiviWPT reward.length * 0.001,
           batchCost: Math.ceil(batchProcessedCount / this.BATCH_SIZE) * 0.05
         }
       }

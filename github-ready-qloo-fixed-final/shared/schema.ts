@@ -104,7 +104,6 @@ export const poolManagement = pgTable("pool_management", {
   id: serial("id").primaryKey(),
   networkId: integer("network_id").references(() => blockchainNetworks.id),
   poolAddress: text("pool_address").notNull(),
-  poolType: text("pool_type").default("uniswap_v3"), // uniswap_v3, pol_staking, dual_rewards
   token0: text("token0").notNull(), // POL, WMATIC
   token1: text("token1").notNull(), // WPT
   totalStaked: decimal("total_staked", { precision: 18, scale: 8 }).default("0"),
@@ -138,7 +137,6 @@ export const polStakingVaults = pgTable("pol_staking_vaults", {
 });
 
 // Table for dual rewards tracking
-export const dualRewards = pgTable("dual_rewards", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   poolId: integer("pool_id").references(() => poolManagement.id),
