@@ -9,6 +9,14 @@ A cutting-edge multi-agent blockchain protocol that automatically rewards conten
 
 ## 🌟 Key Features
 
+### 📊 Authentic Pool Data Integration
+- **Real-Time Uniswap V3 Data**: Direct integration with authentic Polygon pools (USDC/WETH, WMATIC/USDC)  
+- **24-Hour Intelligent Caching**: Cost-effective API usage with smart cache management
+- **Zero Simulation Policy**: 100% authentic blockchain data - no artificial inflation or fake values
+- **Transparent Data Source**: Real-time cache status and data source validation
+- **API Accessibility Transparency**: Shows authentic $0 values when APIs are inaccessible
+
+### 🤖 Advanced Features
 - **🤖 Multi-Agent AI System**: WebPayback, Autoregolator, PoolAgent, and Transparent Agent working together
 - **🔗 Multi-Chain Support**: Polygon, Ethereum, BSC, Arbitrum deployment capabilities
 - **💰 Automatic Rewards**: Real-time WPT token distribution when AI uses creator content
