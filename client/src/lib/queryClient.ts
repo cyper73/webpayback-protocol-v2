@@ -14,8 +14,16 @@ export async function apiRequest(
 ): Promise<Response> {
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   
-  // Skip CSRF token for domain check endpoint (it's a read-only operation)
-  // CSRF tokens cause CORS issues and domain check doesn't need CSRF protection
+  // Auto-add CSRF token for POST requests (except domain check which is read-only)
+  if (method === 'POST' && !url.includes('/api/domain/chainlink/check')) {
+    try {
+      const tokenResponse = await fetch('/api/csrf/token');
+      const tokenData = await tokenResponse.json();
+      headers['X-CSRF-Token'] = tokenData.csrfToken;
+    } catch (error) {
+      console.warn('Failed to get CSRF token:', error);
+    }
+  }
 
   const res = await fetch(url, {
     method,
