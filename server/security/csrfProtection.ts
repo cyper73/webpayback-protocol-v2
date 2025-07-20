@@ -170,7 +170,7 @@ export const cleanupExpiredTokens = (): void => {
 // Start cleanup interval
 setInterval(cleanupExpiredTokens, 60 * 60 * 1000); // Every hour
 
-// CORS Configuration for CSRF Protection
+// CORS Configuration for CSRF Protection - Fixed for Replit
 export const corsConfig = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Allow requests with no origin (mobile apps, curl, etc.)
@@ -183,7 +183,13 @@ export const corsConfig = {
       'https://127.0.0.1:5000'
     ];
     
-    if (allowedOrigins.includes(origin)) {
+    // Check for Replit domains
+    const isReplit = origin.includes('.replit.dev') || 
+                    origin.includes('.repl.co') ||
+                    origin.includes('localhost:') ||
+                    origin.includes('127.0.0.1:');
+    
+    if (allowedOrigins.includes(origin) || isReplit || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
       console.log('CORS: Blocked origin:', origin);
@@ -192,8 +198,9 @@ export const corsConfig = {
   },
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token', 'X-CSRF-Token'],
+  exposedHeaders: ['X-CSRF-Token']
 };
 
 // Double Submit Cookie Pattern (additional protection)
