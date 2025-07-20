@@ -57,31 +57,44 @@ La **head section** è la parte invisibile del codice HTML del tuo sito web dove
 4. Cerca il tuo token "wpt-verify-s2rk9ucnj87"
 5. Se lo vedi, torna su WebPayback e clicca "Verify Meta Tag"
 
-## 🔥 SOCIAL MEDIA - SOLUZIONE SEMPLICE:
+## 🔥 SOCIAL MEDIA - SOLUZIONE UNIVERSALE:
 
-### LinkedIn, Twitter, Facebook, Instagram:
-**Non puoi accedere alla head section?** Nessun problema!
+### ✅ TUTTE le piattaforme social funzionano allo stesso modo:
 
-**SOLUZIONE: Crea un nuovo POST con il token**
+**LINKEDIN** → Crea nuovo POST  
+**TWITTER/X** → Crea nuovo TWEET  
+**FACEBOOK** → Crea nuovo POST  
+**INSTAGRAM** → Post o Storia  
+**TIKTOK** → Inserisci nella descrizione video  
+**YOUTUBE** → Inserisci nella descrizione video  
+**MEDIUM** → Scrivi in un nuovo articolo  
+**GITHUB** → Aggiungi nel README o descrizione repository  
 
-Esempio per il tuo caso LinkedIn:
+### 📝 Esempi pratici:
+
+**LinkedIn/Facebook/Twitter:**
 ```
 🚀 Sto verificando la mia presenza su WebPayback Protocol!
 WPT-VERIFY: wpt-verify-s2rk9ucnj87
 #blockchain #crypto #verification
 ```
 
-O semplicemente:
+**Instagram/TikTok (biografia o post):**
 ```
-wpt-verify-s2rk9ucnj87
+Verifica WebPayback: wpt-verify-s2rk9ucnj87 🚀
 ```
 
-### 📱 Formati riconosciuti per i POST:
+**YouTube (descrizione video):**
+```
+Token di verifica WebPayback: WPT-VERIFY: wpt-verify-s2rk9ucnj87
+```
+
+### 📱 Formati universali riconosciuti:
 - `WPT-VERIFY: wpt-verify-s2rk9ucnj87`
 - `wpt-verify: wpt-verify-s2rk9ucnj87`
 - `wpt-verify-s2rk9ucnj87` (solo il token)
 
-**Il sistema scansiona tutti i tuoi post pubblici per trovare il token!**
+**Il sistema scansiona automaticamente tutti i contenuti pubblici di qualsiasi piattaforma!**
 
 ## 🆘 Alternative complete:
 
