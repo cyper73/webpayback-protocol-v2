@@ -1484,16 +1484,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // CHAINLINK DOMAIN VERIFICATION ENDPOINTS
 
-  // Check domain with Chainlink (NO CSRF for domain check - read-only operation)
-  app.post('/api/domain/chainlink/check', (req, res, next) => {
-    // Set CORS headers directly for this endpoint
+  // PREFLIGHT OPTIONS for domain check
+  app.options('/api/domain/chainlink/check', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
-    
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With');
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    res.sendStatus(200);
+  });
+
+  // Check domain with Chainlink (NO CSRF - read-only operation)
+  app.post('/api/domain/chainlink/check', (req, res, next) => {
+    // Force CORS headers for ALL origins
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', '*');
+    res.header('Access-Control-Expose-Headers', '*');
     next();
   }, async (req, res) => {
     try {

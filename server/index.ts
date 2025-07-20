@@ -6,19 +6,30 @@ import { corsConfig } from "./security/csrfProtection";
 
 const app = express();
 
-// CORS Configuration - ALLOW ALL ORIGINS IN DEVELOPMENT
-if (process.env.NODE_ENV === 'development') {
-  app.use(cors({
-    origin: true, // Allow all origins in development
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With'],
-    exposedHeaders: ['X-CSRF-Token']
-  }));
-} else {
-  // Use strict CORS in production
-  app.use(cors(corsConfig));
-}
+// ULTRA-PERMISSIVE CORS FOR DEVELOPMENT
+app.use((req, res, next) => {
+  // Allow all origins, methods, and headers
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Expose-Headers', '*');
+  res.header('Access-Control-Max-Age', '86400');
+  
+  // Handle preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// Additional CORS as backup
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['*'],
+  exposedHeaders: ['*']
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
