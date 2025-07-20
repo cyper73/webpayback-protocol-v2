@@ -54,6 +54,9 @@ export class QlooService {
    */
   async analyzeContent(contentUrl: string, contentText?: string): Promise<QlooContentAnalysis> {
     try {
+      if (!contentUrl) {
+        throw new Error('Content URL is required');
+      }
       console.log(`🔍 Analyzing content with Qloo LIVE API: ${contentUrl}`);
       
       // Real Qloo Hackathon API integration - testing with search endpoint
@@ -200,6 +203,9 @@ export class QlooService {
 
   private categorizeFromUrl(url: string): string[] {
     const categories: string[] = [];
+    if (!url || typeof url !== 'string') {
+      return ['general_content'];
+    }
     const urlLower = url.toLowerCase();
 
     // Food & Cuisine

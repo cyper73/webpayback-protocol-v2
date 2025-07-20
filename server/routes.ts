@@ -2106,7 +2106,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Qloo Cultural Intelligence Integration Routes
+  // Qloo Cultural Intelligence Test - CLEAN ENDPOINT
+  app.post('/api/qloo/test', async (req, res) => {
+    try {
+      const { url, content_text } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ success: false, error: 'URL is required' });
+      }
+      
+      console.log(`🧪 Testing Qloo DIRECT with URL: ${url}`);
+      
+      const { qlooService } = await import('./services/qlooService');
+      const analysis = await qlooService.analyzeContent(url, content_text);
+      
+      res.json({ 
+        success: true, 
+        message: 'Qloo LIVE test completed',
+        url: url,
+        content_text: content_text || 'none',
+        analysis,
+        qloo_endpoint: 'https://hackathon.api.qloo.com',
+        api_key_status: 'active'
+      });
+    } catch (error) {
+      console.error('Qloo direct test failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        url: req.body.url,
+        qloo_endpoint: 'https://hackathon.api.qloo.com'
+      });
+    }
+  });
+
+  // Keep original cultural analyze for other integrations
   app.post('/api/cultural/analyze', async (req, res) => {
     try {
       const { culturalRewardEngine } = await import('./services/culturalRewardEngine');
