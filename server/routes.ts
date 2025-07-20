@@ -949,11 +949,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pool information for WMATIC/WPT
+  // Get pool information for WMATIC/WPT or POL/WPT
   app.get("/api/web3/pool-info", async (req, res) => {
     try {
-      const poolInfo = await web3Service.getPoolInfo();
+      const poolType = req.query.pool as string; // 'pol' or 'wmatic'
+      const poolInfo = await web3Service.getPoolInfo(poolType);
       res.json(poolInfo);
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Get all available pools
+  app.get("/api/web3/pools", async (req, res) => {
+    try {
+      const pools = await web3Service.getAllPools();
+      res.json(pools);
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }

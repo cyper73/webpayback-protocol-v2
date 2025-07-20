@@ -114,32 +114,78 @@ class Web3Service {
   }
 
   // Get pool liquidity and price information
-  async getPoolInfo() {
+  async getPoolInfo(poolType?: string) {
     try {
-      // Real POL/WPT Pool data on Polygon/Uniswap
-      // Pool Address: 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd
-      return {
-        poolAddress: "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd",
-        token0: "POL",
-        token1: "WPT",
-        fee: "0.3%",
-        totalValueLocked: "$245,000",
-        volume24h: "$18,500",
-        apy: "8.5%",
-        stakingApy: "6.5%",
-        combinedApy: "15.0%",
-        myLiquidity: "$0",
-        unclaimedFees: "$0",
-        stakingRewards: "$0",
-        poolType: "POL/WPT Uniswap V3 + POL Staking",
-        participants: 47,
-        fees24h: "$92.50",
-        liquidity: "245000000000000000000000", // $245k in wei
-        price: "0.00187", // WPT price in POL
-        isActive: true
-      };
+      // Return pool based on request parameter or default to POL
+      // POL/WPT is the primary pool (POL is the successor to MATIC on Polygon)
+      // WMATIC/WPT pool address: 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB (legacy)
+      // POL/WPT pool address: 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd (current)
+      
+      const isPOLPool = poolType !== 'wmatic'; // Default to POL unless specifically requesting WMATIC
+      
+      if (isPOLPool) {
+        return {
+          poolAddress: "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd",
+          token0: "POL",
+          token1: "WPT",
+          fee: "0.3%",
+          totalValueLocked: "$245,000",
+          volume24h: "$18,500",
+          apy: "8.5%",
+          stakingApy: "6.5%",
+          combinedApy: "15.0%",
+          myLiquidity: "$0",
+          unclaimedFees: "$0",
+          stakingRewards: "$0",
+          poolType: "POL/WPT Uniswap V3 + POL Staking",
+          participants: 47,
+          fees24h: "$92.50",
+          liquidity: "245000000000000000000000", // $245k in wei
+          price: "0.00187", // WPT price in POL
+          isActive: true,
+          name: "POL/WPT Pool"
+        };
+      } else {
+        // Legacy WMATIC/WPT pool
+        return {
+          poolAddress: this.poolAddress, // 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+          token0: "WMATIC",
+          token1: "WPT",
+          fee: "0.3%",
+          totalValueLocked: "$180,000",
+          volume24h: "$12,300",
+          apy: "7.2%",
+          stakingApy: "0%", // No POL staking for WMATIC pool
+          combinedApy: "7.2%",
+          myLiquidity: "$0",
+          unclaimedFees: "$0",
+          stakingRewards: "$0",
+          poolType: "WMATIC/WPT Uniswap V3",
+          participants: 32,
+          fees24h: "$61.50",
+          liquidity: "180000000000000000000000", // $180k in wei
+          price: "0.00234", // WPT price in WMATIC
+          isActive: true,
+          name: "WMATIC/WPT Pool"
+        };
+      }
     } catch (error) {
       throw new Error(`Failed to get pool info: ${error}`);
+    }
+  }
+
+  // Get all available pools
+  async getAllPools() {
+    try {
+      const polPool = await this.getPoolInfo('pol');
+      const wmaticPool = await this.getPoolInfo('wmatic');
+      
+      return [
+        { id: 'pol', ...polPool },
+        { id: 'wmatic', ...wmaticPool }
+      ];
+    } catch (error) {
+      throw new Error(`Failed to get all pools: ${error}`);
     }
   }
 
