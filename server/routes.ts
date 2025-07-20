@@ -2006,6 +2006,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POL Staking Routes - Real Implementation
+  app.get('/api/pol-staking/validators', async (req, res) => {
+    try {
+      const { polStakingService } = await import('./services/polStakingService');
+      const validators = await polStakingService.getRecommendedValidators();
+      res.json(validators);
+    } catch (error) {
+      console.error('Error fetching validators:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch validators' 
+      });
+    }
+  });
+
+  app.get('/api/pol-staking/stats', async (req, res) => {
+    try {
+      const { polStakingService } = await import('./services/polStakingService');
+      const stats = await polStakingService.getStakingStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching staking stats:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch staking statistics' 
+      });
+    }
+  });
+
+  app.post('/api/pol-staking/delegate', async (req, res) => {
+    try {
+      const { polStakingService } = await import('./services/polStakingService');
+      const { validatorId, amount, userAddress } = req.body;
+      
+      if (!validatorId || !amount || !userAddress) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: validatorId, amount, userAddress'
+        });
+      }
+
+      const result = await polStakingService.delegateToValidator(
+        parseInt(validatorId), 
+        amount, 
+        userAddress
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error delegating POL:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to delegate POL' 
+      });
+    }
+  });
+
+  app.post('/api/pol-staking/calculate-dual-rewards', async (req, res) => {
+    try {
+      const { polStakingService } = await import('./services/polStakingService');
+      const { lpAmount, polAmount } = req.body;
+      
+      if (!lpAmount || !polAmount) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: lpAmount, polAmount'
+        });
+      }
+
+      const rewards = await polStakingService.calculateDualRewards(lpAmount, polAmount);
+      res.json(rewards);
+    } catch (error) {
+      console.error('Error calculating dual rewards:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to calculate dual rewards' 
+      });
+    }
+  });
+
+  app.post('/api/pol-staking/update-pool', async (req, res) => {
+    try {
+      const { polStakingService } = await import('./services/polStakingService');
+      const result = await polStakingService.updatePoolInfo();
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating pool info:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to update pool information' 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

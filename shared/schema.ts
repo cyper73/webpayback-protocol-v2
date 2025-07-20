@@ -103,11 +103,54 @@ export const rewardDistributions = pgTable("reward_distributions", {
 export const poolManagement = pgTable("pool_management", {
   id: serial("id").primaryKey(),
   networkId: integer("network_id").references(() => blockchainNetworks.id),
+  poolAddress: text("pool_address").notNull(),
+  poolType: text("pool_type").default("uniswap_v3"), // uniswap_v3, pol_staking, dual_rewards
+  token0: text("token0").notNull(), // POL, WMATIC
+  token1: text("token1").notNull(), // WPT
   totalStaked: decimal("total_staked", { precision: 18, scale: 8 }).default("0"),
   totalRewards: decimal("total_rewards", { precision: 18, scale: 8 }).default("0"),
   apy: decimal("apy", { precision: 5, scale: 2 }).default("0"),
+  tradingFeeApy: decimal("trading_fee_apy", { precision: 5, scale: 2 }).default("0"),
+  stakingApy: decimal("staking_apy", { precision: 5, scale: 2 }).default("0"),
   stakersCount: integer("stakers_count").default(0),
+  totalValueLocked: decimal("total_value_locked", { precision: 18, scale: 8 }).default("0"),
+  volume24h: decimal("volume_24h", { precision: 18, scale: 8 }).default("0"),
+  feesCollected24h: decimal("fees_collected_24h", { precision: 18, scale: 8 }).default("0"),
+  isActive: boolean("is_active").default(true),
   lastUpdate: timestamp("last_update").defaultNow(),
+});
+
+// New table for POL staking integration
+export const polStakingVaults = pgTable("pol_staking_vaults", {
+  id: serial("id").primaryKey(),
+  vaultAddress: text("vault_address").notNull(),
+  validatorAddress: text("validator_address").notNull(),
+  validatorName: text("validator_name").notNull(),
+  commission: decimal("commission", { precision: 3, scale: 2 }).default("0"),
+  totalDelegated: decimal("total_delegated", { precision: 18, scale: 8 }).default("0"),
+  rewards: decimal("rewards", { precision: 18, scale: 8 }).default("0"),
+  apy: decimal("apy", { precision: 5, scale: 2 }).default("0"),
+  uptime: decimal("uptime", { precision: 5, scale: 2 }).default("0"),
+  lastRewardClaim: timestamp("last_reward_claim"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Table for dual rewards tracking
+export const dualRewards = pgTable("dual_rewards", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  poolId: integer("pool_id").references(() => poolManagement.id),
+  vaultId: integer("vault_id").references(() => polStakingVaults.id),
+  lpTokensStaked: decimal("lp_tokens_staked", { precision: 18, scale: 8 }).default("0"),
+  polStaked: decimal("pol_staked", { precision: 18, scale: 8 }).default("0"),
+  tradingFeesEarned: decimal("trading_fees_earned", { precision: 18, scale: 8 }).default("0"),
+  stakingRewardsEarned: decimal("staking_rewards_earned", { precision: 18, scale: 8 }).default("0"),
+  totalRewardsEarned: decimal("total_rewards_earned", { precision: 18, scale: 8 }).default("0"),
+  lastClaim: timestamp("last_claim"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const complianceRecords = pgTable("compliance_records", {
