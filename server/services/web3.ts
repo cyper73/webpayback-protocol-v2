@@ -122,6 +122,8 @@ class Web3Service {
       const poolKey = poolType === 'wmatic' ? 'wmatic' : 'pol';
       const realData = await realPoolDataService.getPoolData(poolKey);
       
+      console.log(`Pool data for ${poolKey}:`, realData);
+      
       // Calculate APYs based on pool type
       const stakingApy = poolKey === 'pol' ? "6.5%" : "0%";
       const tradingApy = poolKey === 'pol' ? "8.5%" : "7.2%";

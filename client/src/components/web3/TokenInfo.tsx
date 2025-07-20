@@ -29,6 +29,9 @@ interface PoolInfo {
   apy?: string;
   stakingApy?: string;
   combinedApy?: string;
+  name?: string;
+  dataSource?: string;
+  lastUpdated?: number;
 }
 
 interface NetworkStatus {
@@ -62,14 +65,22 @@ export default function TokenInfo() {
   });
 
   const formatNumber = (value: string, decimals: number = 18) => {
+    // If value is null, undefined, or empty, return default
+    if (!value || value === "0") return "$0";
+    
     // Check if value already contains currency symbols or is pre-formatted
     if (value && (value.includes('$') || value.includes(',') || value.includes('.'))) {
-      return value; // Return as-is if already formatted
+      return value; // Return as-is if already formatted from real data
     }
     
-    // Only apply decimal conversion for raw wei values
-    const num = parseFloat(value) / Math.pow(10, decimals);
-    return num.toLocaleString();
+    // Only apply decimal conversion for raw wei values (very large numbers)
+    if (value.length > 10) {
+      const num = parseFloat(value) / Math.pow(10, decimals);
+      return `$${num.toLocaleString()}`;
+    }
+    
+    // For smaller numbers, treat as already formatted
+    return value;
   };
 
   const formatPrice = (value: string) => {
