@@ -57,11 +57,36 @@ La **head section** è la parte invisibile del codice HTML del tuo sito web dove
 4. Cerca il tuo token "wpt-verify-s2rk9ucnj87"
 5. Se lo vedi, torna su WebPayback e clicca "Verify Meta Tag"
 
-## 🆘 Alternative se non riesci ad accedere alla head section:
+## 🔥 SOCIAL MEDIA - SOLUZIONE SEMPLICE:
 
-Il nostro sistema ora riconosce anche questi formati nel contenuto visibile della pagina:
+### LinkedIn, Twitter, Facebook, Instagram:
+**Non puoi accedere alla head section?** Nessun problema!
+
+**SOLUZIONE: Crea un nuovo POST con il token**
+
+Esempio per il tuo caso LinkedIn:
+```
+🚀 Sto verificando la mia presenza su WebPayback Protocol!
+WPT-VERIFY: wpt-verify-s2rk9ucnj87
+#blockchain #crypto #verification
+```
+
+O semplicemente:
+```
+wpt-verify-s2rk9ucnj87
+```
+
+### 📱 Formati riconosciuti per i POST:
 - `WPT-VERIFY: wpt-verify-s2rk9ucnj87`
 - `wpt-verify: wpt-verify-s2rk9ucnj87`
-- Semplicemente `wpt-verify-s2rk9ucnj87`
+- `wpt-verify-s2rk9ucnj87` (solo il token)
 
-Puoi inserire una di queste stringhe in qualsiasi parte del testo della tua pagina (biografia, descrizione, post, etc.).
+**Il sistema scansiona tutti i tuoi post pubblici per trovare il token!**
+
+## 🆘 Alternative complete:
+
+Il nostro sistema ora riconosce questi formati ovunque:
+- **Post pubblici** (LinkedIn, Twitter, Facebook)
+- **Biografia/Descrizione profilo**
+- **Contenuto delle pagine web**
+- **Meta tag HTML** (per siti web tradizionali)
