@@ -28,9 +28,9 @@ class RealPoolDataService {
   };
 
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-  // Use Polygon subgraph for V3 and V2 compatibility
-  private readonly UNISWAP_V3_GRAPH_URL = "https://gateway.thegraph.com/api/[api-key]/subgraphs/id/3hCPRGf4z88VC5rsBKU5AA9FBBDZnV2yBKkHdwwASdwq";
-  private readonly UNISWAP_V2_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
+  // Use Polygon subgraph for V2 (WPT requires V2 due to transfer fees)  
+  private readonly UNISWAP_V2_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/sushiswap/matic-exchange";
+  private readonly QUICKSWAP_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/sameepsi/quickswap06";
   
   // VERIFIED real token addresses on Polygon
   // POL: Native Polygon token (verified)

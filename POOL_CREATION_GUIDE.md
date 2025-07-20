@@ -3,8 +3,8 @@
 ## Situazione Attuale
 - **WPT Token**: Deployato su Polygon `0x9077051D318b614F915E8A07861090856FDEC91e` ✅
 - **POL Token**: Native Polygon `0x0000000000000000000000000000000000001010` ✅
-- **Pool V2**: Creata dall'utente ma non visibile nel sistema
-- **Sistema**: Configurato per Uniswap V3
+- **PROBLEMA IDENTIFICATO**: WPT ha commissioni di trasferimento, incompatibili con V3
+- **SOLUZIONE**: Usare Uniswap V2 obbligatoriamente
 
 ## Opzioni Disponibili
 
@@ -22,24 +22,16 @@
 - Indirizzo pool V2 creata dall'utente
 - Aggiornamento del sistema per compatibilità V2
 
-### OPZIONE B: Creare Pool V3 Nuova
-**Vantaggi:**
-- Compatibilità completa con sistema WebPayback
-- Funzioni avanzate: range personalizzabili, commissioni ottimizzate
-- Migliori rendimenti potenziali
+### PROCEDURA V2 OBBLIGATORIA
+**WPT richiede V2** a causa delle commissioni di trasferimento.
 
-**Svantaggi:**
-- Richiede nuova transazione e gas fees
-- Spostamento liquidità da V2 a V3
-
-**Procedura V3:**
-1. Vai su [app.uniswap.org](https://app.uniswap.org)
-2. Pool → Create a pool
-3. Token A: `0x0000000000000000000000000000000000001010` (POL)
-4. Token B: `0x9077051D318b614F915E8A07861090856FDEC91e` (WPT)
-5. Fee Tier: 0.3%
-6. Imposta range di prezzo
-7. Aggiungi liquidità
+**Procedura V2:**
+1. Su Uniswap, clicca "Crea una posizione v2" 
+2. Token A: `0x0000000000000000000000000000000000001010` (POL)
+3. Token B: `0x9077051D318b614F915E8A07861090856FDEC91e` (WPT)
+4. Imposta liquidità desiderata
+5. Conferma transazioni
+6. **IMPORTANTE**: Copia indirizzo pool generato per aggiornamento sistema
 
 ## Raccomandazione
 
