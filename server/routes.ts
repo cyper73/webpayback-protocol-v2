@@ -1484,8 +1484,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // CHAINLINK DOMAIN VERIFICATION ENDPOINTS
 
-  // Check domain with Chainlink and CSRF protection
-  app.post('/api/domain/chainlink/check', csrfProtection, async (req, res) => {
+  // Check domain with Chainlink (NO CSRF for domain check - read-only operation)
+  app.post('/api/domain/chainlink/check', async (req, res) => {
     try {
       const { websiteUrl } = req.body;
       
@@ -1493,6 +1493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Website URL is required' });
       }
       
+      const { chainlinkDomainVerificationService } = await import('./services/chainlinkDomainVerification');
       const result = await chainlinkDomainVerificationService.checkDomainWithChainlink(websiteUrl);
       res.json(result);
     } catch (error) {

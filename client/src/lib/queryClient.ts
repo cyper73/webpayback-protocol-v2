@@ -12,9 +12,22 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  
+  // Auto-add CSRF token for POST requests
+  if (method === 'POST' && url.includes('/api/domain/chainlink/check')) {
+    try {
+      const tokenResponse = await fetch('/api/csrf/token');
+      const tokenData = await tokenResponse.json();
+      headers['X-CSRF-Token'] = tokenData.csrfToken;
+    } catch (error) {
+      console.warn('Failed to get CSRF token:', error);
+    }
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
