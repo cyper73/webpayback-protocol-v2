@@ -1675,7 +1675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Meta tag verification endpoint
+  // Meta tag verification endpoint - NOW WITH REAL HTTP FETCH
   app.post('/api/domain/chainlink/verify-meta-tag', async (req, res) => {
     try {
       const { websiteUrl, verificationToken } = req.body;
@@ -1684,22 +1684,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Website URL and verification token are required' });
       }
       
+      console.log('🔗 REAL VERIFICATION ENDPOINT CALLED');
+      console.log('🔍 URL:', websiteUrl);
+      console.log('🎯 Token:', verificationToken);
+      
       const isVerified = await chainlinkDomainVerificationService.verifyMetaTag(websiteUrl, verificationToken);
+      
+      console.log('🎯 VERIFICATION RESULT:', isVerified ? 'SUCCESS' : 'FAILED');
       
       if (isVerified) {
         res.json({ 
           success: true, 
-          message: 'Meta tag verification successful',
+          message: '🎉 Token trovato! Verifica completata con successo!',
           verified: true 
         });
       } else {
+        // For social media, provide specific guidance
+        const domain = new URL(websiteUrl).hostname.toLowerCase();
+        let message = '❌ Token non trovato nella pagina.';
+        
+        if (domain.includes('linkedin.com')) {
+          message = '❌ Token non trovato. Assicurati di aver pubblicato un POST LinkedIn con: WPT-VERIFY: ' + verificationToken;
+        } else if (domain.includes('twitter.com') || domain.includes('x.com')) {
+          message = '❌ Token non trovato. Assicurati di aver pubblicato un TWEET con: WPT-VERIFY: ' + verificationToken;
+        } else if (domain.includes('facebook.com')) {
+          message = '❌ Token non trovato. Assicurati di aver pubblicato un POST Facebook con: WPT-VERIFY: ' + verificationToken;
+        } else if (domain.includes('instagram.com')) {
+          message = '❌ Token non trovato. Assicurati di aver pubblicato un POST/Storia Instagram con: WPT-VERIFY: ' + verificationToken;
+        }
+        
         res.status(400).json({ 
           success: false, 
-          message: 'Meta tag verification failed. Please ensure the meta tag is properly placed on your page.',
+          message,
           verified: false 
         });
       }
     } catch (error) {
+      console.error('❌ Verification endpoint error:', error);
       res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
