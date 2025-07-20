@@ -1179,6 +1179,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Test endpoint for meta tag verification
+  app.post('/api/domain/test-token', async (req, res) => {
+    try {
+      const { token, content } = req.body;
+      
+      if (!token || !content) {
+        return res.status(400).json({ error: 'Token and content are required' });
+      }
+      
+      console.log('🧪 TESTING TOKEN VERIFICATION');
+      console.log('🔍 Token:', token);
+      console.log('📄 Content preview:', content.substring(0, 200));
+      
+      // Test all patterns
+      const patterns = [
+        new RegExp(`WPT-VERIFY:\\s*${token}`, 'i'),
+        new RegExp(`wpt-verify:\\s*${token}`, 'i'), 
+        new RegExp(`WPT-VERIFY\\s*${token}`, 'i'),
+        new RegExp(`wpt-verify\\s*${token}`, 'i'),
+        new RegExp(`${token}`, 'i'), // Just the token itself
+        new RegExp(`<meta\\s+name=["']wpt-verification["']\\s+content=["']${token}["']\\s*/?>`, 'i')
+      ];
+      
+      const results = patterns.map((pattern, index) => {
+        const matches = pattern.test(content);
+        return {
+          pattern: pattern.toString(),
+          matches,
+          name: ['WPT-VERIFY: (space)', 'wpt-verify: (space)', 'WPT-VERIFY (no space)', 'wpt-verify (no space)', 'token only', 'meta tag'][index]
+        };
+      });
+      
+      const anyMatch = results.some(r => r.matches);
+      const tokenExists = content.toLowerCase().includes(token.toLowerCase());
+      
+      console.log('🎯 Test results:', { anyMatch, tokenExists });
+      
+      res.json({
+        token,
+        tokenExists,
+        anyPatternMatched: anyMatch,
+        patternResults: results,
+        contentLength: content.length,
+        recommendation: anyMatch ? 'TOKEN FOUND! Verification should work.' : 'Token not found in expected format. Try adding "WPT-VERIFY: " before the token.'
+      });
+      
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Chainlink prices endpoint with fallback data
   app.get('/api/chainlink/prices', async (req, res) => {
     console.log('🔗 Fetching Chainlink prices...');

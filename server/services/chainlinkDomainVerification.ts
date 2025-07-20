@@ -445,41 +445,62 @@ Steps:
       // Simulate HTTP request to fetch page content
       const pageContent = await this.simulatePageContentFetch(websiteUrl, domain, verificationToken);
       
-      // Platform-specific verification patterns
-      let verificationPattern: RegExp;
+      // Platform-specific verification patterns - FLEXIBLE MATCHING
+      let verificationPatterns: RegExp[] = [];
       
       switch (domain) {
         case 'youtube.com':
-          // For YouTube, look for verification code in video description
-          verificationPattern = new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i');
-          break;
         case 'instagram.com':
         case 'tiktok.com':
         case 'twitter.com':
         case 'x.com':
-          // For social media, look for verification code in bio/description
-          verificationPattern = new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i');
-          break;
         case 'discord.com':
         case 'twitch.tv':
         case 'medium.com':
         case 'patreon.com':
         case 'github.com':
-          // For these platforms, look for verification code in content
-          verificationPattern = new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i');
+          // For all platforms, look for various verification formats:
+          verificationPatterns = [
+            new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i'),
+            new RegExp(`wpt-verify:\\s*${verificationToken}`, 'i'), 
+            new RegExp(`WPT-VERIFY\\s*${verificationToken}`, 'i'),
+            new RegExp(`wpt-verify\\s*${verificationToken}`, 'i'),
+            new RegExp(`${verificationToken}`, 'i') // Just the token itself
+          ];
           break;
         default:
-          // For regular websites, look for HTML meta tag
-          verificationPattern = new RegExp(`<meta\\s+name=["']wpt-verification["']\\s+content=["']${verificationToken}["']\\s*/?>`);
+          // For regular websites, look for HTML meta tag AND text patterns
+          verificationPatterns = [
+            new RegExp(`<meta\\s+name=["']wpt-verification["']\\s+content=["']${verificationToken}["']\\s*/?>`, 'i'),
+            new RegExp(`WPT-VERIFY:\\s*${verificationToken}`, 'i'),
+            new RegExp(`wpt-verify:\\s*${verificationToken}`, 'i'),
+            new RegExp(`${verificationToken}`, 'i') // Just the token itself
+          ];
           break;
       }
       
-      const isVerified = verificationPattern.test(pageContent);
+      // Test all patterns and return true if any match
+      let isVerified = false;
+      let matchedPattern = '';
       
-      console.log('🔗 Platform-specific verification result:', isVerified);
-      console.log('🔗 Verification pattern used:', verificationPattern.toString());
-      console.log('🔗 Page content snippet:', pageContent.substring(0, 200) + '...');
+      for (const pattern of verificationPatterns) {
+        if (pattern.test(pageContent)) {
+          isVerified = true;
+          matchedPattern = pattern.toString();
+          break;
+        }
+      }
+      
+      console.log('🔗 FLEXIBLE verification result:', isVerified);
+      console.log('🔗 Matched pattern:', matchedPattern || 'NONE');
+      console.log('🔗 All patterns tested:', verificationPatterns.length);
+      console.log('🔗 Page content snippet:', pageContent.substring(0, 300) + '...');
       console.log('🔗 Looking for token in content:', verificationToken);
+      
+      // Additional debug: check if token appears anywhere in content
+      const tokenExists = pageContent.toLowerCase().includes(verificationToken?.toLowerCase() || '');
+      console.log('🔗 Token exists in content (simple search):', tokenExists);
+      
       return isVerified;
     } catch (error) {
       console.error('❌ Meta tag verification failed:', error);
@@ -488,14 +509,38 @@ Steps:
   }
 
   private async simulatePageContentFetch(url: string, domain: string, verificationToken?: string): Promise<string> {
-    // In production, this would use Chainlink Functions to fetch actual page content
-    // For demo purposes, we return EMPTY content to force real verification
+    // REAL HTTP FETCH IMPLEMENTATION
+    // Now we'll attempt to fetch the actual page content via HTTP
     
-    console.log('🔗 Simulating page content fetch for:', domain);
-    console.log('🔗 SECURITY: Returning empty content - meta tag must be actually inserted!');
+    console.log('🔗 REAL HTTP FETCH for:', url);
+    console.log('🔗 Looking for verification token:', verificationToken);
     
-    // Return EMPTY content without verification token
-    // This forces users to actually add the meta tag to their website
+    try {
+      // Attempt real HTTP fetch
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'WebPayback-Verifier/1.0',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        },
+        timeout: 10000 // 10 second timeout
+      });
+      
+      if (response.ok) {
+        const content = await response.text();
+        console.log('🔗 SUCCESS: Real page content fetched, length:', content.length);
+        console.log('🔗 Content preview:', content.substring(0, 300));
+        return content;
+      } else {
+        console.log('🔗 HTTP Error:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.log('🔗 Fetch failed:', error.message);
+      console.log('🔗 URL may not be publicly accessible or CORS blocked');
+    }
+    
+    // If real fetch fails, return empty content to fail verification
+    console.log('🔗 SECURITY: Real fetch failed - returning empty content');
     const tokenToUse = 'NEVER-MATCHES-UNLESS-ACTUALLY-INSERTED';
     
     switch (domain) {
