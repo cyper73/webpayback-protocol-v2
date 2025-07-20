@@ -7,7 +7,7 @@ import { eq, desc } from 'drizzle-orm';
 export class PolStakingService {
   private stakingContractAddress = '0x5e3Ef299fDDf15eAa0432E6e66473ace8c13D908'; // Polygon Staking Manager
   private polTokenAddress = '0x455e53DC43b0E8AC7e96A72FBE76E86D4DC6Fc3d'; // POL on Ethereum
-  private realPoolAddress = '0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd'; // Real POL/WPT Pool
+  private realPoolAddress = '0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd'; // Original POL/WPT Pool
 
   constructor() {
     // Service ready for real blockchain integration

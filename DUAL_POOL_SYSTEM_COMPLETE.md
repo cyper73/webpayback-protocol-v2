@@ -1,10 +1,10 @@
 # Sistema Pool Dual POL/WPT - COMPLETATO
 
-## Pool V2 Creata Correttamente
-- **Indirizzo Pool**: `0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB`
-- **Token Pair**: POL/WPT (Uniswap V2)
-- **URL Pool**: https://app.uniswap.org/positions/v2/polygon/0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
-- **Motivo V2**: WPT ha commissioni di trasferimento incompatibili con V3
+## Pool Originale Ripristinata
+- **Indirizzo Pool**: `0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd`
+- **Token Pair**: POL/WPT (Original working pool)
+- **Status**: Sistema già completo e funzionante
+- **Note**: Pool duplicata rimossa, ripristinato sistema originale
 
 ## Sistema Aggiornato
 - ✅ Compatibilità V2 implementata nel RealPoolDataService
@@ -16,7 +16,7 @@
 ```
 POL (Native Polygon): 0x0000000000000000000000000000000000001010
 WPT (WebPayback):     0x9077051D318b614F915E8A07861090856FDEC91e
-Pool V2 Address:      0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+Pool Address (Original): 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd
 ```
 
 ## Sistema di Staking Dual Rewards

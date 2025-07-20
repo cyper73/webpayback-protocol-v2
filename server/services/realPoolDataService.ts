@@ -24,7 +24,7 @@ class RealPoolDataService {
   private cache: CachedPoolData = {
     pol: null,
     wmatic: null,
-    lastFetch: 0 // Force V2 refresh for POL/WPT pool
+    lastFetch: 0 // Force refresh with original pool address
   };
 
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -38,9 +38,9 @@ class RealPoolDataService {
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9077051D318b614F915E8A07861090856FDEC91e";
   
-  // Pool addresses - VERIFIED FROM USER
-  private readonly POL_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // WMATIC/WPT pool (existing)
-  private readonly WMATIC_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // Same pool address
+  // Pool addresses - ORIGINAL WORKING POOLS
+  private readonly POL_WPT_POOL = "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd"; // Original POL/WPT pool (working)
+  private readonly WMATIC_WPT_POOL = "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd"; // Same pool address
 
   private isCacheValid(): boolean {
     const now = Date.now();
