@@ -21,6 +21,11 @@ interface PoolInfo {
   price: string;
   volume24h: string;
   fees24h: string;
+  totalValueLocked?: string;
+  fee?: string;
+  apy?: string;
+  stakingApy?: string;
+  combinedApy?: string;
 }
 
 interface NetworkStatus {
@@ -51,6 +56,12 @@ export default function TokenInfo() {
   });
 
   const formatNumber = (value: string, decimals: number = 18) => {
+    // Check if value already contains currency symbols or is pre-formatted
+    if (value && (value.includes('$') || value.includes(',') || value.includes('.'))) {
+      return value; // Return as-is if already formatted
+    }
+    
+    // Only apply decimal conversion for raw wei values
     const num = parseFloat(value) / Math.pow(10, decimals);
     return num.toLocaleString();
   };
@@ -184,7 +195,7 @@ export default function TokenInfo() {
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="text-sm text-gray-500 mb-2">Current Price</p>
-                <p className="text-lg font-semibold">{formatPrice(poolInfo.price)} MATIC</p>
+                <p className="text-lg font-semibold">{formatPrice(poolInfo.price)} {poolInfo.token0}</p>
               </div>
             </div>
 
@@ -194,16 +205,16 @@ export default function TokenInfo() {
               <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0 mr-4">
                   <p className="text-sm text-gray-500 mb-2">Liquidity</p>
-                  <p className="text-lg font-semibold break-words">{formatNumber(poolInfo.liquidity)} WPT</p>
+                  <p className="text-lg font-semibold break-words">{poolInfo.totalValueLocked || formatNumber(poolInfo.liquidity) + ' WPT'}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm text-gray-500 mb-2">24h Fees</p>
-                  <p className="text-lg font-semibold">{formatNumber(poolInfo.fees24h)} WPT</p>
+                  <p className="text-lg font-semibold">{formatNumber(poolInfo.fees24h)}</p>
                 </div>
               </div>
               <div className="text-center">
                 <p className="text-sm text-gray-500 mb-2">24h Volume</p>
-                <p className="text-lg font-semibold">{formatNumber(poolInfo.volume24h)} WPT</p>
+                <p className="text-lg font-semibold">{formatNumber(poolInfo.volume24h)}</p>
               </div>
             </div>
           </div>
