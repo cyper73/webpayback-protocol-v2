@@ -290,9 +290,10 @@ WebPayback Protocol offers the first creator economy platform with native Polygo
 - [🏗️ **Staking Platform Integration**](STAKING_PLATFORM_INTEGRATION.md) - Technical implementation
 
 ### Dual Rewards System
-- **Pool Trading**: 8.5% APY from WMATIC/WPT trading fees
-- **POL Staking**: 6.8% APY via StakeCraft (0% commission)
-- **Combined Total**: 15.3% APY for maximum creator yield
+- **Pool Trading**: 8.5% APY from POL/WPT trading fees (primary pool)
+- **POL Staking**: 6.5% APY via StakeCraft (0% commission validator)
+- **Legacy Support**: WMATIC/WPT pool available (7.2% APY, trading only)
+- **Combined Total**: 15.0% APY for maximum creator yield (POL/WPT + staking)
 
 ## 📞 Support
 

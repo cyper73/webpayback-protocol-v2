@@ -189,7 +189,7 @@ export default function TokenInfo() {
                 onClick={() => setSelectedPool('pol')}
                 className={`text-xs ${selectedPool === 'pol' ? 'bg-purple-600 hover:bg-purple-700' : 'hover:bg-purple-100'}`}
               >
-                💎 POL/WPT
+                💎 POL/WPT (Primary)
               </Button>
               <Button
                 variant={selectedPool === 'wmatic' ? 'default' : 'outline'}
@@ -197,7 +197,7 @@ export default function TokenInfo() {
                 onClick={() => setSelectedPool('wmatic')}
                 className={`text-xs ${selectedPool === 'wmatic' ? 'bg-orange-600 hover:bg-orange-700' : 'hover:bg-orange-100'}`}
               >
-                🔄 WMATIC/WPT
+                🔄 WMATIC/WPT (Legacy)
               </Button>
             </div>
           </CardDescription>
