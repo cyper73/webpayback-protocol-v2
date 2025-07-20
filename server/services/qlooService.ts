@@ -42,49 +42,43 @@ interface QlooRewardCalculation {
 
 export class QlooService {
   private apiKey: string;
-  private baseUrl = 'https://api.qloo.com/v1';
+  private baseUrl = 'https://hackathon.api.qloo.com';
   
   constructor() {
-    this.apiKey = process.env.QLOO_API_KEY || '';
-    if (!this.apiKey) {
-      console.warn('Qloo API key not found. Cultural intelligence features will be simulated.');
-    }
+    this.apiKey = process.env.QLOO_API_KEY || '8oruYQqpoCoCq7ydB2KPXk5q_Vrr-0e9wrbCk4vvp5Q';
+    console.log('🚀 Qloo LIVE API integration activated with hackathon endpoint!');
   }
 
   /**
-   * Analyze content for cultural context and taste profile
+   * Analyze content for cultural context and taste profile using LIVE Qloo Hackathon API
    */
   async analyzeContent(contentUrl: string, contentText?: string): Promise<QlooContentAnalysis> {
     try {
-      if (!this.apiKey) {
-        return this.simulateQlooAnalysis(contentUrl, contentText);
-      }
-
-      // Real Qloo API integration
-      const response = await fetch(`${this.baseUrl}/cultural/analyze`, {
-        method: 'POST',
+      console.log(`🔍 Analyzing content with Qloo LIVE API: ${contentUrl}`);
+      
+      // Real Qloo Hackathon API integration - testing with search endpoint
+      const encodedQuery = encodeURIComponent(contentUrl.split('/').pop() || 'content');
+      const response = await fetch(`${this.baseUrl}/entities/search?q=${encodedQuery}&limit=10`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'X-API-KEY': this.apiKey,
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          url: contentUrl,
-          text: contentText,
-          analysis_depth: 'deep',
-          cultural_context: true,
-          taste_profiling: true
-        })
+        }
       });
 
       if (!response.ok) {
-        throw new Error(`Qloo API error: ${response.status}`);
+        console.error(`❌ Qloo API error: ${response.status} ${response.statusText}`);
+        const errorBody = await response.text();
+        console.error('Error details:', errorBody);
+        return this.simulateQlooAnalysis(contentUrl, contentText);
       }
 
       const data = await response.json();
+      console.log('✅ Qloo LIVE response received:', data);
       return this.processQlooResponse(data, contentUrl);
 
     } catch (error) {
-      console.error('Qloo analysis failed:', error);
+      console.error('❌ Qloo service error:', error);
       return this.simulateQlooAnalysis(contentUrl, contentText);
     }
   }
@@ -335,28 +329,111 @@ export class QlooService {
   }
 
   private processQlooResponse(data: any, contentUrl: string): QlooContentAnalysis {
-    // Process real Qloo API response
+    console.log('🔄 Processing Qloo LIVE response data:', JSON.stringify(data, null, 2));
+    
+    // Extract data from Qloo entities search response
+    const entities = data.entities || data.results || [];
+    const firstEntity = entities[0] || {};
+    
+    // Convert Qloo entities to our cultural analysis format
+    const categories = this.extractCategoriesFromEntities(entities);
+    const culturalTags = this.extractCulturalTagsFromEntities(entities);
+    
     return {
-      content_id: data.content_id || this.generateContentId(contentUrl),
-      content_type: data.content_type || 'article',
-      detected_categories: data.categories || [],
-      cultural_tags: data.cultural_tags || [],
-      taste_profile: data.taste_profile || {
-        categories: [],
-        genres: [],
-        cultural_context: { region: 'Global', demographic: 'general', interests: [] },
-        taste_score: 0.7,
-        cultural_relevance: 0.8,
-        engagement_potential: 0.6
+      content_id: firstEntity.id || this.generateContentId(contentUrl),
+      content_type: this.inferContentType(contentUrl),
+      detected_categories: categories,
+      cultural_tags: culturalTags,
+      taste_profile: {
+        categories: categories,
+        genres: this.extractGenresFromEntities(entities),
+        cultural_context: {
+          region: this.extractRegionFromEntities(entities),
+          demographic: this.extractDemographicFromEntities(entities),
+          interests: categories.slice(0, 3)
+        },
+        taste_score: this.calculateTasteScore(entities),
+        cultural_relevance: this.calculateCulturalRelevance(entities),
+        engagement_potential: this.calculateEngagementPotential(entities)
       },
-      audience_match: data.audience_match || {
-        primary_demographic: 'general',
-        cultural_affinity: 0.7,
-        taste_alignment: 0.8
+      audience_match: {
+        primary_demographic: this.extractDemographicFromEntities(entities),
+        cultural_affinity: this.calculateCulturalRelevance(entities),
+        taste_alignment: this.calculateTasteScore(entities)
       },
-      reward_multiplier: data.reward_multiplier || 1.0,
-      cultural_bonus: data.cultural_bonus || 0.0
+      reward_multiplier: this.calculateRewardMultiplier(categories, culturalTags),
+      cultural_bonus: this.calculateCulturalBonus(culturalTags)
     };
+  }
+
+  private extractCategoriesFromEntities(entities: any[]): string[] {
+    const categories = new Set<string>();
+    entities.forEach(entity => {
+      if (entity.type) categories.add(entity.type.toLowerCase().replace(/\s+/g, '_'));
+      if (entity.category) categories.add(entity.category.toLowerCase().replace(/\s+/g, '_'));
+      if (entity.genres) entity.genres.forEach((g: string) => categories.add(g.toLowerCase().replace(/\s+/g, '_')));
+    });
+    return Array.from(categories).slice(0, 5) || ['general_content'];
+  }
+
+  private extractCulturalTagsFromEntities(entities: any[]): string[] {
+    const tags = new Set<string>();
+    entities.forEach(entity => {
+      if (entity.cultural_context) tags.add(entity.cultural_context);
+      if (entity.region) tags.add(entity.region.toLowerCase());
+      if (entity.origin) tags.add(entity.origin.toLowerCase());
+    });
+    return Array.from(tags);
+  }
+
+  private extractGenresFromEntities(entities: any[]): string[] {
+    const genres = new Set<string>();
+    entities.forEach(entity => {
+      if (entity.genres) entity.genres.forEach((g: string) => genres.add(g));
+      if (entity.type) genres.add(entity.type);
+    });
+    return Array.from(genres).slice(0, 3) || ['general'];
+  }
+
+  private extractRegionFromEntities(entities: any[]): string {
+    for (const entity of entities) {
+      if (entity.region) return entity.region;
+      if (entity.origin) return entity.origin;
+    }
+    return 'Global';
+  }
+
+  private extractDemographicFromEntities(entities: any[]): string {
+    for (const entity of entities) {
+      if (entity.demographic) return entity.demographic;
+      if (entity.target_audience) return entity.target_audience;
+    }
+    return 'general_audience';
+  }
+
+  private calculateTasteScore(entities: any[]): number {
+    if (entities.length === 0) return 0.7;
+    const avgPopularity = entities.reduce((sum, e) => sum + (e.popularity || 0.5), 0) / entities.length;
+    return Math.min(1.0, avgPopularity + 0.3);
+  }
+
+  private calculateCulturalRelevance(entities: any[]): number {
+    if (entities.length === 0) return 0.7;
+    const culturalScore = entities.reduce((sum, e) => sum + (e.cultural_score || 0.6), 0) / entities.length;
+    return Math.min(1.0, culturalScore + 0.2);
+  }
+
+  private calculateEngagementPotential(entities: any[]): number {
+    if (entities.length === 0) return 0.6;
+    const engagementScore = entities.reduce((sum, e) => sum + (e.engagement || 0.5), 0) / entities.length;
+    return Math.min(1.0, engagementScore + 0.3);
+  }
+
+  private calculateRewardMultiplier(categories: string[], culturalTags: string[]): number {
+    let multiplier = 1.0;
+    if (categories.length > 2) multiplier += 0.2;
+    if (culturalTags.length > 0) multiplier += 0.3;
+    return Math.round(multiplier * 100) / 100;
   }
 }
 
