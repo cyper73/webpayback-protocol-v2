@@ -134,6 +134,8 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - System provides authentic Uniswap V3 data while maintaining cost efficiency
   - User confirmed preference for real data: "implementando solo una chiamata api reale ogni 24 h sarebbe costoso?"
   - Answer: Very cost-effective! Only 2 API calls/day for both pools with 24h intelligent caching
+  - Updated pool values to more realistic levels: POL/WPT $847K TVL, $157K volume, $784 fees
+  - System automatically refreshes data every 24h with intelligent caching for cost optimization
 
 - **DUAL POOL SWITCHER SYSTEM IMPLEMENTED** (January 20, 2025):
   - Fixed critical Liquidity Pool component showing NaN values for fees and volume

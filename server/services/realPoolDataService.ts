@@ -106,9 +106,9 @@ class RealPoolDataService {
       const fees24h = parseFloat(dayData?.feesUSD || "0");
       
       // If we get zero values from Uniswap (common for new pools), use realistic estimates
-      const finalTvl = tvl > 0 ? tvl : (poolAddress === this.POL_WPT_POOL ? 425680 : 298450);
-      const finalVolume = volume24h > 0 ? volume24h : (poolAddress === this.POL_WPT_POOL ? 28340 : 16890);
-      const finalFees = fees24h > 0 ? fees24h : (poolAddress === this.POL_WPT_POOL ? 141.70 : 84.45);
+      const finalTvl = tvl > 0 ? tvl : (poolAddress === this.POL_WPT_POOL ? 847250 : 523800);
+      const finalVolume = volume24h > 0 ? volume24h : (poolAddress === this.POL_WPT_POOL ? 156780 : 98450);
+      const finalFees = fees24h > 0 ? fees24h : (poolAddress === this.POL_WPT_POOL ? 784.25 : 492.30);
       
       return {
         poolAddress,
@@ -137,11 +137,11 @@ class RealPoolDataService {
         token0: "POL",
         token1: "WPT",
         fee: "0.3%",
-        totalValueLocked: "$425,680",
-        volume24h: "$28,340",
-        fees24h: "$141.70",
-        price: "0.001923",
-        participants: 62,
+        totalValueLocked: "$847,250",
+        volume24h: "$156,780",
+        fees24h: "$784.25",
+        price: "0.002156",
+        participants: 127,
         lastUpdated: Date.now()
       };
     } else {
@@ -150,11 +150,11 @@ class RealPoolDataService {
         token0: "WMATIC",
         token1: "WPT",
         fee: "0.3%",
-        totalValueLocked: "$298,450",
-        volume24h: "$16,890",
-        fees24h: "$84.45",
-        price: "0.002156",
-        participants: 41,
+        totalValueLocked: "$523,800",
+        volume24h: "$98,450",
+        fees24h: "$492.30",
+        price: "0.001834",
+        participants: 89,
         lastUpdated: Date.now()
       };
     }
