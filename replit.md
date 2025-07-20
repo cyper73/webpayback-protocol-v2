@@ -133,6 +133,7 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - Backend endpoints: /api/web3/pool-info?pool=pol|wmatic and /api/web3/pools
   - User confirmed POL as preferred default pool (successor to MATIC with staking benefits)
   - Complete dual pool system operational with real-time switching functionality
+  - User confirmed functionality and visibility working correctly: "confermo funzionalita' e visibilita' corretta"
 
 - **MULTI-CHAIN DEPLOYMENT BUG FIXED** (January 20, 2025):
   - Fixed critical Multi-Chain Token Deployment dashboard component showing empty content

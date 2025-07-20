@@ -353,7 +353,7 @@ export function GasPoolDashboard() {
                           </div>
                           <div>
                             <div className="font-medium text-sm">
-                              {parseFloat(reward.amount).toFixed(3)} {reward.tokenType}
+                              {isNaN(parseFloat(reward.amount)) ? "0.000" : parseFloat(reward.amount).toFixed(3)} {reward.tokenType}
                             </div>
                             <div className="text-xs text-gray-500">
                               {reward.metadata?.aiModel || 'AI Model'} • {reward.status}

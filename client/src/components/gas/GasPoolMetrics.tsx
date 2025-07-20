@@ -73,6 +73,7 @@ export function GasPoolMetrics() {
   const savingsPercentage = metrics.gasEfficiency.individualCost > 0 
     ? ((gasSavings / metrics.gasEfficiency.individualCost) * 100) 
     : 0;
+  const displaySavingsPercentage = isNaN(savingsPercentage) ? 0 : savingsPercentage;
 
   return (
     <div className="space-y-6">

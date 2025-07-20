@@ -29,7 +29,7 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Total Collected:</span>
-                <span className="font-mono">{(totalRewards * 0.03).toFixed(0)} WPT</span>
+                <span className="font-mono">{isNaN(totalRewards * 0.03) ? "0" : (totalRewards * 0.03).toFixed(0)} WPT</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Creator Wallet:</span>
@@ -53,11 +53,11 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Daily Rewards:</span>
-                <span className="font-mono">{(totalRewards * 0.1).toFixed(0)} WPT</span>
+                <span className="font-mono">{isNaN(totalRewards * 0.1) ? "0" : (totalRewards * 0.1).toFixed(0)} WPT</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Sustainability:</span>
-                <span className="text-neon-green">{Math.floor(totalPool / (totalRewards * 0.1) || 0)} days</span>
+                <span className="text-neon-green">{isNaN(totalPool / (totalRewards * 0.1)) ? "∞" : Math.floor(totalPool / (totalRewards * 0.1)) || 0} days</span>
               </div>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Rewards Today:</span>
-                <span className="font-mono">{(totalRewards * 0.05).toFixed(0)} WPT</span>
+                <span className="font-mono">{isNaN(totalRewards * 0.05) ? "0" : (totalRewards * 0.05).toFixed(0)} WPT</span>
               </div>
             </div>
           </div>
