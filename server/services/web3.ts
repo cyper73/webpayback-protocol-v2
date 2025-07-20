@@ -113,62 +113,44 @@ class Web3Service {
     }
   }
 
-  // Get pool liquidity and price information
+  // Get pool liquidity and price information with real data (cached 24h)
   async getPoolInfo(poolType?: string) {
     try {
-      // Return pool based on request parameter or default to POL
-      // POL/WPT is the primary pool (POL is the successor to MATIC on Polygon)
-      // WMATIC/WPT pool address: 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB (legacy)
-      // POL/WPT pool address: 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd (current)
+      // Use real pool data service with 24h caching
+      const { realPoolDataService } = await import("./realPoolDataService.js");
       
-      const isPOLPool = poolType !== 'wmatic'; // Default to POL unless specifically requesting WMATIC
+      const poolKey = poolType === 'wmatic' ? 'wmatic' : 'pol';
+      const realData = await realPoolDataService.getPoolData(poolKey);
       
-      if (isPOLPool) {
-        return {
-          poolAddress: "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd",
-          token0: "POL",
-          token1: "WPT",
-          fee: "0.3%",
-          totalValueLocked: "$245,000",
-          volume24h: "$18,500",
-          apy: "8.5%",
-          stakingApy: "6.5%",
-          combinedApy: "15.0%",
-          myLiquidity: "$0",
-          unclaimedFees: "$0",
-          stakingRewards: "$0",
-          poolType: "POL/WPT Uniswap V3 + POL Staking",
-          participants: 47,
-          fees24h: "$92.50",
-          liquidity: "245000000000000000000000", // $245k in wei
-          price: "0.00187", // WPT price in POL
-          isActive: true,
-          name: "POL/WPT Pool"
-        };
-      } else {
-        // Legacy WMATIC/WPT pool
-        return {
-          poolAddress: this.poolAddress, // 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
-          token0: "WMATIC",
-          token1: "WPT",
-          fee: "0.3%",
-          totalValueLocked: "$180,000",
-          volume24h: "$12,300",
-          apy: "7.2%",
-          stakingApy: "0%", // No POL staking for WMATIC pool
-          combinedApy: "7.2%",
-          myLiquidity: "$0",
-          unclaimedFees: "$0",
-          stakingRewards: "$0",
-          poolType: "WMATIC/WPT Uniswap V3",
-          participants: 32,
-          fees24h: "$61.50",
-          liquidity: "180000000000000000000000", // $180k in wei
-          price: "0.00234", // WPT price in WMATIC
-          isActive: true,
-          name: "WMATIC/WPT Pool"
-        };
-      }
+      // Calculate APYs based on pool type
+      const stakingApy = poolKey === 'pol' ? "6.5%" : "0%";
+      const tradingApy = poolKey === 'pol' ? "8.5%" : "7.2%";
+      const combinedApy = poolKey === 'pol' ? "15.0%" : "7.2%";
+      
+      // Combine real data with calculated values
+      return {
+        poolAddress: realData.poolAddress,
+        token0: realData.token0,
+        token1: realData.token1,
+        fee: realData.fee,
+        totalValueLocked: realData.totalValueLocked,
+        volume24h: realData.volume24h,
+        fees24h: realData.fees24h,
+        price: realData.price,
+        participants: realData.participants,
+        apy: tradingApy,
+        stakingApy: stakingApy,
+        combinedApy: combinedApy,
+        myLiquidity: "$0",
+        unclaimedFees: "$0",
+        stakingRewards: "$0",
+        poolType: poolKey === 'pol' ? "POL/WPT Uniswap V3 + POL Staking" : "WMATIC/WPT Uniswap V3",
+        liquidity: (parseFloat(realData.totalValueLocked.replace(/[$,]/g, '')) * 1e18).toString(),
+        isActive: true,
+        name: poolKey === 'pol' ? "POL/WPT Pool" : "WMATIC/WPT Pool",
+        dataSource: realData.lastUpdated ? 'real' : 'fallback',
+        lastUpdated: realData.lastUpdated
+      };
     } catch (error) {
       throw new Error(`Failed to get pool info: ${error}`);
     }

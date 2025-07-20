@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, TrendingUp, Activity, ArrowLeftRight } from "lucide-react";
+import PoolDataStatus from "./PoolDataStatus";
 
 interface TokenInfo {
   address: string;
@@ -119,6 +120,9 @@ export default function TokenInfo() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pool Data Status */}
+      <PoolDataStatus />
 
       {/* Token Information */}
       <Card className="border-blue-500/20 bg-blue-900/5">

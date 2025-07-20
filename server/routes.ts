@@ -970,6 +970,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get real pool data cache status
+  app.get("/api/web3/pool-cache-status", async (req, res) => {
+    try {
+      const { realPoolDataService } = await import("./services/realPoolDataService.js");
+      const status = realPoolDataService.getCacheStatus();
+      res.json({ success: true, status });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Force refresh pool data (for testing)
+  app.post("/api/web3/refresh-pools", async (req, res) => {
+    try {
+      const { realPoolDataService } = await import("./services/realPoolDataService.js");
+      await realPoolDataService.forceRefresh();
+      res.json({ success: true, message: "Pool data refreshed successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   // Get network status
   app.get("/api/web3/network-status", async (req, res) => {
     try {
