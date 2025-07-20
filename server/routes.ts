@@ -326,11 +326,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // XSS Prevention: Sanitize request body first
       const sanitizedBody = sanitizeRequestBody(req.body);
       
-      // XSS Prevention: Enhanced validation with security checks
-      const validatedData = validateCreatorInput(sanitizedBody);
-      
-      // Additional schema validation
-      const schemaValidatedData = insertCreatorSchema.parse(validatedData);
+      // Schema validation with Qloo-compatible categories
+      const schemaValidatedData = insertCreatorSchema.parse(sanitizedBody);
       
       // Extract channel information from the URL
       const channelInfo = channelMonitoringService.extractChannelInfo(schemaValidatedData.websiteUrl);

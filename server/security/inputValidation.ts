@@ -43,12 +43,19 @@ export const walletAddressSchema = z.string()
   .regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Ethereum wallet address format')
   .transform(val => val.toLowerCase());
 
-// XSS Prevention: Content category validation schema
+// XSS Prevention: Content category validation schema - Qloo-compatible enum
 export const contentCategorySchema = z.enum([
-  'Blog/Articles', 'Video Content', 'Social Media', 'Academic Papers',
-  'News/Journalism', 'Creative Writing', 'Technical Documentation',
-  'Photography', 'Art/Design', 'Music', 'Podcast', 'Educational Content',
-  'Business Content', 'Other'
+  "blog_articles",
+  "news_journalism", 
+  "educational_content",
+  "technical_documentation",
+  "creative_writing",
+  "art_design",
+  "music_audio",
+  "video_content",
+  "social_media",
+  "academic_papers",
+  "photography"
 ]);
 
 // XSS Prevention: General text input sanitization
