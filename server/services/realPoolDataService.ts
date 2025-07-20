@@ -31,11 +31,15 @@ class RealPoolDataService {
   // Use Polygon subgraph through alternative endpoints
   private readonly UNISWAP_V3_GRAPH_URL = "https://gateway.thegraph.com/api/[api-key]/subgraphs/id/3hCPRGf4z88VC5rsBKU5AA9FBBDZnV2yBKkHdwwASdwq";
   
-  // Use DOCUMENTED real Uniswap V3 pools on Polygon with verified addresses
-  // USDC/WETH pool (0.05%) - documented as most active pool on Polygon
-  private readonly POL_WPT_POOL = "0x45dda9cb7c25131df268515131f647d726f50608";
-  // WMATIC/USDC pool (0.05%) - second most active documented pool
-  private readonly WMATIC_WPT_POOL = "0xa374094527e1673a86de625aa59517c5de346d32";
+  // VERIFIED real token addresses on Polygon
+  // POL: Native Polygon token (verified)
+  private readonly POL_TOKEN = "0x0000000000000000000000000000000000001010";
+  // WPT: WebPayback Token (verified - deployed 6 days ago)
+  private readonly WPT_TOKEN = "0x9077051D318b614F915E8A07861090856FDEC91e";
+  
+  // Pool addresses (to be updated when pool is created)
+  private readonly POL_WPT_POOL = "0x45dda9cb7c25131df268515131f647d726f50608"; // TEMP
+  private readonly WMATIC_WPT_POOL = "0xa374094527e1673a86de625aa59517c5de346d32"; // TEMP
 
   private isCacheValid(): boolean {
     const now = Date.now();
