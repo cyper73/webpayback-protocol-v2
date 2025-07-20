@@ -24,7 +24,7 @@ class RealPoolDataService {
   private cache: CachedPoolData = {
     pol: null,
     wmatic: null,
-    lastFetch: 0
+    lastFetch: 0 // Force refresh with new pool address
   };
 
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -37,9 +37,9 @@ class RealPoolDataService {
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9077051D318b614F915E8A07861090856FDEC91e";
   
-  // Pool addresses (to be updated when pool is created)
-  private readonly POL_WPT_POOL = "0x45dda9cb7c25131df268515131f647d726f50608"; // TEMP
-  private readonly WMATIC_WPT_POOL = "0xa374094527e1673a86de625aa59517c5de346d32"; // TEMP
+  // Pool addresses - VERIFIED FROM USER
+  private readonly POL_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // WMATIC/WPT pool (existing)
+  private readonly WMATIC_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // Same pool address
 
   private isCacheValid(): boolean {
     const now = Date.now();
@@ -112,17 +112,16 @@ class RealPoolDataService {
       const volume24h = parseFloat(dayData?.volumeUSD || "0");
       const fees24h = parseFloat(dayData?.feesUSD || "0");
       
-      // If we get zero values from Uniswap (common for new pools), use realistic estimates
-      const finalTvl = tvl > 0 ? tvl : (poolAddress === this.POL_WPT_POOL ? 847250 : 523800);
-      const finalVolume = volume24h > 0 ? volume24h : (poolAddress === this.POL_WPT_POOL ? 156780 : 98450);
-      const finalFees = fees24h > 0 ? fees24h : (poolAddress === this.POL_WPT_POOL ? 784.25 : 492.30);
+      // Show AUTHENTIC $0 values when APIs return zero - complete transparency
+      const finalTvl = tvl;
+      const finalVolume = volume24h;  
+      const finalFees = fees24h;
       
-      // Use pool names that make sense for the UI
-      const isPolPool = poolAddress === this.POL_WPT_POOL;
+      // Use correct token names for WMATIC/WPT pool
       return {
         poolAddress,
-        token0: isPolPool ? "USDC" : "WMATIC",
-        token1: isPolPool ? "WETH" : "USDC",
+        token0: "WMATIC",
+        token1: "WPT",
         fee: `${(pool.feeTier / 10000)}%` || "0.05%",
         totalValueLocked: `$${finalTvl.toLocaleString()}`,
         volume24h: `$${finalVolume.toLocaleString()}`,
