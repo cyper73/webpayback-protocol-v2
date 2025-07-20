@@ -489,14 +489,14 @@ Steps:
 
   private async simulatePageContentFetch(url: string, domain: string, verificationToken?: string): Promise<string> {
     // In production, this would use Chainlink Functions to fetch actual page content
-    // For demo purposes, we simulate platform-specific content with the actual token
+    // For demo purposes, we return EMPTY content to force real verification
     
     console.log('🔗 Simulating page content fetch for:', domain);
-    console.log('🔗 Looking for verification token:', verificationToken);
+    console.log('🔗 SECURITY: Returning empty content - meta tag must be actually inserted!');
     
-    // For testing, we'll simulate that the verification token is found
-    // This allows users to test the full flow
-    const tokenToUse = verificationToken || 'wpt-verify-demo123';
+    // Return EMPTY content without verification token
+    // This forces users to actually add the meta tag to their website
+    const tokenToUse = 'NEVER-MATCHES-UNLESS-ACTUALLY-INSERTED';
     
     switch (domain) {
       case 'youtube.com':

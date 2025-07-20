@@ -74,8 +74,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize blockchain networks on startup
   await blockchainService.initializeNetworks();
   
-  // CSRF Token Generation with Rate Limiting
-  app.get("/api/csrf/token", csrfTokenRateLimit, async (req, res) => {
+  // CSRF Token Generation with Rate Limiting and CORS
+  app.get("/api/csrf/token", (req, res, next) => {
+    // Force CORS headers for CSRF endpoint
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Content-Type', 'application/json');
+    next();
+  }, csrfTokenRateLimit, async (req, res) => {
     try {
       const sessionId = getSessionId(req);
       
