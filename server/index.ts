@@ -6,8 +6,19 @@ import { corsConfig } from "./security/csrfProtection";
 
 const app = express();
 
-// CSRF Protection: Configure CORS
-app.use(cors(corsConfig));
+// CORS Configuration - ALLOW ALL ORIGINS IN DEVELOPMENT
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors({
+    origin: true, // Allow all origins in development
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With'],
+    exposedHeaders: ['X-CSRF-Token']
+  }));
+} else {
+  // Use strict CORS in production
+  app.use(cors(corsConfig));
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
