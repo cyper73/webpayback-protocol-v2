@@ -16,36 +16,55 @@ export class PolStakingService {
   // Get recommended validators for POL staking
   async getRecommendedValidators() {
     try {
+      // REAL validators from official Polygon staking.technology (updated with user delegation)
       const validators = [
         {
           id: 1,
-          address: '0x6E723Ba0A3f7a3D4F8b5B2A6B5B3E9F4C5A4B9C8',
-          name: 'Luganodes',
-          commission: 2.5,
-          uptime: 99.9,
-          totalDelegated: '2500000000',
+          address: '0x6215cf116c6a96872486cdc7cb50f52e515ccd15',
+          name: 'StakeCraft 🔥 0% Fee',
+          commission: 0.0,
+          uptime: 96.71,
+          totalDelegated: '585024',
           apy: 6.8,
-          description: 'Enterprise-grade validator with 99.9% uptime'
+          description: 'ZERO commission validator - USER DELEGATED! ✅',
+          status: 'ACTIVE_DELEGATION',
+          officialUrl: 'https://staking.polygon.technology/'
         },
         {
           id: 2,
-          address: '0x9F234Ba0A3f7a3D4F8b5B2A6B5B3E9F4C5A4B9D7',
-          name: 'Kiln',
-          commission: 3.0,
-          uptime: 99.95,
-          totalDelegated: '1800000000',
-          apy: 6.5,
-          description: 'Institutional staking with highest security standards'
+          address: '0x2bfe6bd51977491fe18eecd309e9030e8a79b869',
+          name: 'LinkPool',
+          commission: 0.0,
+          uptime: 95.43,
+          totalDelegated: '1606378',
+          apy: 6.8,
+          description: 'Enterprise-grade validator with 0% commission - BACKUP OPTION',
+          status: 'RECOMMENDED',
+          officialUrl: 'https://staking.polygon.technology/'
         },
         {
           id: 3,
-          address: '0x8E567Ba0A3f7a3D4F8b5B2A6B5B3E9F4C5A4B9E6',
-          name: 'Stakin',
-          commission: 2.8,
-          uptime: 99.8,
-          totalDelegated: '1500000000',
+          address: '0x65690a7f05b96d041ce4d12bef23c91cd37bd0af',
+          name: 'BCW Technologies',
+          commission: 3.0,
+          uptime: 98.14,
+          totalDelegated: '1563294',
           apy: 6.6,
-          description: 'Community-focused validator with strong performance'
+          description: 'High-performance validator with low 3% commission',
+          status: 'ALTERNATIVE',
+          officialUrl: 'https://staking.polygon.technology/'
+        },
+        {
+          id: 4,
+          address: '0xae09a7bcbcff2fd81f98f90eda73bd80b6883741',
+          name: 'Mantra Chain',
+          commission: 0.0,
+          uptime: 96.71,
+          totalDelegated: '280944',
+          apy: 6.8,
+          description: '0% commission alternative validator',
+          status: 'ALTERNATIVE',
+          officialUrl: 'https://staking.polygon.technology/'
         }
       ];
 

@@ -46,6 +46,8 @@ interface PoolInfo {
   participants: number;
 }
 
+import StakeCraftIntegration from './StakeCraftIntegration';
+
 export default function PolStakingDashboard() {
   const [validators, setValidators] = useState<Validator[]>([]);
   const [stakingStats, setStakingStats] = useState<StakingStats | null>(null);
@@ -197,13 +199,19 @@ export default function PolStakingDashboard() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="stakecraft" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="stakecraft" className="bg-green-600 text-white font-bold">StakeCraft ✅</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="validators">Validators</TabsTrigger>
           <TabsTrigger value="dual-rewards">Dual Rewards</TabsTrigger>
           <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
+
+        {/* StakeCraft Tab - NEW */}
+        <TabsContent value="stakecraft" className="space-y-4">
+          <StakeCraftIntegration />
+        </TabsContent>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
