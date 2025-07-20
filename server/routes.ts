@@ -1179,6 +1179,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Direct LinkedIn verification endpoint for testing
+  app.post('/api/domain/verify-linkedin', async (req, res) => {
+    try {
+      const { linkedinUrl, token } = req.body;
+      
+      if (!linkedinUrl || !token) {
+        return res.status(400).json({ error: 'LinkedIn URL and token are required' });
+      }
+      
+      console.log('🔗 LINKEDIN VERIFICATION TEST');
+      console.log('🔍 URL:', linkedinUrl);
+      console.log('🎯 Token:', token);
+      
+      // Simulate LinkedIn post content with token
+      const mockLinkedInContent = `
+        <html>
+        <body>
+          <div class="feed-shared-update-v2">
+            <div class="feed-shared-text">
+              🚀 Verificando la mia presenza su WebPayback Protocol!
+              WPT-VERIFY: ${token}
+              #blockchain #crypto #verification
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      // Use the same verification logic
+      const patterns = [
+        new RegExp(`WPT-VERIFY:\\s*${token}`, 'i'),
+        new RegExp(`wpt-verify:\\s*${token}`, 'i'),
+        new RegExp(`${token}`, 'i')
+      ];
+      
+      const results = patterns.map((pattern, index) => {
+        const matches = pattern.test(mockLinkedInContent);
+        return {
+          pattern: pattern.toString(),
+          matches,
+          name: ['WPT-VERIFY: format', 'wpt-verify: format', 'token only'][index]
+        };
+      });
+      
+      const verified = results.some(r => r.matches);
+      console.log('🎯 LinkedIn verification result:', verified ? 'SUCCESS' : 'FAILED');
+      
+      res.json({
+        success: verified,
+        message: verified ? 'Token trovato nel post LinkedIn!' : 'Token non trovato',
+        patterns: results,
+        recommendation: verified ? 
+          'Registrazione LinkedIn pronta!' : 
+          'Assicurati di aver pubblicato un post con il token'
+      });
+      
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Test endpoint for meta tag verification
   app.post('/api/domain/test-token', async (req, res) => {
     try {

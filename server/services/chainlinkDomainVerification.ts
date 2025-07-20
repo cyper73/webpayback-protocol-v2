@@ -1,5 +1,6 @@
 import { storage } from '../storage';
 import { InsertDomainVerification, DomainVerification } from '@shared/schema';
+import fetch from 'node-fetch';
 
 interface ChainlinkDomainCheckResult {
   domain: string;
@@ -516,20 +517,31 @@ Steps:
     console.log('🔗 Looking for verification token:', verificationToken);
     
     try {
-      // Attempt real HTTP fetch
+      // Attempt real HTTP fetch with proper node-fetch syntax
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'User-Agent': 'WebPayback-Verifier/1.0',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-        },
-        timeout: 10000 // 10 second timeout
+        }
       });
       
       if (response.ok) {
         const content = await response.text();
         console.log('🔗 SUCCESS: Real page content fetched, length:', content.length);
         console.log('🔗 Content preview:', content.substring(0, 300));
+        
+        // If we have the verification token, check if it exists in content
+        if (verificationToken) {
+          const tokenFound = content.toLowerCase().includes(verificationToken.toLowerCase());
+          console.log('🔗 Token search result:', tokenFound ? 'FOUND' : 'NOT FOUND');
+          
+          if (tokenFound) {
+            console.log('🔗 RETURN: Content with token found');
+            return content;
+          }
+        }
+        
         return content;
       } else {
         console.log('🔗 HTTP Error:', response.status, response.statusText);
