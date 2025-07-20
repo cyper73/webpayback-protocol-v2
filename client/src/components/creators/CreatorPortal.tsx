@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertCreatorSchema } from "@shared/schema";
+import { insertCreatorSchema, contentCategoryEnum, type InsertCreator } from "@shared/schema";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +43,7 @@ export default function CreatorPortal() {
     defaultValues: {
       websiteUrl: "",
       walletAddress: "",
-      contentCategory: "",
+      contentCategory: "blog_articles" as const,
       termsAccepted: false
     }
   });
@@ -526,15 +526,17 @@ export default function CreatorPortal() {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="blog">Blog/Articles</SelectItem>
-                <SelectItem value="news">News/Journalism</SelectItem>
-                <SelectItem value="educational">Educational Content</SelectItem>
-                <SelectItem value="technical">Technical Documentation</SelectItem>
-                <SelectItem value="creative">Creative Writing</SelectItem>
-                <SelectItem value="art">Art/Visual Content</SelectItem>
-                <SelectItem value="music">Music/Audio Content</SelectItem>
-                <SelectItem value="gaming">Videogame/Gaming</SelectItem>
-                <SelectItem value="sports">Sports/Fitness</SelectItem>
+                <SelectItem value="blog_articles">Blog/Articles</SelectItem>
+                <SelectItem value="news_journalism">News/Journalism</SelectItem>
+                <SelectItem value="educational_content">Educational Content</SelectItem>
+                <SelectItem value="technical_documentation">Technical Documentation</SelectItem>
+                <SelectItem value="creative_writing">Creative Writing</SelectItem>
+                <SelectItem value="art_design">Art/Design</SelectItem>
+                <SelectItem value="music_audio">Music/Audio</SelectItem>
+                <SelectItem value="video_content">Video Content</SelectItem>
+                <SelectItem value="social_media">Social Media</SelectItem>
+                <SelectItem value="academic_papers">Academic Papers</SelectItem>
+                <SelectItem value="photography">Photography</SelectItem>
               </SelectContent>
             </Select>
             {errors.contentCategory && (

@@ -439,6 +439,21 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+// Content category enum aligned with Qloo Cultural Intelligence categories
+export const contentCategoryEnum = z.enum([
+  "blog_articles",
+  "news_journalism", 
+  "educational_content",
+  "technical_documentation",
+  "creative_writing",
+  "art_design",
+  "music_audio",
+  "video_content",
+  "social_media",
+  "academic_papers",
+  "photography"
+]);
+
 export const insertCreatorSchema = createInsertSchema(creators).pick({
   userId: true,
   websiteUrl: true,
@@ -449,6 +464,8 @@ export const insertCreatorSchema = createInsertSchema(creators).pick({
   channelName: true,
   channelVerificationUrl: true,
   monitoringScope: true,
+}).extend({
+  contentCategory: contentCategoryEnum
 });
 
 export const insertChannelContentMappingSchema = createInsertSchema(channelContentMappings).pick({
