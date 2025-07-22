@@ -271,13 +271,12 @@ class ContentMonitoringService {
       try {
         const fakeCreatorCheck = await fakeCreatorDetection.detectFakeCreator(creator.id, creator.websiteUrl);
         
-        if (fakeCreatorCheck.isSuspicious) {
+        if (fakeCreatorCheck.shouldBlock) {
           console.log(`🚨 FAKE CREATOR DETECTED - Blocking reward:
             Creator: ${creator.name || creator.id}
             URL: ${creator.websiteUrl}
-            Similarity Score: ${fakeCreatorCheck.similarity}%
-            Risk Level: ${fakeCreatorCheck.riskLevel}
-            Matched Domain: ${fakeCreatorCheck.matchedDomain}
+            Similarity Score: ${fakeCreatorCheck.similarityScore}%
+            Risk Score: ${fakeCreatorCheck.riskScore}%
             Evidence: ${fakeCreatorCheck.evidence}`);
           return false; // Block the reward
         }
@@ -315,7 +314,7 @@ class ContentMonitoringService {
       
       // Apply reputation penalty if applicable
       const reputationScore = await storage.getCreatorReputationScore(creator.id);
-      if (reputationScore && reputationScore.overallScore < 70) {
+      if (reputationScore && reputationScore.overallScore !== null && reputationScore.overallScore < 70) {
         const penaltyMultiplier = Math.max(0.1, reputationScore.overallScore / 100);
         rewardAmount = (parseFloat(rewardAmount) * penaltyMultiplier).toFixed(8);
         console.log(`⚠️ Reputation penalty applied: ${penaltyMultiplier.toFixed(2)}x`);
@@ -360,7 +359,6 @@ class ContentMonitoringService {
             await gasManager.queueReward({
               creatorId: creator.id,
               amount: rewardAmount,
-              tokenType: "WPT",
               transactionHash: `mev-protected-${commitResult.commitHash.slice(0, 16)}`,
               status: "pending",
               metadata: {
@@ -383,7 +381,6 @@ class ContentMonitoringService {
         await gasManager.queueReward({
           creatorId: creator.id,
           amount: rewardAmount,
-          tokenType: "WPT",
           transactionHash: `0x${Date.now().toString(16)}`,
           status: "pending",
           metadata: {
