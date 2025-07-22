@@ -2624,6 +2624,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download endpoint for updated routes.ts file
+  app.get("/api/download/routes", (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const routesPath = path.join(__dirname, 'routes.ts');
+      
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="routes.ts"');
+      
+      const content = fs.readFileSync(routesPath, 'utf8');
+      res.send(content);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to download file' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
