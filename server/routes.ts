@@ -510,6 +510,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         aiType = 'gpt';
         confidence = 0.9;
         console.log('✅ DETECTED: GPT AI (confidence: 90%)');
+      } else if (lowerUA.includes('gemini') || lowerUA.includes('bard') || lowerUA.includes('google-ai')) {
+        aiType = 'gemini';
+        confidence = 0.85;
+        console.log('✅ DETECTED: Gemini AI (confidence: 85%)');
       } else if (lowerUA.includes('ai-agent') || lowerUA.includes('bot')) {
         aiType = 'bot';
         confidence = 0.7;
@@ -517,6 +521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         confidence = 0.4; // Default low confidence
         console.log('❌ NO CLEAR AI PATTERN DETECTED (confidence: 40%)');
+        console.log(`   User-Agent analizzato: ${userAgent}`);
       }
       
       if (confidence < 0.5) {
@@ -546,6 +551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (aiType === 'perplexity') rewardAmount = 1.0;
       if (aiType === 'claude') rewardAmount = 1.5;
       if (aiType === 'gpt') rewardAmount = 1.3;
+      if (aiType === 'gemini') rewardAmount = 1.2;
       
       // Track the access in database
       const trackingData = {
