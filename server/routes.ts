@@ -518,6 +518,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         aiType = 'deepseek';
         confidence = 0.88;
         console.log('✅ DETECTED: DeepSeek AI (confidence: 88%)');
+      } else if (lowerUA.includes('grok') || lowerUA.includes('xai')) {
+        aiType = 'grok';
+        confidence = 0.92;
+        console.log('✅ DETECTED: Grok AI (confidence: 92%)');
       } else if (lowerUA.includes('ai-agent') || lowerUA.includes('bot')) {
         aiType = 'bot';
         confidence = 0.7;
@@ -557,6 +561,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (aiType === 'gpt') rewardAmount = 1.3;
       if (aiType === 'gemini') rewardAmount = 1.2;
       if (aiType === 'deepseek') rewardAmount = 0.99;
+      if (aiType === 'grok') rewardAmount = 1.25;
       
       // Track the access in database
       const trackingData = {
