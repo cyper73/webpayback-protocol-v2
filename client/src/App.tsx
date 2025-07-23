@@ -9,12 +9,14 @@ import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import TestConnectivity from "@/pages/test-connectivity";
 import PolStakingPage from "@/pages/PolStakingPage";
+import Citations from "@/pages/Citations";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/staking" component={PolStakingPage} />
+      <Route path="/citations" component={Citations} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route component={NotFound} />

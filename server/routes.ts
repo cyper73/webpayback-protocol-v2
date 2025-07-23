@@ -13,12 +13,15 @@ import { aiKnowledgeTrackingService } from "./services/aiKnowledgeTracking";
 import { poolDrainProtectionService } from "./services/poolDrainProtection";
 import { fakeCreatorDetection } from "./services/fakeCreatorDetection";
 import { reentrancyProtection } from "./services/reentrancyProtection";
+import { citationRewardEngine } from "./services/citationRewardEngine";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
   insertContentTrackingSchema,
   insertRewardDistributionSchema,
-  insertBlockchainNetworkSchema
+  insertBlockchainNetworkSchema,
+  insertCitationTrackingSchema,
+  insertAiKnowledgeIndexSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { 
@@ -245,6 +248,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       addresses: addresses.map(addr => addr.slice(0, 6) + '...' + addr.slice(-4)), // Privacy protection
       note: "These addresses have triggered reentrancy protection warnings"
     });
+  });
+
+  // ===== CITATION-BASED REWARDS ENDPOINTS =====
+  
+  // Process a citation event
+  app.post("/api/citations/process", enhancedCSRFProtection, contentTrackingRateLimit, async (req, res) => {
+    try {
+      const validatedData = insertCitationTrackingSchema.parse(req.body);
+      
+      const result = await citationRewardEngine.processCitation({
+        sourceUrl: validatedData.sourceUrl,
+        citationContext: validatedData.citationContext,
+        citationType: validatedData.citationType as any,
+        querySource: validatedData.querySource,
+        aiModel: validatedData.aiModel,
+        userAgent: validatedData.userAgent,
+        sessionId: validatedData.sessionId,
+        confidence: parseFloat(validatedData.citationConfidence || "0.95"),
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Citation processing error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error.message) 
+      });
+    }
+  });
+
+  // Get citation statistics for a creator
+  app.get("/api/citations/stats/:creatorId", authorizeCreatorAccess, async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const stats = await citationRewardEngine.getCitationStats(creatorId);
+      res.json({ success: true, stats });
+    } catch (error) {
+      console.error('Citation stats error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error.message) 
+      });
+    }
+  });
+
+  // Simulate citation reward (for testing)
+  app.post("/api/citations/simulate", generalRateLimit, async (req, res) => {
+    try {
+      const { creatorUrl, userQuery, aiModel, citationType } = req.body;
+      
+      if (!creatorUrl || !userQuery || !aiModel) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Missing required parameters: creatorUrl, userQuery, aiModel" 
+        });
+      }
+
+      const result = await citationRewardEngine.simulateCitation({
+        creatorUrl,
+        userQuery,
+        aiModel,
+        citationType
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Citation simulation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error.message) 
+      });
+    }
   });
   
   // Initialize AI agents

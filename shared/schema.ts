@@ -89,6 +89,38 @@ export const contentTracking = pgTable("content_tracking", {
   metadata: jsonb("metadata").default({}),
 });
 
+// New table for citation-based rewards
+export const citationTracking = pgTable("citation_tracking", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  sourceUrl: text("source_url").notNull(), // Original creator content URL
+  citationContext: text("citation_context").notNull(), // What part was cited/used
+  citationType: text("citation_type").default("content_reference"), // content_reference, direct_quote, paraphrase, factual_data
+  querySource: text("query_source").notNull(), // User query that triggered the citation
+  aiModel: text("ai_model").notNull(), // AI that provided the citation
+  userAgent: text("user_agent"), // Browser/app that made the query
+  sessionId: text("session_id"), // To track related queries
+  citationConfidence: decimal("citation_confidence", { precision: 3, scale: 2 }).default("0.95"),
+  rewardAmount: decimal("reward_amount", { precision: 18, scale: 8 }).default("0"),
+  timestamp: timestamp("timestamp").defaultNow(),
+  metadata: jsonb("metadata").default({}), // Additional context
+});
+
+// Track AI memory/knowledge that may lead to future citations
+export const aiKnowledgeIndex = pgTable("ai_knowledge_index", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  contentFingerprint: text("content_fingerprint").notNull(), // Unique identifier for content
+  contentSummary: text("content_summary"), // AI-generated summary of the content
+  keyTopics: text("key_topics").array(), // Topics/keywords for citation matching
+  accessTimestamp: timestamp("access_timestamp").defaultNow(), // When AI first accessed this content
+  lastCitationDate: timestamp("last_citation_date"), // Most recent citation
+  totalCitations: integer("total_citations").default(0),
+  cumulativeRewards: decimal("cumulative_rewards", { precision: 18, scale: 8 }).default("0"),
+  knowledgeDecayFactor: decimal("knowledge_decay_factor", { precision: 3, scale: 2 }).default("1.00"), // Decrease over time
+  isActive: boolean("is_active").default(true),
+});
+
 export const rewardDistributions = pgTable("reward_distributions", {
   id: serial("id").primaryKey(),
   creatorId: integer("creator_id").references(() => creators.id),
@@ -606,14 +638,20 @@ export const insertRewardPoolLimitsSchema = createInsertSchema(rewardPoolLimits)
   isActive: true,
 });
 
-export const insertPoolDrainProtectionSchema = createInsertSchema(poolDrainProtection).pick({
-  protectionType: true,
-  threshold: true,
-  currentValue: true,
-  timeWindow: true,
-  windowStart: true,
-  isTriggered: true,
-  metadata: true,
+export const insertPoolDrainProtectionSchema = createInsertSchema(poolDrainProtection).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCitationTrackingSchema = createInsertSchema(citationTracking).omit({
+  id: true,
+  timestamp: true,
+});
+
+export const insertAiKnowledgeIndexSchema = createInsertSchema(aiKnowledgeIndex).omit({
+  id: true,
+  accessTimestamp: true,
+  lastCitationDate: true,
 });
 
 export const insertRewardPoolSecuritySchema = createInsertSchema(rewardPoolSecurity).pick({
@@ -685,6 +723,13 @@ export type PoolDrainProtection = typeof poolDrainProtection.$inferSelect;
 
 export type InsertRewardPoolSecurity = z.infer<typeof insertRewardPoolSecuritySchema>;
 export type RewardPoolSecurity = typeof rewardPoolSecurity.$inferSelect;
+
+// Citation-based reward types
+export type InsertCitationTracking = z.infer<typeof insertCitationTrackingSchema>;
+export type CitationTracking = typeof citationTracking.$inferSelect;
+
+export type InsertAiKnowledgeIndex = z.infer<typeof insertAiKnowledgeIndexSchema>;
+export type AiKnowledgeIndex = typeof aiKnowledgeIndex.$inferSelect;
 
 // Reentrancy Protection Schema
 export const reentrancyProtectionLogs = pgTable("reentrancy_protection_logs", {
