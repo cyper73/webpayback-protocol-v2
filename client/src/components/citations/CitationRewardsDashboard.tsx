@@ -27,11 +27,20 @@ interface CitationRewardsDashboardProps {
 }
 
 export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboardProps) {
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: response, isLoading: statsLoading, error } = useQuery({
     queryKey: ['/api/citations/stats', creatorId],
     enabled: !!creatorId,
     refetchInterval: 5000,
   });
+
+  // Extract stats from the response wrapper
+  const stats = response?.stats;
+
+  // Debug logging
+  console.log('Citations API Response:', response);
+  console.log('Extracted stats:', stats);
+  console.log('Loading state:', statsLoading);
+  console.log('Error:', error);
 
   const getCitationTypeColor = (type: string) => {
     switch (type) {
