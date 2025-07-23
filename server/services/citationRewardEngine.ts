@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { citationTracking, aiKnowledgeIndex, creators, rewardDistributions } from "@shared/schema";
+import { citationTracking, aiKnowledgeIndex, creators, rewardDistributions, contentTracking } from "@shared/schema";
 import { eq, sql, and, desc } from "drizzle-orm";
 
 export interface CitationEvent {
@@ -228,7 +228,7 @@ export class CitationRewardEngine {
   }
 
   /**
-   * Get citation statistics for a creator
+   * Get citation statistics for a creator - using AUTHENTIC content_tracking data
    */
   async getCitationStats(creatorId: number): Promise<{
     totalCitations: number;
@@ -237,54 +237,96 @@ export class CitationRewardEngine {
     citationsByAI: Record<string, number>;
     recentCitations: any[];
   }> {
-    // Get total citations and rewards
-    const stats = await db
-      .select({
-        totalCitations: sql<number>`count(*)`,
-        totalRewards: sql<number>`sum(${citationTracking.rewardAmount})`,
-      })
-      .from(citationTracking)
-      .where(eq(citationTracking.creatorId, creatorId));
+    try {
+      // Use imported contentTracking table
+      
+      // Get total authentic accesses and rewards from content_tracking
+      const stats = await db
+        .select({
+          totalCitations: sql<number>`count(*)`,
+          totalRewards: sql<number>`sum(${contentTracking.rewardAmount})`,
+        })
+        .from(contentTracking)
+        .where(eq(contentTracking.creatorId, creatorId));
 
-    // Get citations by type
-    const citationsByType = await db
-      .select({
-        type: citationTracking.citationType,
-        count: sql<number>`count(*)`,
-      })
-      .from(citationTracking)
-      .where(eq(citationTracking.creatorId, creatorId))
-      .groupBy(citationTracking.citationType);
+      // Get accesses by AI model
+      const citationsByAI = await db
+        .select({
+          aiModel: contentTracking.aiModel,
+          count: sql<number>`count(*)`,
+        })
+        .from(contentTracking)
+        .where(eq(contentTracking.creatorId, creatorId))
+        .groupBy(contentTracking.aiModel);
 
-    // Get citations by AI model
-    const citationsByAI = await db
-      .select({
-        aiModel: citationTracking.aiModel,
-        count: sql<number>`count(*)`,
-      })
-      .from(citationTracking)
-      .where(eq(citationTracking.creatorId, creatorId))
-      .groupBy(citationTracking.aiModel);
+      // Get recent authentic accesses
+      const recentAccesses = await db
+        .select()
+        .from(contentTracking)
+        .where(eq(contentTracking.creatorId, creatorId))
+        .orderBy(desc(contentTracking.timestamp))
+        .limit(10);
 
-    // Get recent citations
-    const recentCitations = await db
-      .select()
-      .from(citationTracking)
-      .where(eq(citationTracking.creatorId, creatorId))
-      .orderBy(desc(citationTracking.timestamp))
-      .limit(10);
+      // Convert content_tracking records to citation format for display
+      const recentCitations = recentAccesses.map(access => {
+        let sourceUrl = 'Unknown Source';
+        let citationContext = 'AI content access detected';
+        
+        // Extract URL from metadata if available
+        try {
+          const metadata = access.metadata as any;
+          if (metadata?.url) {
+            sourceUrl = metadata.url;
+          }
+          if (metadata?.fingerprint?.title) {
+            citationContext = `AI accessed content: "${metadata.fingerprint.title}"`;
+          }
+        } catch (e) {
+          // Use defaults if metadata parsing fails
+        }
 
-    return {
-      totalCitations: stats[0]?.totalCitations || 0,
-      totalRewards: stats[0]?.totalRewards || 0,
-      citationsByType: Object.fromEntries(
-        citationsByType.map(item => [item.type, item.count])
-      ),
-      citationsByAI: Object.fromEntries(
-        citationsByAI.map(item => [item.aiModel, item.count])
-      ),
-      recentCitations,
-    };
+        return {
+          id: access.id,
+          creatorId: access.creatorId,
+          sourceUrl,
+          citationContext,
+          citationType: 'content_reference', // Default type for authentic accesses
+          querySource: 'Authentic AI content access',
+          aiModel: access.aiModel || 'unknown',
+          userAgent: null,
+          sessionId: null,
+          citationConfidence: access.detectionConfidence || 0.85,
+          rewardAmount: access.rewardAmount,
+          timestamp: access.timestamp,
+          metadata: access.metadata
+        };
+      });
+
+      // Create citation types based on authentic access patterns
+      const citationsByType = {
+        'content_reference': stats[0]?.totalCitations || 0
+      };
+
+      return {
+        totalCitations: stats[0]?.totalCitations || 0,
+        totalRewards: parseFloat(stats[0]?.totalRewards?.toString() || '0'),
+        citationsByType,
+        citationsByAI: Object.fromEntries(
+          citationsByAI.map(item => [item.aiModel || 'unknown', item.count])
+        ),
+        recentCitations,
+      };
+    } catch (error) {
+      console.error('Error getting authentic citation stats:', error);
+      // Return empty stats if error occurs
+      return {
+        totalCitations: 0,
+        totalRewards: 0,
+        citationsByType: {},
+        citationsByAI: {},
+        recentCitations: [],
+      };
+    }
   }
 
   /**
