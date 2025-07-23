@@ -107,9 +107,9 @@ export default function Dashboard() {
       </header>
 
       {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
-        <div className="mb-8">
+        <div className="mb-6">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -251,15 +251,15 @@ export default function Dashboard() {
         </div>
 
         {/* Creator Registration Portal - Priority Section */}
-        <div className="mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <CreatorPortal />
             <GasTracker />
           </div>
         </div>
 
         {/* Agent Collaboration Panel */}
-        <div className="mb-8">
+        <div className="mb-6">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -283,36 +283,36 @@ export default function Dashboard() {
         </div>
 
         {/* Inter-Agent Communication */}
-        <div className="mb-8">
+        <div className="mb-6">
           <AgentCommunication />
         </div>
 
         {/* Multi-Chain Deployment Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2">
             <MultiChainDeployment networks={networks} />
           </div>
           
           {/* Real-time Analytics */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <LiveStats stats={stats} />
           </div>
         </div>
 
         {/* Token Economics and Pool Management */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <TokenEconomics />
           <TokenInfo />
         </div>
 
         {/* Creator Rewards & Governance */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <RewardDistribution />
           <ComplianceMonitor />
         </div>
 
         {/* Qloo Cultural Intelligence Dashboard */}
-        <div className="mb-8">
+        <div className="mb-6">
           <Card className="glass-card rounded-2xl shadow-neon-purple border-purple-500/30">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -332,34 +332,25 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Pool Drain Protection */}
-        <div className="mb-8">
+        {/* Security & Monitoring Systems */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <PoolDrainProtection />
-        </div>
-
-        {/* Fake Creator Detection */}
-        <div className="mb-8">
           <FakeCreatorDetection />
         </div>
-
-        {/* Reentrancy Protection */}
-        <div className="mb-8">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <ReentrancyProtection />
-        </div>
-
-        {/* Alchemy API Usage Monitoring */}
-        <div className="mb-8">
           <AlchemyUsageMonitor />
         </div>
 
         {/* Network Switcher */}
-        <div className="mb-8">
+        <div className="mb-6">
           <NetworkSwitcher />
         </div>
       </main>
 
       {/* Footer with Privacy Policy */}
-      <footer className="glass-card border-t border-white/10 mt-12">
+      <footer className="glass-card border-t border-white/10 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
