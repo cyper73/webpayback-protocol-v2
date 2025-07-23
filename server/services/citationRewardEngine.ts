@@ -267,17 +267,21 @@ export class CitationRewardEngine {
         .orderBy(desc(contentTracking.timestamp))
         .limit(10);
 
+      // Get creator info for source URL
+      const [creatorInfo] = await db
+        .select({ websiteUrl: creators.websiteUrl })
+        .from(creators)
+        .where(eq(creators.id, creatorId))
+        .limit(1);
+
       // Convert content_tracking records to citation format for display
       const recentCitations = recentAccesses.map(access => {
-        let sourceUrl = 'Unknown Source';
+        let sourceUrl = creatorInfo?.websiteUrl || 'Unknown Source'; // Use REAL creator URL
         let citationContext = 'AI content access detected';
         
-        // Extract URL from metadata if available
+        // Extract more details from metadata if available
         try {
           const metadata = access.metadata as any;
-          if (metadata?.url) {
-            sourceUrl = metadata.url;
-          }
           if (metadata?.fingerprint?.title) {
             citationContext = `AI accessed content: "${metadata.fingerprint.title}"`;
           }
@@ -295,8 +299,8 @@ export class CitationRewardEngine {
           aiModel: access.aiModel || 'unknown',
           userAgent: null,
           sessionId: null,
-          citationConfidence: access.detectionConfidence || 0.85,
-          rewardAmount: access.rewardAmount,
+          citationConfidence: access.detectionConfidence || '0.85',
+          rewardAmount: access.rewardAmount || '0.00000000',
           timestamp: access.timestamp,
           metadata: access.metadata
         };
