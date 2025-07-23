@@ -1,107 +1,58 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Quote, Search, TrendingUp, Zap, Brain, Coins } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Quote, Coins, TrendingUp, Brain, Globe, Bot, Sparkles } from 'lucide-react';
 
 interface CitationStats {
-  totalCitations: string | number;
-  totalRewards: string | number;
-  citationsByType: Record<string, string | number>;
-  citationsByAI: Record<string, string | number>;
-  recentCitations: any[];
+  totalCitations: number;
+  totalRewards: number;
+  citationsByType: Record<string, number>;
+  citationsByAI: Record<string, number>;
+  recentCitations: Array<{
+    id: number;
+    aiModel: string;
+    citationType: string;
+    sourceUrl: string;
+    citationContext: string;
+    rewardAmount: number;
+    createdAt: string;
+  }>;
 }
 
-export function CitationRewardsDashboard() {
-  const [selectedCreatorId, setSelectedCreatorId] = useState<number>(4); // Default creator
-  const [simulationData, setSimulationData] = useState({
-    creatorUrl: 'https://marcosantoriello.it',
-    userQuery: '',
-    aiModel: 'claude',
-    citationType: 'content_reference'
+interface CitationRewardsDashboardProps {
+  creatorId: number;
+}
+
+export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboardProps) {
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['/api/citations/stats', creatorId],
+    enabled: !!creatorId,
+    refetchInterval: 5000,
   });
-
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Fetch citation statistics
-  const { data: citationStats, isLoading: statsLoading } = useQuery<CitationStats>({
-    queryKey: ['/api/citations/stats', selectedCreatorId],
-    enabled: !!selectedCreatorId,
-    refetchInterval: 5000, // Refresh every 5 seconds
-    refetchOnWindowFocus: true,
-  });
-
-  // Extract stats from nested API response
-  const stats = citationStats?.stats || citationStats;
-
-  // Simulate citation mutation
-  const simulateCitationMutation = useMutation({
-    mutationFn: async (data: typeof simulationData) => {
-      const response = await fetch('/api/citations/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to simulate citation');
-      return response.json();
-    },
-    onSuccess: (result) => {
-      toast({
-        title: "Citation Simulated Successfully!",
-        description: `${result.message} - Reward: ${result.rewardAmount} WPT`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/citations/stats'] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Simulation Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  });
-
-  const handleSimulation = () => {
-    if (!simulationData.userQuery.trim()) {
-      toast({
-        title: "Missing Query",
-        description: "Please enter a user query to simulate",
-        variant: "destructive",
-      });
-      return;
-    }
-    simulateCitationMutation.mutate(simulationData);
-  };
 
   const getCitationTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      'direct_quote': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-      'content_reference': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      'paraphrase': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      'factual_data': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-    };
-    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    switch (type) {
+      case 'direct_quote': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      case 'content_reference': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'paraphrase': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'factual_data': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
   };
 
   const getAIModelIcon = (model: string) => {
-    const icons: Record<string, React.ReactNode> = {
-      'claude': <Brain className="w-4 h-4" />,
-      'gpt': <Zap className="w-4 h-4" />,
-      'grok': <TrendingUp className="w-4 h-4" />,
-      'gemini': <Search className="w-4 h-4" />,
-      'perplexity': <Quote className="w-4 h-4" />,
-      'deepseek': <AlertCircle className="w-4 h-4" />,
-    };
-    return icons[model] || <Brain className="w-4 h-4" />;
+    switch (model.toLowerCase()) {
+      case 'claude': return <Bot className="h-4 w-4 text-orange-600" />;
+      case 'gpt': case 'chatgpt': return <Sparkles className="h-4 w-4 text-green-600" />;
+      case 'gemini': return <Globe className="h-4 w-4 text-blue-600" />;
+      case 'grok': return <Brain className="h-4 w-4 text-purple-600" />;
+      case 'perplexity': return <TrendingUp className="h-4 w-4 text-teal-600" />;
+      case 'deepseek': return <Quote className="h-4 w-4 text-indigo-600" />;
+      default: return <Bot className="h-4 w-4 text-gray-600" />;
+    }
   };
 
   return (
@@ -122,9 +73,8 @@ export function CitationRewardsDashboard() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="simulator">Citation Simulator</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
@@ -241,129 +191,49 @@ export function CitationRewardsDashboard() {
             </Card>
 
             <Card>
-            <CardHeader>
-              <CardTitle>Recent Citations</CardTitle>
-              <CardDescription>
-                Latest AI citations of your content with reward details
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {statsLoading ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Loading recent citations...
-                  </div>
-                ) : stats?.recentCitations?.length > 0 ? (
-                  stats.recentCitations.slice(0, 5).map((citation: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        {getAIModelIcon(citation.aiModel)}
-                        <div>
-                          <div className="font-medium">{citation.aiModel.toUpperCase()} Citation</div>
-                          <div className="text-sm text-muted-foreground">
-                            {citation.citationContext?.slice(0, 60)}...
+              <CardHeader>
+                <CardTitle>Recent Citations</CardTitle>
+                <CardDescription>
+                  Latest AI citations of your content with reward details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {statsLoading ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Loading recent citations...
+                    </div>
+                  ) : stats?.recentCitations?.length > 0 ? (
+                    stats.recentCitations.slice(0, 5).map((citation: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          {getAIModelIcon(citation.aiModel)}
+                          <div>
+                            <div className="font-medium">{citation.aiModel.toUpperCase()} Citation</div>
+                            <div className="text-sm text-muted-foreground">
+                              {citation.citationContext?.slice(0, 60)}...
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge className={getCitationTypeColor(citation.citationType)}>
+                            {citation.citationType.replace('_', ' ')}
+                          </Badge>
+                          <div className="text-sm font-medium text-green-600 mt-1">
+                            +{citation.rewardAmount} WPT
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge className={getCitationTypeColor(citation.citationType)}>
-                          {citation.citationType.replace('_', ' ')}
-                        </Badge>
-                        <div className="text-sm font-medium text-green-600 mt-1">
-                          +{citation.rewardAmount} WPT
-                        </div>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No citations recorded yet. Citations will appear when AI systems reference your content.
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No citations recorded yet. Test the system using the Citation Simulator.
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="simulator" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Citation Simulator</CardTitle>
-              <CardDescription>
-                Test the citation-based reward system by simulating AI queries
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="creatorUrl">Creator URL</Label>
-                  <Input
-                    id="creatorUrl"
-                    value={simulationData.creatorUrl}
-                    onChange={(e) => setSimulationData({...simulationData, creatorUrl: e.target.value})}
-                    placeholder="https://creator-website.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="aiModel">AI Model</Label>
-                  <Select
-                    value={simulationData.aiModel}
-                    onValueChange={(value) => setSimulationData({...simulationData, aiModel: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="claude">Claude (1.3x multiplier)</SelectItem>
-                      <SelectItem value="gpt">GPT (1.2x multiplier)</SelectItem>
-                      <SelectItem value="grok">Grok (1.25x multiplier)</SelectItem>
-                      <SelectItem value="gemini">Gemini (1.1x multiplier)</SelectItem>
-                      <SelectItem value="perplexity">Perplexity (1.0x multiplier)</SelectItem>
-                      <SelectItem value="deepseek">DeepSeek (0.9x multiplier)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="citationType">Citation Type</Label>
-                <Select
-                  value={simulationData.citationType}
-                  onValueChange={(value) => setSimulationData({...simulationData, citationType: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="direct_quote">Direct Quote (1.5x multiplier)</SelectItem>
-                    <SelectItem value="content_reference">Content Reference (1.2x multiplier)</SelectItem>
-                    <SelectItem value="paraphrase">Paraphrase (1.0x multiplier)</SelectItem>
-                    <SelectItem value="factual_data">Factual Data (0.8x multiplier)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="userQuery">User Query</Label>
-                <Textarea
-                  id="userQuery"
-                  value={simulationData.userQuery}
-                  onChange={(e) => setSimulationData({...simulationData, userQuery: e.target.value})}
-                  placeholder="What question would a user ask that would cause the AI to cite this content?"
-                  rows={3}
-                />
-              </div>
-
-              <Button 
-                onClick={handleSimulation}
-                disabled={simulateCitationMutation.isPending}
-                className="w-full"
-              >
-                {simulateCitationMutation.isPending ? 'Simulating...' : 'Simulate Citation'}
-              </Button>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
@@ -375,7 +245,7 @@ export function CitationRewardsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {Object.entries(citationStats?.citationsByType || {}).map(([type, count]) => (
+                  {Object.entries(stats?.citationsByType || {}).map(([type, count]) => (
                     <div key={type} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Badge className={getCitationTypeColor(type)}>
@@ -385,7 +255,7 @@ export function CitationRewardsDashboard() {
                       <div className="text-right">
                         <div className="text-sm font-medium">{count} citations</div>
                         <Progress 
-                          value={(count / (citationStats?.totalCitations || 1)) * 100} 
+                          value={(Number(count) / (Number(stats?.totalCitations) || 1)) * 100} 
                           className="w-20 h-2"
                         />
                       </div>
@@ -402,7 +272,7 @@ export function CitationRewardsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {Object.entries(citationStats?.citationsByAI || {}).map(([ai, count]) => (
+                  {Object.entries(stats?.citationsByAI || {}).map(([ai, count]) => (
                     <div key={ai} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         {getAIModelIcon(ai)}
@@ -411,7 +281,7 @@ export function CitationRewardsDashboard() {
                       <div className="text-right">
                         <div className="text-sm font-medium">{count} citations</div>
                         <Progress 
-                          value={(count / (citationStats?.totalCitations || 1)) * 100} 
+                          value={(Number(count) / (Number(stats?.totalCitations) || 1)) * 100} 
                           className="w-20 h-2"
                         />
                       </div>
