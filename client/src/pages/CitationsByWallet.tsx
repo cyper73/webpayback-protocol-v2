@@ -1,20 +1,34 @@
 import { useParams, Link } from "wouter";
-import { useState } from "react";
-import { UnifiedCitationRewardsDashboard } from "@/components/citations/UnifiedCitationRewardsDashboard";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, ArrowLeft, Shield, Eye } from "lucide-react";
+import { Wallet, ArrowLeft, Shield, BarChart3, Coins, Brain } from "lucide-react";
+
+interface CitationStats {
+  totalCitations: string;
+  totalRewards: string;
+  citationsByAI: Record<string, number>;
+  recentCitations: Array<{
+    id: number;
+    aiModel: string;
+    rewardAmount: string;
+    timestamp: string;
+    usageCount: number;
+    detectionConfidence: number;
+  }>;
+  citedSources: string[];
+  isAuthentic: boolean;
+  walletAddress: string;
+}
 
 export default function CitationsByWallet() {
   const { walletAddress } = useParams();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // For demo purposes, we'll simulate wallet connection
-  // In production, this would integrate with MetaMask/WalletConnect
-  const handleWalletConnect = () => {
-    setIsAuthenticated(true);
-  };
+  const { data: citationData, isLoading, error } = useQuery<{ success: boolean; stats: CitationStats; message: string }>({
+    queryKey: ['/api/citations/wallet', walletAddress],
+    enabled: !!walletAddress,
+  });
 
   if (!walletAddress) {
     return (
@@ -39,70 +53,41 @@ export default function CitationsByWallet() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+              <h2 className="text-xl font-semibold text-white">Loading Citation Data...</h2>
+              <p className="text-gray-300">Fetching authentic blockchain data for wallet {walletAddress}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !citationData?.success) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">
-                🔐 Wallet Authentication Required
-              </h1>
-              <p className="text-gray-300">
-                Connect your wallet to access your personalized Citation Dashboard
-              </p>
-            </div>
-
-            <Card className="bg-card/50 backdrop-blur border-border/50">
+            <Card className="bg-card/50 backdrop-blur border-border/50 border-red-500/50">
               <CardHeader className="text-center">
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Wallet className="h-6 w-6 text-blue-400" />
-                  Wallet-Based Access
-                </CardTitle>
+                <CardTitle className="text-red-400">Error Loading Data</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="bg-muted/20 p-4 rounded-lg">
-                  <h3 className="font-semibold text-white mb-2">Requesting Access For:</h3>
-                  <Badge variant="outline" className="text-sm font-mono">
-                    {walletAddress}
-                  </Badge>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <Shield className="h-4 w-4 text-green-400" />
-                    Only you can access your citation data
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <Eye className="h-4 w-4 text-blue-400" />
-                    View all your registered platforms in one dashboard
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <Wallet className="h-4 w-4 text-purple-400" />
-                    Decentralized authentication via wallet signature
-                  </div>
-                </div>
-
-                <div className="pt-4 space-y-3">
-                  <Button 
-                    onClick={handleWalletConnect}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Wallet className="h-4 w-4 mr-2" />
-                    Connect Wallet & Access Dashboard
+              <CardContent className="text-center space-y-4">
+                <p className="text-muted-foreground">
+                  Unable to load citation data for wallet: {walletAddress}
+                </p>
+                <Link href="/citations">
+                  <Button variant="outline">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Wallet Input
                   </Button>
-                  
-                  <Link href="/citations">
-                    <Button variant="outline" className="w-full">
-                      <ArrowLeft className="h-4 w-4 mr-2" />
-                      Back to General Dashboard
-                    </Button>
-                  </Link>
-                </div>
-
-                <div className="text-xs text-muted-foreground text-center pt-4 border-t border-border/20">
-                  🔒 Your data is protected by blockchain-based authentication
-                </div>
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -111,36 +96,142 @@ export default function CitationsByWallet() {
     );
   }
 
+  const stats = citationData.stats;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Wallet Info Header */}
-        <div className="mb-6 p-4 bg-muted/10 rounded-lg border border-border/20">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Header */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Wallet className="h-5 w-5 text-green-400" />
-              <div>
-                <p className="text-sm text-muted-foreground">Authenticated Wallet</p>
-                <Badge variant="outline" className="text-xs font-mono">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                🎯 Citation Rewards Dashboard
+              </h1>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-sm font-mono">
                   {walletAddress}
                 </Badge>
+                {stats.isAuthentic && (
+                  <Badge className="bg-green-600 text-white">
+                    <Shield className="h-3 w-3 mr-1" />
+                    Authentic Data
+                  </Badge>
+                )}
               </div>
             </div>
             <Link href="/citations">
-              <Button variant="outline" size="sm">
+              <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                General Dashboard
+                Back
               </Button>
             </Link>
           </div>
-        </div>
 
-        {/* Personalized Dashboard - Using wallet address as user identifier */}
-        <UnifiedCitationRewardsDashboard 
-          key={`wallet-${walletAddress}`}
-          userId={1} // For now, we'll need to map wallet to userId
-          walletAddress={walletAddress}
-        />
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-card/50 backdrop-blur border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                  <BarChart3 className="h-4 w-4 text-blue-400" />
+                  Total Citations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{stats.totalCitations}</div>
+                <p className="text-xs text-muted-foreground">AI system accesses</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50 backdrop-blur border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                  <Coins className="h-4 w-4 text-yellow-400" />
+                  Total Rewards
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{stats.totalRewards} WPT</div>
+                <p className="text-xs text-muted-foreground">Authentic blockchain rewards</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50 backdrop-blur border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                  <Brain className="h-4 w-4 text-purple-400" />
+                  AI Models
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{Object.keys(stats.citationsByAI).length}</div>
+                <p className="text-xs text-muted-foreground">Different AI systems</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* AI Breakdown */}
+          <Card className="bg-card/50 backdrop-blur border-border/50">
+            <CardHeader>
+              <CardTitle>AI Citations Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {Object.entries(stats.citationsByAI).map(([aiModel, count]) => (
+                  <div key={aiModel} className="text-center">
+                    <div className="text-lg font-bold text-white">{count}</div>
+                    <div className="text-sm text-muted-foreground capitalize">{aiModel}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Citations */}
+          <Card className="bg-card/50 backdrop-blur border-border/50">
+            <CardHeader>
+              <CardTitle>Recent Citations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {stats.recentCitations.slice(0, 5).map((citation) => (
+                  <div key={citation.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="capitalize">
+                        {citation.aiModel}
+                      </Badge>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(citation.timestamp).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-white">{citation.rewardAmount} WPT</div>
+                      <div className="text-xs text-muted-foreground">
+                        {Math.round(citation.detectionConfidence * 100)}% confidence
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Cited Sources */}
+          <Card className="bg-card/50 backdrop-blur border-border/50">
+            <CardHeader>
+              <CardTitle>Your Cited Sources ({stats.citedSources.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {stats.citedSources.map((source, index) => (
+                  <div key={index} className="p-2 bg-muted/20 rounded text-sm font-mono text-muted-foreground truncate">
+                    {source}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
