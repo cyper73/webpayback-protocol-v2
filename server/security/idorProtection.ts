@@ -20,7 +20,7 @@ const userSessions = new Map<string, UserSession>();
 userSessions.set('session_user_1', {
   userId: 1,
   isAdmin: false,
-  authenticatedCreatorIds: [4] // User 1 owns creator 4
+  authenticatedCreatorIds: [4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 25, 26, 27] // User 1 owns multiple creators
 });
 
 userSessions.set('session_admin', {
@@ -47,7 +47,7 @@ export const getUserSession = (req: Request): UserSession | null => {
   }
   
   // Default to user 1 for demo (NOT SECURE - only for testing)
-  return { userId: 1, isAdmin: false, authenticatedCreatorIds: [4] };
+  return { userId: 1, isAdmin: false, authenticatedCreatorIds: [4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 25, 26, 27] };
 };
 
 // IDOR Protection: Verify user can access creator data

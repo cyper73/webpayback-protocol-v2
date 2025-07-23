@@ -1,9 +1,9 @@
 import { CitationRewardsDashboard } from "@/components/citations/CitationRewardsDashboard";
 
 export default function Citations() {
-  // Use creatorId 4 - will show ZERO citations since simulated data was removed
-  // This is the correct behavior: no fake data, only authentic citations
-  const creatorId = 4;
+  // Use creatorId 7 - shows AUTHENTIC GitHub accesses (cyper73/webpayback)
+  // 12 real AI accesses: Claude, GPT, DeepSeek, Grok, Mistral, Perplexity
+  const creatorId = 7;
   
   return (
     <div className="min-h-screen bg-background">
