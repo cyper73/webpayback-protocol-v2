@@ -181,11 +181,46 @@
   100% { transform: translateX(-50%); }
 }
 
-/* FORCE INFRASTRUCTURE DASHBOARD VISIBILITY */
-.infrastructure-debug {
-  background: red !important;
-  color: white !important;
-  border: 5px solid yellow !important;
-  padding: 20px !important;
-  margin: 20px !important;
+/* Dashboard Layout Optimization */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.dashboard-section {
+  width: 100%;
+  min-height: fit-content;
+}
+
+/* Ensure consistent card heights */
+.glass-card {
+  height: fit-content !important;
+  min-height: auto !important;
+}
+
+/* Better alignment for grid layouts */
+.xl\:grid-cols-2 > * {
+  height: fit-content;
+  align-self: start;
+}
+
+.xl\:grid-cols-3 > * {
+  height: fit-content;
+  align-self: start;
+}
+
+/* Compact spacing for internal components */
+.space-y-6 > * + * {
+  margin-top: 1.5rem !important;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem !important;
 }

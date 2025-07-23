@@ -107,9 +107,9 @@ export default function Dashboard() {
       </header>
 
       {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dashboard-container">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
-        <div className="mb-6">
+        <section className="dashboard-section">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -248,18 +248,16 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </section>
 
         {/* Creator Registration Portal - Priority Section */}
-        <div className="mb-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CreatorPortal />
-            <GasTracker />
-          </div>
-        </div>
+        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
+          <CreatorPortal />
+          <GasTracker />
+        </section>
 
         {/* Agent Collaboration Panel */}
-        <div className="mb-6">
+        <section className="dashboard-section">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -280,39 +278,37 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </section>
 
         {/* Inter-Agent Communication */}
-        <div className="mb-6">
+        <section className="dashboard-section">
           <AgentCommunication />
-        </div>
+        </section>
 
-        {/* Multi-Chain Deployment Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2">
+        {/* Analytics & Multi-Chain Deployment */}
+        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-3">
+          <div className="xl:col-span-2">
             <MultiChainDeployment networks={networks} />
           </div>
-          
-          {/* Real-time Analytics */}
-          <div className="space-y-4">
+          <div>
             <LiveStats stats={stats} />
           </div>
-        </div>
+        </section>
 
         {/* Token Economics and Pool Management */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <TokenEconomics />
+        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
+          <TokenEconomics stats={stats} pool={pool} rewards={rewards} />
           <TokenInfo />
-        </div>
+        </section>
 
         {/* Creator Rewards & Governance */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
           <RewardDistribution />
           <ComplianceMonitor />
-        </div>
+        </section>
 
         {/* Qloo Cultural Intelligence Dashboard */}
-        <div className="mb-6">
+        <section className="dashboard-section">
           <Card className="glass-card rounded-2xl shadow-neon-purple border-purple-500/30">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -330,23 +326,24 @@ export default function Dashboard() {
               <QlooCulturalDashboard />
             </CardContent>
           </Card>
-        </div>
+        </section>
 
         {/* Security & Monitoring Systems */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <PoolDrainProtection />
-          <FakeCreatorDetection />
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <ReentrancyProtection />
-          <AlchemyUsageMonitor />
-        </div>
+        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
+          <div className="space-y-6">
+            <PoolDrainProtection />
+            <ReentrancyProtection />
+          </div>
+          <div className="space-y-6">
+            <FakeCreatorDetection />
+            <AlchemyUsageMonitor />
+          </div>
+        </section>
 
         {/* Network Switcher */}
-        <div className="mb-6">
+        <section className="dashboard-section">
           <NetworkSwitcher />
-        </div>
+        </section>
       </main>
 
       {/* Footer with Privacy Policy */}
