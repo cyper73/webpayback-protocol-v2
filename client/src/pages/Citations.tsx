@@ -8,7 +8,7 @@ export default function Citations() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <UnifiedCitationRewardsDashboard userId={userId} />
+        <UnifiedCitationRewardsDashboard key={Date.now()} userId={userId} />
       </div>
     </div>
   );
