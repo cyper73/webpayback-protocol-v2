@@ -85,6 +85,14 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Citations Dashboard Link */}
+              <RouterLink to="/citations">
+                <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Citations Rewards
+                </Button>
+              </RouterLink>
+              
               <div className="flex items-center space-x-2 text-sm">
                 <Wallet className="text-electric-blue" />
                 <span className="font-mono">0x9077...91e</span>
