@@ -102,9 +102,9 @@ export function UnifiedCitationRewardsDashboard({ userId }: UnifiedCitationRewar
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">🎯 Tutti i Tuoi Siti Citati - Dashboard Unificata</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">🎯 Citation-Based Rewards Dashboard</h1>
         <p className="text-gray-300">
-          Monitoraggio autentico delle citazioni AI su tutte le tue piattaforme registrate
+          Authentic AI citation tracking across all your registered platforms
         </p>
         {stats?.isAuthentic && (
           <Badge variant="outline" className="mt-2 border-green-500 text-green-400 bg-green-500/10">
