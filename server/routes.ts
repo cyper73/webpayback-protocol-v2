@@ -14,6 +14,7 @@ import { poolDrainProtectionService } from "./services/poolDrainProtection";
 import { fakeCreatorDetection } from "./services/fakeCreatorDetection";
 import { reentrancyProtection } from "./services/reentrancyProtection";
 import { citationRewardEngine } from "./services/citationRewardEngine";
+import { authenticityLayer } from "./services/authenticitylayer";
 import { 
   insertCreatorSchema, 
   insertAgentCommunicationSchema,
@@ -282,10 +283,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/citations/stats/:creatorId", authorizeCreatorAccess, async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
-      const stats = await citationRewardEngine.getCitationStats(creatorId);
-      res.json({ success: true, stats });
+      
+      // USE AUTHENTICITY LAYER FOR ALL USERS - NO SIMULATION EVER
+      const authenticStats = await authenticityLayer.getAuthenticCitationStats(creatorId);
+      
+      // Validate data authenticity before sending to client
+      const validation = await authenticityLayer.validateDataAuthenticity(creatorId);
+      
+      res.json({ 
+        success: true, 
+        stats: authenticStats,
+        authenticity: {
+          isValid: validation.isValid,
+          hasOnlyRealData: !validation.hasSimulatedData,
+          recommendation: validation.recommendation
+        }
+      });
     } catch (error) {
       console.error('Citation stats error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error.message) 
+      });
+    }
+  });
+
+  // Apply authenticity policy to all users (system-wide standard)
+  app.post("/api/authenticity/enforce", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "User ID required" 
+        });
+      }
+
+      // Apply authenticity policy to all creators for this user
+      const result = await authenticityLayer.enforceAuthenticityPolicy(userId);
+      
+      res.json({
+        success: true,
+        message: "Authenticity policy applied to all user creators",
+        appliedPolicy: result.appliedPolicy,
+        affectedCreators: result.affectedCreators,
+        systemMessage: result.message
+      });
+    } catch (error) {
+      console.error('Authenticity enforcement error:', error);
       res.status(500).json({ 
         success: false, 
         error: sanitizeErrorMessage(error.message) 
