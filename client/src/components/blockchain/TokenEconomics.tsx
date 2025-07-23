@@ -20,67 +20,70 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
         <CardTitle className="text-xl font-bold gradient-text">Token Economics Dashboard</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div className="bg-glass-dark rounded-xl p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Creator Fee Distribution */}
+          <div className="bg-glass-dark rounded-xl p-4 h-fit">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-electric-blue">Creator Fee Distribution</h4>
+              <h4 className="font-semibold text-electric-blue text-sm">Creator Fee Distribution</h4>
               <Badge className="text-xs bg-neon-green/20 text-neon-green">3.0%</Badge>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Total Collected:</span>
-                <span className="font-mono">{isNaN(totalRewards * 0.03) ? "0" : (totalRewards * 0.03).toFixed(0)} WPT</span>
+                <span className="font-mono font-bold text-white">{isNaN(totalRewards * 0.03) ? "0" : (totalRewards * 0.03).toFixed(0)} WPT</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Creator Wallet:</span>
                 <span className="font-mono text-xs">0xca5E...508Ba</span>
               </div>
-              <Progress value={75} className="w-full h-2" />
+              <Progress value={75} className="w-full h-1.5" />
             </div>
           </div>
           
-          <div className="bg-glass-dark rounded-xl p-4">
+          {/* Reward Pool Status */}
+          <div className="bg-glass-dark rounded-xl p-4 h-fit">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-neon-green">Reward Pool Status</h4>
+              <h4 className="font-semibold text-neon-green text-sm">Reward Pool Status</h4>
               <Badge className="text-xs bg-neon-green/20 text-neon-green">
                 {totalPool > 500000 ? "HEALTHY" : "LOW"}
               </Badge>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Pool Balance:</span>
-                <span className="font-mono">{totalPool.toFixed(0)} WPT</span>
+                <span className="font-mono font-bold text-white">{totalPool.toFixed(0)} WPT</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Daily Rewards:</span>
-                <span className="font-mono">{isNaN(totalRewards * 0.1) ? "0" : (totalRewards * 0.1).toFixed(0)} WPT</span>
+                <span className="font-mono font-bold text-white">{isNaN(totalRewards * 0.1) ? "0" : (totalRewards * 0.1).toFixed(0)} WPT</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Sustainability:</span>
-                <span className="text-neon-green">{isNaN(totalPool / (totalRewards * 0.1)) ? "∞" : Math.floor(totalPool / (totalRewards * 0.1)) || 0} days</span>
+                <span className="text-neon-green font-bold">{isNaN(totalPool / (totalRewards * 0.1)) ? "∞" : Math.floor(totalPool / (totalRewards * 0.1)) || 0} days</span>
               </div>
             </div>
           </div>
           
-          <div className="bg-glass-dark rounded-xl p-4">
+          {/* Staking Rewards */}
+          <div className="bg-glass-dark rounded-xl p-4 h-fit">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-cyber-purple">Staking Rewards</h4>
+              <h4 className="font-semibold text-cyber-purple text-sm">Staking Rewards</h4>
               <Badge className="text-xs bg-cyber-purple/20 text-cyber-purple">
                 {avgApy.toFixed(1)}% APY
               </Badge>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Total Staked:</span>
-                <span className="font-mono">{totalPool.toFixed(0)} WPT</span>
+                <span className="font-mono font-bold text-white">{totalPool.toFixed(0)} WPT</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Stakers:</span>
-                <span className="font-mono">{pool.reduce((sum, p) => sum + (p.stakersCount || 0), 0)}</span>
+                <span className="font-mono font-bold text-white">{pool.reduce((sum, p) => sum + (p.stakersCount || 0), 0)}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Rewards Today:</span>
-                <span className="font-mono">{isNaN(totalRewards * 0.05) ? "0" : (totalRewards * 0.05).toFixed(0)} WPT</span>
+                <span className="font-mono font-bold text-white">{isNaN(totalRewards * 0.05) ? "0" : (totalRewards * 0.05).toFixed(0)} WPT</span>
               </div>
             </div>
           </div>
