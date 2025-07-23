@@ -89,37 +89,7 @@ export const contentTracking = pgTable("content_tracking", {
   metadata: jsonb("metadata").default({}),
 });
 
-// New table for citation-based rewards
-export const citationTracking = pgTable("citation_tracking", {
-  id: serial("id").primaryKey(),
-  creatorId: integer("creator_id").references(() => creators.id),
-  sourceUrl: text("source_url").notNull(), // Original creator content URL
-  citationContext: text("citation_context").notNull(), // What part was cited/used
-  citationType: text("citation_type").default("content_reference"), // content_reference, direct_quote, paraphrase, factual_data
-  querySource: text("query_source").notNull(), // User query that triggered the citation
-  aiModel: text("ai_model").notNull(), // AI that provided the citation
-  userAgent: text("user_agent"), // Browser/app that made the query
-  sessionId: text("session_id"), // To track related queries
-  citationConfidence: decimal("citation_confidence", { precision: 3, scale: 2 }).default("0.95"),
-  rewardAmount: decimal("reward_amount", { precision: 18, scale: 8 }).default("0"),
-  timestamp: timestamp("timestamp").defaultNow(),
-  metadata: jsonb("metadata").default({}), // Additional context
-});
 
-// Track AI memory/knowledge that may lead to future citations
-export const aiKnowledgeIndex = pgTable("ai_knowledge_index", {
-  id: serial("id").primaryKey(),
-  creatorId: integer("creator_id").references(() => creators.id),
-  contentFingerprint: text("content_fingerprint").notNull(), // Unique identifier for content
-  contentSummary: text("content_summary"), // AI-generated summary of the content
-  keyTopics: text("key_topics").array(), // Topics/keywords for citation matching
-  accessTimestamp: timestamp("access_timestamp").defaultNow(), // When AI first accessed this content
-  lastCitationDate: timestamp("last_citation_date"), // Most recent citation
-  totalCitations: integer("total_citations").default(0),
-  cumulativeRewards: decimal("cumulative_rewards", { precision: 18, scale: 8 }).default("0"),
-  knowledgeDecayFactor: decimal("knowledge_decay_factor", { precision: 3, scale: 2 }).default("1.00"), // Decrease over time
-  isActive: boolean("is_active").default(true),
-});
 
 export const rewardDistributions = pgTable("reward_distributions", {
   id: serial("id").primaryKey(),
@@ -323,14 +293,44 @@ export const domainVerifications = pgTable("domain_verifications", {
   verificationProof: text("verification_proof"), // DNS TXT record, HTML meta tag, file content, social post URL
   verifiedAt: timestamp("verified_at"),
   expiresAt: timestamp("expires_at"), // verification expires after 90 days
-  attemptCount: integer("attempt_count").default(0),
-  lastAttempt: timestamp("last_attempt"),
-  failureReason: text("failure_reason"),
-  isManualReview: boolean("is_manual_review").default(false),
-  reviewedBy: text("reviewed_by"),
-  reviewNotes: text("review_notes"),
+  reviewNotes: text("review_notes"), // Manual review notes for famous domains
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ===== CITATION-BASED REWARDS SYSTEM =====
+
+// Citation tracking table - tracks each time AI systems cite creator content
+export const citationTracking = pgTable("citation_tracking", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  sourceUrl: text("source_url").notNull(), // Original creator content URL
+  citationContext: text("citation_context").notNull(), // What part was cited/used
+  citationType: text("citation_type").default("content_reference"), // content_reference, direct_quote, paraphrase, factual_data
+  querySource: text("query_source").notNull(), // User query that triggered the citation
+  aiModel: text("ai_model").notNull(), // AI that provided the citation
+  userAgent: text("user_agent"), // Browser/app that made the query
+  sessionId: text("session_id"), // To track related queries
+  citationConfidence: decimal("citation_confidence", { precision: 3, scale: 2 }).default("0.95"),
+  rewardAmount: decimal("reward_amount", { precision: 18, scale: 8 }).default("0"),
+  timestamp: timestamp("timestamp").defaultNow(),
+  metadata: jsonb("metadata").default({}), // Additional context
+});
+
+// AI Knowledge Index - tracks what content each AI system has learned from
+export const aiKnowledgeIndex = pgTable("ai_knowledge_index", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  sourceUrl: text("source_url").notNull(),
+  contentHash: text("content_hash").notNull(), // Hash of content for deduplication
+  aiModel: text("ai_model").notNull(), // Which AI system learned this content
+  knowledgeType: text("knowledge_type").default("general_content"), // general_content, factual_data, code_snippet, creative_work
+  learningConfidence: decimal("learning_confidence", { precision: 3, scale: 2 }).default("0.90"),
+  accessTimestamp: timestamp("access_timestamp").defaultNow(), // When AI first accessed/learned
+  citationCount: integer("citation_count").default(0), // How many times this content has been cited
+  totalRewardsGenerated: decimal("total_rewards_generated", { precision: 18, scale: 8 }).default("0"),
+  lastCitationDate: timestamp("last_citation_date"),
+  isActive: boolean("is_active").default(true), // Whether this content is still generating citations
+  metadata: jsonb("metadata").default({}),
 });
 
 // Relations
