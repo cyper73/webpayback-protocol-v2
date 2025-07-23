@@ -129,41 +129,41 @@ export default function CitationsByWallet() {
           </div>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-card/50 backdrop-blur border-border/50">
-              <CardHeader className="pb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="glass-card rounded-2xl h-fit">
+              <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm font-medium">
                   <BarChart3 className="h-4 w-4 text-blue-400" />
                   Total Citations
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-3">
                 <div className="text-2xl font-bold text-white">{stats.totalCitations}</div>
                 <p className="text-xs text-muted-foreground">AI system accesses</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur border-border/50">
-              <CardHeader className="pb-3">
+            <Card className="glass-card rounded-2xl h-fit">
+              <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm font-medium">
                   <Coins className="h-4 w-4 text-yellow-400" />
                   Total Rewards
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-3">
                 <div className="text-2xl font-bold text-white">{stats.totalRewards} WPT</div>
                 <p className="text-xs text-muted-foreground">Authentic blockchain rewards</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur border-border/50">
-              <CardHeader className="pb-3">
+            <Card className="glass-card rounded-2xl h-fit">
+              <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm font-medium">
                   <Brain className="h-4 w-4 text-purple-400" />
                   AI Models
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-3">
                 <div className="text-2xl font-bold text-white">{Object.keys(stats.citationsByAI).length}</div>
                 <p className="text-xs text-muted-foreground">Different AI systems</p>
               </CardContent>
@@ -171,12 +171,12 @@ export default function CitationsByWallet() {
           </div>
 
           {/* AI Breakdown */}
-          <Card className="bg-card/50 backdrop-blur border-border/50">
-            <CardHeader>
+          <Card className="glass-card rounded-2xl">
+            <CardHeader className="pb-2">
               <CardTitle>AI Citations Breakdown</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <CardContent className="pb-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {Object.entries(stats.citationsByAI).map(([aiModel, count]) => (
                   <div key={aiModel} className="text-center">
                     <div className="text-lg font-bold text-white">{count}</div>
@@ -188,12 +188,12 @@ export default function CitationsByWallet() {
           </Card>
 
           {/* Recent Citations */}
-          <Card className="bg-card/50 backdrop-blur border-border/50">
-            <CardHeader>
+          <Card className="glass-card rounded-2xl">
+            <CardHeader className="pb-2">
               <CardTitle>Recent Citations</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="pb-3">
+              <div className="space-y-2.5">
                 {stats.recentCitations.slice(0, 5).map((citation) => (
                   <div key={citation.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
                     <div className="flex items-center gap-3">
@@ -217,11 +217,11 @@ export default function CitationsByWallet() {
           </Card>
 
           {/* Cited Sources */}
-          <Card className="bg-card/50 backdrop-blur border-border/50">
-            <CardHeader>
+          <Card className="glass-card rounded-2xl">
+            <CardHeader className="pb-2">
               <CardTitle>Your Cited Sources ({stats.citedSources.length})</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {stats.citedSources.map((source, index) => (
                   <div key={index} className="p-2 bg-muted/20 rounded text-sm font-mono text-muted-foreground truncate">

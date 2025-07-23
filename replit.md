@@ -133,6 +133,8 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - Fixed badge positioning to prevent overlap with metric numbers
   - Enhanced security metric containers with proper height constraints and overflow handling
   - Improved line-height and margin specifications for better text readability
+  - Applied consistent glass-card styling to Citation Rewards dashboard (CitationsByWallet.tsx and Citations.tsx)
+  - Optimized Citation cards with reduced padding (pb-2, pb-3) and tighter gap spacing (gap-3, gap-2.5)
   - User confirmed layout improvements needed before system break
 
 - **WALLET-BASED CITATIONS DASHBOARD FULLY OPERATIONAL** (January 23, 2025):

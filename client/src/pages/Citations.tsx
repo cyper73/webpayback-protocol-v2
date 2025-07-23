@@ -34,14 +34,14 @@ export default function Citations() {
             </p>
           </div>
 
-          <Card className="bg-card/50 backdrop-blur border-border/50">
-            <CardHeader className="text-center">
+          <Card className="glass-card rounded-2xl">
+            <CardHeader className="text-center pb-2">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Wallet className="h-6 w-6 text-blue-400" />
                 Wallet-Based Authentication
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 pb-3">
               <div className="space-y-3">
                 <label className="text-sm font-medium text-white">
                   Wallet Address
@@ -65,7 +65,7 @@ export default function Citations() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3">
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Shield className="h-4 w-4 text-green-400" />
                   <span>Secure Access</span>
