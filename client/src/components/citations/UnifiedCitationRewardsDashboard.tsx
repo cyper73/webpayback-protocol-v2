@@ -25,17 +25,22 @@ interface UnifiedCitationStats {
 
 interface UnifiedCitationRewardsDashboardProps {
   userId: number;
+  walletAddress?: string;
 }
 
-export function UnifiedCitationRewardsDashboard({ userId }: UnifiedCitationRewardsDashboardProps) {
+export function UnifiedCitationRewardsDashboard({ userId, walletAddress }: UnifiedCitationRewardsDashboardProps) {
+  // Use wallet endpoint if walletAddress is provided, otherwise use user endpoint
+  const endpoint = walletAddress ? `/api/citations/wallet/${walletAddress}` : `/api/citations/unified/${userId}`;
+  
   const { data: response, isLoading: statsLoading } = useQuery<{
     success: boolean;
     stats: UnifiedCitationStats;
     message: string;
   }>({
-    queryKey: ['/api/citations/unified', userId],
-    enabled: !!userId,
+    queryKey: walletAddress ? ['/api/citations/wallet', walletAddress] : ['/api/citations/unified', userId],
+    enabled: !!(walletAddress || userId),
     refetchInterval: 10000,
+    queryFn: () => fetch(endpoint).then(res => res.json()),
   });
 
   const stats = response?.stats;

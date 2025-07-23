@@ -10,6 +10,7 @@ import Terms from "@/pages/terms";
 import TestConnectivity from "@/pages/test-connectivity";
 import PolStakingPage from "@/pages/PolStakingPage";
 import Citations from "@/pages/Citations";
+import CitationsByWallet from "@/pages/CitationsByWallet";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/citations" component={Citations} />
+      <Route path="/citations/:walletAddress" component={CitationsByWallet} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route component={NotFound} />

@@ -308,6 +308,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get citations by wallet address for wallet-based access
+  app.get("/api/citations/wallet/:walletAddress", async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      
+      // Get all creators for this wallet address
+      const creatorsResult = await db.select()
+        .from(creators)
+        .where(eq(creators.walletAddress, walletAddress));
+
+      if (creatorsResult.length === 0) {
+        return res.json({
+          success: true,
+          stats: {
+            totalCitations: "0",
+            totalRewards: 0,
+            citationsByAI: {},
+            recentCitations: [],
+            citedSources: [],
+            isAuthentic: true
+          },
+          message: 'No creators found for this wallet address'
+        });
+      }
+
+      const creatorIds = creatorsResult.map(c => c.id);
+
+      // Get all citations for these creators using authenticity layer
+      const citationsResult = await db.select({
+        id: contentTracking.id,
+        aiModel: contentTracking.aiModel,
+        citationType: contentTracking.citationType,
+        sourceUrl: contentTracking.sourceUrl,
+        citationContext: contentTracking.citationContext,
+        rewardAmount: contentTracking.rewardAmount,
+        timestamp: contentTracking.timestamp,
+        creatorId: contentTracking.creatorId
+      })
+        .from(contentTracking)
+        .where(inArray(contentTracking.creatorId, creatorIds))
+        .orderBy(desc(contentTracking.timestamp));
+
+      // Calculate statistics
+      const totalCitations = citationsResult.length;
+      const totalRewards = citationsResult.reduce((sum, citation) => 
+        sum + parseFloat(citation.rewardAmount || '0'), 0
+      );
+
+      const citationsByAI: Record<string, number> = {};
+      citationsResult.forEach(citation => {
+        if (citation.aiModel) {
+          citationsByAI[citation.aiModel] = (citationsByAI[citation.aiModel] || 0) + 1;
+        }
+      });
+
+      const citedSources = [...new Set(creatorsResult.map(c => c.websiteUrl))];
+
+      const recentCitations = citationsResult.slice(0, 10).map(citation => ({
+        id: citation.id,
+        aiModel: citation.aiModel || 'Unknown',
+        citationType: citation.citationType || 'direct',
+        sourceUrl: citation.sourceUrl || 'Unknown Source',
+        citationContext: citation.citationContext || 'No context available',
+        rewardAmount: citation.rewardAmount || '0',
+        timestamp: citation.timestamp?.toISOString() || new Date().toISOString()
+      }));
+
+      res.json({
+        success: true,
+        stats: {
+          totalCitations: totalCitations.toString(),
+          totalRewards: totalRewards,
+          citationsByAI,
+          recentCitations,
+          citedSources,
+          isAuthentic: true,
+          walletAddress
+        },
+        message: `Found citations for wallet ${walletAddress}`
+      });
+
+    } catch (error) {
+      console.error('Error fetching wallet citations:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch wallet citation data'
+      });
+    }
+  });
+
   // Get unified citation stats for ALL user creators
   app.get("/api/citations/unified/:userId", async (req, res) => {
     try {
