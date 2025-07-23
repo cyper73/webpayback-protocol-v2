@@ -185,13 +185,15 @@
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  max-width: 100%;
 }
 
 .dashboard-grid {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
   align-items: start;
+  width: 100%;
 }
 
 .dashboard-section {
@@ -199,28 +201,73 @@
   min-height: fit-content;
 }
 
-/* Ensure consistent card heights */
+/* Ensure consistent card heights and better spacing */
 .glass-card {
   height: fit-content !important;
   min-height: auto !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.glass-card .card-header {
+  padding: 1rem 1.25rem 0.75rem 1.25rem !important;
+}
+
+.glass-card .card-content {
+  padding: 0.75rem 1.25rem 1rem 1.25rem !important;
+  flex: 1;
 }
 
 /* Better alignment for grid layouts */
 .xl\:grid-cols-2 > * {
   height: fit-content;
   align-self: start;
+  min-height: 200px;
 }
 
 .xl\:grid-cols-3 > * {
   height: fit-content;
   align-self: start;
+  min-height: 200px;
 }
 
 /* Compact spacing for internal components */
 .space-y-6 > * + * {
-  margin-top: 1.5rem !important;
+  margin-top: 1.25rem !important;
 }
 
 .space-y-4 > * + * {
-  margin-top: 1rem !important;
+  margin-top: 0.875rem !important;
+}
+
+/* Optimize card content spacing */
+.glass-card .grid {
+  gap: 0.875rem !important;
+}
+
+.glass-card .space-y-3 > * + * {
+  margin-top: 0.75rem !important;
+}
+
+/* Security Systems specific optimization */
+.dashboard-section .space-y-6 .glass-card {
+  min-height: 280px;
+  max-height: 400px;
+}
+
+/* Better grid alignment for security cards */
+.dashboard-section .space-y-6 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Reentrancy Protection card optimization */
+.glass-card:has([data-component="reentrancy-protection"]) {
+  min-height: 320px;
+}
+
+/* Alchemy Usage Monitor card optimization */
+.glass-card:has([data-component="alchemy-usage"]) {
+  min-height: 280px;
 }
