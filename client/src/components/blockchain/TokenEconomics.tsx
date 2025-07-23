@@ -15,19 +15,19 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
   const avgApy = pool.length > 0 ? pool.reduce((sum, p) => sum + parseFloat(p.apy || "0"), 0) / pool.length : 0;
 
   return (
-    <Card className="glass-card rounded-2xl">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold gradient-text">Token Economics Dashboard</CardTitle>
+    <Card className="glass-card rounded-2xl h-fit">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-bold gradient-text">Token Economics Dashboard</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <CardContent className="pb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Creator Fee Distribution */}
-          <div className="bg-glass-dark rounded-xl p-4 h-fit">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-glass-dark rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
               <h4 className="font-semibold text-electric-blue text-sm">Creator Fee Distribution</h4>
               <Badge className="text-xs bg-neon-green/20 text-neon-green">3.0%</Badge>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Total Collected:</span>
                 <span className="font-mono font-bold text-white">{isNaN(totalRewards * 0.03) ? "0" : (totalRewards * 0.03).toFixed(0)} WPT</span>
@@ -41,14 +41,14 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
           </div>
           
           {/* Reward Pool Status */}
-          <div className="bg-glass-dark rounded-xl p-4 h-fit">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-glass-dark rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
               <h4 className="font-semibold text-neon-green text-sm">Reward Pool Status</h4>
               <Badge className="text-xs bg-neon-green/20 text-neon-green">
                 {totalPool > 500000 ? "HEALTHY" : "LOW"}
               </Badge>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Pool Balance:</span>
                 <span className="font-mono font-bold text-white">{totalPool.toFixed(0)} WPT</span>
@@ -65,14 +65,14 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
           </div>
           
           {/* Staking Rewards */}
-          <div className="bg-glass-dark rounded-xl p-4 h-fit">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-glass-dark rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
               <h4 className="font-semibold text-cyber-purple text-sm">Staking Rewards</h4>
               <Badge className="text-xs bg-cyber-purple/20 text-cyber-purple">
                 {avgApy.toFixed(1)}% APY
               </Badge>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Total Staked:</span>
                 <span className="font-mono font-bold text-white">{totalPool.toFixed(0)} WPT</span>
