@@ -13,10 +13,10 @@ import { AlertCircle, Quote, Search, TrendingUp, Zap, Brain, Coins } from 'lucid
 import { useToast } from '@/hooks/use-toast';
 
 interface CitationStats {
-  totalCitations: number;
-  totalRewards: number;
-  citationsByType: Record<string, number>;
-  citationsByAI: Record<string, number>;
+  totalCitations: string | number;
+  totalRewards: string | number;
+  citationsByType: Record<string, string | number>;
+  citationsByAI: Record<string, string | number>;
   recentCitations: any[];
 }
 
@@ -36,7 +36,12 @@ export function CitationRewardsDashboard() {
   const { data: citationStats, isLoading: statsLoading } = useQuery<CitationStats>({
     queryKey: ['/api/citations/stats', selectedCreatorId],
     enabled: !!selectedCreatorId,
+    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchOnWindowFocus: true,
   });
+
+  // Extract stats from nested API response
+  const stats = citationStats?.stats || citationStats;
 
   // Simulate citation mutation
   const simulateCitationMutation = useMutation({
@@ -132,7 +137,7 @@ export function CitationRewardsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : (citationStats?.totalCitations || 0)}
+                  {statsLoading ? '...' : (Number(stats?.totalCitations) || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Content references by AI systems
@@ -147,7 +152,7 @@ export function CitationRewardsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : (citationStats?.totalRewards?.toFixed(4) || '0.0000')} WPT
+                  {statsLoading ? '...' : (Number(stats?.totalRewards)?.toFixed(4) || '0.0000')} WPT
                 </div>
                 <p className="text-xs text-muted-foreground">
                   From AI content citations
@@ -163,8 +168,8 @@ export function CitationRewardsDashboard() {
               <CardContent>
                 <div className="text-2xl font-bold">
                   {statsLoading ? '...' : 
-                    Object.entries(citationStats?.citationsByType || {})
-                      .sort(([,a], [,b]) => b - a)[0]?.[0] || 'None'
+                    Object.entries(stats?.citationsByType || {})
+                      .sort(([,a], [,b]) => Number(b) - Number(a))[0]?.[0] || 'None'
                   }
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -180,7 +185,7 @@ export function CitationRewardsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : Object.keys(citationStats?.citationsByAI || {}).length}
+                  {statsLoading ? '...' : Object.keys(stats?.citationsByAI || {}).length}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   AI systems citing content
@@ -202,8 +207,8 @@ export function CitationRewardsDashboard() {
                   <div className="text-center py-8 text-muted-foreground">
                     Loading recent citations...
                   </div>
-                ) : citationStats?.recentCitations?.length > 0 ? (
-                  citationStats.recentCitations.slice(0, 5).map((citation, index) => (
+                ) : stats?.recentCitations?.length > 0 ? (
+                  stats.recentCitations.slice(0, 5).map((citation, index) => (
                     <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center space-x-3">
                         {getAIModelIcon(citation.aiModel)}
