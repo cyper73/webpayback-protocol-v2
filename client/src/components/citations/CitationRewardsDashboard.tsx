@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,18 +7,18 @@ import { Progress } from '@/components/ui/progress';
 import { Quote, Coins, TrendingUp, Brain, Globe, Bot, Sparkles } from 'lucide-react';
 
 interface CitationStats {
-  totalCitations: number;
-  totalRewards: number;
-  citationsByType: Record<string, number>;
-  citationsByAI: Record<string, number>;
+  totalCitations: string | number;
+  totalRewards: string | number;
+  citationsByType: Record<string, string | number>;
+  citationsByAI: Record<string, string | number>;
   recentCitations: Array<{
     id: number;
     aiModel: string;
     citationType: string;
     sourceUrl: string;
     citationContext: string;
-    rewardAmount: number;
-    createdAt: string;
+    rewardAmount: string | number;
+    timestamp: string;
   }>;
 }
 
@@ -27,20 +27,17 @@ interface CitationRewardsDashboardProps {
 }
 
 export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboardProps) {
-  const { data: response, isLoading: statsLoading, error } = useQuery({
+  const { data: response, isLoading: statsLoading } = useQuery({
     queryKey: ['/api/citations/stats', creatorId],
     enabled: !!creatorId,
-    refetchInterval: 5000,
+    refetchInterval: 10000, // Reduced frequency
   });
 
-  // Extract stats from the response wrapper
-  const stats = response?.stats;
+  const stats = response?.stats as CitationStats;
 
-  // Debug logging
-  console.log('Citations API Response:', response);
-  console.log('Extracted stats:', stats);
-  console.log('Loading state:', statsLoading);
-  console.log('Error:', error);
+  // Convert string values to numbers for display
+  const totalCitations = Number(stats?.totalCitations) || 0;
+  const totalRewards = Number(stats?.totalRewards) || 0;
 
   const getCitationTypeColor = (type: string) => {
     switch (type) {
@@ -62,6 +59,16 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
       case 'deepseek': return <Quote className="h-4 w-4 text-indigo-600" />;
       default: return <Bot className="h-4 w-4 text-gray-600" />;
     }
+  };
+
+  const getTopCitationType = () => {
+    if (!stats?.citationsByType) return 'None';
+    return Object.entries(stats.citationsByType)
+      .sort(([,a], [,b]) => Number(b) - Number(a))[0]?.[0]?.replace('_', ' ') || 'None';
+  };
+
+  const getActiveAIModels = () => {
+    return Object.keys(stats?.citationsByAI || {}).length;
   };
 
   return (
@@ -96,7 +103,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : (Number(stats?.totalCitations) || 0)}
+                  {statsLoading ? '...' : totalCitations}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Content references by AI systems
@@ -111,7 +118,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : (Number(stats?.totalRewards)?.toFixed(4) || '0.0000')} WPT
+                  {statsLoading ? '...' : totalRewards.toFixed(4)} WPT
                 </div>
                 <p className="text-xs text-muted-foreground">
                   From AI content citations
@@ -126,10 +133,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : 
-                    Object.entries(stats?.citationsByType || {})
-                      .sort(([,a], [,b]) => Number(b) - Number(a))[0]?.[0] || 'None'
-                  }
+                  {statsLoading ? '...' : getTopCitationType()}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Most frequent citation method
@@ -144,7 +148,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statsLoading ? '...' : Object.keys(stats?.citationsByAI || {}).length}
+                  {statsLoading ? '...' : getActiveAIModels()}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   AI systems citing content
@@ -168,28 +172,32 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
                       Loading cited sources...
                     </div>
                   ) : stats?.recentCitations?.length > 0 ? (
-                    Array.from(new Set(stats.recentCitations.map((c: any) => c.sourceUrl))).map((url: string, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                              {url.includes('youtube') ? '▶️' : '🌐'}
-                            </span>
-                          </div>
-                          <div>
-                            <div className="font-medium text-sm">
-                              {url.length > 40 ? `${url.substring(0, 40)}...` : url}
+                    Array.from(new Set(stats.recentCitations.map(c => c.sourceUrl))).slice(0, 3).map((url, index) => {
+                      const citationCount = stats.recentCitations.filter(c => c.sourceUrl === url).length;
+                      return (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                {url.includes('youtube') ? '▶️' : '🌐'}
+                              </span>
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {stats.recentCitations.filter((c: any) => c.sourceUrl === url).length} citation{stats.recentCitations.filter((c: any) => c.sourceUrl === url).length > 1 ? 's' : ''}
+                            <div>
+                              <div className="font-medium text-sm">
+                                {url.includes('marcosantoriello') ? 'marcosantoriello.it' : 
+                                 url.length > 30 ? `${url.substring(0, 30)}...` : url}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {citationCount} citation{citationCount > 1 ? 's' : ''}
+                              </div>
                             </div>
                           </div>
+                          <Badge variant="outline" className="text-xs">
+                            {url.includes('youtube') ? 'Video' : 'Website'}
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className="text-xs">
-                          {url.includes('youtube') ? 'Video' : 'Website'}
-                        </Badge>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="text-center py-4 text-muted-foreground">
                       No cited sources yet
@@ -213,14 +221,14 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
                       Loading recent citations...
                     </div>
                   ) : stats?.recentCitations?.length > 0 ? (
-                    stats.recentCitations.slice(0, 5).map((citation: any, index: number) => (
+                    stats.recentCitations.slice(0, 4).map((citation, index) => (
                       <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center space-x-3">
                           {getAIModelIcon(citation.aiModel)}
                           <div>
                             <div className="font-medium">{citation.aiModel.toUpperCase()} Citation</div>
                             <div className="text-sm text-muted-foreground">
-                              {citation.citationContext?.slice(0, 60)}...
+                              {citation.citationContext?.slice(0, 50)}...
                             </div>
                           </div>
                         </div>
@@ -229,7 +237,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
                             {citation.citationType.replace('_', ' ')}
                           </Badge>
                           <div className="text-sm font-medium text-green-600 mt-1">
-                            +{citation.rewardAmount} WPT
+                            +{Number(citation.rewardAmount).toFixed(3)} WPT
                           </div>
                         </div>
                       </div>
@@ -264,7 +272,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
                       <div className="text-right">
                         <div className="text-sm font-medium">{count} citations</div>
                         <Progress 
-                          value={(Number(count) / (Number(stats?.totalCitations) || 1)) * 100} 
+                          value={(Number(count) / totalCitations) * 100} 
                           className="w-20 h-2"
                         />
                       </div>
@@ -290,7 +298,7 @@ export function CitationRewardsDashboard({ creatorId }: CitationRewardsDashboard
                       <div className="text-right">
                         <div className="text-sm font-medium">{count} citations</div>
                         <Progress 
-                          value={(Number(count) / (Number(stats?.totalCitations) || 1)) * 100} 
+                          value={(Number(count) / totalCitations) * 100} 
                           className="w-20 h-2"
                         />
                       </div>
