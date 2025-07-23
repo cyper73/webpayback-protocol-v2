@@ -1,7 +1,8 @@
 import { CitationRewardsDashboard } from "@/components/citations/CitationRewardsDashboard";
 
 export default function Citations() {
-  // Use creatorId 4 which has the real citation data
+  // Use creatorId 4 - will show ZERO citations since simulated data was removed
+  // This is the correct behavior: no fake data, only authentic citations
   const creatorId = 4;
   
   return (
