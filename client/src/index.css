@@ -251,23 +251,98 @@
 
 /* Security Systems specific optimization */
 .dashboard-section .space-y-6 .glass-card {
-  min-height: 280px;
-  max-height: 400px;
+  min-height: 340px;
+  max-height: none;
+  overflow: visible;
 }
 
 /* Better grid alignment for security cards */
 .dashboard-section .space-y-6 {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
-/* Reentrancy Protection card optimization */
-.glass-card:has([data-component="reentrancy-protection"]) {
-  min-height: 320px;
+/* Prevent text overlap in security cards */
+.glass-card .grid .space-y-2 > * + * {
+  margin-top: 0.75rem !important;
 }
 
-/* Alchemy Usage Monitor card optimization */
-.glass-card:has([data-component="alchemy-usage"]) {
-  min-height: 280px;
+.glass-card .grid .space-y-3 > * + * {
+  margin-top: 1rem !important;
+}
+
+/* Ensure proper spacing for security metrics */
+.glass-card .grid > div {
+  min-height: 80px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Fix overlapping headers and content */
+.glass-card .card-header {
+  z-index: 10;
+  position: relative;
+  padding-bottom: 0.75rem !important;
+}
+
+.glass-card .card-content {
+  z-index: 5;
+  position: relative;
+  margin-top: 0;
+  padding-top: 0 !important;
+}
+
+/* Security cards metric numbers styling */
+.glass-card .text-2xl, .glass-card .text-3xl {
+  line-height: 1.1 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.glass-card .text-xs, .glass-card .text-sm {
+  line-height: 1.2 !important;
+  margin-top: 0.125rem !important;
+}
+
+/* Prevent metric overflow */
+.glass-card .grid > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Better spacing between security metrics */
+@media (min-width: 1280px) {
+  .dashboard-section .space-y-6 .glass-card .grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.25rem !important;
+  }
+}
+
+/* Fix badge positioning to prevent overlap */
+.glass-card .card-header .flex.items-center.justify-between {
+  margin-bottom: 0.5rem;
+  align-items: flex-start !important;
+}
+
+.glass-card .card-header .badge {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+/* Ensure security metric containers have proper height */
+.glass-card .bg-gray-800\/50 {
+  min-height: 70px !important;
+  padding: 0.75rem !important;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Fix "At Risk" and other status badges */
+.glass-card .bg-red-500\/20, .glass-card .bg-blue-500\/20 {
+  position: relative;
+  z-index: 1;
 }
