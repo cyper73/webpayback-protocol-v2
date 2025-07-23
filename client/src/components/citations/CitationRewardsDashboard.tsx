@@ -194,7 +194,53 @@ export function CitationRewardsDashboard() {
             </Card>
           </div>
 
-          <Card>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Cited Sources</CardTitle>
+                <CardDescription>
+                  Websites and content sources being cited by AI systems
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {statsLoading ? (
+                    <div className="text-center py-4 text-muted-foreground">
+                      Loading cited sources...
+                    </div>
+                  ) : stats?.recentCitations?.length > 0 ? (
+                    Array.from(new Set(stats.recentCitations.map((c: any) => c.sourceUrl))).map((url: string, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                              {url.includes('youtube') ? '▶️' : '🌐'}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">
+                              {url.length > 40 ? `${url.substring(0, 40)}...` : url}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {stats.recentCitations.filter((c: any) => c.sourceUrl === url).length} citation{stats.recentCitations.filter((c: any) => c.sourceUrl === url).length > 1 ? 's' : ''}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {url.includes('youtube') ? 'Video' : 'Website'}
+                        </Badge>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No cited sources yet
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
             <CardHeader>
               <CardTitle>Recent Citations</CardTitle>
               <CardDescription>
@@ -208,7 +254,7 @@ export function CitationRewardsDashboard() {
                     Loading recent citations...
                   </div>
                 ) : stats?.recentCitations?.length > 0 ? (
-                  stats.recentCitations.slice(0, 5).map((citation, index) => (
+                  stats.recentCitations.slice(0, 5).map((citation: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center space-x-3">
                         {getAIModelIcon(citation.aiModel)}
@@ -237,6 +283,7 @@ export function CitationRewardsDashboard() {
               </div>
             </CardContent>
           </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="simulator" className="space-y-4">
