@@ -308,6 +308,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get unified citation stats for ALL user creators
+  app.get("/api/citations/unified/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Get unified stats for ALL user creators
+      const unifiedStats = await authenticityLayer.getAllUserCitationStats(userId);
+      
+      res.json({ 
+        success: true, 
+        stats: unifiedStats,
+        message: `Found ${unifiedStats.citedSources.length} cited sources with ${unifiedStats.totalCitations} total citations`
+      });
+    } catch (error) {
+      console.error('Unified citation stats error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error.message) 
+      });
+    }
+  });
+
   // Apply authenticity policy to all users (system-wide standard)
   app.post("/api/authenticity/enforce", async (req, res) => {
     try {
