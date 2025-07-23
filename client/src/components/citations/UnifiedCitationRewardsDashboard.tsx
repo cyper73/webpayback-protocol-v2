@@ -28,13 +28,17 @@ interface UnifiedCitationRewardsDashboardProps {
 }
 
 export function UnifiedCitationRewardsDashboard({ userId }: UnifiedCitationRewardsDashboardProps) {
-  const { data: response, isLoading: statsLoading } = useQuery({
+  const { data: response, isLoading: statsLoading } = useQuery<{
+    success: boolean;
+    stats: UnifiedCitationStats;
+    message: string;
+  }>({
     queryKey: ['/api/citations/unified', userId],
     enabled: !!userId,
     refetchInterval: 10000,
   });
 
-  const stats = response?.stats as UnifiedCitationStats;
+  const stats = response?.stats;
 
   const getAIModelIcon = (model: string) => {
     switch (model?.toLowerCase()) {
@@ -100,7 +104,7 @@ export function UnifiedCitationRewardsDashboard({ userId }: UnifiedCitationRewar
       <div className="text-center">
         <h1 className="text-3xl font-bold text-white mb-2">🎯 Tutti i Tuoi Siti Citati - Dashboard Unificata</h1>
         <p className="text-gray-300">
-          Authentic AI citation tracking across all your registered platforms
+          Monitoraggio autentico delle citazioni AI su tutte le tue piattaforme registrate
         </p>
         {stats?.isAuthentic && (
           <Badge variant="outline" className="mt-2 border-green-500 text-green-400 bg-green-500/10">
