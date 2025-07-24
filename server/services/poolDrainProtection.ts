@@ -380,6 +380,12 @@ class PoolDrainProtectionService {
     riskScore: number, 
     alerts: string[]
   ): Promise<void> {
+    // IMPORTANTE: Non loggiamo mai eventi di sicurezza per il wallet del founder
+    if (walletAddress.toLowerCase() === this.FOUNDER_WALLET.toLowerCase()) {
+      console.log(`🔓 FOUNDER WALLET: Skipping security event logging for ${this.FOUNDER_WALLET}`);
+      return;
+    }
+
     let suspiciousActivity = 'normal_activity';
     let alertLevel = 'low';
     
@@ -447,6 +453,41 @@ class PoolDrainProtectionService {
   }
 
   /**
+   * Clean any existing security events for founder wallet
+   */
+  async cleanFounderSecurityEvents(): Promise<void> {
+    console.log(`🧹 CLEANING: Removing any security events for founder wallet ${this.FOUNDER_WALLET}`);
+    
+    // Get all security events
+    const allEvents = await storage.getRewardPoolSecurity();
+    
+    // Find founder wallet events
+    const founderEvents = allEvents.filter(event => 
+      event.walletAddress.toLowerCase() === this.FOUNDER_WALLET.toLowerCase()
+    );
+    
+    if (founderEvents.length > 0) {
+      console.log(`🗑️ FOUND ${founderEvents.length} founder wallet security events to remove`);
+      
+      // Mark founder events as resolved to hide them from active alerts
+      for (const event of founderEvents) {
+        await storage.updateRewardPoolSecurity(event.id, {
+          isResolved: true,
+          evidence: {
+            ...event.evidence,
+            founderWalletCleaned: true,
+            cleanedAt: new Date().toISOString()
+          }
+        });
+      }
+      
+      console.log(`✅ CLEANED: All founder wallet security events marked as resolved`);
+    } else {
+      console.log(`✅ CLEAN: No founder wallet security events found`);
+    }
+  }
+
+  /**
    * Get protection statistics for monitoring
    */
   async getProtectionStats(): Promise<{
@@ -459,7 +500,10 @@ class PoolDrainProtectionService {
       isHealthy: boolean;
     };
   }> {
-    const securityEvents = await storage.getRewardPoolSecurity();
+    const allSecurityEvents = await storage.getRewardPoolSecurity();
+    
+    // Filter out resolved events (including cleaned founder events)
+    const securityEvents = allSecurityEvents.filter(e => !e.isResolved);
     
     const totalBlocked = securityEvents.filter(e => e.actionTaken === 'blocked').length;
     const recentAlerts = securityEvents.filter(e => {
@@ -503,3 +547,14 @@ class PoolDrainProtectionService {
 }
 
 export const poolDrainProtectionService = new PoolDrainProtectionService();
+
+// Auto-cleanup founder wallet events on service initialization
+(async () => {
+  console.log(`🧹 AUTO-CLEANUP: Checking for founder wallet security events...`);
+  try {
+    await poolDrainProtectionService.cleanFounderSecurityEvents();
+    console.log(`✅ AUTO-CLEANUP: Founder wallet security events processed`);
+  } catch (error) {
+    console.error(`❌ AUTO-CLEANUP ERROR:`, error);
+  }
+})();

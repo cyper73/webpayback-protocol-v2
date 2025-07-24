@@ -2227,6 +2227,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clean founder wallet security events
+  app.post('/api/pool/drain-protection/clean-founder', async (req, res) => {
+    try {
+      const { poolDrainProtectionService } = await import('./services/poolDrainProtection');
+      await poolDrainProtectionService.cleanFounderSecurityEvents();
+      
+      res.json({
+        success: true,
+        message: 'Founder wallet security events cleaned successfully',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   // Force cache bypass test
   app.get("/api/test/cache-bypass", (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
