@@ -38,9 +38,9 @@ class RealPoolDataService {
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9077051D318b614F915E8A07861090856FDEC91e";
   
-  // Pool addresses - ORIGINAL WORKING POOLS
-  private readonly POL_WPT_POOL = "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd"; // Original POL/WPT pool (working)
-  private readonly WMATIC_WPT_POOL = "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd"; // Same pool address
+  // Pool addresses - CORRECTED WORKING POOLS
+  private readonly POL_WPT_POOL = "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd"; // Old POL/WPT pool (closed)
+  private readonly WMATIC_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // CORRECT WMATIC/WPT pool (active)
 
   private isCacheValid(): boolean {
     const now = Date.now();

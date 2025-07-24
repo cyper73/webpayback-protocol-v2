@@ -123,6 +123,14 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
 
 ## Recent Changes
 
+- **CRITICAL POOL ADDRESS CORRECTION IN DEBUGGING SYSTEM** (January 24, 2025):
+  - **USER DISCOVERED ERROR**: Pool Debugger was using wrong pool address (0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd - closed)
+  - **CORRECTED TO ACTIVE POOL**: Updated all services to use correct WMATIC/WPT pool address: 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+  - **SERVICES UPDATED**: realPoolDataService.ts, poolDebugService.ts, web3.ts all now use correct pool address
+  - **DOCUMENTATION UPDATED**: UNISWAP_GAS_ERROR_SOLUTION.md now shows correct active pool
+  - **ROOT CAUSE**: Old POL/WPT pool (0x1FF3...) was closed, active WMATIC/WPT pool is 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+  - This explains why user was getting "Unpredictable gas limit" - system was pointing to closed pool instead of active one
+
 - **POOL DEBUGGING SYSTEM IMPLEMENTED FOR UNISWAP GAS ERROR RESOLUTION** (January 24, 2025):
   - **CRITICAL FIX**: Updated WPT token contract address to correct value: 0x9077051D318b614F915E8A07861090856FDEC91e
   - **COMPREHENSIVE POOL DEBUGGER**: Created complete debugging system for "Unpredictable gas limit" error on Uniswap

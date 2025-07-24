@@ -79,10 +79,11 @@ Slippage: 5% (invece di 0.5%)
 
 ## 🚀 **ALTERNATIVE**
 
-### **Opzione A: Pool POL/WPT**
+### **Opzione A: Pool WMATIC/WPT (CORRETTA)**
 ```
-Pool Address: 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd
-Vantaggi: Pool esistente, liquidità attiva
+Pool Address: 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+Vantaggi: Pool attiva e funzionante per WMATIC/WPT
+NOTA: Pool 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd è chiusa
 ```
 
 ### **Opzione B: Retry con parametri ottimizzati**

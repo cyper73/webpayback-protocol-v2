@@ -47,6 +47,9 @@ class PoolDebugService {
     try {
       const poolInfo = await web3Service.getPoolInfo();
       
+      // CORRECT WMATIC/WPT pool address
+      const correctPoolAddress = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB";
+      
       // WPT Token info (your token)
       const wptToken = {
         address: "0x9077051D318b614F915E8A07861090856FDEC91e",
@@ -94,7 +97,7 @@ class PoolDebugService {
       recommendations.push("Ensure token decimals are correct (18 for both tokens)");
       
       return {
-        poolAddress: poolInfo.poolAddress,
+        poolAddress: correctPoolAddress, // Use correct pool address
         tokenA: wptToken,
         tokenB: wmaticToken,
         poolStatus: {
