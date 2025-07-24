@@ -1370,6 +1370,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Pool debugging endpoints
+  app.get("/api/web3/pool-debug/:walletAddress", async (req, res) => {
+    try {
+      const { poolDebugService } = await import("./services/poolDebugService.js");
+      const debugInfo = await poolDebugService.debugPool(req.params.walletAddress);
+      res.json({ success: true, debugInfo });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/web3/generate-liquidity-params", async (req, res) => {
+    try {
+      const { poolDebugService } = await import("./services/poolDebugService.js");
+      const { wmaticAmount, wptAmount, walletAddress, slippageTolerance } = req.body;
+      const params = await poolDebugService.generateOptimalLiquidityParams(
+        wmaticAmount, 
+        wptAmount, 
+        walletAddress, 
+        slippageTolerance
+      );
+      res.json({ success: true, params });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.get("/api/web3/pool-instructions", async (req, res) => {
+    try {
+      const { poolDebugService } = await import("./services/poolDebugService.js");
+      const instructions = poolDebugService.getStepByStepInstructions();
+      res.json({ success: true, instructions });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   // Distribute real rewards to creator wallet
   app.post("/api/web3/distribute-rewards", async (req, res) => {
     try {

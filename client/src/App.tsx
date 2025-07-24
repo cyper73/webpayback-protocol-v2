@@ -11,12 +11,14 @@ import TestConnectivity from "@/pages/test-connectivity";
 import PolStakingPage from "@/pages/PolStakingPage";
 import Citations from "@/pages/Citations";
 import CitationsByWallet from "@/pages/CitationsByWallet";
+import PoolDebugger from "@/pages/PoolDebugger";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/staking" component={PolStakingPage} />
+      <Route path="/pool-debug" component={PoolDebugger} />
       <Route path="/citations" component={Citations} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />
       <Route path="/privacy" component={Privacy} />
