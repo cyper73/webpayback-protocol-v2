@@ -49,7 +49,7 @@ class PoolDebugService {
       
       // WPT Token info (your token)
       const wptToken = {
-        address: "0x9077051D318b614F915E8A0786a3fE2d9D44fB3a",
+        address: "0x9077051D318b614F915E8A07861090856FDEC91e",
         symbol: "WPT",
         balance: "511274.03", // From screenshot
         allowance: "0", // Likely needs approval
@@ -123,18 +123,18 @@ class PoolDebugService {
     slippageTolerance: number = 3
   ): Promise<LiquidityParams> {
     
-    // Convert to wei (18 decimals)
-    const amount0Desired = (wmaticAmount * 1e18).toString();
-    const amount1Desired = (wptAmount * 1e18).toString();
+    // Convert to wei (18 decimals) using BigInt to avoid precision issues
+    const amount0Desired = (BigInt(Math.floor(wmaticAmount * 1000)) * BigInt(10 ** 15)).toString(); // 1000 for precision, then multiply by 10^15
+    const amount1Desired = (BigInt(Math.floor(wptAmount * 1000)) * BigInt(10 ** 15)).toString();
     
     // Calculate minimum amounts with slippage tolerance
-    const slippageMultiplier = (100 - slippageTolerance) / 100;
-    const amount0Min = (BigInt(amount0Desired) * BigInt(Math.floor(slippageMultiplier * 100)) / BigInt(100)).toString();
-    const amount1Min = (BigInt(amount1Desired) * BigInt(Math.floor(slippageMultiplier * 100)) / BigInt(100)).toString();
+    const slippagePercent = Math.floor((100 - slippageTolerance) * 100); // Convert to basis points
+    const amount0Min = (BigInt(amount0Desired) * BigInt(slippagePercent) / BigInt(10000)).toString();
+    const amount1Min = (BigInt(amount1Desired) * BigInt(slippagePercent) / BigInt(10000)).toString();
     
     return {
       token0: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
-      token1: "0x9077051D318b614F915E8A0786a3fE2d9D44fB3a", // WPT  
+      token1: "0x9077051D318b614F915E8A07861090856FDEC91e", // WPT  
       amount0Desired,
       amount1Desired,
       amount0Min,
