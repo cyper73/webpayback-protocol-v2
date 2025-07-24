@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard-working";
+import Dashboard from "@/pages/dashboard";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/terms";
 import TestConnectivity from "@/pages/test-connectivity";
