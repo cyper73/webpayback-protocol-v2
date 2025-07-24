@@ -2153,14 +2153,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get pool security events
+  // Get pool security events (only unresolved events)
   app.get('/api/pool/drain-protection/security-events', async (req, res) => {
     try {
       const events = await storage.getRewardPoolSecurity();
       
+      // Filter out resolved events - only show active security events
+      const activeEvents = events.filter(event => {
+        // Handle PostgreSQL boolean values (true = true, false = false)
+        return !event.isResolved;
+      });
+      
       res.json({
         success: true,
-        events: events.map(event => ({
+        events: activeEvents.map(event => ({
           id: event.id,
           walletAddress: event.walletAddress,
           suspiciousActivity: event.suspiciousActivity,
@@ -2220,6 +2226,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           remainingQuota: protection.remainingQuota,
           securityAlerts: protection.securityAlerts
         },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // Get ALL pool security events (including resolved ones) - Admin endpoint
+  app.get('/api/pool/drain-protection/security-events/all', async (req, res) => {
+    try {
+      const events = await storage.getRewardPoolSecurity();
+      
+      res.json({
+        success: true,
+        events: events.map(event => ({
+          id: event.id,
+          walletAddress: event.walletAddress,
+          suspiciousActivity: event.suspiciousActivity,
+          riskScore: parseFloat(event.riskScore),
+          alertLevel: event.alertLevel,
+          actionTaken: event.actionTaken,
+          isResolved: event.isResolved,
+          createdAt: event.createdAt
+        })),
         timestamp: new Date().toISOString()
       });
     } catch (error) {
