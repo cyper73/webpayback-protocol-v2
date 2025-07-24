@@ -62,7 +62,11 @@ export default function PoolDrainProtection() {
     refetchInterval: 10000, // Refresh every 10 seconds
   });
 
-  const { data: securityEvents, isLoading: eventsLoading } = useQuery<{ events: SecurityEvent[] }>({
+  const { data: securityEvents, isLoading: eventsLoading } = useQuery<{ 
+    success: boolean; 
+    events: SecurityEvent[]; 
+    timestamp: string; 
+  }>({
     queryKey: ['/api/pool/drain-protection/security-events'],
     refetchInterval: 15000, // Refresh every 15 seconds
   });
