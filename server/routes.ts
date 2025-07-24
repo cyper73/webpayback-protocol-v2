@@ -15,6 +15,8 @@ import { fakeCreatorDetection } from "./services/fakeCreatorDetection";
 import { reentrancyProtection } from "./services/reentrancyProtection";
 import { citationRewardEngine } from "./services/citationRewardEngine";
 import { authenticityLayer } from "./services/authenticitylayer";
+import { aiQueryProtection } from "./services/aiQueryProtection";
+import { vpnDetection } from "./services/vpnDetection";
 import { db } from "./db";
 import { creators, contentTracking } from "@shared/schema";
 import { eq, inArray, desc, and, gte, sql } from "drizzle-orm";
@@ -2851,6 +2853,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching StakeCraft status:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch StakeCraft status' });
+    }
+  });
+
+  // AI QUERY PROTECTION ENDPOINTS
+  
+  // Analyze AI query for spam/fraud
+  app.post('/api/ai-query/analyze', async (req, res) => {
+    try {
+      const { query, aiModel, ipAddress, userAgent, responseTime, walletAddress } = req.body;
+      
+      if (!query || !aiModel || !ipAddress) {
+        return res.status(400).json({ error: 'Query, AI model, and IP address are required' });
+      }
+      
+      const analysis = await aiQueryProtection.analyzeAIQuery({
+        query,
+        aiModel,
+        ipAddress,
+        userAgent: userAgent || 'Unknown',
+        timestamp: new Date(),
+        responseTime: responseTime || 200,
+        walletAddress
+      });
+      
+      res.json({
+        success: true,
+        analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Get AI query protection statistics
+  app.get('/api/ai-query/stats', async (req, res) => {
+    try {
+      const stats = await aiQueryProtection.getQueryStats();
+      
+      res.json({
+        success: true,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Test AI query analysis
+  app.post('/api/ai-query/test', async (req, res) => {
+    try {
+      const { query, ipAddress } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Query is required for testing' });
+      }
+      
+      const analysis = await aiQueryProtection.testQuery(query, ipAddress);
+      
+      res.json({
+        success: true,
+        testResults: analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // VPN DETECTION ENDPOINTS
+  
+  // Analyze IP address for VPN/proxy usage
+  app.post('/api/vpn/analyze', async (req, res) => {
+    try {
+      const { ipAddress, userAgent } = req.body;
+      
+      if (!ipAddress) {
+        return res.status(400).json({ error: 'IP address is required' });
+      }
+      
+      const analysis = await vpnDetection.analyzeIP(ipAddress, userAgent);
+      
+      res.json({
+        success: true,
+        analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Get VPN detection statistics
+  app.get('/api/vpn/stats', async (req, res) => {
+    try {
+      const stats = await vpnDetection.getVPNStats();
+      
+      res.json({
+        success: true,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Test IP address analysis
+  app.post('/api/vpn/test', async (req, res) => {
+    try {
+      const { ipAddress } = req.body;
+      
+      if (!ipAddress) {
+        return res.status(400).json({ error: 'IP address is required for testing' });
+      }
+      
+      const analysis = await vpnDetection.testIP(ipAddress);
+      
+      res.json({
+        success: true,
+        testResults: analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 

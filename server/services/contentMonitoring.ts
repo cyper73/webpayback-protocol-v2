@@ -7,6 +7,8 @@ import { channelMonitoringService } from "./channelMonitoring";
 import { mevProtectionService } from "./mevProtection";
 import { poolDrainProtectionService } from "./poolDrainProtection";
 import { fakeCreatorDetection } from "./fakeCreatorDetection";
+import { aiQueryProtection } from "./aiQueryProtection";
+import { vpnDetection } from "./vpnDetection";
 
 interface AIAccessDetection {
   userAgent: string;
@@ -246,6 +248,38 @@ class ContentMonitoringService {
         return false;
       }
 
+      // 🤖 AI QUERY ANALYSIS - Check for spam/bot queries
+      console.log(`🤖 Analyzing AI query for spam detection...`);
+      const queryAnalysis = await aiQueryProtection.analyzeAIQuery({
+        query: detection.url, // Using URL as query for now
+        aiModel: detection.aiType,
+        ipAddress: detection.ipAddress,
+        userAgent: detection.userAgent,
+        timestamp: detection.timestamp,
+        responseTime: 200
+      });
+
+      if (queryAnalysis.recommendation === 'BLOCK') {
+        console.log(`🚨 AI QUERY BLOCKED - Spam/fraud detected:
+          Risk Score: ${queryAnalysis.riskScore}%
+          Reasons: ${queryAnalysis.reasons.join(', ')}
+          Confidence: ${(queryAnalysis.confidence * 100).toFixed(1)}%`);
+        return false;
+      }
+
+      // 🌐 VPN/PROXY DETECTION - Check IP legitimacy
+      console.log(`🌐 Analyzing IP for VPN/proxy usage...`);
+      const vpnAnalysis = await vpnDetection.analyzeIP(detection.ipAddress, detection.userAgent);
+
+      if (vpnAnalysis.recommendation === 'BLOCK') {
+        console.log(`🚨 VPN/PROXY BLOCKED - Suspicious IP detected:
+          Risk Score: ${vpnAnalysis.riskScore}%
+          Reasons: ${vpnAnalysis.reasons.join(', ')}
+          Country: ${vpnAnalysis.country}
+          Provider: ${vpnAnalysis.provider || 'Unknown'}`);
+        return false;
+      }
+
       // 🔒 ANTI-FRAUD ANALYSIS
       const fraudAnalysis = await fraudDetectionService.analyzeCreatorAccess(creator.id, {
         url: detection.url,
@@ -258,7 +292,7 @@ class ContentMonitoringService {
       // Block reward if fraudulent activity detected
       if (fraudAnalysis.isFraudulent) {
         console.log(`🚨 FRAUD DETECTED - Blocking reward:
-          Creator: ${creator.name || creator.id}
+          Creator: ${creator.id}
           Risk Score: ${fraudAnalysis.riskScore}%
           Reasons: ${fraudAnalysis.reasons.join(', ')}
           Action: ${fraudAnalysis.recommendedAction}`);
@@ -273,7 +307,7 @@ class ContentMonitoringService {
         
         if (fakeCreatorCheck.shouldBlock) {
           console.log(`🚨 FAKE CREATOR DETECTED - Blocking reward:
-            Creator: ${creator.name || creator.id}
+            Creator: ${creator.id}
             URL: ${creator.websiteUrl}
             Similarity Score: ${fakeCreatorCheck.similarityScore}%
             Risk Score: ${fakeCreatorCheck.riskScore}%
@@ -297,14 +331,7 @@ class ContentMonitoringService {
         accessType: "ai_access",
         aiModel: detection.aiType,
         detectionConfidence: detection.confidence.toString(),
-        metadata: {
-          userAgent: detection.userAgent,
-          ipAddress: detection.ipAddress,
-          fingerprint: fingerprint,
-          fraudAnalysis: fraudAnalysis,
-          isChannelContent: channelResult.isChannelContent,
-          channelMapping: channelResult.channelMapping
-        }
+        // metadata field removed - not needed for schema
       };
 
       await storage.createContentTracking(trackingData);
@@ -361,15 +388,7 @@ class ContentMonitoringService {
               amount: rewardAmount,
               transactionHash: `mev-protected-${commitResult.commitHash.slice(0, 16)}`,
               status: "pending",
-              metadata: {
-                aiModel: detection.aiType,
-                contentHash: fingerprint.contentHash,
-                detectionConfidence: detection.confidence,
-                fraudAnalysis: fraudAnalysis,
-                mevProtected: true,
-                commitHash: commitResult.commitHash,
-                poolProtection: poolProtectionStatus
-              }
+              // metadata removed for schema compatibility
             });
           } catch (error) {
             console.error("MEV-protected reveal failed:", error);
@@ -383,14 +402,7 @@ class ContentMonitoringService {
           amount: rewardAmount,
           transactionHash: `0x${Date.now().toString(16)}`,
           status: "pending",
-          metadata: {
-            aiModel: detection.aiType,
-            contentHash: fingerprint.contentHash,
-            detectionConfidence: detection.confidence,
-            fraudAnalysis: fraudAnalysis,
-            mevProtected: false,
-            poolProtection: poolProtectionStatus
-          }
+          // metadata removed for schema compatibility
         });
       }
 
@@ -402,7 +414,7 @@ class ContentMonitoringService {
       );
 
       console.log(`✅ AI Access Detected and Rewarded:
-        Creator: ${creator.name || creator.id}
+        Creator: ${creator.id}
         URL: ${detection.url}
         AI Type: ${detection.aiType}
         Confidence: ${(detection.confidence * 100).toFixed(1)}%

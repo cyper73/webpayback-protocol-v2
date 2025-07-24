@@ -18,6 +18,7 @@ import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
 import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
 import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
+import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtectionDashboard";
 
 import { Box, Wallet, Coins, Link, Shield, FileText } from "lucide-react";
 import { Link as RouterLink } from "wouter";
@@ -338,6 +339,21 @@ export default function Dashboard() {
             <FakeCreatorDetection />
             <AlchemyUsageMonitor />
           </div>
+        </section>
+
+        {/* AI Query & VPN Protection */}
+        <section className="dashboard-section">
+          <Card className="glass-card rounded-2xl shadow-neon-purple">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold gradient-text">
+                Advanced AI Query & VPN Protection
+              </CardTitle>
+              <p className="text-gray-400">Enhanced fraud detection with semantic analysis and geo-intelligence</p>
+            </CardHeader>
+            <CardContent>
+              <AIQueryProtectionDashboard />
+            </CardContent>
+          </Card>
         </section>
 
         {/* Network Switcher */}
