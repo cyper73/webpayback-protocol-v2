@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -20,7 +17,6 @@ import {
   TrendingUp,
   Globe
 } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
 
 interface QueryAnalysis {
   isSpam: boolean;
@@ -41,10 +37,6 @@ interface VPNAnalysis {
 }
 
 export function AIQueryProtectionDashboard() {
-  const queryClient = useQueryClient();
-  const [testQuery, setTestQuery] = useState('');
-  const [testIP, setTestIP] = useState('');
-
   // Fetch AI Query Stats
   const { data: queryStats, isLoading: queryStatsLoading } = useQuery({
     queryKey: ['/api/ai-query/stats'],
@@ -57,40 +49,7 @@ export function AIQueryProtectionDashboard() {
     refetchInterval: 10000
   });
 
-  // Test AI Query Mutation
-  const testQueryMutation = useMutation({
-    mutationFn: async (data: { query: string; ipAddress?: string }) => {
-      return apiRequest('/api/ai-query/test', 'POST', data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/ai-query/stats'] });
-    },
-  });
 
-  // Test VPN Detection Mutation
-  const testVPNMutation = useMutation({
-    mutationFn: async (data: { ipAddress: string }) => {
-      return apiRequest('/api/vpn/test', 'POST', data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/vpn/stats'] });
-    },
-  });
-
-  const handleTestQuery = () => {
-    if (testQuery.trim()) {
-      testQueryMutation.mutate({ 
-        query: testQuery,
-        ipAddress: testIP || '192.168.1.100'
-      });
-    }
-  };
-
-  const handleTestVPN = () => {
-    if (testIP.trim()) {
-      testVPNMutation.mutate({ ipAddress: testIP });
-    }
-  };
 
   const getRiskColor = (riskScore: number) => {
     if (riskScore >= 70) return 'text-red-500';
@@ -123,11 +82,10 @@ export function AIQueryProtectionDashboard() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="query-analysis">Query Analysis</TabsTrigger>
           <TabsTrigger value="vpn-detection">VPN Detection</TabsTrigger>
-          <TabsTrigger value="testing">Testing</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -365,170 +323,7 @@ export function AIQueryProtectionDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="testing" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* AI Query Testing */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Test AI Query Analysis</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Test Query</label>
-                  <Textarea
-                    placeholder="Enter a query to test for spam detection..."
-                    value={testQuery}
-                    onChange={(e) => setTestQuery(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">IP Address (Optional)</label>
-                  <Input
-                    placeholder="192.168.1.100"
-                    value={testIP}
-                    onChange={(e) => setTestIP(e.target.value)}
-                  />
-                </div>
-                <Button 
-                  onClick={handleTestQuery}
-                  disabled={testQueryMutation.isPending || !testQuery.trim()}
-                  className="w-full"
-                >
-                  {testQueryMutation.isPending ? 'Analyzing...' : 'Test Query'}
-                </Button>
 
-                {testQueryMutation.data && (
-                  <div className="space-y-3">
-                    <div className="p-4 border rounded-lg space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">Risk Score</span>
-                        <span className={`font-bold ${getRiskColor(testQueryMutation.data.testResults.riskScore)}`}>
-                          {testQueryMutation.data.testResults.riskScore}/100
-                        </span>
-                      </div>
-                      
-                      <Progress 
-                        value={testQueryMutation.data.testResults.riskScore} 
-                        className="h-2"
-                      />
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">Recommendation</span>
-                        <Badge className={getRecommendationBadge(testQueryMutation.data.testResults.recommendation)}>
-                          {testQueryMutation.data.testResults.recommendation}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">Confidence</span>
-                        <span>{(testQueryMutation.data.testResults.confidence * 100).toFixed(1)}%</span>
-                      </div>
-
-                      {testQueryMutation.data.testResults.reasons.length > 0 && (
-                        <div>
-                          <span className="font-semibold">Reasons:</span>
-                          <ul className="mt-1 space-y-1">
-                            {testQueryMutation.data.testResults.reasons.map((reason: string, i: number) => (
-                              <li key={i} className="text-sm text-muted-foreground">
-                                • {reason}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* VPN Detection Testing */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Test VPN Detection</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">IP Address</label>
-                  <Input
-                    placeholder="Enter IP address to test..."
-                    value={testIP}
-                    onChange={(e) => setTestIP(e.target.value)}
-                  />
-                </div>
-                <Button 
-                  onClick={handleTestVPN}
-                  disabled={testVPNMutation.isPending || !testIP.trim()}
-                  className="w-full"
-                >
-                  {testVPNMutation.isPending ? 'Analyzing...' : 'Test IP'}
-                </Button>
-
-                {testVPNMutation.data && (
-                  <div className="space-y-3">
-                    <div className="p-4 border rounded-lg space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">Risk Score</span>
-                        <span className={`font-bold ${getRiskColor(testVPNMutation.data.testResults.riskScore)}`}>
-                          {testVPNMutation.data.testResults.riskScore}/100
-                        </span>
-                      </div>
-                      
-                      <Progress 
-                        value={testVPNMutation.data.testResults.riskScore} 
-                        className="h-2"
-                      />
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">VPN Detected</span>
-                        {testVPNMutation.data.testResults.isVPN ? (
-                          <XCircle className="h-5 w-5 text-red-500" />
-                        ) : (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">Recommendation</span>
-                        <Badge className={getRecommendationBadge(testVPNMutation.data.testResults.recommendation)}>
-                          {testVPNMutation.data.testResults.recommendation}
-                        </Badge>
-                      </div>
-
-                      {testVPNMutation.data.testResults.country && (
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold">Country</span>
-                          <span>{testVPNMutation.data.testResults.country}</span>
-                        </div>
-                      )}
-
-                      {testVPNMutation.data.testResults.provider && (
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold">Provider</span>
-                          <span>{testVPNMutation.data.testResults.provider}</span>
-                        </div>
-                      )}
-
-                      {testVPNMutation.data.testResults.reasons.length > 0 && (
-                        <div>
-                          <span className="font-semibold">Reasons:</span>
-                          <ul className="mt-1 space-y-1">
-                            {testVPNMutation.data.testResults.reasons.map((reason: string, i: number) => (
-                              <li key={i} className="text-sm text-muted-foreground">
-                                • {reason}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
     </div>
   );
