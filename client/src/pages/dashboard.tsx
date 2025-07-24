@@ -50,13 +50,13 @@ export default function Dashboard() {
     queryKey: ["/api/analytics/dashboard"],
     refetchInterval: isUserInteracting ? false : 30000,
     staleTime: 0,
-    cacheTime: 5 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
   // Always show content, never loading screen
   // This prevents the initialization message from appearing
 
-  const { agents = [], networks = [], creators = [], stats = {}, rewards = [], pool = [], compliance = [] } = dashboardData || {
+  const data = dashboardData || {
     agents: [],
     networks: [],
     creators: [],
@@ -65,6 +65,8 @@ export default function Dashboard() {
     pool: [],
     compliance: []
   };
+  
+  const { agents, networks, creators, stats, rewards, pool, compliance } = data;
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
@@ -273,7 +275,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {agents.map((agent) => (
+                {agents.map((agent: any) => (
                   <AgentCard key={agent.id} agent={agent} />
                 ))}
               </div>
@@ -305,7 +307,7 @@ export default function Dashboard() {
         {/* Creator Rewards & Governance */}
         <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
           <RewardDistribution />
-          <ComplianceMonitor />
+          <ComplianceMonitor compliance={compliance} />
         </section>
 
         {/* Qloo Cultural Intelligence Dashboard */}
