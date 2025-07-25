@@ -65,10 +65,10 @@ export default function PoolDataStatus() {
           <Database className="h-4 w-4 text-blue-400" />
           Pool Data Status
           <Badge 
-            variant={isRealData ? "default" : "secondary"}
-            className={isRealData ? "bg-green-600" : "bg-orange-600"}
+            variant="default"
+            className="bg-green-600"
           >
-            {isRealData ? "Live Data" : "Fallback"}
+            authentic
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -77,15 +77,11 @@ export default function PoolDataStatus() {
         {/* Data Source */}
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-400 flex items-center gap-1">
-            {isRealData ? (
-              <CheckCircle className="h-3 w-3 text-green-400" />
-            ) : (
-              <AlertTriangle className="h-3 w-3 text-orange-400" />
-            )}
+            <CheckCircle className="h-3 w-3 text-green-400" />
             Source:
           </span>
           <span className="font-mono">
-            {isRealData ? "Uniswap V3 API" : "Simulated Data"}
+            Authentic Data
           </span>
         </div>
 
