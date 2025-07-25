@@ -101,10 +101,10 @@ class RealPoolDataService {
 
       if (!pair) {
         console.warn(`No pair data found for ${poolAddress}`);
-        // Return authentic $0 data for V2 pool
+        // Return authentic $0 data for WMATIC/WPT pool
         return {
           poolAddress,
-          token0: "POL",
+          token0: "WMATIC",
           token1: "WPT",
           fee: "0.30%",
           totalValueLocked: "$0",
@@ -126,11 +126,11 @@ class RealPoolDataService {
       const finalVolume = volume24h;  
       const finalFees = fees24h;
       
-      // Use V2 pair format for POL/WPT
+      // Use V2 pair format for WMATIC/WPT only
       return {
         poolAddress,
-        token0: pair.token0?.symbol === "POL" ? "POL" : "WMATIC",
-        token1: pair.token1?.symbol === "WPT" ? "WPT" : "WPT",
+        token0: "WMATIC",
+        token1: "WPT",
         fee: "0.30%", // V2 standard fee
         totalValueLocked: `$${finalTvl.toLocaleString()}`,
         volume24h: `$${finalVolume.toLocaleString()}`,

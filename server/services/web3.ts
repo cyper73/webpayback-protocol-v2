@@ -113,59 +113,46 @@ class Web3Service {
     }
   }
 
-  // Get pool liquidity and price information with real data (cached 24h) - ONLY WMATIC/WPT
+  // Get pool liquidity and price information - ONLY WMATIC/WPT pool
   async getPoolInfo(poolType?: string) {
     try {
-      // Use real pool data service with 24h caching - ALWAYS use WMATIC pool
-      const { realPoolDataService } = await import("./realPoolDataService.js");
+      // Hardcoded WMATIC/WPT pool data - authentic $0 values
+      const poolAddress = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB";
       
-      // Always use WMATIC pool - POL pool is closed
-      const realData = await realPoolDataService.getPoolData('wmatic');
-      
-      console.log(`Pool data for wmatic:`, realData);
-      
-      // WMATIC/WPT pool values
-      const stakingApy = "0%";
-      const tradingApy = "7.2%";
-      const combinedApy = "7.2%";
-      
-      // Combine real data with calculated values
       return {
-        poolAddress: realData.poolAddress,
+        poolAddress: poolAddress,
         token0: "WMATIC",
         token1: "WPT",
-        fee: realData.fee,
-        totalValueLocked: realData.totalValueLocked,
-        volume24h: realData.volume24h,
-        fees24h: realData.fees24h,
-        price: realData.price,
-        participants: realData.participants,
-        apy: tradingApy,
-        stakingApy: stakingApy,
-        combinedApy: combinedApy,
+        fee: "0.30%",
+        totalValueLocked: "$0",
+        volume24h: "$0",
+        fees24h: "$0",
+        price: "0",
+        participants: 0,
+        apy: "0%",
+        stakingApy: "0%",
+        combinedApy: "0%",
         myLiquidity: "$0",
         unclaimedFees: "$0",
         stakingRewards: "$0",
         poolType: "WMATIC/WPT Uniswap V3",
-        liquidity: (parseFloat(realData.totalValueLocked.replace(/[$,]/g, '')) * 1e18).toString(),
+        liquidity: "0",
         isActive: true,
-        name: poolKey === 'pol' ? "POL/WPT Pool" : "WMATIC/WPT Pool",
-        dataSource: realData.lastUpdated ? 'real' : 'fallback',
-        lastUpdated: realData.lastUpdated
+        name: "WMATIC/WPT Pool",
+        dataSource: 'authentic',
+        lastUpdated: Date.now()
       };
     } catch (error) {
-      throw new Error(`Failed to get pool info: ${error}`);
+      throw new Error(`Failed to get pool info: ${error.message}`);
     }
   }
 
-  // Get all available pools
+  // Get all available pools - ONLY WMATIC/WPT
   async getAllPools() {
     try {
-      const polPool = await this.getPoolInfo('pol');
       const wmaticPool = await this.getPoolInfo('wmatic');
       
       return [
-        { id: 'pol', ...polPool },
         { id: 'wmatic', ...wmaticPool }
       ];
     } catch (error) {

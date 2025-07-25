@@ -1317,13 +1317,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pool information for WMATIC/WPT or POL/WPT
+  // Get pool information for WMATIC/WPT ONLY
   app.get("/api/web3/pool-info", async (req, res) => {
     try {
-      const poolType = req.query.pool as string; // 'pol' or 'wmatic'
-      const poolInfo = await web3Service.getPoolInfo(poolType);
+      // Always return WMATIC/WPT pool data - ignore any pool parameter
+      const poolInfo = await web3Service.getPoolInfo('wmatic');
       res.json(poolInfo);
     } catch (error) {
+      console.error("Pool-info error:", error);
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
