@@ -113,27 +113,27 @@ class Web3Service {
     }
   }
 
-  // Get pool liquidity and price information with real data (cached 24h)
+  // Get pool liquidity and price information with real data (cached 24h) - ONLY WMATIC/WPT
   async getPoolInfo(poolType?: string) {
     try {
-      // Use real pool data service with 24h caching
+      // Use real pool data service with 24h caching - ALWAYS use WMATIC pool
       const { realPoolDataService } = await import("./realPoolDataService.js");
       
-      const poolKey = poolType === 'wmatic' ? 'wmatic' : 'pol';
-      const realData = await realPoolDataService.getPoolData(poolKey);
+      // Always use WMATIC pool - POL pool is closed
+      const realData = await realPoolDataService.getPoolData('wmatic');
       
-      console.log(`Pool data for ${poolKey}:`, realData);
+      console.log(`Pool data for wmatic:`, realData);
       
-      // Calculate APYs based on pool type
-      const stakingApy = poolKey === 'pol' ? "6.5%" : "0%";
-      const tradingApy = poolKey === 'pol' ? "8.5%" : "7.2%";
-      const combinedApy = poolKey === 'pol' ? "15.0%" : "7.2%";
+      // WMATIC/WPT pool values
+      const stakingApy = "0%";
+      const tradingApy = "7.2%";
+      const combinedApy = "7.2%";
       
       // Combine real data with calculated values
       return {
         poolAddress: realData.poolAddress,
-        token0: realData.token0,
-        token1: realData.token1,
+        token0: "WMATIC",
+        token1: "WPT",
         fee: realData.fee,
         totalValueLocked: realData.totalValueLocked,
         volume24h: realData.volume24h,
@@ -146,7 +146,7 @@ class Web3Service {
         myLiquidity: "$0",
         unclaimedFees: "$0",
         stakingRewards: "$0",
-        poolType: poolKey === 'pol' ? "POL/WPT Uniswap V3 + POL Staking" : "WMATIC/WPT Uniswap V3",
+        poolType: "WMATIC/WPT Uniswap V3",
         liquidity: (parseFloat(realData.totalValueLocked.replace(/[$,]/g, '')) * 1e18).toString(),
         isActive: true,
         name: poolKey === 'pol' ? "POL/WPT Pool" : "WMATIC/WPT Pool",

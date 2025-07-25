@@ -15,14 +15,12 @@ interface PoolData {
 }
 
 interface CachedPoolData {
-  pol: PoolData | null;
   wmatic: PoolData | null;
   lastFetch: number;
 }
 
 class RealPoolDataService {
   private cache: CachedPoolData = {
-    pol: null,
     wmatic: null,
     lastFetch: 0 // Force refresh with original pool address
   };
@@ -38,8 +36,7 @@ class RealPoolDataService {
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9077051D318b614F915E8A07861090856FDEC91e";
   
-  // Pool addresses - CORRECTED WORKING POOLS
-  private readonly POL_WPT_POOL = "0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd"; // Old POL/WPT pool (closed)
+  // Pool addresses - ONLY ACTIVE WMATIC/WPT POOL
   private readonly WMATIC_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // CORRECT WMATIC/WPT pool (active)
 
   private isCacheValid(): boolean {
@@ -149,35 +146,20 @@ class RealPoolDataService {
     }
   }
 
-  private getFallbackData(poolType: 'pol' | 'wmatic'): PoolData {
-    // Only use as absolute last resort - prefer real Uniswap data
-    if (poolType === 'pol') {
-      return {
-        poolAddress: this.POL_WPT_POOL,
-        token0: "USDC",
-        token1: "WMATIC",
-        fee: "0.05%",
-        totalValueLocked: "$0",
-        volume24h: "$0", 
-        fees24h: "$0",
-        price: "0",
-        participants: 0,
-        lastUpdated: Date.now()
-      };
-    } else {
-      return {
-        poolAddress: this.WMATIC_WPT_POOL,
-        token0: "WETH",
-        token1: "WMATIC",
-        fee: "0.3%",
-        totalValueLocked: "$0",
-        volume24h: "$0",
-        fees24h: "$0", 
-        price: "0",
-        participants: 0,
-        lastUpdated: Date.now()
-      };
-    }
+  private getFallbackData(poolType: 'wmatic'): PoolData {
+    // Return authentic $0 data for WMATIC/WPT pool only
+    return {
+      poolAddress: this.WMATIC_WPT_POOL,
+      token0: "WMATIC",
+      token1: "WPT",
+      fee: "0.30%",
+      totalValueLocked: "$0",
+      volume24h: "$0",
+      fees24h: "$0", 
+      price: "0",
+      participants: 0,
+      lastUpdated: Date.now()
+    };
   }
 
   async refreshPoolData(): Promise<void> {
@@ -189,14 +171,10 @@ class RealPoolDataService {
     console.log("Refreshing pool data from Uniswap V3...");
 
     try {
-      // Fetch both pools in parallel (only 2 API calls per day)
-      const [polData, wmaticData] = await Promise.all([
-        this.fetchPoolDataFromUniswap(this.POL_WPT_POOL),
-        this.fetchPoolDataFromUniswap(this.WMATIC_WPT_POOL)
-      ]);
+      // Fetch only WMATIC/WPT pool data (1 API call per day)
+      const wmaticData = await this.fetchPoolDataFromUniswap(this.WMATIC_WPT_POOL);
 
       // Update cache with real data or fallback
-      this.cache.pol = polData || this.getFallbackData('pol');
       this.cache.wmatic = wmaticData || this.getFallbackData('wmatic');
       this.cache.lastFetch = Date.now();
 
@@ -207,22 +185,21 @@ class RealPoolDataService {
       console.error("Failed to refresh pool data:", error);
       
       // Use fallback data if we don't have any cached data
-      if (!this.cache.pol || !this.cache.wmatic) {
-        this.cache.pol = this.getFallbackData('pol');
+      if (!this.cache.wmatic) {
         this.cache.wmatic = this.getFallbackData('wmatic');
         this.cache.lastFetch = Date.now();
       }
     }
   }
 
-  async getPoolData(poolType: 'pol' | 'wmatic'): Promise<PoolData> {
+  async getPoolData(poolType: 'wmatic'): Promise<PoolData> {
     // Refresh data if cache is expired
     await this.refreshPoolData();
 
-    const data = poolType === 'pol' ? this.cache.pol : this.cache.wmatic;
+    const data = this.cache.wmatic;
     
     if (!data) {
-      return this.getFallbackData(poolType);
+      return this.getFallbackData('wmatic');
     }
 
     return data;
@@ -237,7 +214,7 @@ class RealPoolDataService {
       isValid: this.isCacheValid(),
       lastFetch: new Date(this.cache.lastFetch).toISOString(),
       nextRefresh: new Date(now + timeUntilNextRefresh).toISOString(),
-      dataSource: this.cache.pol ? 'real' : 'fallback',
+      dataSource: this.cache.wmatic ? 'real' : 'fallback',
       hoursUntilRefresh: Math.max(0, timeUntilNextRefresh / (1000 * 60 * 60))
     };
   }

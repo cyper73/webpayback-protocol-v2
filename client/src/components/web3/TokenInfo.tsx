@@ -46,16 +46,13 @@ interface NetworkStatus {
 }
 
 export default function TokenInfo() {
-  const [selectedPool, setSelectedPool] = useState<'pol' | 'wmatic'>('pol');
-
   const { data: tokenInfo } = useQuery<TokenInfo>({
     queryKey: ["/api/web3/token-info"],
     refetchInterval: 30000
   });
 
   const { data: poolInfo } = useQuery<PoolInfo>({
-    queryKey: ["/api/web3/pool-info", selectedPool],
-    queryFn: () => fetch(`/api/web3/pool-info?pool=${selectedPool}`).then(r => r.json()),
+    queryKey: ["/api/web3/pool-info"],
     refetchInterval: 30000
   });
 
@@ -190,31 +187,13 @@ export default function TokenInfo() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-purple-400" />
-            Liquidity Pool ({poolInfo.token0}/{poolInfo.token1})
+            WMATIC/WPT Liquidity Pool
             <Badge variant="outline" className="ml-auto">
-              {poolInfo?.name || `${poolInfo?.token0}/${poolInfo?.token1} Pool`}
+              WMATIC/WPT Pool
             </Badge>
           </CardTitle>
-          <CardDescription className="flex items-center justify-between">
-            <span>Live pool data from Polygon DEX</span>
-            <div className="flex gap-2">
-              <Button
-                variant={selectedPool === 'pol' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedPool('pol')}
-                className={`text-xs ${selectedPool === 'pol' ? 'bg-purple-600 hover:bg-purple-700' : 'hover:bg-purple-100'}`}
-              >
-                💎 POL/WPT (Primary)
-              </Button>
-              <Button
-                variant={selectedPool === 'wmatic' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedPool('wmatic')}
-                className={`text-xs ${selectedPool === 'wmatic' ? 'bg-orange-600 hover:bg-orange-700' : 'hover:bg-orange-100'}`}
-              >
-                🔄 WMATIC/WPT (Legacy)
-              </Button>
-            </div>
+          <CardDescription>
+            <span>Live WMATIC/WPT pool data from Polygon DEX</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
