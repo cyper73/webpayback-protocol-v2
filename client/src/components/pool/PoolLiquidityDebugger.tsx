@@ -369,7 +369,7 @@ export default function PoolLiquidityDebugger() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => copyToClipboard("0x9077051D318b614F915E8A07861090856FDEC91e")}
+              onClick={() => copyToClipboard("0x9408f17a8b4666f8cb8231ba213de04137dc3825")}
             >
               Copy WPT Address
             </Button>

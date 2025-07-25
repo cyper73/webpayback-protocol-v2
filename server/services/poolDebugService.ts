@@ -52,7 +52,7 @@ class PoolDebugService {
       
       // WPT Token info (your token)
       const wptToken = {
-        address: "0x9077051D318b614F915E8A07861090856FDEC91e",
+        address: "0x9408f17a8b4666f8cb8231ba213de04137dc3825",
         symbol: "WPT",
         balance: "511274.03", // From screenshot
         allowance: "0", // Likely needs approval
@@ -137,7 +137,7 @@ class PoolDebugService {
     
     return {
       token0: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
-      token1: "0x9077051D318b614F915E8A07861090856FDEC91e", // WPT  
+      token1: "0x9408f17a8b4666f8cb8231ba213de04137dc3825", // WPT V2  
       amount0Desired,
       amount1Desired,
       amount0Min,

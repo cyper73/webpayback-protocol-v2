@@ -34,7 +34,7 @@ class RealPoolDataService {
   // POL: Native Polygon token (verified)
   private readonly POL_TOKEN = "0x0000000000000000000000000000000000001010";
   // WPT: WebPayback Token (verified - deployed 6 days ago)
-  private readonly WPT_TOKEN = "0x9077051D318b614F915E8A07861090856FDEC91e";
+  private readonly WPT_TOKEN = "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
   // Pool addresses - ONLY ACTIVE WMATIC/WPT POOL
   private readonly WMATIC_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // CORRECT WMATIC/WPT pool (active)

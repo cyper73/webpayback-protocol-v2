@@ -6,8 +6,8 @@ const POLYGON_CONFIG = {
   chainId: 137,
   rpcUrl: "https://polygon-rpc.com/",
   explorerUrl: "https://polygonscan.com",
-  tokenAddress: "0x9077051D318b614F915E8A07861090856FDEC91e", // Your WPT token
-  poolAddress: "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB", // WMATIC/WPT pool (verified)
+  tokenAddress: "0x9408f17a8B4666f8cb8231BA213DE04137dc3825", // WPT V2 token (optimized)
+  poolAddress: "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB", // WMATIC/WPT V2 pool (fresh)
   symbol: "WPT",
   decimals: 18
 };
