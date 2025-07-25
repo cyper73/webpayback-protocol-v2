@@ -1,12 +1,11 @@
 /**
- *Optimized for verification at polygonscan.com
- *Based on original WPT contract with security improvements
+ *Submitted for verification at polygonscan.com on 2025-07-13
 */
 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// --- OpenZeppelin-style ERC20 implementation (same as original) ---
+// --- OpenZeppelin-style ERC20 implementation ---
 
 abstract contract Context {
     function _msgSender() internal view virtual returns (address) {
@@ -154,48 +153,74 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
     }
 }
 
-// *** WEBPAYBACK TOKEN V2 - OPTIMIZED FOR SCANNERS ***
-contract WebPaybackTokenV2 is ERC20 {
-    // FIXED IMMUTABLE PARAMETERS (cannot be changed by anyone)
-    address public constant creatorWallet = 0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba; // Your wallet
-    uint256 public constant creatorFeeBasisPoints = 10; // 0.1% (10 basis points) - FIXED FOREVER
-    
-    // Events for transparency
-    event CreatorFeeCollected(address indexed from, uint256 feeAmount);
+abstract contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    constructor() {
+        _transferOwnership(_msgSender());
+    }
+
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
+// *** IL TUO CONTRATTO PERSONALIZZATO ***
+contract WebPaybackToken is ERC20, Ownable {
+    address public creatorWallet = 0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba; // <-- Mainnet address here!
+    uint256 public creatorFeeBasisPoints = 300; // 3% (300 basis points)
+    uint256 public constant MAX_FEE_BPS = 1000; // 10% max
+
+    event FeeChanged(uint256 oldFee, uint256 newFee);
+    event CreatorWalletChanged(address oldWallet, address newWallet);
 
     constructor() ERC20("WebPayback Token", "WPT") {
-        // Mint same supply as original (1 million tokens)
         _mint(msg.sender, 1_000_000 * 10 ** decimals());
     }
-    // Override _transfer to include fee mechanism (same logic as original but with 0.1% fee)
+
+    function setCreatorFee(uint256 _bps) external onlyOwner {
+        require(_bps <= MAX_FEE_BPS, "Fee too high");
+        emit FeeChanged(creatorFeeBasisPoints, _bps);
+        creatorFeeBasisPoints = _bps;
+    }
+
+    function setCreatorWallet(address _newWallet) external onlyOwner {
+        require(_newWallet != address(0), "Invalid wallet");
+        emit CreatorWalletChanged(creatorWallet, _newWallet);
+        creatorWallet = _newWallet;
+    }
+
     function _transfer(
         address sender,
         address recipient,
         uint256 amount
     ) internal virtual override {
-        // Calculate fee: 0.1% instead of 3%
         uint256 fee = (amount * creatorFeeBasisPoints) / 10000;
-        
-        // Send fee to creator wallet (if fee > 0)
         if (fee > 0 && creatorWallet != address(0)) {
             super._transfer(sender, creatorWallet, fee);
-            emit CreatorFeeCollected(sender, fee);
         }
-        
-        // Send remaining amount to recipient
         super._transfer(sender, recipient, amount - fee);
-    }
-    
-    // View functions for transparency
-    function getCreatorWallet() external pure returns (address) {
-        return creatorWallet;
-    }
-    
-    function getCreatorFee() external pure returns (uint256) {
-        return creatorFeeBasisPoints;
-    }
-    
-    function calculateFee(uint256 amount) external pure returns (uint256) {
-        return (amount * creatorFeeBasisPoints) / 10000;
     }
 }
