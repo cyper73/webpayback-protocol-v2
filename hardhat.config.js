@@ -20,28 +20,21 @@ module.exports = {
   networks: {
     polygon: {
       url: "https://polygon-rpc.com/",
-      accounts: [
-        // Add your private key here (keep it secure!)
-        // process.env.PRIVATE_KEY
-        "YOUR_PRIVATE_KEY_HERE"
-      ],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 30000000000, // 30 gwei
       gas: 2100000
     },
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com/",
-      accounts: [
-        // process.env.PRIVATE_KEY
-        "YOUR_PRIVATE_KEY_HERE"
-      ],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 30000000000,
       gas: 2100000
     }
   },
   etherscan: {
     apiKey: {
-      polygon: "YOUR_POLYGONSCAN_API_KEY",
-      polygonMumbai: "YOUR_POLYGONSCAN_API_KEY"
+      polygon: process.env.POLYGONSCAN_API_KEY || "",
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY || ""
     }
   },
   paths: {
