@@ -4,8 +4,20 @@
 
 ### Split 50/50:
 ```
-500 EUR → WPOL (Wrapped POL)
-500 EUR → WPT V2 (dal contratto appena deployato)
+500 EUR → WPOL (Wrapped POL) - DA COMPRARE TU
+500 EUR → WPT V2 (dal contratto) - LI RICEVI AUTOMATICAMENTE
+```
+
+### Tu devi comprare SOLO:
+```
+500 EUR di WPOL 
+= ~2,183 WPOL al prezzo attuale ($0.229)
+```
+
+### Gli altri 500 EUR in WPT:
+```
+Li ottieni automaticamente dal contratto WPT V2
+Quando deployo il contratto, ricevi i WPT gratis
 ```
 
 ## 🛒 Come Ottenere WPOL (500 EUR)
