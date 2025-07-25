@@ -1,0 +1,44 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/runner/workspace/contracts/WPTv2.sol": {
+      "lastModificationDate": 1753479906589,
+      "contentHash": "e087931343b26cce72a668e5a4b689b4",
+      "sourceName": "contracts/WPTv2.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context",
+        "ERC20",
+        "IERC20",
+        "IERC20Metadata",
+        "WebPaybackTokenV2"
+      ]
+    }
+  }
+}
