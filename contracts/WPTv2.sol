@@ -164,8 +164,8 @@ contract WebPaybackTokenV2 is ERC20 {
     event CreatorFeeCollected(address indexed from, uint256 feeAmount);
 
     constructor() ERC20("WebPayback Token", "WPT") {
-        // Mint same supply as original (1 million tokens)
-        _mint(msg.sender, 1_000_000 * 10 ** decimals());
+        // Mint 10 million tokens for better liquidity and divisibility
+        _mint(msg.sender, 10_000_000 * 10 ** decimals());
     }
     // Override _transfer to include fee mechanism (same logic as original but with 0.1% fee)
     function _transfer(
@@ -197,5 +197,21 @@ contract WebPaybackTokenV2 is ERC20 {
     
     function calculateFee(uint256 amount) external pure returns (uint256) {
         return (amount * creatorFeeBasisPoints) / 10000;
+    }
+    
+    // Additional utility functions for better UX
+    function netTransferAmount(uint256 grossAmount) external pure returns (uint256) {
+        uint256 fee = (grossAmount * creatorFeeBasisPoints) / 10000;
+        return grossAmount - fee;
+    }
+    
+    // Burn function for deflationary tokenomics
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount);
+    }
+    
+    // Check if address receives fee-free transfers (only creator wallet)
+    function isFeeFree(address account) external pure returns (bool) {
+        return account == creatorWallet;
     }
 }
