@@ -61,15 +61,15 @@ Narrow range:
 ## Liquidity Provision Strategy
 
 ### Initial Liquidity Amount
-**Conservative**: $2,000 total value
-- $1,000 WMATIC
-- $1,000 worth WPT V2
+**Optimal**: 1,000 EUR total value
+- 500 EUR WPOL (~2,183 WPOL at $0.229)
+- 500 EUR worth WPT V2
 - Wide price range for discovery
 
-**Aggressive**: $5,000 total value
-- $2,500 WMATIC
-- $2,500 worth WPT V2
-- Tighter range, higher efficiency
+**Scale-Up (Phase 2)**: 2,000 EUR total value
+- 1,000 EUR WPOL
+- 1,000 EUR worth WPT V2
+- Narrower range, higher efficiency
 
 ### Liquidity Ratio
 For new token, consider:

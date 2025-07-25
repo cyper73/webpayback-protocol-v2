@@ -44,7 +44,7 @@
 1. **Pool Setup**
    - Fee tier: 0.3% (standard for new tokens)
    - Initial range: ±50% for price discovery
-   - Liquidity: $3,000-5,000 WMATIC/WPT-V2
+   - Liquidity: 1,000 EUR WPOL/WPT-V2 (conservative start)
    - Position management setup
 
 2. **Trading Validation**
