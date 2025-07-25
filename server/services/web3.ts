@@ -124,11 +124,11 @@ class Web3Service {
         token0: "WMATIC",
         token1: "WPT",
         fee: "0.30%",
-        totalValueLocked: "$0",
+        totalValueLocked: "€500", // User's manually added liquidity
         volume24h: "$0",
         fees24h: "$0",
-        price: "0",
-        participants: 0,
+        price: "124.993", // User reported: 124.993 WPT = 1 WMATIC
+        participants: 1, // User as liquidity provider
         apy: "0%",
         stakingApy: "0%",
         combinedApy: "0%",
