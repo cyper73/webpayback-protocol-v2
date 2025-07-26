@@ -125,8 +125,8 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
 
 - **PROJECT ORGANIZATION COMPLETED** (January 26, 2025):
   - **DOCUMENTATION ORGANIZED**: All .md files moved to dedicated `docs/` folder for better project structure
-  - **PERSONAL FILES REMOVED**: Eliminated LIQUIDITY_STRATEGY_1000EUR.md for privacy protection
-  - **CLEAN STRUCTURE**: New professional README.md created in root directory
+  - **LEGACY FILES REMOVED**: Eliminated personal and migration files (LIQUIDITY_STRATEGY_1000EUR.md, MIGRATION_PLAN.md, WPT_V1_SUNSET_PLAN.md, WPT_V1_V2_MIGRATION_STRATEGY.md)
+  - **CLEAN STRUCTURE**: New professional README.md created in root directory focusing on current WPT V2 deployment
   - **TOKEN SUPPLY CORRECTED**: Fixed dashboard display from 1B to correct 10M WPT tokens matching deployed contract
 
 - **WPT V2 DEPLOYMENT AND POOL CREATION COMPLETED** (January 25, 2025):

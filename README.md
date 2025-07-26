@@ -58,7 +58,7 @@ npx hardhat run scripts/deploy.js --network polygon
 All detailed documentation is available in the `docs/` folder:
 
 - [Deployment Parameters](docs/DEPLOYMENT_PARAMETERS.md)
-- [Migration Strategy](docs/MIGRATION_PLAN.md)
+- [Fee Analysis](docs/FEE_REVENUE_ANALYSIS.md)
 - [Pool Management](docs/UNISWAP_V3_POOL_STRATEGY.md)
 - [Security Features](docs/POOL_DRAIN_PROTECTION_UPDATE.md)
 
