@@ -1,7 +1,5 @@
 🚀 WEBPAYBACK PROTOCOL - IMPORTANT UPDATES 🚀
 
-✅ ENGLISH INTERFACE: Platform now fully converted to English for better international accessibility
-
 📄 UPDATED CONTRACT ADDRESSES:
 • WPT Token V2: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
 • Uniswap V3 Pool: 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3

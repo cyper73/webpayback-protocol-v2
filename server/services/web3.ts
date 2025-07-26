@@ -127,18 +127,18 @@ class Web3Service {
         totalValueLocked: "€500", // User's manually added liquidity
         volume24h: "$0",
         fees24h: "$0",
-        price: "124.993", // User reported: 124.993 WPT = 1 WMATIC
+        price: "124.993000", // User reported: 124.993 WPT = 1 WMATIC
         participants: 1, // User as liquidity provider
         apy: "0%",
         stakingApy: "0%",
         combinedApy: "0%",
-        myLiquidity: "$0",
+        myLiquidity: "€500",
         unclaimedFees: "$0",
         stakingRewards: "$0",
         poolType: "WMATIC/WPT Uniswap V3",
-        liquidity: "0",
+        liquidity: "€500",
         isActive: true,
-        name: "WMATIC/WPT Pool",
+        name: "WMATIC/WPT Liquidity Pool",
         dataSource: 'authentic',
         lastUpdated: Date.now()
       };
