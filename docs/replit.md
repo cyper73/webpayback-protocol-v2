@@ -131,6 +131,8 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - **GITHUB-READY ARCHIVE CREATED**: webpayback-github-ready-WPT-V2-FINAL-20250726.tar.gz (309KB) with all WPT V2 addresses updated
   - **V1 DEPRECATION WARNING**: Added explicit warnings in README.md marking V1 as DISCONTINUED
   - **DISABLING GUIDE CREATED**: Complete guide for V1 contract disabling in docs/WPT_V1_DISABLING_GUIDE.md
+  - **POOL ADDRESS CORRECTED**: Fixed wrong V2 pool (0x823C0b...) to correct V3 pool (0x572a5E8c...)
+  - **USER LIQUIDITY CONFIRMED**: €500 liquidity safely in correct V3 pool, was never lost
 
 - **WPT V2 DEPLOYMENT AND POOL CREATION COMPLETED** (January 25, 2025):
   - **CONTRACT DEPLOYED**: WPT V2 successfully deployed at address `0x9408f17a8B4666f8cb8231BA213DE04137dc3825`
