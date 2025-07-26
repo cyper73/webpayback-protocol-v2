@@ -31,13 +31,13 @@ class RealPoolDataService {
   private readonly POLYGON_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon";
   
   // VERIFIED real token addresses on Polygon
-  // POL: Native Polygon token (verified)
-  private readonly POL_TOKEN = "0x0000000000000000000000000000000000001010";
+  // WMATIC: Wrapped MATIC token (used in pool)
+  private readonly WMATIC_TOKEN = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
   // Pool addresses - ONLY ACTIVE WMATIC/WPT POOL
-  private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool CORRETTA POL/WPT V2
+  private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool CORRETTA WMATIC/WPT
 
   private isCacheValid(): boolean {
     const now = Date.now();
