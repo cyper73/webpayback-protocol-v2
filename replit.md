@@ -7,6 +7,7 @@ WebPayback Protocol is a sophisticated multi-agent blockchain application that a
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Interface language: English-only for better international understanding and system stability.
 
 ## System Architecture
 
