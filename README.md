@@ -14,7 +14,7 @@ A sophisticated decentralized application (dApp) that automatically rewards cont
 
 **CURRENT (V2)**: 
 - **WPT V2 Contract**: `0x9408f17a8B4666f8cb8231BA213DE04137dc3825` ✅ **ACTIVE**
-- **Liquidity Pool**: `0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB` ✅ **ACTIVE**
+- **Liquidity Pool**: `0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3` ✅ **ACTIVE V3**
 
 **DEPRECATED (V1)**:
 - **WPT V1 Contract**: `0x9077051D318b614F915E8A07861090856FDEC91e` ❌ **DISCONTINUED**

@@ -37,7 +37,7 @@ class RealPoolDataService {
   private readonly WPT_TOKEN = "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
   // Pool addresses - ONLY ACTIVE WMATIC/WPT POOL
-  private readonly WMATIC_WPT_POOL = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB"; // CORRECT WMATIC/WPT pool (active)
+  private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool CORRETTA POL/WPT V2
 
   private isCacheValid(): boolean {
     const now = Date.now();

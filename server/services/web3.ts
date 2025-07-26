@@ -7,7 +7,7 @@ const POLYGON_CONFIG = {
   rpcUrl: "https://polygon-rpc.com/",
   explorerUrl: "https://polygonscan.com",
   tokenAddress: "0x9408f17a8B4666f8cb8231BA213DE04137dc3825", // WPT V2 token (optimized)
-  poolAddress: "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB", // WMATIC/WPT V2 pool (fresh)
+  poolAddress: "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3", // V3 pool CORRETTA POL/WPT V2
   symbol: "WPT",
   decimals: 18
 };
@@ -116,8 +116,8 @@ class Web3Service {
   // Get pool liquidity and price information - ONLY WMATIC/WPT pool
   async getPoolInfo(poolType?: string) {
     try {
-      // Hardcoded WMATIC/WPT pool data - authentic $0 values
-      const poolAddress = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB";
+      // Hardcoded WMATIC/WPT pool data - authentic V3 pool address
+      const poolAddress = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3";
       
       return {
         poolAddress: poolAddress,
@@ -143,7 +143,7 @@ class Web3Service {
         lastUpdated: Date.now()
       };
     } catch (error) {
-      throw new Error(`Failed to get pool info: ${error.message}`);
+      throw new Error(`Failed to get pool info: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -156,7 +156,7 @@ class Web3Service {
         { id: 'wmatic', ...wmaticPool }
       ];
     } catch (error) {
-      throw new Error(`Failed to get all pools: ${error}`);
+      throw new Error(`Failed to get all pools: ${String(error)}`);
     }
   }
 
@@ -197,7 +197,7 @@ class Web3Service {
         transactionHash: result.transactionHash,
         networkId: 3, // Polygon network ID in our database
         status: "completed",
-        completedAt: new Date()
+        // completedAt field removed as not in schema
       };
 
       await storage.createRewardDistribution(rewardData);

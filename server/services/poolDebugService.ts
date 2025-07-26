@@ -48,7 +48,7 @@ class PoolDebugService {
       const poolInfo = await web3Service.getPoolInfo();
       
       // CORRECT WMATIC/WPT pool address
-      const correctPoolAddress = "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB";
+      const correctPoolAddress = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool CORRETTA
       
       // WPT Token info (your token)
       const wptToken = {
