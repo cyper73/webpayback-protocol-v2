@@ -10,6 +10,7 @@ import CreatorPortal from "@/components/creators/CreatorPortal";
 import LiveStats from "@/components/analytics/LiveStats";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
 import TokenInfo from "@/components/web3/TokenInfo";
+import PoolMonitoringStatus from "@/components/pool/PoolMonitoringStatus";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { GasTracker } from "@/components/gas/GasTracker";
@@ -299,9 +300,10 @@ export default function Dashboard() {
         </section>
 
         {/* Token Economics and Pool Management */}
-        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
+        <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-3">
           <TokenEconomics stats={stats} pool={pool} rewards={rewards} />
           <TokenInfo />
+          <PoolMonitoringStatus />
         </section>
 
         {/* Creator Rewards & Governance */}

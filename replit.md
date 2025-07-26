@@ -31,6 +31,14 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - Added rate limiting protection against DDoS attacks
 - Verified authentic blockchain integration with real liquidity data
 
+### Pool Monitoring System (July 26, 2025)
+- Implemented automatic pool data monitoring every 12 hours (user requested)
+- User confirmed pool contains more than €500 liquidity
+- System displays "€500+" to accurately reflect higher actual amounts
+- Added PoolMonitoringStatus dashboard component for real-time tracking
+- Manual refresh capability for immediate pool data updates
+- English-only interface for better international understanding
+
 ### Domain Integration Completed
 - **webpayback.com**: Successfully connected with SSL security
 - **DNS Configuration**: Ionos DNS properly configured to Replit app

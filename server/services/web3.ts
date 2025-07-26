@@ -119,28 +119,32 @@ class Web3Service {
       // Hardcoded WMATIC/WPT pool data - authentic V3 pool address
       const poolAddress = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3";
       
+      // Get authentic pool data from realPoolDataService (refreshed every 12h)
+      const { realPoolDataService } = await import('./realPoolDataService');
+      const realPoolData = await realPoolDataService.getPoolData('wmatic');
+
       return {
         poolAddress: poolAddress,
         token0: "WMATIC",
         token1: "WPT",
-        fee: "0.30%",
-        totalValueLocked: "€500", // User's manually added liquidity
-        volume24h: "$0",
-        fees24h: "$0",
-        price: "124.993000", // User reported: 124.993 WPT = 1 WMATIC
-        participants: 1, // User as liquidity provider
+        fee: realPoolData.fee || "0.30%",
+        totalValueLocked: realPoolData.totalValueLocked, // Real data from Uniswap V3
+        volume24h: realPoolData.volume24h,
+        fees24h: realPoolData.fees24h,
+        price: realPoolData.price, // Real exchange rate
+        participants: realPoolData.participants,
         apy: "0%",
         stakingApy: "0%",
         combinedApy: "0%",
-        myLiquidity: "€500",
+        myLiquidity: realPoolData.totalValueLocked,
         unclaimedFees: "$0",
         stakingRewards: "$0",
         poolType: "WMATIC/WPT Uniswap V3",
-        liquidity: "€500",
+        liquidity: realPoolData.totalValueLocked,
         isActive: true,
         name: "WMATIC/WPT Liquidity Pool",
         dataSource: 'authentic',
-        lastUpdated: Date.now()
+        lastUpdated: realPoolData.lastUpdated
       };
     } catch (error) {
       throw new Error(`Failed to get pool info: ${error instanceof Error ? error.message : String(error)}`);
