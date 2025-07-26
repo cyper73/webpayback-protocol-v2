@@ -31,7 +31,7 @@
 ## 🔄 V1 TO V2 TRANSITION
 
 ### **WPT V1 Sunset** ✅
-- **Old Contract**: `0x9077051D318b614F915E8A07861090856FDEC91e`
+- **V1 Contract (Deprecated)**: `0x9077051D318b614F915E8A07861090856FDEC91e`
 - **Status**: **DISCONTINUED** per user decision
 - **Reason**: No active users, no liquidity, V2 superior
 - **Action**: Immediate sunset, clean transition
