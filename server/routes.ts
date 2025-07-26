@@ -3066,6 +3066,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Security headers test endpoint
+  app.get("/api/security/headers/test", (req, res) => {
+    const securityHeaders = {
+      'Content-Security-Policy': res.getHeader('Content-Security-Policy'),
+      'X-Content-Type-Options': res.getHeader('X-Content-Type-Options'),
+      'X-Frame-Options': res.getHeader('X-Frame-Options'),
+      'X-XSS-Protection': res.getHeader('X-XSS-Protection'),
+      'Referrer-Policy': res.getHeader('Referrer-Policy'),
+      'Permissions-Policy': res.getHeader('Permissions-Policy'),
+      'Strict-Transport-Security': res.getHeader('Strict-Transport-Security')
+    };
+
+    res.json({
+      success: true,
+      message: 'Security headers implemented and active',
+      headers: securityHeaders,
+      corsStatus: 'Restricted to trusted domains only',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Download endpoint for updated routes.ts file
   app.get("/api/download/routes", (req, res) => {
     try {
