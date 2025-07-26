@@ -72,7 +72,7 @@ class Web3Service {
         address: this.tokenAddress,
         symbol: POLYGON_CONFIG.symbol,
         decimals: POLYGON_CONFIG.decimals,
-        totalSupply: "1000000000000000000000000000", // 1B tokens (example)
+        totalSupply: "10000000000000000000000000", // 10M tokens (real deployment)
         poolAddress: this.poolAddress,
         poolLiquidity: "500000000000000000000000" // 500K tokens in pool (example)
       };

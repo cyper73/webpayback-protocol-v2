@@ -125,7 +125,7 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
 
 - **WPT V2 DEPLOYMENT AND POOL CREATION COMPLETED** (January 25, 2025):
   - **CONTRACT DEPLOYED**: WPT V2 successfully deployed at address `0x9408f17a8B4666f8cb8231BA213DE04137dc3825`
-  - **DEPLOYMENT VERIFIED**: 10M WPT total supply, 0.1% creator fee, zero-gas cost deployment (0.025 MATIC)
+  - **DEPLOYMENT VERIFIED**: 10M WPT total supply (confirmed on-chain), 0.1% creator fee, zero-gas cost deployment (0.025 MATIC)
   - **POOL CREATED**: WMATIC/WPT V2 pool successfully created on Uniswap V3 with 0.3% fee tier
   - **LIQUIDITY PROVIDED**: User successfully added concentrated liquidity with "gamma personalizzata" approach
   - **POOL STATUS**: Live and operational at price 124.993 WPT = 1 WMATIC, ready for trading
