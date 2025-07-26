@@ -10,6 +10,8 @@ const app = express();
 const allowedOrigins = [
   'https://web-payback-tokenizer.replit.app',
   'https://webpayback.replit.app',
+  'https://webpayback.com',
+  'https://www.webpayback.com',
   'http://localhost:3000',
   'http://localhost:5000',
   'http://127.0.0.1:3000',
@@ -54,7 +56,7 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://web-payback-tokenizer.replit.app https://polygon-mainnet.g.alchemy.com wss: https:",
+    "connect-src 'self' https://web-payback-tokenizer.replit.app https://webpayback.com https://polygon-mainnet.g.alchemy.com wss: https:",
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",

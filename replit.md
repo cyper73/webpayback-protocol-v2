@@ -8,6 +8,7 @@ WebPayback Protocol is a sophisticated multi-agent blockchain application that a
 
 Preferred communication style: Simple, everyday language.
 Interface language: English-only for better international understanding and system stability.
+Domain configuration: webpayback.com registered on Ionos with Domain Guard, redirects to Replit app.
 
 ## System Architecture
 
