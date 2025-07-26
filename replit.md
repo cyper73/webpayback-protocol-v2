@@ -16,7 +16,7 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - Contract Address: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
 - Security Score: 95/100 (Excellent)
 - PolygonScan Verification: Confirmed and visible
-- Pool Address: 0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd (POL/WPT)
+- Pool Address: 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3 (POL/WPT - 500 EUR)
 - Status: Production ready with comprehensive security monitoring active
 - Date: July 26, 2025
 
