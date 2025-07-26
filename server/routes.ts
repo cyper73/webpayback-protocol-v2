@@ -3083,6 +3083,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // OpenAPI Schema endpoint for penetration testing
+  app.get("/api/openapi/schema", (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const schemaPath = path.join(process.cwd(), 'webpayback-api-schema.json');
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      
+      const schema = fs.readFileSync(schemaPath, 'utf8');
+      res.send(schema);
+    } catch (error) {
+      console.error('Schema endpoint error:', error);
+      res.status(500).json({ 
+        error: 'Failed to load API schema',
+        message: 'OpenAPI schema file not found'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
