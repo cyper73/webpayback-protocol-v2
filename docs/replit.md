@@ -129,6 +129,8 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - **CLEAN STRUCTURE**: New professional README.md created in root directory focusing on current WPT V2 deployment
   - **TOKEN SUPPLY CORRECTED**: Fixed dashboard display from 1B to correct 10M WPT tokens matching deployed contract
   - **GITHUB-READY ARCHIVE CREATED**: webpayback-github-ready-WPT-V2-FINAL-20250726.tar.gz (309KB) with all WPT V2 addresses updated
+  - **V1 DEPRECATION WARNING**: Added explicit warnings in README.md marking V1 as DISCONTINUED
+  - **DISABLING GUIDE CREATED**: Complete guide for V1 contract disabling in docs/WPT_V1_DISABLING_GUIDE.md
 
 - **WPT V2 DEPLOYMENT AND POOL CREATION COMPLETED** (January 25, 2025):
   - **CONTRACT DEPLOYED**: WPT V2 successfully deployed at address `0x9408f17a8B4666f8cb8231BA213DE04137dc3825`
