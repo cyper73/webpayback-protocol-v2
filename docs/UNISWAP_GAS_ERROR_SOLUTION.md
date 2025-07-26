@@ -32,7 +32,7 @@ Gas Limit: 500,000
 ```javascript
 WMATIC: 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270
 WPT:    0x9408f17a8B4666f8cb8231BA213DE04137dc3825
-Pool:   0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+Pool:   0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3
 Router: 0xE592427A0AEce92De3Edee1F18E0157C05861564
 ```
 
@@ -81,9 +81,9 @@ Slippage: 5% (invece di 0.5%)
 
 ### **Opzione A: Pool WMATIC/WPT (CORRETTA)**
 ```
-Pool Address: 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB
+Pool Address: 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3
 Vantaggi: Pool attiva e funzionante per WMATIC/WPT
-NOTA: Pool 0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB è attiva
+NOTA: Pool 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3 è attiva
 ```
 
 ### **Opzione B: Retry con parametri ottimizzati**
