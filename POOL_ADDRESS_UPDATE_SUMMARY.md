@@ -43,3 +43,11 @@ Il sistema ora utilizza la pool V3 corretta che:
 - È compatibile con WPT V2
 
 **Status**: ✅ COMPLETATO - Pool address corretta implementata
+
+## 📝 NOTE AGGIUNTIVE
+
+**Uniswap V3 Position NFT**:
+- URL posizione: `https://app.uniswap.org/positions/v3/polygon/2610779`
+- Pool address: `0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3`
+- Liquidità: $592.98 (€500 circa)
+- Status: ✅ Posizione attiva e visibile
