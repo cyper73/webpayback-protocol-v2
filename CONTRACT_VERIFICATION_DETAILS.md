@@ -15,6 +15,7 @@ v0.8.19+commit.7dd6d404
 ### Optimization Settings
 - **Optimization Enabled**: Yes
 - **Runs**: 200
+- **EVM Version**: london (default for Solidity 0.8.19)
 
 ### Constructor Arguments (ABI-Encoded)
 ```
