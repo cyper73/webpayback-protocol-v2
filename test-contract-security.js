@@ -10,10 +10,10 @@ import { Alchemy, Network } from 'alchemy-sdk';
 
 console.log('🛡️ Starting WebPayback Contract Security Tests...\n');
 
-// Contract addresses on Polygon (will be updated after deployment)
+// Contract addresses on Polygon - LIVE DEPLOYMENT
 const CONTRACTS = {
-  WPT_V2: process.env.WPT_CONTRACT_ADDRESS || 'NOT_DEPLOYED', // Will be set after deployment
-  UNISWAP_V3_POOL: '0x17fb62f5bb0de328fa8b98e9a62b0eb8b6f9e7e5', // WPOL/WPT pool (placeholder)
+  WPT_V2: '0x9408f17a8B4666f8cb8231BA213DE04137dc3825', // WebPayback Token v2 DEPLOYED
+  UNISWAP_V3_POOL: '0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd', // Real POL/WPT Pool
   CREATOR_WALLET: '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'
 };
 
@@ -42,12 +42,7 @@ async function testContractSecurity() {
   console.log('==========================================');
   
   try {
-    // Check if contract is deployed
-    if (CONTRACTS.WPT_V2 === 'NOT_DEPLOYED') {
-      console.log('⚠️  Contract not yet deployed - Running static analysis only');
-      testResults.warnings.push('Contract Not Deployed');
-      return;
-    }
+    console.log('🎯 Analyzing LIVE deployed contract:', CONTRACTS.WPT_V2);
     
     // Get contract bytecode
     const bytecode = await alchemy.core.getCode(CONTRACTS.WPT_V2);
@@ -103,6 +98,8 @@ async function testPoolSecurity() {
   console.log('=============================================');
   
   try {
+    console.log('🎯 Analyzing LIVE pool:', CONTRACTS.UNISWAP_V3_POOL);
+    
     // Check pool existence and liquidity
     const poolBalance = await alchemy.core.getBalance(CONTRACTS.UNISWAP_V3_POOL);
     
