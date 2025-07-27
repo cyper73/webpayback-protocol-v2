@@ -43,13 +43,13 @@ export default function PoolDataMonitoring() {
 
   // Primary pool - USDT/WPT V2
   const { data: primaryPool } = useQuery<PoolInfo>({
-    queryKey: ['/api/web3/pool-info', { type: 'usdt' }],
+    queryKey: ['/api/web3/pool-info?type=usdt'],
     refetchInterval: 30000
   });
 
   // Secondary pool - WMATIC/WPT V3  
   const { data: secondaryPool } = useQuery<PoolInfo>({
-    queryKey: ['/api/web3/pool-info', { type: 'wmatic' }],
+    queryKey: ['/api/web3/pool-info?type=wmatic'],
     refetchInterval: 30000
   });
 
@@ -186,7 +186,7 @@ export default function PoolDataMonitoring() {
               <div className="space-y-1">
                 <div className="text-xs text-gray-400">USDT/WPT Pool Address:</div>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-green-400">
+                  <code className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-green-400 break-all">
                     {primaryPool.poolAddress}
                   </code>
                   <a 
@@ -215,7 +215,7 @@ export default function PoolDataMonitoring() {
               <div className="space-y-1">
                 <div className="text-xs text-gray-400">WMATIC/WPT Pool Address:</div>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-green-400">
+                  <code className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-green-400 break-all">
                     {secondaryPool.poolAddress}
                   </code>
                   <a 

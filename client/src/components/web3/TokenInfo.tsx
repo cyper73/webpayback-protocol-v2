@@ -129,8 +129,7 @@ export default function TokenInfo() {
         </CardContent>
       </Card>
 
-      {/* Pool Data Monitoring */}
-      <PoolDataMonitoring />
+
 
       {/* Token Information */}
       <Card className="border-blue-500/20 bg-blue-900/5">
