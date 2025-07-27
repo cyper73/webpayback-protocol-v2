@@ -29,7 +29,7 @@ A cutting-edge multi-agent blockchain protocol that automatically rewards conten
 ## 🎯 Live Demo
 
 - **🌐 Platform**: [webpayback.replit.app](https://webpayback.replit.app)
-- **📖 Documentation**: [GitHub Repository](https://github.com/cyper73/webpayback)
+- **📖 Documentation**: [GitHub Repository](https://github.com/cyper73/webpayback-protocol/tree/webpayback)
 - **💬 Community**: [Discord Server](https://discord.gg/webpayback)
 
 ## 🏗️ Architecture

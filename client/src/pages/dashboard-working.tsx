@@ -208,7 +208,7 @@ export default function Dashboard() {
                     Complete source code available on GitHub
                   </p>
                   <a
-                    href="https://github.com/cyper73/webpayback"
+                    href="https://github.com/cyper73/webpayback-protocol/tree/webpayback"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-glass-dark hover:bg-electric-blue/20 text-electric-blue border border-electric-blue/30 rounded-lg transition-all duration-200 hover:scale-105 text-sm font-medium"

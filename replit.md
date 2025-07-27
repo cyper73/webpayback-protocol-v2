@@ -28,6 +28,13 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - Professional domain-based email now reflects webpayback.com domain integration
 - Updated contact information in docs/README.md and attached_assets/README_1753056355845.md
 
+### GitHub Repository Migration (July 27, 2025)
+- **NEW REPOSITORY**: Migrated to dedicated webpayback-protocol repository at https://github.com/cyper73/webpayback-protocol/tree/webpayback
+- **LINK UPDATES COMPLETED**: Updated all GitHub repository links across documentation and codebase
+- **FILES UPDATED**: replit.md, docs/README.md, PrivacyPolicy.tsx, dashboard.tsx, dashboard-static.tsx, dashboard-working.tsx
+- **ARCHIVE READY**: webpayback-complete-final-20250727-2146.tar.gz prepared with .gitignore for GitHub upload
+- **PROFESSIONAL BRANDING**: New repository provides better SEO and professional presentation for WebPayback Protocol
+
 ### Latest Security Fixes (July 26, 2025)
 - Fixed pool address to correct Uniswap V3 contract (0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3)
 - Enhanced CORS security with webpayback.com domain whitelisting
@@ -62,7 +69,7 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - **Production Ready**: Full dashboard at /content-certificate with minting, monitoring, and legal documentation features
 - **Database Schema**: Temporary tables created and tested, then cleaned up as requested by user
 - **Security**: All test data removed, no virtual users or test certificates remain in production database
-- **CREATOR PORTAL INTEGRATION COMPLETED**: Content Certificate system now requires Creator Portal registration before access. User automatically recognized as founder through existing GitHub creator profile (ID: 7, websiteUrl: https://github.com/cyper73/webpayback/tree/webpayback). System implements proper IDOR protection and logical flow: registration → content protection → WPT rewards.
+- **CREATOR PORTAL INTEGRATION COMPLETED**: Content Certificate system now requires Creator Portal registration before access. User automatically recognized as founder through existing GitHub creator profile (ID: 7, websiteUrl: https://github.com/cyper73/webpayback-protocol/tree/webpayback). System implements proper IDOR protection and logical flow: registration → content protection → WPT rewards.
 
 ### Domain Integration Completed
 - **webpayback.com**: Successfully connected with SSL security
