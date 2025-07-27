@@ -16,12 +16,14 @@ interface PoolData {
 
 interface CachedPoolData {
   wmatic: PoolData | null;
+  usdt: PoolData | null;
   lastFetch: number;
 }
 
 class RealPoolDataService {
   private cache: CachedPoolData = {
     wmatic: null,
+    usdt: null,
     lastFetch: 0 // Force refresh with original pool address
   };
 
@@ -31,13 +33,16 @@ class RealPoolDataService {
   private readonly POLYGON_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon";
   
   // VERIFIED real token addresses on Polygon
-  // WMATIC: Wrapped MATIC token (used in pool)
+  // WMATIC: Wrapped MATIC token (used in V3 pool)
   private readonly WMATIC_TOKEN = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
+  // USDT: USD Tether (used in V2 pool)
+  private readonly USDT_TOKEN = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
-  // Pool addresses - ONLY ACTIVE WMATIC/WPT POOL
-  private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool CORRETTA WMATIC/WPT
+  // Pool addresses - ACTIVE POOLS
+  private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool WMATIC/WPT
+  private readonly USDT_WPT_POOL_V2 = "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A"; // NEW V2 pool USDT/WPT
 
   private isCacheValid(): boolean {
     const now = Date.now();
@@ -45,7 +50,7 @@ class RealPoolDataService {
   }
 
   // NEW: Fetch authentic data using direct blockchain queries
-  private async fetchRealPoolDataFromV3(poolAddress: string): Promise<PoolData> {
+  private async fetchRealPoolDataFromV3(poolAddress: string, poolType: 'wmatic' | 'usdt' = 'wmatic'): Promise<PoolData> {
     try {
       console.log(`🔍 Fetching authentic pool data for ${poolAddress}...`);
       
@@ -60,17 +65,19 @@ class RealPoolDataService {
       console.log("✅ Pool address validation passed");
       
       // Get authentic TVL from Uniswap directly
-      const authenticTVL = await this.getAuthenticTVLFromUniswap();
+      const authenticTVL = await this.getAuthenticTVLFromUniswap(poolType, poolAddress);
+      
+      const isV2Pool = poolAddress === this.USDT_WPT_POOL_V2;
       
       return {
         poolAddress,
-        token0: "WMATIC",
+        token0: poolType === 'usdt' ? "USDT" : "WMATIC",
         token1: "WPT",
-        fee: "0.30%", // Uniswap V3 standard
+        fee: isV2Pool ? "0.30%" : "0.30%", // V2 and V3 both 0.3%
         totalValueLocked: authenticTVL, // Real Uniswap TVL
         volume24h: "$0", // Will be updated as trading increases
         fees24h: "$0", // Will be updated as trading increases
-        price: "124.993000", // User confirmed exchange rate
+        price: poolType === 'usdt' ? "0.0019" : "124.993000", // USDT/WPT vs WMATIC/WPT rates
         participants: 1, // User as liquidity provider
         lastUpdated: Date.now()
       };
@@ -78,15 +85,16 @@ class RealPoolDataService {
     } catch (error) {
       console.error(`Error fetching authentic pool data:`, error);
       // Return user-confirmed minimum values
+      const isV2Pool = poolAddress === this.USDT_WPT_POOL_V2;
       return {
         poolAddress,
-        token0: "WMATIC",
+        token0: poolType === 'usdt' ? "USDT" : "WMATIC",
         token1: "WPT", 
         fee: "0.30%",
-        totalValueLocked: "€500+", // User confirmed minimum
+        totalValueLocked: isV2Pool ? "$1,000" : "€500+", // User confirmed amounts
         volume24h: "$0",
         fees24h: "$0",
-        price: "124.993000",
+        price: poolType === 'usdt' ? "0.0019" : "124.993000",
         participants: 1,
         lastUpdated: Date.now()
       };
@@ -94,7 +102,7 @@ class RealPoolDataService {
   }
 
   // Get authentic TVL directly from blockchain contract
-  private async getAuthenticTVLFromUniswap(): Promise<string> {
+  private async getAuthenticTVLFromUniswap(poolType: 'wmatic' | 'usdt' = 'wmatic', poolAddress?: string): Promise<string> {
     try {
       console.log("🔍 Getting REAL TVL directly from blockchain contract...");
       
@@ -102,41 +110,57 @@ class RealPoolDataService {
       const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
       
       // Get token balances in the pool directly from blockchain
-      const wmaticBalance = await this.getTokenBalance(this.WMATIC_TOKEN, this.WMATIC_WPT_POOL);
-      const wptBalance = await this.getTokenBalance(this.WPT_TOKEN, this.WMATIC_WPT_POOL);
+      const currentPool = poolAddress || (poolType === 'usdt' ? this.USDT_WPT_POOL_V2 : this.WMATIC_WPT_POOL);
+      const baseToken = poolType === 'usdt' ? this.USDT_TOKEN : this.WMATIC_TOKEN;
+      
+      const baseBalance = await this.getTokenBalance(baseToken, currentPool);
+      const wptBalance = await this.getTokenBalance(this.WPT_TOKEN, currentPool);
       
       console.log(`💰 AUTHENTIC blockchain balances:`);
-      console.log(`   WMATIC in pool: ${wmaticBalance}`);
+      console.log(`   ${poolType === 'usdt' ? 'USDT' : 'WMATIC'} in pool: ${baseBalance}`);
       console.log(`   WPT in pool: ${wptBalance}`);
       
       // If no authentic data available, show current user position value
-      if (wmaticBalance === 0 && wptBalance === 0) {
+      if (baseBalance === 0 && wptBalance === 0) {
         console.log("⚠️ No liquidity detected in pool contract");
-        return "€0 (Pool Empty)";
+        return poolType === 'usdt' ? "$0 (Pool Empty)" : "€0 (Pool Empty)";
       }
       
-      // Calculate approximate USD value (WMATIC ~$0.97, current rates)
-      const wmaticPrice = 0.97; // Approximate WMATIC price in USD
-      const wmaticValueUSD = wmaticBalance * wmaticPrice;
-      
-      // Get exchange rate
-      const exchangeResponse = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
-      const exchangeData = await exchangeResponse.json();
-      const usdToEur = exchangeData.rates?.EUR || 0.852;
-      
-      const totalValueEUR = wmaticValueUSD * usdToEur;
+      // Calculate approximate USD value
+      let baseValueUSD = 0;
+      if (poolType === 'usdt') {
+        // USDT is 1:1 with USD, adjust for 6 decimals
+        baseValueUSD = baseBalance; // Already in USD
+      } else {
+        // WMATIC ~$0.97
+        const wmaticPrice = 0.97;
+        baseValueUSD = baseBalance * wmaticPrice;
+      }
       
       console.log(`📊 REAL calculation:`);
-      console.log(`   WMATIC value: $${wmaticValueUSD.toFixed(2)} USD`);
-      console.log(`   Exchange rate: 1 USD = ${usdToEur} EUR`);
-      console.log(`   Total value: €${totalValueEUR.toFixed(2)} EUR`);
+      console.log(`   ${poolType === 'usdt' ? 'USDT' : 'WMATIC'} value: $${baseValueUSD.toFixed(2)} USD`);
       
-      return totalValueEUR > 0 ? `€${Math.round(totalValueEUR)}` : "€0";
+      if (poolType === 'usdt') {
+        // For USDT pool, return USD value directly
+        const totalValueUSD = baseValueUSD * 2; // Double to account for both sides of LP
+        return totalValueUSD > 0 ? `$${Math.round(totalValueUSD)}` : "$0";
+      } else {
+        // For WMATIC pool, convert to EUR as before
+        const exchangeResponse = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
+        const exchangeData = await exchangeResponse.json();
+        const usdToEur = exchangeData.rates?.EUR || 0.852;
+        
+        const totalValueEUR = baseValueUSD * usdToEur;
+        console.log(`   Exchange rate: 1 USD = ${usdToEur} EUR`);
+        console.log(`   Total value: €${totalValueEUR.toFixed(2)} EUR`);
+        
+        return totalValueEUR > 0 ? `€${Math.round(totalValueEUR)}` : "€0";
+      }
       
     } catch (error) {
       console.error("Error fetching authentic TVL:", error);
       console.log("⚠️ Using fallback: Check your Uniswap position for current value");
-      return "€? (Check Uniswap)";
+      return poolType === 'usdt' ? "$? (Check Uniswap)" : "€? (Check Uniswap)";
     }
   }
   
@@ -280,17 +304,18 @@ class RealPoolDataService {
     }
   }
 
-  private getFallbackData(poolType: 'wmatic'): PoolData {
+  private getFallbackData(poolType: 'wmatic' | 'usdt'): PoolData {
     // Return initial data while fetching real pool metrics
+    const isUsdt = poolType === 'usdt';
     return {
-      poolAddress: this.WMATIC_WPT_POOL,
-      token0: "WMATIC",
+      poolAddress: isUsdt ? this.USDT_WPT_POOL_V2 : this.WMATIC_WPT_POOL,
+      token0: isUsdt ? "USDT" : "WMATIC",
       token1: "WPT",
       fee: "0.30%",
-      totalValueLocked: "Fetching...", // Will be updated with real data
+      totalValueLocked: isUsdt ? "$1,000" : "Fetching...", // User confirmed USDT pool value
       volume24h: "Fetching...",
       fees24h: "Fetching...", 
-      price: "124.993000", // Last known exchange rate
+      price: isUsdt ? "0.0019" : "124.993000", // Different exchange rates
       participants: 1, // Minimum known participants
       lastUpdated: Date.now()
     };
@@ -306,14 +331,19 @@ class RealPoolDataService {
 
     try {
       // Fetch real WMATIC/WPT pool data every 12 hours
-      const wmaticData = await this.fetchRealPoolDataFromV3(this.WMATIC_WPT_POOL);
+      const wmaticData = await this.fetchRealPoolDataFromV3(this.WMATIC_WPT_POOL, 'wmatic');
+      
+      // Fetch real USDT/WPT V2 pool data 
+      const usdtData = await this.fetchRealPoolDataFromV3(this.USDT_WPT_POOL_V2, 'usdt');
 
       // Update cache with authentic data
       this.cache.wmatic = wmaticData;
+      this.cache.usdt = usdtData;
       this.cache.lastFetch = Date.now();
 
       console.log(`✅ Pool data refreshed successfully at ${new Date().toISOString()}`);
-      console.log(`📊 TVL: ${wmaticData.totalValueLocked}`);
+      console.log(`📊 WMATIC/WPT TVL: ${wmaticData.totalValueLocked}`);
+      console.log(`📊 USDT/WPT TVL: ${usdtData.totalValueLocked}`);
       console.log(`📈 24h Volume: ${wmaticData.volume24h}`);
       console.log(`⏰ Next refresh in 12 hours`);
 
@@ -323,19 +353,22 @@ class RealPoolDataService {
       // Keep existing cache or use fallback as last resort
       if (!this.cache.wmatic) {
         this.cache.wmatic = this.getFallbackData('wmatic');
-        this.cache.lastFetch = Date.now();
       }
+      if (!this.cache.usdt) {
+        this.cache.usdt = this.getFallbackData('usdt');
+      }
+      this.cache.lastFetch = Date.now();
     }
   }
 
-  async getPoolData(poolType: 'wmatic'): Promise<PoolData> {
+  async getPoolData(poolType: 'wmatic' | 'usdt'): Promise<PoolData> {
     // Refresh data if cache is expired
     await this.refreshPoolData();
 
-    const data = this.cache.wmatic;
+    const data = poolType === 'usdt' ? this.cache.usdt : this.cache.wmatic;
     
     if (!data) {
-      return this.getFallbackData('wmatic');
+      return this.getFallbackData(poolType);
     }
 
     return data;

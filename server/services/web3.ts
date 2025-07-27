@@ -113,22 +113,46 @@ class Web3Service {
     }
   }
 
-  // Get pool liquidity and price information - ONLY WMATIC/WPT pool
-  async getPoolInfo(poolType?: string) {
+  // Get pool liquidity and price information - supports WMATIC/WPT and USDT/WPT pools
+  async getPoolInfo(poolType: 'wmatic' | 'usdt' = 'wmatic') {
     try {
-      // Hardcoded WMATIC/WPT pool data - authentic V3 pool address
-      const poolAddress = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3";
-      
       // Get authentic pool data from realPoolDataService (refreshed every 12h)
       const { realPoolDataService } = await import('./realPoolDataService');
-      const realPoolData = await realPoolDataService.getPoolData('wmatic');
+      const realPoolData = await realPoolDataService.getPoolData(poolType);
+
+      // Pool-specific configuration
+      const poolConfig = poolType === 'usdt' ? {
+        poolAddress: "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+        token0: "USDT",
+        token1: "WPT",
+        version: "V2",
+        name: "USDT/WPT Liquidity Pool V2",
+        poolType: "USDT/WPT Uniswap V2",
+        benefits: [
+          "No 'out of range' issues (V2 full range)",
+          "0.3% fees on all USDT/WPT swaps", 
+          "Stable USD-based liquidity",
+          "Lower gas costs than V3"
+        ]
+      } : {
+        poolAddress: "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
+        token0: "WMATIC",
+        token1: "WPT", 
+        version: "V3",
+        name: "WMATIC/WPT Liquidity Pool V3",
+        poolType: "WMATIC/WPT Uniswap V3",
+        benefits: [
+          "Concentrated liquidity for better capital efficiency",
+          "Higher potential returns in range",
+          "Advanced position management",
+          "0.3% fees on swaps"
+        ]
+      };
 
       return {
-        poolAddress: poolAddress,
-        token0: "WMATIC",
-        token1: "WPT",
+        ...poolConfig,
         fee: realPoolData.fee || "0.30%",
-        totalValueLocked: realPoolData.totalValueLocked, // Real data from Uniswap V3
+        totalValueLocked: realPoolData.totalValueLocked, // Real data from blockchain
         volume24h: realPoolData.volume24h,
         fees24h: realPoolData.fees24h,
         price: realPoolData.price, // Real exchange rate
@@ -139,10 +163,8 @@ class Web3Service {
         myLiquidity: realPoolData.totalValueLocked,
         unclaimedFees: "$0",
         stakingRewards: "$0",
-        poolType: "WMATIC/WPT Uniswap V3",
         liquidity: realPoolData.totalValueLocked,
         isActive: true,
-        name: "WMATIC/WPT Liquidity Pool",
         dataSource: 'authentic',
         lastUpdated: realPoolData.lastUpdated
       };

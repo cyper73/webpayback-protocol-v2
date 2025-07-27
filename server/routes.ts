@@ -1317,14 +1317,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pool information for WMATIC/WPT ONLY
+  // Get pool information - supports both WMATIC/WPT and USDT/WPT pools
   app.get("/api/web3/pool-info", async (req, res) => {
     try {
-      // Always return WMATIC/WPT pool data - ignore any pool parameter
-      const poolInfo = await web3Service.getPoolInfo('wmatic');
+      const poolType = req.query.type as string || 'wmatic'; // Default to WMATIC pool
+      
+      if (!['wmatic', 'usdt'].includes(poolType)) {
+        return res.status(400).json({ 
+          error: "Invalid pool type. Use 'wmatic' or 'usdt'" 
+        });
+      }
+      
+      const poolInfo = await web3Service.getPoolInfo(poolType);
       res.json(poolInfo);
     } catch (error) {
       console.error("Pool-info error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // NEW: Get specific USDT/WPT V2 pool information
+  app.get("/api/web3/usdt-pool-info", async (req, res) => {
+    try {
+      const { realPoolDataService } = await import('./services/realPoolDataService');
+      const poolData = await realPoolDataService.getPoolData('usdt');
+      
+      // Explicitly set Content-Type to JSON
+      res.setHeader('Content-Type', 'application/json');
+      
+      res.json({
+        success: true,
+        pool: {
+          poolAddress: "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+          poolType: "USDT/WPT Uniswap V2", 
+          token0: "USDT",
+          token1: "WPT",
+          fee: "0.30%",
+          totalValueLocked: poolData.totalValueLocked,
+          volume24h: poolData.volume24h,
+          fees24h: poolData.fees24h,
+          price: poolData.price, // USDT/WPT exchange rate
+          participants: poolData.participants,
+          lastUpdated: poolData.lastUpdated,
+          version: "V2",
+          benefits: [
+            "No 'out of range' issues (V2 full range)",
+            "0.3% fees on all USDT/WPT swaps",
+            "Stable liquidity provision",
+            "No gas-intensive range management"
+          ]
+        },
+        message: "USDT/WPT V2 pool created successfully on July 27, 2025"
+      });
+    } catch (error) {
+      console.error("USDT pool-info error:", error);
+      res.setHeader('Content-Type', 'application/json');
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
