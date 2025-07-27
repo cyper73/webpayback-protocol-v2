@@ -1,78 +1,115 @@
 import { useQuery } from "@tanstack/react-query";
 import { ContentCertificateManager } from "@/components/content-certificate/ContentCertificateManager";
+import CreatorPortal from "@/components/creators/CreatorPortal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, AlertCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Shield, AlertCircle, CheckCircle, User } from "lucide-react";
 
 export function ContentCertificatePage() {
-  const { data: user } = useQuery<{ id: number; username: string } | null>({
-    queryKey: ['/api/user'],
+  // Check if user has creator profile
+  const { data: creators, isLoading: creatorsLoading } = useQuery({
+    queryKey: ["/api/creators"],
   });
 
-  if (!user) {
+  const userCreator = creators && creators.length > 0 ? creators[0] : null; // Get first creator for current user
+  const hasCreatorAccount = !!userCreator;
+
+  if (creatorsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
-              <Shield className="h-6 w-6 text-blue-600" />
-            </div>
-            <CardTitle>Authentication Required</CardTitle>
-            <CardDescription>
-              Please log in to access the Content Certificate system
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Checking creator registration...</p>
+        </div>
       </div>
     );
   }
 
-  // For demo purposes, using user ID as creator ID
-  // In production, you'd fetch the actual creator ID from the creators table
-  const creatorId = user.id;
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <Shield className="h-8 w-8 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">Anti-AI Scraping Protection</h1>
-              <p className="text-muted-foreground text-lg">
-                Protect your content against Google AI Overview and earn WPT rewards
-              </p>
-            </div>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold gradient-text">
+            🛡️ Content Certificate NFTs
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Revolutionary protection against Google AI Overview content theft through blockchain-verified ownership certificates
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Badge className="bg-red-600 text-white">Combat 15-40% Traffic Loss</Badge>
+            <Badge className="bg-green-600 text-white">ERC-2981 Royalty Standard</Badge>
+            <Badge className="bg-blue-600 text-white">Legal Blockchain Proof</Badge>
           </div>
-
-          {/* Important Notice */}
-          <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 mb-6">
-            <CardContent className="pt-6">
-              <div className="flex gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-amber-900 dark:text-amber-100">
-                    Google AI Overview Impact
-                  </h4>
-                  <div className="text-sm text-amber-700 dark:text-amber-200 mt-2">
-                    <p className="mb-2">
-                      <strong>Traffic Loss:</strong> Creators are experiencing 15-40% traffic drops due to Google AI Overview scraping content without compensation.
-                    </p>
-                    <p className="mb-2">
-                      <strong>No API Access:</strong> Google doesn't provide APIs to track when your content is used in AI Overviews.
-                    </p>
-                    <p>
-                      <strong>Our Solution:</strong> Content Certificate NFTs provide ownership proof and automatic WPT rewards when unauthorized use is detected.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        <ContentCertificateManager creatorId={creatorId} />
+        {/* Creator Registration Required */}
+        {!hasCreatorAccount ? (
+          <div className="space-y-6">
+            <Card className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                  <User className="h-5 w-5" />
+                  Creator Registration Required
+                </CardTitle>
+                <CardDescription className="text-amber-700 dark:text-amber-300">
+                  To mint Content Certificate NFTs and earn WPT rewards, you must first register as a creator. 
+                  This ensures only verified content creators can protect their work and receive token rewards when AI systems use their content.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            {/* Creator Registration Portal */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Register as Content Creator</h2>
+              <CreatorPortal />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Success Message */}
+            <Card className="bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
+                  <CheckCircle className="h-5 w-5" />
+                  Creator Verified - Ready for Content Protection
+                </CardTitle>
+                <CardDescription className="text-green-700 dark:text-green-300">
+                  <div className="space-y-1">
+                    <div><strong>Name:</strong> {userCreator.name || 'Creator Profile'}</div>
+                    <div><strong>Website:</strong> {userCreator.websiteUrl}</div>
+                    <div><strong>Wallet:</strong> {userCreator.walletAddress}</div>
+                    <div><strong>Category:</strong> {userCreator.contentCategory?.replace('_', ' ').toUpperCase()}</div>
+                  </div>
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Important Information */}
+            <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+                  <AlertCircle className="h-5 w-5" />
+                  How Content Certificates Work
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-blue-700 dark:text-blue-300">
+                <ul className="space-y-2 list-disc list-inside">
+                  <li><strong>Mint NFT Certificates:</strong> Create blockchain proof of content ownership</li>
+                  <li><strong>SHA-256 Fingerprinting:</strong> Generate unique cryptographic fingerprints</li>
+                  <li><strong>AI Detection:</strong> Monitor Google AI Overview for unauthorized usage</li>
+                  <li><strong>Automatic Rewards:</strong> Earn WPT tokens when content theft is detected</li>
+                  <li><strong>Legal Protection:</strong> Use blockchain certificates for legal action</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Content Certificate Manager */}
+            <ContentCertificateManager creatorId={userCreator.id} />
+          </div>
+        )}
+        
       </div>
     </div>
   );

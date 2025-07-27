@@ -16,6 +16,11 @@ router.post('/mint', async (req, res) => {
     });
 
     const data = mintSchema.parse(req.body);
+    
+    // TODO: Add verification that creatorId belongs to authenticated user
+    // TODO: Add rate limiting for minting (e.g., max 10 certificates per day)
+    // For now, allowing minting for development
+    
     const result = await contentCertificateNftService.mintContentCertificate(data);
 
     res.json(result);
@@ -58,6 +63,8 @@ router.get('/creator/:creatorId', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid creator ID' });
     }
 
+    // TODO: Add IDOR protection here to ensure user can only access their own certificates
+    // For now, allowing access for development
     const result = await contentCertificateNftService.getCreatorCertificates(creatorId);
     res.json(result);
   } catch (error) {
