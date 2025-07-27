@@ -49,8 +49,8 @@ class RealPoolDataService {
     return (now - this.cache.lastFetch) < this.CACHE_DURATION;
   }
 
-  // NEW: Fetch authentic data using direct blockchain queries
-  private async fetchRealPoolDataFromV3(poolAddress: string, poolType: 'wmatic' | 'usdt' = 'wmatic'): Promise<PoolData> {
+  // NEW: Fetch authentic data using direct blockchain queries - USDT/WPT V2 is PRIMARY
+  private async fetchRealPoolDataFromV3(poolAddress: string, poolType: 'wmatic' | 'usdt' = 'usdt'): Promise<PoolData> {
     try {
       console.log(`🔍 Fetching authentic pool data for ${poolAddress}...`);
       
@@ -101,8 +101,8 @@ class RealPoolDataService {
     }
   }
 
-  // Get authentic TVL directly from blockchain contract
-  private async getAuthenticTVLFromUniswap(poolType: 'wmatic' | 'usdt' = 'wmatic', poolAddress?: string): Promise<string> {
+  // Get authentic TVL directly from blockchain contract - USDT/WPT V2 is PRIMARY
+  private async getAuthenticTVLFromUniswap(poolType: 'wmatic' | 'usdt' = 'usdt', poolAddress?: string): Promise<string> {
     try {
       console.log("🔍 Getting REAL TVL directly from blockchain contract...");
       
@@ -330,11 +330,11 @@ class RealPoolDataService {
     console.log("🔄 Refreshing AUTHENTIC pool data from Uniswap V3 Polygon...");
 
     try {
-      // Fetch real WMATIC/WPT pool data every 12 hours
-      const wmaticData = await this.fetchRealPoolDataFromV3(this.WMATIC_WPT_POOL, 'wmatic');
-      
-      // Fetch real USDT/WPT V2 pool data 
+      // Fetch PRIMARY USDT/WPT V2 pool data first (main pool)
       const usdtData = await this.fetchRealPoolDataFromV3(this.USDT_WPT_POOL_V2, 'usdt');
+      
+      // Fetch secondary WMATIC/WPT pool data
+      const wmaticData = await this.fetchRealPoolDataFromV3(this.WMATIC_WPT_POOL, 'wmatic');
 
       // Update cache with authentic data
       this.cache.wmatic = wmaticData;
@@ -342,9 +342,9 @@ class RealPoolDataService {
       this.cache.lastFetch = Date.now();
 
       console.log(`✅ Pool data refreshed successfully at ${new Date().toISOString()}`);
-      console.log(`📊 WMATIC/WPT TVL: ${wmaticData.totalValueLocked}`);
-      console.log(`📊 USDT/WPT TVL: ${usdtData.totalValueLocked}`);
-      console.log(`📈 24h Volume: ${wmaticData.volume24h}`);
+      console.log(`📊 PRIMARY USDT/WPT V2 TVL: ${usdtData.totalValueLocked}`);
+      console.log(`📊 Secondary WMATIC/WPT V3 TVL: ${wmaticData.totalValueLocked}`);
+      console.log(`📈 24h Volume: ${usdtData.volume24h}`);
       console.log(`⏰ Next refresh in 12 hours`);
 
     } catch (error) {

@@ -1317,10 +1317,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pool information - supports both WMATIC/WPT and USDT/WPT pools
+  // Get pool information - USDT/WPT V2 is now PRIMARY pool 
   app.get("/api/web3/pool-info", async (req, res) => {
     try {
-      const poolType = req.query.type as string || 'wmatic'; // Default to WMATIC pool
+      const poolType = req.query.type as string || 'usdt'; // Default to USDT/WPT V2 pool
       
       if (!['wmatic', 'usdt'].includes(poolType)) {
         return res.status(400).json({ 

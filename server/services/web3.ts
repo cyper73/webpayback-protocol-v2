@@ -113,8 +113,8 @@ class Web3Service {
     }
   }
 
-  // Get pool liquidity and price information - supports WMATIC/WPT and USDT/WPT pools
-  async getPoolInfo(poolType: 'wmatic' | 'usdt' = 'wmatic') {
+  // Get pool liquidity and price information - USDT/WPT V2 is PRIMARY pool
+  async getPoolInfo(poolType: 'wmatic' | 'usdt' = 'usdt') {
     try {
       // Get authentic pool data from realPoolDataService (refreshed every 12h)
       const { realPoolDataService } = await import('./realPoolDataService');
