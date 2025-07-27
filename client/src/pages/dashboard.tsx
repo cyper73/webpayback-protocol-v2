@@ -71,60 +71,62 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-deep-space text-white">
-      {/* Navigation Header */}
+      {/* Clean Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <img src={wptLogo} alt="WPT Logo" className="w-8 h-8" />
-                <span className="text-xl font-bold gradient-text">🔧 WebPayback Protocol - Infrastructure Active</span>
+                <span className="text-lg font-bold gradient-text">WebPayback Protocol</span>
               </div>
-              <div className="hidden md:flex items-center space-x-1 bg-glass-dark px-3 py-1 rounded-full">
+              <div className="hidden sm:flex items-center space-x-1 bg-glass-dark px-2 py-1 rounded-full">
                 <div className={`w-2 h-2 rounded-full ${isFetching ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
-                <span className="text-sm text-gray-300">
-                  {isFetching ? 'Syncing...' : 'Level 280 AI Agents Active'}
-                </span>
+                <span className="text-xs text-gray-300">Level 280 AI Active</span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              {/* Automation Dashboard Link - NEW */}
-              <RouterLink to="/automation">
-                <Button variant="outline" size="sm" className="bg-glass-dark border-emerald-500/30 hover:bg-emerald-500/20 text-white">
-                  <Box className="w-4 h-4 mr-2" />
-                  Auto Pool Manager
-                </Button>
-              </RouterLink>
-              
-              {/* Content Certificate NFT Link - NEW */}
-              <RouterLink to="/content-certificate">
-                <Button variant="outline" size="sm" className="bg-glass-dark border-orange-500/30 hover:bg-orange-500/20 text-white">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Content Certificate
-                </Button>
-              </RouterLink>
-              
-              {/* Citations Dashboard Link */}
-              <RouterLink to="/citations">
-                <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Citations Rewards
-                </Button>
-              </RouterLink>
-              
+            <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2 text-sm">
-                <Wallet className="text-electric-blue" />
-                <span className="font-mono">0x9077...91e</span>
+                <Wallet className="text-electric-blue w-4 h-4" />
+                <span className="font-mono text-xs">0x9077...91e</span>
               </div>
-              <div className="flex items-center space-x-2 bg-glass-dark px-3 py-1 rounded-lg">
-                <Coins className="text-amber-400" />
-                <span className="font-mono">WPT Token Live</span>
+              <div className="flex items-center space-x-2 bg-glass-dark px-2 py-1 rounded-lg">
+                <Coins className="text-amber-400 w-4 h-4" />
+                <span className="font-mono text-xs">WPT Live</span>
               </div>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Quick Actions Bar */}
+      <div className="bg-glass-dark/50 border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <RouterLink to="/automation">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-emerald-500/30 hover:bg-emerald-500/20 text-white">
+                <Box className="w-4 h-4 mr-2" />
+                Auto Pool Manager
+              </Button>
+            </RouterLink>
+            
+            <RouterLink to="/content-certificate">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-orange-500/30 hover:bg-orange-500/20 text-white">
+                <Shield className="w-4 h-4 mr-2" />
+                Content Certificate
+              </Button>
+            </RouterLink>
+            
+            <RouterLink to="/citations">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
+                <FileText className="w-4 h-4 mr-2" />
+                Citations Rewards
+              </Button>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
 
       {/* Main Dashboard */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dashboard-container">
