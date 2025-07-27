@@ -23,6 +23,11 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 
 ## Recent Security Updates
 
+### Email Contact Update (July 27, 2025)
+- Updated business contact email from claudiob73@hotmail.com to info@webpayback.com across all documentation
+- Professional domain-based email now reflects webpayback.com domain integration
+- Updated contact information in docs/README.md and attached_assets/README_1753056355845.md
+
 ### Latest Security Fixes (July 26, 2025)
 - Fixed pool address to correct Uniswap V3 contract (0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3)
 - Enhanced CORS security with webpayback.com domain whitelisting
