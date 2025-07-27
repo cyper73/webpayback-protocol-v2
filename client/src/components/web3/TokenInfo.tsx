@@ -52,7 +52,7 @@ export default function TokenInfo() {
   });
 
   const { data: poolInfo } = useQuery<PoolInfo>({
-    queryKey: ["/api/web3/pool-info"],
+    queryKey: ["/api/web3/pool-info?type=wmatic"],
     refetchInterval: 30000
   });
 
@@ -201,7 +201,7 @@ export default function TokenInfo() {
               <div className="flex-1 min-w-0 mr-4">
                 <p className="text-sm text-gray-500 mb-2">Pool Address</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-mono truncate">{poolInfo.poolAddress.slice(0, 8)}...{poolInfo.poolAddress.slice(-6)}</p>
+                  <p className="text-sm font-mono break-all">{poolInfo.poolAddress}</p>
                   <a 
                     href={`${networkStatus.explorerUrl}/address/${poolInfo.poolAddress}`}
                     target="_blank"
@@ -214,7 +214,7 @@ export default function TokenInfo() {
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="text-sm text-gray-500 mb-2">Current Price</p>
-                <p className="text-lg font-semibold">{formatPrice(poolInfo.price)} {poolInfo.token0}</p>
+                <p className="text-lg font-semibold">{formatPrice(poolInfo.price)} USDT</p>
               </div>
             </div>
 

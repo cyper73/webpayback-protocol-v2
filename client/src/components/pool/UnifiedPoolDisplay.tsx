@@ -42,12 +42,12 @@ export default function UnifiedPoolDisplay() {
 
   // Get both pools data
   const { data: usdtPoolInfo } = useQuery<PoolInfo>({
-    queryKey: ['/api/web3/pool-info', { type: 'usdt' }],
+    queryKey: ['/api/web3/pool-info?type=usdt'],
     refetchInterval: 30000
   });
 
   const { data: wmaticPoolInfo } = useQuery<PoolInfo>({
-    queryKey: ['/api/web3/pool-info', { type: 'wmatic' }],
+    queryKey: ['/api/web3/pool-info?type=wmatic'],
     refetchInterval: 30000
   });
 
