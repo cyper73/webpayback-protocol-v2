@@ -9,7 +9,7 @@ import TokenEconomics from "@/components/blockchain/TokenEconomics";
 import CreatorPortal from "@/components/creators/CreatorPortal";
 import LiveStats from "@/components/analytics/LiveStats";
 import ComplianceMonitor from "@/components/compliance/ComplianceMonitor";
-import TokenInfo from "@/components/web3/TokenInfo";
+import UnifiedPoolDisplay from "@/components/pool/UnifiedPoolDisplay";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
 import { Box, Wallet, Coins } from "lucide-react";
@@ -159,7 +159,7 @@ export default function Dashboard() {
             <LiveStats stats={stats} />
           </div>
           <div>
-            <TokenInfo />
+            <UnifiedPoolDisplay />
           </div>
         </div>
 
