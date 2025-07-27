@@ -97,6 +97,14 @@ export default function Dashboard() {
                 </Button>
               </RouterLink>
               
+              {/* Content Certificate NFT Link - NEW */}
+              <RouterLink to="/content-certificate">
+                <Button variant="outline" size="sm" className="bg-glass-dark border-orange-500/30 hover:bg-orange-500/20 text-white">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Content Certificate
+                </Button>
+              </RouterLink>
+              
               {/* Citations Dashboard Link */}
               <RouterLink to="/citations">
                 <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">

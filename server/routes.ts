@@ -75,6 +75,7 @@ import {
 } from "./security/reentrancyProtection";
 import { automationRouter } from "./routes/automation";
 import { contentCertificateRouter } from "./routes/contentCertificate";
+import userRoutes from "./routes/user";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -3158,6 +3159,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Content Certificate NFT routes (Anti-Google AI Overview)
   app.use('/api/content-certificate', contentCertificateRouter);
+  
+  // User routes
+  app.use('/api/user', userRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
