@@ -142,3 +142,24 @@ docker-compose*
 *api-schema*.json
 *schema*.json
 !components.json
+
+# Internal development and testing files (sensitive)
+test-*.js
+check-*.js
+investigate-*.js
+verify-*.js
+*-test.js
+security-monitoring-dashboard.js
+
+# Internal documentation (sensitive business info)
+COMPREHENSIVE_SECURITY_TESTING_RESULTS.md
+CONTRACT_VERIFICATION_DETAILS.md
+GITHUB_REPOSITORY_DESCRIPTION.md
+LIVE_CONTRACT_VERIFICATION.md
+POOL_ADDRESS_UPDATE_SUMMARY.md
+SECURITY_FIXES_SUMMARY.md
+WEBPAYBACK_DOMAIN_INTEGRATION.md
+COMMUNITY_UPDATE_POST.txt
+
+# Test pages (internal functionality)
+test-connectivity.tsx
