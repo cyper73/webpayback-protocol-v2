@@ -89,6 +89,14 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Automation Dashboard Link - NEW */}
+              <RouterLink to="/automation">
+                <Button variant="outline" size="sm" className="bg-glass-dark border-emerald-500/30 hover:bg-emerald-500/20 text-white">
+                  <Box className="w-4 h-4 mr-2" />
+                  Auto Pool Manager
+                </Button>
+              </RouterLink>
+              
               {/* Citations Dashboard Link */}
               <RouterLink to="/citations">
                 <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">

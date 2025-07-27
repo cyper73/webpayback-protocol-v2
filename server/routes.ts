@@ -73,6 +73,7 @@ import {
   getSuspiciousAddresses,
   clearSuspiciousAddress
 } from "./security/reentrancyProtection";
+import { automationRouter } from "./routes/automation";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -3151,7 +3152,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  // Automation routes
+  app.use('/api/automation', automationRouter);
 
   const httpServer = createServer(app);
   return httpServer;
