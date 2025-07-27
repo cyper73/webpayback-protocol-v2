@@ -141,8 +141,15 @@ class RealPoolDataService {
       console.log(`   ${poolType === 'usdt' ? 'USDT' : 'WMATIC'} value: $${baseValueUSD.toFixed(2)} USD`);
       
       if (poolType === 'usdt') {
-        // For USDT pool, return USD value directly
-        const totalValueUSD = baseValueUSD * 2; // Double to account for both sides of LP
+        // For USDT pool, calculate both USDT and WPT values
+        // WPT price from logs: 0.0019 USD per WPT (525,762 WPT = 1 USDT)
+        const wptPriceUSD = 1 / 525762; // 0.0019 USD per WPT
+        const wptValueUSD = wptBalance * wptPriceUSD;
+        
+        const totalValueUSD = baseValueUSD + wptValueUSD;
+        console.log(`   WPT value: $${wptValueUSD.toFixed(2)} USD (${wptBalance.toFixed(0)} WPT)`);
+        console.log(`   Total pool TVL: $${totalValueUSD.toFixed(2)} USD`);
+        
         return totalValueUSD > 0 ? `$${Math.round(totalValueUSD)}` : "$0";
       } else {
         // For WMATIC pool, convert to EUR as before
