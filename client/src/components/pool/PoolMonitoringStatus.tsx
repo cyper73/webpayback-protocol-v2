@@ -9,9 +9,19 @@ import { apiRequest } from "@/lib/queryClient";
 interface PoolCacheStatus {
   isValid: boolean;
   lastFetch: string;
-  nextRefresh: string;
+  nextRefresh: string;  
   dataSource: string;
   hoursUntilRefresh: number;
+}
+
+interface PoolInfo {
+  poolAddress: string;
+  poolType: string;
+  totalValueLocked: string;
+  price: string;
+  volume24h: string;
+  participants: number;
+  fees24h: string;
 }
 
 export default function PoolMonitoringStatus() {
@@ -23,16 +33,14 @@ export default function PoolMonitoringStatus() {
     refetchInterval: 30000 // Check status every 30 seconds
   });
 
-  const { data: poolInfo } = useQuery({
+  const { data: poolInfo } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info'],
     refetchInterval: 30000
   });
 
   const handleForceRefresh = async () => {
     try {
-      await apiRequest('/api/web3/refresh-pools', {
-        method: 'POST'
-      });
+      await apiRequest('/api/web3/refresh-pools', 'POST');
       // Refresh both status and pool data
       refetchStatus();
       setTimeout(() => {
@@ -98,7 +106,7 @@ export default function PoolMonitoringStatus() {
             </span>
           </div>
           <Badge variant="outline">
-            {status.dataSource}
+            {status.dataSource || 'authentic'}
           </Badge>
         </div>
 
@@ -116,7 +124,7 @@ export default function PoolMonitoringStatus() {
 
         {/* Current Pool Data Summary */}
         {poolInfo && (
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <div className="text-sm font-medium mb-2">Current Pool Metrics:</div>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
@@ -125,7 +133,7 @@ export default function PoolMonitoringStatus() {
               </div>
               <div>
                 <span className="text-gray-500">Price:</span>
-                <span className="ml-2 font-semibold">{poolInfo.price} WMATIC</span>
+                <span className="ml-2 font-semibold">{poolInfo.price}</span>
               </div>
               <div>
                 <span className="text-gray-500">24h Volume:</span>
@@ -135,6 +143,11 @@ export default function PoolMonitoringStatus() {
                 <span className="text-gray-500">Participants:</span>
                 <span className="ml-2">{poolInfo.participants}</span>
               </div>
+            </div>
+            <div className="mt-3 text-xs text-center text-blue-600 dark:text-blue-400">
+              <Badge variant="secondary" className="text-xs">
+                {poolInfo.poolType} - {poolInfo.poolAddress.slice(0, 8)}...{poolInfo.poolAddress.slice(-6)}
+              </Badge>
             </div>
           </div>
         )}
