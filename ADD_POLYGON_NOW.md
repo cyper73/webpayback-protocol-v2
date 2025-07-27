@@ -42,11 +42,11 @@ Explorer: https://polygonscan.com/
 
 ---
 
-## 🚀 POI TORNA A BALANCER:
+## ✅ SETUP COMPLETATO:
 
-1. **Refresha** app.balancer.fi
-2. **Riconnetti** il wallet
-3. **Ora vedrai Polygon** nella lista network!
+La pool USDT/WPT V2 è già stata creata con successo:
+- **Address**: 0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A
+- **Type**: Uniswap V2 (nessun "out of range")
 
 ---
 

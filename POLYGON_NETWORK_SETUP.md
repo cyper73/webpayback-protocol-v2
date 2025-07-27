@@ -1,4 +1,4 @@
-# Setup Polygon Network per Balancer V2
+# Setup Polygon Network - COMPLETED ✅
 
 ## 🔧 PROBLEMA IDENTIFICATO
 Balancer non mostra Polygon perché il network non è aggiunto al tuo wallet.

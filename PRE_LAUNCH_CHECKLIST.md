@@ -1,4 +1,4 @@
-# Pre-Launch Checklist: Pool Balancer V2 USDT/WPT
+# Pre-Launch Checklist: Pool USDT/WPT V2 - COMPLETED ✅
 
 ## ✅ CHECKLIST COMPLETA PRIMA DI INIZIARE
 
@@ -11,7 +11,7 @@
 ### 🔍 Verifica Indirizzi
 - [ ] **USDT Verificato**: `0xc2132D05D31c914a87C6611C10748AEb04B58e8F`
 - [ ] **WPT Verificato**: `0x9408f17a8B4666f8cb8231BA213DE04137dc3825`
-- [ ] **Balancer**: Vai su app.balancer.fi (NON siti fake)
+- [x] **Uniswap V2**: Pool creata su app.uniswap.org ✅
 
 ### 📊 Calcoli Preparati
 Decidi il tuo investimento totale: $______
@@ -67,7 +67,7 @@ Decidi il tuo investimento totale: $______
 ### ✅ Dopo il Successo Vedrai:
 - [ ] Pool creata con indirizzo univoco
 - [ ] BPT tokens nel tuo wallet
-- [ ] Pool visibile su Balancer
+- [x] Pool visibile su Uniswap ✅
 - [ ] TVL = il tuo investimento iniziale
 
 ### 📈 Benefici Immediati:
