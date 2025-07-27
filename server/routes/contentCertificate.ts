@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { contentCertificateNftService } from "../services/contentCertificateNft";
+import { getUserSession } from "../security/idorProtection";
 import { z } from "zod";
 
 const router = Router();
 
-// Mint Content Certificate NFT
+// Mint Content Certificate NFT with IDOR protection
 router.post('/mint', async (req, res) => {
   try {
     const mintSchema = z.object({
@@ -17,9 +18,19 @@ router.post('/mint', async (req, res) => {
 
     const data = mintSchema.parse(req.body);
     
-    // TODO: Add verification that creatorId belongs to authenticated user
-    // TODO: Add rate limiting for minting (e.g., max 10 certificates per day)
-    // For now, allowing minting for development
+    // CRITICAL: Verify user owns the creator
+    const userSession = getUserSession(req);
+    if (!userSession) {
+      return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+
+    if (!userSession.authenticatedCreatorIds.includes(data.creatorId) && !userSession.isAdmin) {
+      console.log(`IDOR BLOCKED: User ${userSession.userId} attempted to mint for creator ${data.creatorId}`);
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You can only mint certificates for your own content' 
+      });
+    }
     
     const result = await contentCertificateNftService.mintContentCertificate(data);
 
@@ -55,7 +66,7 @@ router.post('/detect-usage', async (req, res) => {
   }
 });
 
-// Get creator's certificates
+// Get creator's certificates with IDOR protection
 router.get('/creator/:creatorId', async (req, res) => {
   try {
     const creatorId = parseInt(req.params.creatorId);
@@ -63,8 +74,21 @@ router.get('/creator/:creatorId', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid creator ID' });
     }
 
-    // TODO: Add IDOR protection here to ensure user can only access their own certificates
-    // For now, allowing access for development
+    // CRITICAL: IDOR protection - verify user owns this creator
+    const userSession = getUserSession(req);
+    if (!userSession) {
+      return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+
+    // Check if user owns this creator
+    if (!userSession.authenticatedCreatorIds.includes(creatorId) && !userSession.isAdmin) {
+      console.log(`IDOR BLOCKED: User ${userSession.userId} attempted to access creator ${creatorId}`);
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You can only view your own certificates' 
+      });
+    }
+
     const result = await contentCertificateNftService.getCreatorCertificates(creatorId);
     res.json(result);
   } catch (error) {

@@ -6,20 +6,41 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, AlertCircle, CheckCircle, User } from "lucide-react";
 
 export function ContentCertificatePage() {
+  // Get current authenticated user first
+  const { data: currentUser, isLoading: userLoading } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
   // Check if user has creator profile
   const { data: creators, isLoading: creatorsLoading } = useQuery({
     queryKey: ["/api/creators"],
+    enabled: !!currentUser, // Only fetch creators if user is authenticated
   });
 
-  const userCreator = creators && creators.length > 0 ? creators[0] : null; // Get first creator for current user
+  // Find creator belonging to current authenticated user
+  const userCreator = creators && currentUser ? 
+    creators.find(creator => creator.userId === currentUser.id) : null;
   const hasCreatorAccount = !!userCreator;
 
-  if (creatorsLoading) {
+  if (userLoading || creatorsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Checking creator registration...</p>
+          <p className="text-muted-foreground">Verifying user authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Security check: if no user is authenticated, show error
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Shield className="h-12 w-12 text-red-500 mx-auto" />
+          <h2 className="text-2xl font-bold text-red-600">Authentication Required</h2>
+          <p className="text-muted-foreground">You must be logged in to access Content Certificate features.</p>
         </div>
       </div>
     );
