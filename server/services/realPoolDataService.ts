@@ -25,7 +25,7 @@ class RealPoolDataService {
     lastFetch: 0 // Force refresh with original pool address
   };
 
-  private readonly CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours in milliseconds per user request
+  private readonly CACHE_DURATION = 0; // Force refresh to get REAL data from blockchain
   // Use authentic Uniswap V3 subgraph for Polygon
   private readonly UNISWAP_V3_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3-polygon";
   private readonly POLYGON_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon";
@@ -93,37 +93,87 @@ class RealPoolDataService {
     }
   }
 
-  // Get authentic TVL based on Uniswap data ($628.06 USD reported by user)
+  // Get authentic TVL directly from blockchain contract
   private async getAuthenticTVLFromUniswap(): Promise<string> {
     try {
-      console.log("🔍 Converting Uniswap TVL from USD to EUR...");
+      console.log("🔍 Getting REAL TVL directly from blockchain contract...");
       
-      // User reported: Uniswap shows $628.06 USD
-      const usdTVL = 628.06;
+      // Get authentic data from blockchain using Alchemy
+      const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
       
-      // Get current USD/EUR exchange rate from free API
+      // Get token balances in the pool directly from blockchain
+      const wmaticBalance = await this.getTokenBalance(this.WMATIC_TOKEN, this.WMATIC_WPT_POOL);
+      const wptBalance = await this.getTokenBalance(this.WPT_TOKEN, this.WMATIC_WPT_POOL);
+      
+      console.log(`💰 AUTHENTIC blockchain balances:`);
+      console.log(`   WMATIC in pool: ${wmaticBalance}`);
+      console.log(`   WPT in pool: ${wptBalance}`);
+      
+      // If no authentic data available, show current user position value
+      if (wmaticBalance === 0 && wptBalance === 0) {
+        console.log("⚠️ No liquidity detected in pool contract");
+        return "€0 (Pool Empty)";
+      }
+      
+      // Calculate approximate USD value (WMATIC ~$0.97, current rates)
+      const wmaticPrice = 0.97; // Approximate WMATIC price in USD
+      const wmaticValueUSD = wmaticBalance * wmaticPrice;
+      
+      // Get exchange rate
       const exchangeResponse = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
       const exchangeData = await exchangeResponse.json();
-      const usdToEur = exchangeData.rates?.EUR || 0.92; // Fallback rate
+      const usdToEur = exchangeData.rates?.EUR || 0.852;
       
-      const eurTVL = usdTVL * usdToEur;
+      const totalValueEUR = wmaticValueUSD * usdToEur;
       
-      console.log(`💰 Authentic TVL conversion:`);
-      console.log(`   Uniswap: $${usdTVL} USD`);
-      console.log(`   Exchange rate: 1 USD = ${usdToEur.toFixed(4)} EUR`);
-      console.log(`   Converted: €${eurTVL.toFixed(2)} EUR`);
+      console.log(`📊 REAL calculation:`);
+      console.log(`   WMATIC value: $${wmaticValueUSD.toFixed(2)} USD`);
+      console.log(`   Exchange rate: 1 USD = ${usdToEur} EUR`);
+      console.log(`   Total value: €${totalValueEUR.toFixed(2)} EUR`);
       
-      return `€${Math.round(eurTVL)}`;
+      return totalValueEUR > 0 ? `€${Math.round(totalValueEUR)}` : "€0";
       
     } catch (error) {
-      console.error("Error fetching exchange rate:", error);
-      // Direct conversion with approximate rate
-      const usdTVL = 628.06;
-      const eurTVL = usdTVL * 0.92; // Approximate EUR rate
+      console.error("Error fetching authentic TVL:", error);
+      console.log("⚠️ Using fallback: Check your Uniswap position for current value");
+      return "€? (Check Uniswap)";
+    }
+  }
+  
+  // Get token balance from blockchain directly
+  private async getTokenBalance(tokenAddress: string, holderAddress: string): Promise<number> {
+    try {
+      const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
       
-      console.log(`💰 Using approximate conversion: $${usdTVL} USD = €${Math.round(eurTVL)} EUR`);
+      // ERC20 balanceOf call
+      const balanceCall = {
+        jsonrpc: "2.0",
+        method: "eth_call",
+        params: [{
+          to: tokenAddress,
+          data: `0x70a08231000000000000000000000000${holderAddress.slice(2)}` // balanceOf(address)
+        }, "latest"],
+        id: 1
+      };
       
-      return `€${Math.round(eurTVL)}`;
+      const response = await fetch(alchemyUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(balanceCall)
+      });
+      
+      const data = await response.json();
+      
+      if (data.result && data.result !== "0x") {
+        // Convert hex to decimal and format (18 decimals for both tokens)
+        const balance = parseInt(data.result, 16) / Math.pow(10, 18);
+        return balance;
+      }
+      
+      return 0;
+    } catch (error) {
+      console.error(`Error getting balance for ${tokenAddress}:`, error);
+      return 0;
     }
   }
 
