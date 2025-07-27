@@ -13,6 +13,7 @@ import Citations from "@/pages/Citations";
 import CitationsByWallet from "@/pages/CitationsByWallet";
 import PoolDebugger from "@/pages/PoolDebugger";
 import AutomationPage from "@/pages/AutomationPage";
+import { ContentCertificatePage } from "@/pages/ContentCertificatePage";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />
+      <Route path="/content-certificate" component={ContentCertificatePage} />
       <Route path="/pool-debug" component={PoolDebugger} />
       <Route path="/citations" component={Citations} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />

@@ -43,6 +43,41 @@ export const channelContentMappings = pgTable("channel_content_mappings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Content Certificate NFTs for Google AI Overview Protection
+export const contentCertificateNfts = pgTable("content_certificate_nfts", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => creators.id),
+  contentUrl: text("content_url").notNull(),
+  contentTitle: text("content_title").notNull(),
+  contentFingerprint: text("content_fingerprint").notNull(), // SHA-256 hash of content
+  nftTokenId: text("nft_token_id").notNull(),
+  nftContractAddress: text("nft_contract_address").notNull(),
+  blockchainNetwork: text("blockchain_network").default("polygon"),
+  mintTransactionHash: text("mint_transaction_hash").notNull(),
+  royaltyPercentage: decimal("royalty_percentage", { precision: 5, scale: 2 }).default("10.00"), // 10% royalty
+  totalDetectedUses: integer("total_detected_uses").default(0),
+  totalWptEarned: decimal("total_wpt_earned", { precision: 18, scale: 8 }).default("0"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Google AI Overview Detection Logs
+export const googleAiOverviewDetections = pgTable("google_ai_overview_detections", {
+  id: serial("id").primaryKey(),
+  certificateNftId: integer("certificate_nft_id").references(() => contentCertificateNfts.id),
+  querySearched: text("query_searched").notNull(),
+  detectedFragment: text("detected_fragment").notNull(), // The text fragment found in AI Overview
+  matchingConfidence: decimal("matching_confidence", { precision: 5, scale: 2 }).notNull(), // 0-100%
+  googleSnippetUrl: text("google_snippet_url"), // URL to the AI Overview result
+  wptRewardAmount: decimal("wpt_reward_amount", { precision: 18, scale: 8 }).notNull(),
+  rewardTransactionHash: text("reward_transaction_hash"),
+  detectionMethod: text("detection_method").default("content_fingerprint"), // content_fingerprint, semantic_matching
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const blockchainNetworks = pgTable("blockchain_networks", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -729,6 +764,23 @@ export type InsertCitationTracking = z.infer<typeof insertCitationTrackingSchema
 export type CitationTracking = typeof citationTracking.$inferSelect;
 
 export type InsertAiKnowledgeIndex = z.infer<typeof insertAiKnowledgeIndexSchema>;
+
+// Insert schemas for Content Certificate NFTs
+export const insertContentCertificateNftSchema = createInsertSchema(contentCertificateNfts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertGoogleAiOverviewDetectionSchema = createInsertSchema(googleAiOverviewDetections).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ContentCertificateNft = typeof contentCertificateNfts.$inferSelect;
+export type InsertContentCertificateNft = z.infer<typeof insertContentCertificateNftSchema>;
+export type GoogleAiOverviewDetection = typeof googleAiOverviewDetections.$inferSelect;
+export type InsertGoogleAiOverviewDetection = z.infer<typeof insertGoogleAiOverviewDetectionSchema>;
 export type AiKnowledgeIndex = typeof aiKnowledgeIndex.$inferSelect;
 
 // Reentrancy Protection Schema

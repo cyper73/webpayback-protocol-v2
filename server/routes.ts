@@ -74,6 +74,7 @@ import {
   clearSuspiciousAddress
 } from "./security/reentrancyProtection";
 import { automationRouter } from "./routes/automation";
+import { contentCertificateRouter } from "./routes/contentCertificate";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -3154,6 +3155,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Automation routes
   app.use('/api/automation', automationRouter);
+  
+  // Content Certificate NFT routes (Anti-Google AI Overview)
+  app.use('/api/content-certificate', contentCertificateRouter);
 
   const httpServer = createServer(app);
   return httpServer;
