@@ -137,3 +137,8 @@ docker-compose*
 
 # Sentry
 .sentryclirc
+
+# API Schema files (sensitive internal documentation)
+*api-schema*.json
+*schema*.json
+!components.json
