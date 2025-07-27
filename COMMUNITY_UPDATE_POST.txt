@@ -1,5 +1,11 @@
 🚀 WEBPAYBACK PROTOCOL - MAJOR UPDATES & NEW FEATURES 🚀
 
+🌐 LIVE PLATFORM ACCESS:
+• Official Domain: https://webpayback.com
+• Fully operational with SSL security
+• Mobile-optimized interface
+• Real-time blockchain integration
+
 📄 UPDATED CONTRACT ADDRESSES:
 • WPT Token V2: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
 • Primary USDT/WPT V2 Pool: 0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A
