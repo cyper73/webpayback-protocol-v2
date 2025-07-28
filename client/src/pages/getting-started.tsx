@@ -13,7 +13,9 @@ import {
   ArrowRight,
   CheckCircle,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  Users,
+  Heart
 } from "lucide-react";
 
 export default function GettingStarted() {
@@ -308,63 +310,63 @@ export default function GettingStarted() {
       </Card>
 
       {/* Economy Manifesto */}
-      <Card className="mb-8 border-2 border-dashed border-orange-300 dark:border-orange-700">
+      <Card className="mb-8 border-2 border-dashed border-green-300 dark:border-green-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-orange-500" />
-            🚀 WebPayback Economy Manifesto - Coming Soon!
+            <Trophy className="h-5 w-5 text-green-500" />
+            🚀 WebPayback Economy Manifesto - Community-Driven
           </CardTitle>
           <CardDescription>
-            Revolutionary self-sustaining creator economy launching at 1,000 registered creators
+            The first self-sustaining creator ecosystem powered by transparency and collective growth
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 p-6 rounded-lg border">
-            <h3 className="font-bold text-lg mb-3 text-orange-900 dark:text-orange-100">
-              The First Self-Sustaining Creator Economy
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg border">
+            <h3 className="font-bold text-lg mb-3 text-green-900 dark:text-green-100">
+              The First Self-Sustaining Creator Ecosystem
             </h3>
             
             <p className="text-sm text-muted-foreground mb-4">
-              WebPayback Protocol isn't just another crypto platform - it's the first completely self-sustaining economy 
-              where every new creator makes all existing creators more valuable.
+              WebPayback Protocol is not just another crypto platform. It's the first self-sustaining economy designed 
+              for creators, powered by transparency, fairness, and the collective strength of our community.
             </p>
 
             <div className="grid md:grid-cols-2 gap-4 mb-4">
               <div className="space-y-2">
                 <h4 className="font-semibold text-sm flex items-center gap-2">
-                  <Coins className="h-4 w-4 text-green-500" />
-                  Smart Investment Strategy
+                  <Users className="h-4 w-4 text-green-500" />
+                  Premium Creator
                 </h4>
                 <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Creator invests €50-200 → Gets 2-5x rewards multiplier</li>
-                  <li>• Every new investor increases your token value</li>
-                  <li>• Early investors get maximum price advantage</li>
-                  <li>• ROI potential: 300-10,000% based on adoption</li>
+                  <li>• Support the project with small amounts (from $10)</li>
+                  <li>• Get higher monthly rewards and exclusive features</li>
+                  <li>• Vote and help govern the platform</li>
+                  <li>• Be part of a sustainable community</li>
                 </ul>
               </div>
 
               <div className="space-y-2">
                 <h4 className="font-semibold text-sm flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-blue-500" />
-                  VIP Creator Benefits
+                  <Heart className="h-4 w-4 text-blue-500" />
+                  Basic Creator
                 </h4>
                 <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Bronze (€50+): 2x rewards, priority support</li>
-                  <li>• Silver (€200+): 3x rewards, governance rights</li>
-                  <li>• Gold (€500+): 5x rewards, revenue sharing</li>
-                  <li>• Exclusive NFT certificates and co-marketing</li>
+                  <li>• Join for free and earn WPT rewards</li>
+                  <li>• Access all open features of the ecosystem</li>
+                  <li>• Protect your original content</li>
+                  <li>• Grow with the community</li>
                 </ul>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-l-orange-500">
-              <h4 className="font-bold text-sm mb-2">💡 The Mathematical Advantage:</h4>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-l-green-500">
+              <h4 className="font-bold text-sm mb-2">🌱 Why It's Sustainable:</h4>
               <div className="text-xs text-muted-foreground space-y-1">
-                <p><strong>Today:</strong> WPT costs €0.0016 (foundation price)</p>
-                <p><strong>1,000 creators:</strong> Estimated €0.016 (+900% growth)</p>
-                <p><strong>5,000 creators:</strong> Estimated €0.16 (+10,000% growth)</p>
-                <p className="text-orange-600 dark:text-orange-400 font-semibold">
-                  Early investors get WPT at the lowest price in history!
+                <p><strong>Community Growth:</strong> Rewards grow as the community grows - no speculation</p>
+                <p><strong>Real Usage:</strong> WPT value depends on ecosystem health, not investments</p>
+                <p><strong>Transparency:</strong> Every token backed by smart contracts and growing creator pool</p>
+                <p className="text-green-600 dark:text-green-400 font-semibold">
+                  A community that grows together, earns together
                 </p>
               </div>
             </div>

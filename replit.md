@@ -70,6 +70,9 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - **CREATOR EDUCATION**: Comprehensive explanation of difference between "investor-creators" (who buy WPT and strengthen ecosystem) vs "receiver-only creators" (who only drain value)
 - **SOCIAL MEDIA READY**: Manifesto formatted for sharing across platforms to attract intelligent creators who understand investment value
 - **FOUNDER INSIGHT**: User demonstrated excellent understanding of crypto economics - theoretical vs actual value, liquidity constraints, and profit realization mechanisms
+- **SUSTAINABLE APPROACH ADOPTED (July 28, 2025)**: Revised manifesto from speculative investment model to sustainable community-driven ecosystem. Focus shifted from "Ponzi-like" growth promises to transparent, fair creator economy powered by real usage and community strength. Premium Creator model starts from $10 minimum support, Basic Creator remains completely free.
+- **ENGLISH VERSION CREATED**: Complete English manifesto (WEBPAYBACK_ECONOMY_MANIFESTO_EN.md) following user requirement for all platform/git documentation in English
+- **UI UPDATED**: Getting Started page refreshed with sustainable messaging - green theme instead of orange, community focus instead of investment hype, realistic expectations instead of speculative promises
 
 ### Getting Started Module Addition (July 28, 2025)
 - **NEW FEATURE**: Complete "Getting Started" module created in English language
