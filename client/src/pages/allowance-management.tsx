@@ -71,10 +71,10 @@ interface DashboardData {
 // Default wallet address for WebPayback Protocol founder
 const DEFAULT_WALLET = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
 
-// Founder device detection
+// Founder device detection (Firefox + Windows OK)
 const isFounderDevice = () => {
   const userAgent = navigator.userAgent;
-  return userAgent.includes('Windows') && userAgent.includes('Chrome');
+  return userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
 };
 
 export default function AllowanceManagementPage() {

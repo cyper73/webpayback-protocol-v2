@@ -24,9 +24,9 @@ const isFounderAuthenticated = (req: any, res: any, next: any) => {
     });
   }
   
-  // Additional session-based check for founder's device
+  // Additional session-based check for founder's device (Firefox + Windows OK)
   const userAgent = req.headers['user-agent'] || '';
-  const isFounderDevice = userAgent.includes('Windows') && userAgent.includes('Chrome');
+  const isFounderDevice = userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
   
   if (!isFounderDevice) {
     return res.status(403).json({ 

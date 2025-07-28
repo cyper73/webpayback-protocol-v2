@@ -26,10 +26,10 @@ import { Link as RouterLink } from "wouter";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
-// Founder device detection
+// Founder device detection (Firefox + Windows OK)
 const isFounderDevice = () => {
   const userAgent = navigator.userAgent;
-  return userAgent.includes('Windows') && userAgent.includes('Chrome');
+  return userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
 };
 
 export default function Dashboard() {
