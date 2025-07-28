@@ -81,12 +81,14 @@ export default function AllowanceManagementPage() {
   const [walletAddress, setWalletAddress] = useState(DEFAULT_WALLET);
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [newConfig, setNewConfig] = useState({
-    maxAllowance: "5000000", // 5M WPT
-    refillThreshold: "50000", // 50k WPT
-    refillAmount: "500000", // 500k WPT
-    alertThreshold: "100000", // 100k WPT
+    maxAllowance: "2000000", // 2M WPT - Configurazione suggerita
+    refillThreshold: "50000", // 50k WPT - Soglia ricarica automatica
+    refillAmount: "500000", // 500k WPT - Quantità per ricarica
+    alertThreshold: "100000", // 100k WPT - Soglia notifica
     contractAddress: "0x9408f17a8B4666f8cb8231BA213DE04137dc3825", // WPT Contract
-    tokenAddress: "0x9408f17a8B4666f8cb8231BA213DE04137dc3825" // WPT Token
+    tokenAddress: "0x9408f17a8B4666f8cb8231BA213DE04137dc3825", // WPT Token
+    autoRefill: true, // Ricarica automatica attivata
+    isActive: true // Sistema attivo
   });
 
   const { toast } = useToast();
@@ -215,9 +217,18 @@ export default function AllowanceManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Allowance Management</h1>
-          <p className="text-gray-600 mt-2">
-            Automated WPT token reserve management for creator rewards
-          </p>
+          <div className="mt-2">
+            <p className="text-gray-600">
+              Sistema di automazione per la distribuzione rewards WPT senza MetaMask
+            </p>
+            {!dashboard && (
+              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-sm text-amber-800">
+                  <strong>🚀 Sistema non ancora configurato</strong> - Clicca "Configure" per attivare l'automazione
+                </p>
+              </div>
+            )}
+          </div>
         </div>
         <Button
           onClick={() => setIsConfiguring(!isConfiguring)}
@@ -230,12 +241,15 @@ export default function AllowanceManagementPage() {
 
       {/* Configuration Panel */}
       {isConfiguring && (
-        <Card>
+        <Card className="border-blue-200 bg-blue-50/30">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Settings className="h-5 w-5 mr-2" />
+              <Settings className="h-5 w-5 mr-2 text-blue-600" />
               Allowance Configuration
             </CardTitle>
+            <p className="text-sm text-gray-600 mt-2">
+              Configura l'automazione per la distribuzione dei rewards WPT. I valori preimpostati sono ottimizzati per i tuoi 10M WPT token.
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -284,13 +298,26 @@ export default function AllowanceManagementPage() {
               </div>
             </div>
             
-            <Button 
-              onClick={handleSetupAllowance}
-              disabled={setupAllowanceMutation.isPending}
-              className="w-full"
-            >
-              {setupAllowanceMutation.isPending ? "Setting up..." : "Setup Allowance"}
-            </Button>
+            <div className="space-y-3">
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Configurazione Suggerita:</strong><br/>
+                  • Max Allowance: 2M WPT (20% dei tuoi token)<br/>
+                  • Refill Amount: 500K WPT per ricarica<br/>
+                  • Refill Threshold: 50K WPT (ricarica automatica)<br/>
+                  • Alert Threshold: 100K WPT (notifica preventiva)
+                </AlertDescription>
+              </Alert>
+              
+              <Button 
+                onClick={handleSetupAllowance}
+                disabled={setupAllowanceMutation.isPending}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                {setupAllowanceMutation.isPending ? "Configurando..." : "🚀 Attiva Allowance Management"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
