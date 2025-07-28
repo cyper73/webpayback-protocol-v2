@@ -326,7 +326,7 @@ export default function GettingStarted() {
               The First Self-Sustaining Creator Ecosystem
             </h3>
             
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-foreground/80 mb-4 font-medium">
               WebPayback Protocol is not just another crypto platform. It's the first self-sustaining economy designed 
               for creators, powered by transparency, fairness, and the collective strength of our community.
             </p>
@@ -337,7 +337,7 @@ export default function GettingStarted() {
                   <Users className="h-4 w-4 text-green-500" />
                   Premium Creator
                 </h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
+                <ul className="text-xs text-foreground/70 space-y-1 font-medium">
                   <li>• Support the project with small amounts (from $10)</li>
                   <li>• Get higher monthly rewards and exclusive features</li>
                   <li>• Vote and help govern the platform</li>
@@ -350,7 +350,7 @@ export default function GettingStarted() {
                   <Heart className="h-4 w-4 text-blue-500" />
                   Basic Creator
                 </h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
+                <ul className="text-xs text-foreground/70 space-y-1 font-medium">
                   <li>• Join for free and earn WPT rewards</li>
                   <li>• Access all open features of the ecosystem</li>
                   <li>• Protect your original content</li>
@@ -361,12 +361,12 @@ export default function GettingStarted() {
 
             <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-l-green-500">
               <h4 className="font-bold text-sm mb-2">🌱 Why It's Sustainable:</h4>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p><strong>Community Growth:</strong> Rewards grow as the community grows - no speculation</p>
-                <p><strong>Real Usage:</strong> WPT value depends on ecosystem health, not investments</p>
-                <p><strong>Transparency:</strong> Every token backed by smart contracts and growing creator pool</p>
-                <p className="text-green-600 dark:text-green-400 font-semibold">
-                  A community that grows together, earns together
+              <div className="text-xs text-foreground/75 space-y-1 font-medium">
+                <p><strong className="text-foreground">Community Growth:</strong> Rewards grow as the community grows - no speculation</p>
+                <p><strong className="text-foreground">Real Usage:</strong> WPT value depends on ecosystem health, not investments</p>
+                <p><strong className="text-foreground">Transparency:</strong> Every token backed by smart contracts and growing creator pool</p>
+                <p className="text-green-700 dark:text-green-300 font-bold text-sm mt-2">
+                  "A community that grows together, earns together"
                 </p>
               </div>
             </div>
