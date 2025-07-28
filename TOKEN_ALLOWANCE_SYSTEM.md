@@ -100,8 +100,10 @@ The system is designed exclusively for protocol founder access:
 
 ### 🔄 In Progress
 - Automatic pool monitoring every 12 hours
-- Alchemy API integration (252/1000 calls used)
-- Pool TVL tracking: $1 USDT/WPT, €219 WMATIC/WPT
+- Alchemy API integration (72/1000 calls used)
+- Pool TVL tracking: 
+  * USDT/WPT V2 Pool: $0.54 USD (283,013 WPT remaining, USDT depleted through swaps)
+  * WMATIC/WPT V3 Pool: €219 EUR (265 WMATIC in pool)
 
 ## Contatti
 - Email: info@webpayback.com

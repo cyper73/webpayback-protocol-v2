@@ -56,6 +56,7 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - **DASHBOARD FEATURES**: Real-time statistics, configuration controls, transaction history, security monitoring
 - **DATABASE SCHEMA SYNCHRONIZATION**: Fixed database schema mismatches by adding missing columns (gas_used, security_event_type, etc.) to match TypeScript definitions
 - **PRODUCTION READY**: System tested and confirmed working by founder Claudio - displays correct parameters (2M WPT max allowance, 0% utilization)
+- **POOL STATUS UPDATE**: USDT/WPT V2 pool shows authentic blockchain data - USDT depleted through trading activity (283,013 WPT remaining, original $1,000 liquidity mostly consumed)
 - **ROUTE**: /allowance-management with comprehensive allowance configuration interface
 
 ### Getting Started Module Addition (July 28, 2025)
