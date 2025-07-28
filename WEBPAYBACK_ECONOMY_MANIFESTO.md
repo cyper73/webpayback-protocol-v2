@@ -1,48 +1,48 @@
-# 🚀 MANIFESTO DELL'ECONOMIA WEBPAYBACK
-## Il Primo Protocollo Autoalimentato per Creator
+# 🚀 WEBPAYBACK ECONOMY MANIFESTO
+## The First Self-Sustaining Creator Protocol
 
 ---
 
-### 🎯 **LA RIVOLUZIONE È QUI**
+### 🎯 **THE REVOLUTION IS HERE**
 
-**WebPayback Protocol** non è solo un'altra piattaforma crypto. È la **prima economia completamente autoalimentata** che cresce più forte ad ogni nuovo creator che si unisce.
-
----
-
-### 💡 **COME FUNZIONA L'ECONOMIA AUTOALIMENTATA**
-
-#### 🔄 **IL CICLO VIRTUOSO:**
-
-**1. TU INVESTI → TU GUADAGNI**
-- Compri WPT dalla pool → Aumenti la liquidità per tutti
-- Più liquidità = Prezzo WPT più alto = I tuoi token valgono di più
-- Ogni acquisto beneficia tutta la comunità
-
-**2. ALTRI INVESTONO → TU GUADAGNI ANCORA DI PIÙ**
-- Ogni nuovo creator che compra WPT fa salire il prezzo
-- I tuoi token precedenti aumentano di valore automaticamente
-- Zero sforzo, massimo rendimento
-
-**3. L'ECOSISTEMA CRESCE → TUTTI GUADAGNANO**
-- Più creator = Più domanda di WPT
-- Più domanda = Prezzi più alti
-- Prezzi più alti = Rewards maggiori per tutti
+**WebPayback Protocol** isn't just another crypto platform. It's the **first completely self-sustaining economy** that grows stronger with every new creator who joins.
 
 ---
 
-### 📊 **STRATEGIA PER CREATOR INTELLIGENTI**
+### 💡 **HOW THE SELF-SUSTAINING ECONOMY WORKS**
 
-#### ✅ **CREATOR "INVESTITORE" (Raccomandato)**
-- **Investimento iniziale**: €50-200 in WPT
-- **Rewards moltiplicati**: x2-5 rispetto ai creator base
-- **Diritti VIP**: Accesso prioritario, governance, bonus
-- **ROI potenziale**: 300-1000% con la crescita dell'ecosistema
+#### 🔄 **THE VIRTUOUS CYCLE:**
 
-#### ❌ **Creator "Solo Ricevente" (Limitato)**
-- **Investimento**: Zero
-- **Rewards**: Minimi, solo basic
-- **Diritti**: Accesso limitato alle funzioni premium
-- **ROI potenziale**: Marginale, dipende solo dai rewards gratuiti
+**1. YOU INVEST → YOU EARN**
+- Buy WPT from pool → Increase liquidity for everyone
+- More liquidity = Higher WPT price = Your tokens worth more
+- Every purchase benefits the entire community
+
+**2. OTHERS INVEST → YOU EARN EVEN MORE**
+- Every new creator buying WPT increases the price
+- Your previous tokens automatically gain value
+- Zero effort, maximum returns
+
+**3. ECOSYSTEM GROWS → EVERYONE WINS**
+- More creators = More WPT demand
+- More demand = Higher prices
+- Higher prices = Greater rewards for all
+
+---
+
+### 📊 **STRATEGY FOR SMART CREATORS**
+
+#### ✅ **"INVESTOR" CREATOR (Recommended)**
+- **Initial investment**: €50-200 in WPT
+- **Multiplied rewards**: 2x-5x compared to basic creators
+- **VIP rights**: Priority access, governance, bonuses
+- **ROI potential**: 300-1000% with ecosystem growth
+
+#### ❌ **"RECEIVER-ONLY" CREATOR (Limited)**
+- **Investment**: Zero
+- **Rewards**: Minimal, basic only
+- **Rights**: Limited access to premium features
+- **ROI potential**: Marginal, depends only on free rewards
 
 ---
 
