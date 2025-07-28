@@ -321,53 +321,92 @@ export default function GettingStarted() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg border">
-            <h3 className="font-bold text-lg mb-3 text-green-900 dark:text-green-100">
-              The First Self-Sustaining Creator Ecosystem
-            </h3>
-            
-            <p className="text-sm text-foreground/80 mb-4 font-medium">
-              WebPayback Protocol is not just another crypto platform. It's the first self-sustaining economy designed 
-              for creators, powered by transparency, fairness, and the collective strength of our community.
-            </p>
+          <div className="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-emerald-950/30 dark:via-green-950/30 dark:to-teal-950/30 p-8 rounded-xl border-2 border-green-200 dark:border-green-800">
+            <div className="text-center mb-6">
+              <h3 className="font-bold text-2xl mb-2 text-green-800 dark:text-green-200">
+                The First Self-Sustaining Creator Ecosystem
+              </h3>
+              <p className="text-base text-gray-800 dark:text-gray-200 font-medium leading-relaxed">
+                WebPayback Protocol is not just another crypto platform. It's the first self-sustaining economy designed 
+                for creators, powered by transparency, fairness, and the collective strength of our community.
+              </p>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm flex items-center gap-2">
-                  <Users className="h-4 w-4 text-green-500" />
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-white/80 dark:bg-gray-800/80 p-5 rounded-xl border border-green-300 dark:border-green-700 shadow-sm">
+                <h4 className="font-bold text-lg flex items-center gap-3 mb-3 text-green-700 dark:text-green-300">
+                  <Users className="h-6 w-6 text-emerald-600" />
                   Premium Creator
                 </h4>
-                <ul className="text-xs text-foreground/70 space-y-1 font-medium">
-                  <li>• Support the project with small amounts (from $10)</li>
-                  <li>• Get higher monthly rewards and exclusive features</li>
-                  <li>• Vote and help govern the platform</li>
-                  <li>• Be part of a sustainable community</li>
+                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 font-medium">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    Support the project with small amounts (from $10)
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    Get higher monthly rewards and exclusive features
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    Vote and help govern the platform
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    Be part of a sustainable community
+                  </li>
                 </ul>
               </div>
 
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-blue-500" />
+              <div className="bg-white/80 dark:bg-gray-800/80 p-5 rounded-xl border border-blue-300 dark:border-blue-700 shadow-sm">
+                <h4 className="font-bold text-lg flex items-center gap-3 mb-3 text-blue-700 dark:text-blue-300">
+                  <Heart className="h-6 w-6 text-blue-600" />
                   Basic Creator
                 </h4>
-                <ul className="text-xs text-foreground/70 space-y-1 font-medium">
-                  <li>• Join for free and earn WPT rewards</li>
-                  <li>• Access all open features of the ecosystem</li>
-                  <li>• Protect your original content</li>
-                  <li>• Grow with the community</li>
+                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 font-medium">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 font-bold">•</span>
+                    Join for free and earn WPT rewards
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 font-bold">•</span>
+                    Access all open features of the ecosystem
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 font-bold">•</span>
+                    Protect your original content
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-500 font-bold">•</span>
+                    Grow with the community
+                  </li>
                 </ul>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-l-green-500">
-              <h4 className="font-bold text-sm mb-2">🌱 Why It's Sustainable:</h4>
-              <div className="text-xs text-foreground/75 space-y-1 font-medium">
-                <p><strong className="text-foreground">Community Growth:</strong> Rewards grow as the community grows - no speculation</p>
-                <p><strong className="text-foreground">Real Usage:</strong> WPT value depends on ecosystem health, not investments</p>
-                <p><strong className="text-foreground">Transparency:</strong> Every token backed by smart contracts and growing creator pool</p>
-                <p className="text-green-700 dark:text-green-300 font-bold text-sm mt-2">
-                  "A community that grows together, earns together"
+            <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 p-6 rounded-xl border-l-4 border-l-green-600 shadow-inner">
+              <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-green-800 dark:text-green-200">
+                <span className="text-2xl">🌱</span>
+                Why It's Sustainable:
+              </h4>
+              <div className="text-sm text-gray-800 dark:text-gray-200 space-y-3 font-medium">
+                <p>
+                  <strong className="text-green-700 dark:text-green-300">Community Growth:</strong> 
+                  <span className="ml-1">Rewards grow as the community grows - no speculation</span>
                 </p>
+                <p>
+                  <strong className="text-green-700 dark:text-green-300">Real Usage:</strong> 
+                  <span className="ml-1">WPT value depends on ecosystem health, not investments</span>
+                </p>
+                <p>
+                  <strong className="text-green-700 dark:text-green-300">Transparency:</strong> 
+                  <span className="ml-1">Every token backed by smart contracts and growing creator pool</span>
+                </p>
+                <div className="mt-4 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-green-300 dark:border-green-600">
+                  <p className="text-green-800 dark:text-green-200 font-bold text-center text-lg italic">
+                    "A community that grows together, earns together"
+                  </p>
+                </div>
               </div>
             </div>
 
