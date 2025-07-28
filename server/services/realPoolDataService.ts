@@ -40,13 +40,40 @@ class RealPoolDataService {
   // WPT: WebPayback Token (verified - deployed 6 days ago)
   private readonly WPT_TOKEN = "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
-  // Pool addresses - ACTIVE POOLS
+  // SECURITY: Blacklisted old WPT token contract - DO NOT USE
+  private readonly OLD_WPT_TOKEN_BLACKLIST = "0x9077051d318b614f915e8a07861090856fdec91e";
+  
+  // Pool addresses - ACTIVE POOLS ONLY
   private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool WMATIC/WPT
   private readonly USDT_WPT_POOL_V2 = "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A"; // NEW V2 pool USDT/WPT
+  
+  // SECURITY: Blacklisted phantom pools with old contracts
+  private readonly PHANTOM_POOLS_BLACKLIST = [
+    "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB", // PHANTOM: WMATIC/OLD_WPT pool
+  ];
 
   private isCacheValid(): boolean {
     const now = Date.now();
     return (now - this.cache.lastFetch) < this.CACHE_DURATION;
+  }
+
+  /**
+   * SECURITY: Validate pool is not a phantom/blacklisted pool
+   */
+  private isValidPool(poolAddress: string, tokenAddresses: string[]): boolean {
+    // Check if pool is blacklisted
+    if (this.PHANTOM_POOLS_BLACKLIST.includes(poolAddress.toLowerCase())) {
+      console.log(`🚨 SECURITY: Blocked phantom pool ${poolAddress}`);
+      return false;
+    }
+    
+    // Check if any token is the old blacklisted WPT contract
+    if (tokenAddresses.some(addr => addr.toLowerCase() === this.OLD_WPT_TOKEN_BLACKLIST.toLowerCase())) {
+      console.log(`🚨 SECURITY: Blocked pool using old WPT contract ${poolAddress}`);
+      return false;
+    }
+    
+    return true;
   }
 
   // NEW: Fetch authentic data using direct blockchain queries - USDT/WPT V2 is PRIMARY
@@ -395,6 +422,14 @@ class RealPoolDataService {
     console.log("🔄 Refreshing AUTHENTIC pool data from Uniswap V3 Polygon...");
 
     try {
+      // SECURITY: Validate pools before processing
+      if (!this.isValidPool(this.USDT_WPT_POOL_V2, [this.USDT_TOKEN, this.WPT_TOKEN])) {
+        throw new Error("🚨 SECURITY: USDT pool validation failed");
+      }
+      if (!this.isValidPool(this.WMATIC_WPT_POOL, [this.WMATIC_TOKEN, this.WPT_TOKEN])) {
+        throw new Error("🚨 SECURITY: WMATIC pool validation failed");
+      }
+      
       // Fetch PRIMARY USDT/WPT V2 pool data first (main pool)
       const usdtData = await this.fetchRealPoolDataFromV3(this.USDT_WPT_POOL_V2, 'usdt');
       
