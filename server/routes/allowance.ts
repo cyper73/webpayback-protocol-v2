@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { db } from "../db";
+import { tokenInjectionService } from "../services/tokenInjection";
 import { 
   allowanceManagement, 
   allowanceTransactions, 
@@ -301,6 +302,77 @@ export function registerAllowanceRoutes(app: Express) {
     } catch (error) {
       console.error("Error fetching allowance dashboard:", error);
       res.status(500).json({ success: false, error: "Failed to fetch dashboard data" });
+    }
+  });
+
+  // IMMEDIATE TOKEN INJECTION - Inject 1M WPT tokens to contract
+  app.post("/api/allowance/inject-tokens", isFounderAuthenticated, async (req, res) => {
+    try {
+      const { amount = "1000000", targetContract } = req.body;
+      const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
+      
+      // Security validation
+      if (!targetContract || !targetContract.match(/^0x[a-fA-F0-9]{40}$/)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Valid target contract address required" 
+        });
+      }
+
+      // Use token injection service
+      const injectionResult = await tokenInjectionService.injectTokens(
+        targetContract,
+        amount,
+        founderWallet
+      );
+
+      if (!injectionResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: injectionResult.error
+        });
+      }
+      
+      // Record transaction in database
+      const allowanceId = 1; // Founder's allowance ID (number)
+      await db
+        .insert(allowanceTransactions)
+        .values({
+          allowanceId,
+          transactionType: "injection",
+          amount: amount.toString(),
+          transactionHash: injectionResult.transactionHash!,
+          gasUsed: injectionResult.gasUsed!,
+          blockNumber: injectionResult.blockNumber!,
+          status: "confirmed",
+        });
+      
+      // Update allowance usage
+      await db
+        .update(allowanceManagement)
+        .set({
+          usedAllowance: amount.toString(),
+          lastRefillAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(allowanceManagement.walletAddress, founderWallet));
+      
+      res.json({
+        success: true,
+        message: `Successfully injected ${amount} WPT tokens`,
+        transactionHash: injectionResult.transactionHash!,
+        blockNumber: injectionResult.blockNumber!,
+        gasUsed: injectionResult.gasUsed!,
+        targetContract,
+        amount: amount
+      });
+      
+    } catch (error: any) {
+      console.error("❌ Token injection failed:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Token injection failed: " + (error?.message || String(error))
+      });
     }
   });
 }
