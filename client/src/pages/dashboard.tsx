@@ -131,6 +131,13 @@ export default function Dashboard() {
                 Citations Rewards
               </Button>
             </RouterLink>
+            
+            <RouterLink to="/allowance-management">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-purple-500/30 hover:bg-purple-500/20 text-white">
+                <Wallet className="w-4 h-4 mr-2" />
+                Allowance Management
+              </Button>
+            </RouterLink>
           </div>
         </div>
       </div>

@@ -274,8 +274,74 @@ export const fraudDetectionAlerts = pgTable("fraud_detection_alerts", {
   severity: text("severity").default("medium"), // low, medium, high, critical
   status: text("status").default("active"), // active, resolved, ignored
   details: jsonb("details").default({}),
-  evidence: jsonb("evidence").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Allowance Management System for Automated Token Reserve Refills
+export const allowanceManagement = pgTable("allowance_management", {
+  id: serial("id").primaryKey(),
+  walletAddress: text("wallet_address").notNull(),
+  contractAddress: text("contract_address").notNull(),
+  tokenAddress: text("token_address").notNull(), // WPT token address
+  maxAllowance: decimal("max_allowance", { precision: 18, scale: 8 }).notNull(), // 5M WPT
+  currentAllowance: decimal("current_allowance", { precision: 18, scale: 8 }).default("0"),
+  usedAllowance: decimal("used_allowance", { precision: 18, scale: 8 }).default("0"),
+  refillThreshold: decimal("refill_threshold", { precision: 18, scale: 8 }).default("50000"), // Auto-refill when reserves < 50k WPT
+  refillAmount: decimal("refill_amount", { precision: 18, scale: 8 }).default("500000"), // 500k WPT per refill
+  isActive: boolean("is_active").default(true),
+  lastRefillAt: timestamp("last_refill_at"),
+  alertThreshold: decimal("alert_threshold", { precision: 18, scale: 8 }).default("100000"), // Alert when < 100k WPT
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Auto-Refill Transaction History
+export const allowanceTransactions = pgTable("allowance_transactions", {
+  id: serial("id").primaryKey(),
+  allowanceId: integer("allowance_id").references(() => allowanceManagement.id).notNull(),
+  transactionType: text("transaction_type").notNull(), // approve, refill, revoke
+  amount: decimal("amount", { precision: 18, scale: 8 }).notNull(),
+  transactionHash: text("transaction_hash").notNull(),
+  gasUsed: text("gas_used"),
+  gasPrice: text("gas_price"),
+  blockNumber: integer("block_number"),
+  status: text("status").default("pending"), // pending, confirmed, failed
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  confirmedAt: timestamp("confirmed_at"),
+});
+
+// Reserve Pool Monitoring
+export const reservePoolStatus = pgTable("reserve_pool_status", {
+  id: serial("id").primaryKey(),
+  contractAddress: text("contract_address").notNull(),
+  currentBalance: decimal("current_balance", { precision: 18, scale: 8 }).notNull(),
+  minimumThreshold: decimal("minimum_threshold", { precision: 18, scale: 8 }).default("50000"),
+  optimalBalance: decimal("optimal_balance", { precision: 18, scale: 8 }).default("2000000"), // 2M WPT
+  totalDistributedToday: decimal("total_distributed_today", { precision: 18, scale: 8 }).default("0"),
+  totalDistributedWeek: decimal("total_distributed_week", { precision: 18, scale: 8 }).default("0"),
+  totalDistributedMonth: decimal("total_distributed_month", { precision: 18, scale: 8 }).default("0"),
+  averageDailyUsage: decimal("average_daily_usage", { precision: 18, scale: 8 }).default("0"),
+  projectedDaysRemaining: integer("projected_days_remaining"),
+  lastRefillAmount: decimal("last_refill_amount", { precision: 18, scale: 8 }),
+  lastRefillAt: timestamp("last_refill_at"),
+  nextScheduledRefill: timestamp("next_scheduled_refill"),
+  alertLevel: text("alert_level").default("normal"), // normal, warning, critical, emergency
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Allowance Security Monitoring
+export const allowanceSecurity = pgTable("allowance_security", {
+  id: serial("id").primaryKey(),
+  allowanceId: integer("allowance_id").references(() => allowanceManagement.id).notNull(),
+  securityEventType: text("security_event_type").notNull(), // unusual_usage, threshold_breach, unauthorized_access
+  riskLevel: text("risk_level").notNull(), // low, medium, high, critical
+  description: text("description").notNull(),
+  affectedAmount: decimal("affected_amount", { precision: 18, scale: 8 }),
+  actionTaken: text("action_taken"), // monitored, throttled, blocked, manual_review
+  isResolved: boolean("is_resolved").default(false),
   resolvedAt: timestamp("resolved_at"),
+  evidence: jsonb("evidence").default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -500,6 +566,26 @@ export const domainVerificationsRelations = relations(domainVerifications, ({ on
   }),
 }));
 
+// Allowance Management Relations
+export const allowanceManagementRelations = relations(allowanceManagement, ({ many }) => ({
+  transactions: many(allowanceTransactions),
+  securityEvents: many(allowanceSecurity),
+}));
+
+export const allowanceTransactionsRelations = relations(allowanceTransactions, ({ one }) => ({
+  allowance: one(allowanceManagement, {
+    fields: [allowanceTransactions.allowanceId],
+    references: [allowanceManagement.id],
+  }),
+}));
+
+export const allowanceSecurityRelations = relations(allowanceSecurity, ({ one }) => ({
+  allowance: one(allowanceManagement, {
+    fields: [allowanceSecurity.allowanceId],
+    references: [allowanceManagement.id],
+  }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -619,6 +705,59 @@ export const insertFraudDetectionAlertSchema = createInsertSchema(fraudDetection
   severity: true,
   status: true,
   details: true,
+});
+
+// Allowance Management insert schemas
+export const insertAllowanceManagementSchema = createInsertSchema(allowanceManagement).pick({
+  walletAddress: true,
+  contractAddress: true,
+  tokenAddress: true,
+  maxAllowance: true,
+  currentAllowance: true,
+  usedAllowance: true,
+  refillThreshold: true,
+  refillAmount: true,
+  isActive: true,
+  alertThreshold: true,
+});
+
+export const insertAllowanceTransactionSchema = createInsertSchema(allowanceTransactions).pick({
+  allowanceId: true,
+  transactionType: true,
+  amount: true,
+  transactionHash: true,
+  gasUsed: true,
+  gasPrice: true,
+  blockNumber: true,
+  status: true,
+  errorMessage: true,
+});
+
+export const insertReservePoolStatusSchema = createInsertSchema(reservePoolStatus).pick({
+  contractAddress: true,
+  currentBalance: true,
+  minimumThreshold: true,
+  optimalBalance: true,
+  totalDistributedToday: true,
+  totalDistributedWeek: true,
+  totalDistributedMonth: true,
+  averageDailyUsage: true,
+  projectedDaysRemaining: true,
+  lastRefillAmount: true,
+  lastRefillAt: true,
+  nextScheduledRefill: true,
+  alertLevel: true,
+});
+
+export const insertAllowanceSecuritySchema = createInsertSchema(allowanceSecurity).pick({
+  allowanceId: true,
+  securityEventType: true,
+  riskLevel: true,
+  description: true,
+  affectedAmount: true,
+  actionTaken: true,
+  isResolved: true,
+  resolvedAt: true,
   evidence: true,
 });
 
@@ -806,3 +945,16 @@ export type ReentrancyProtectionLog = typeof reentrancyProtectionLogs.$inferSele
 
 export type FakeCreatorDetection = typeof fakeCreatorDetection.$inferSelect;
 export type InsertFakeCreatorDetection = typeof fakeCreatorDetection.$inferInsert;
+
+// Allowance Management Types
+export type AllowanceManagement = typeof allowanceManagement.$inferSelect;
+export type InsertAllowanceManagement = z.infer<typeof insertAllowanceManagementSchema>;
+
+export type AllowanceTransaction = typeof allowanceTransactions.$inferSelect;
+export type InsertAllowanceTransaction = z.infer<typeof insertAllowanceTransactionSchema>;
+
+export type ReservePoolStatus = typeof reservePoolStatus.$inferSelect;
+export type InsertReservePoolStatus = z.infer<typeof insertReservePoolStatusSchema>;
+
+export type AllowanceSecurity = typeof allowanceSecurity.$inferSelect;
+export type InsertAllowanceSecurity = z.infer<typeof insertAllowanceSecuritySchema>;

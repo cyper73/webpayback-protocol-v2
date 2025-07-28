@@ -75,6 +75,7 @@ import {
 } from "./security/reentrancyProtection";
 import { automationRouter } from "./routes/automation";
 import { contentCertificateRouter } from "./routes/contentCertificate";
+import { registerAllowanceRoutes } from "./routes/allowance";
 import userRoutes from "./routes/user";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -3162,6 +3163,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // User routes
   app.use('/api/user', userRoutes);
+  
+  // Allowance Management routes
+  registerAllowanceRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;
