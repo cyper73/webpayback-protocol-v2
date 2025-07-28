@@ -103,13 +103,10 @@ export default function AllowanceManagementPage() {
   // Setup allowance mutation
   const setupAllowanceMutation = useMutation({
     mutationFn: async (config: any) => {
-      return apiRequest("/api/allowance/setup", {
-        method: "POST",
-        body: JSON.stringify({
-          walletAddress,
-          ...config,
-          isActive: true
-        }),
+      return apiRequest("POST", "/api/allowance/setup", {
+        walletAddress,
+        ...config,
+        isActive: true
       });
     },
     onSuccess: () => {
@@ -209,7 +206,7 @@ export default function AllowanceManagementPage() {
     );
   }
 
-  const dashboard = dashboardData?.dashboard as DashboardData | undefined;
+  const dashboard = (dashboardData as any)?.dashboard as DashboardData | undefined;
 
   return (
     <div className="container mx-auto p-6 space-y-6">

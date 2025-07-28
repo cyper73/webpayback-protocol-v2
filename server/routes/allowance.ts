@@ -14,7 +14,9 @@ import { eq, desc, and, gte, lte } from "drizzle-orm";
 // Founder-only access control for Allowance Management
 const isFounderAuthenticated = (req: any, res: any, next: any) => {
   const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
-  const { walletAddress } = req.params;
+  
+  // Get wallet address from params (GET requests) or body (POST requests)
+  const walletAddress = req.params?.walletAddress || req.body?.walletAddress;
   
   // Check if requesting access to founder's wallet data
   if (walletAddress && walletAddress.toLowerCase() !== founderWallet.toLowerCase()) {
@@ -293,7 +295,7 @@ export function registerAllowanceRoutes(app: Express) {
           recentTransactions,
           reserveStatus: reserveStatus[0] || null,
           activeSecurityEvents: securityEventsCount.length,
-          utilizationPercent: ((parseFloat(config[0].usedAllowance) / parseFloat(config[0].maxAllowance)) * 100).toFixed(2)
+          utilizationPercent: ((parseFloat(config[0].usedAllowance || "0") / parseFloat(config[0].maxAllowance || "1")) * 100).toFixed(2)
         }
       });
     } catch (error) {
