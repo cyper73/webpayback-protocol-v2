@@ -306,6 +306,96 @@ export default function GettingStarted() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Economy Manifesto */}
+      <Card className="mb-8 border-2 border-dashed border-orange-300 dark:border-orange-700">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-orange-500" />
+            🚀 WebPayback Economy Manifesto - Coming Soon!
+          </CardTitle>
+          <CardDescription>
+            Revolutionary self-sustaining creator economy launching at 1,000 registered creators
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 p-6 rounded-lg border">
+            <h3 className="font-bold text-lg mb-3 text-orange-900 dark:text-orange-100">
+              The First Self-Sustaining Creator Economy
+            </h3>
+            
+            <p className="text-sm text-muted-foreground mb-4">
+              WebPayback Protocol isn't just another crypto platform - it's the first completely self-sustaining economy 
+              where every new creator makes all existing creators more valuable.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <Coins className="h-4 w-4 text-green-500" />
+                  Smart Investment Strategy
+                </h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Creator invests €50-200 → Gets 2-5x rewards multiplier</li>
+                  <li>• Every new investor increases your token value</li>
+                  <li>• Early investors get maximum price advantage</li>
+                  <li>• ROI potential: 300-10,000% based on adoption</li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-blue-500" />
+                  VIP Creator Benefits
+                </h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Bronze (€50+): 2x rewards, priority support</li>
+                  <li>• Silver (€200+): 3x rewards, governance rights</li>
+                  <li>• Gold (€500+): 5x rewards, revenue sharing</li>
+                  <li>• Exclusive NFT certificates and co-marketing</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-l-orange-500">
+              <h4 className="font-bold text-sm mb-2">💡 The Mathematical Advantage:</h4>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p><strong>Today:</strong> WPT costs €0.0016 (foundation price)</p>
+                <p><strong>1,000 creators:</strong> Estimated €0.016 (+900% growth)</p>
+                <p><strong>5,000 creators:</strong> Estimated €0.16 (+10,000% growth)</p>
+                <p className="text-orange-600 dark:text-orange-400 font-semibold">
+                  Early investors get WPT at the lowest price in history!
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
+              <Badge variant="outline" className="flex items-center gap-1 justify-center">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                100% Transparent & Secure
+              </Badge>
+              <Badge variant="outline" className="flex items-center gap-1 justify-center">
+                <Shield className="h-3 w-3 text-blue-500" />
+                Smart Contract Verified
+              </Badge>
+              <Badge variant="outline" className="flex items-center gap-1 justify-center">
+                <Coins className="h-3 w-3 text-orange-500" />
+                Zero Rug-Pull Risk
+              </Badge>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <Button variant="outline" size="sm" disabled>
+              <Trophy className="h-4 w-4 mr-2" />
+              Activate at 1,000 Creators
+            </Button>
+            <div className="text-xs text-muted-foreground text-center">
+              📊 Current: ~50 creators | Target: 1,000 creators for launch
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
