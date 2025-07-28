@@ -44,6 +44,19 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - **CONTACT**: Commercial licensing inquiries directed to info@webpayback.com
 - **DOCUMENTATION UPDATED**: README.md updated to reflect new licensing terms and restrictions
 
+### Allowance Management System (July 28, 2025)
+- **FOUNDER-ONLY ACCESS**: Comprehensive token allowance management system with multi-layer security
+- **DATABASE INFRASTRUCTURE**: Created complete database schema (allowance_management, allowance_transactions, reserve_pool_status, allowance_security)
+- **BACKEND API**: Full REST API with 8+ endpoints for configuration, monitoring, and transaction history
+- **SECURITY IMPLEMENTATION**: Multi-layer founder authentication system:
+  * Device fingerprinting (Windows + Firefox/Chrome detection)
+  * Wallet address validation (0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8 only)
+  * Server-side middleware protection on all routes
+  * Frontend conditional rendering (button hidden for non-founders)
+- **DASHBOARD FEATURES**: Real-time statistics, configuration controls, transaction history, security monitoring
+- **ACCESS CONFIRMED**: Founder has full access, smartphone/external devices completely blocked
+- **ROUTE**: /allowance-management with comprehensive allowance configuration interface
+
 ### Getting Started Module Addition (July 28, 2025)
 - **NEW FEATURE**: Complete "Getting Started" module created in English language
 - **USER INTERFACE**: Added blue "Getting Started" button to Quick Actions Bar with consistent design
