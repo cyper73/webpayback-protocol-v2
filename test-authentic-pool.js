@@ -1,76 +1,121 @@
 #!/usr/bin/env node
-
 /**
- * Force refresh and get AUTHENTIC pool data directly from blockchain
+ * 🔍 TEST AUTENTICO POOL USDT/WPT
+ * Verifica se i token sono veramente nella pool
  */
 
-import fetch from 'node-fetch';
+import { ethers } from 'ethers';
 
 async function testAuthenticPool() {
-  console.log("🔍 Testing AUTHENTIC pool data...");
-  
   try {
-    // Force refresh by calling the API
-    console.log("1️⃣ Forcing cache refresh...");
-    const response = await fetch("http://localhost:5000/api/web3/pool-info");
-    const data = await response.json();
+    console.log('🔍 TEST AUTENTICO POOL USDT/WPT...');
     
-    console.log("📊 Current API Response:");
-    console.log(`   TVL: ${data.totalValueLocked}`);
-    console.log(`   Last Updated: ${new Date(data.lastUpdated).toLocaleString()}`);
-    console.log(`   Data Source: ${data.dataSource}`);
+    // Setup provider
+    const alchemyKey = process.env.ALCHEMY_API_KEY;
+    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`);
     
-    // Test direct blockchain call for WMATIC balance
-    console.log("\n2️⃣ Testing direct blockchain call...");
-    const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
-    const poolAddress = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3";
-    const wmaticAddress = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
+    // Pool USDT/WPT V2
+    const POOL_ADDRESS = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A';
+    const USDT_CONTRACT = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
+    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
     
-    const balanceCall = {
-      jsonrpc: "2.0",
-      method: "eth_call",
-      params: [{
-        to: wmaticAddress,
-        data: `0x70a08231000000000000000000000000${poolAddress.slice(2)}` // balanceOf(pool)
-      }, "latest"],
-      id: 1
-    };
+    const erc20ABI = [
+      'function balanceOf(address owner) view returns (uint256)',
+      'function decimals() view returns (uint8)',
+      'function symbol() view returns (string)',
+      'function name() view returns (string)'
+    ];
     
-    const balanceResponse = await fetch(alchemyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(balanceCall)
-    });
+    const usdtContract = new ethers.Contract(USDT_CONTRACT, erc20ABI, provider);
+    const wptContract = new ethers.Contract(WPT_CONTRACT, erc20ABI, provider);
     
-    const balanceData = await balanceResponse.json();
+    console.log(`📋 Pool testata: ${POOL_ADDRESS}`);
+    console.log(`📋 USDT contract: ${USDT_CONTRACT}`);
+    console.log(`📋 WPT contract: ${WPT_CONTRACT}`);
+    console.log('');
     
-    if (balanceData.result && balanceData.result !== "0x") {
-      const wmaticBalance = parseInt(balanceData.result, 16) / Math.pow(10, 18);
-      console.log(`   WMATIC in pool (blockchain): ${wmaticBalance.toFixed(6)}`);
-      
-      // Calculate value
-      const wmaticPrice = 0.97; // Approximate price
-      const valueUSD = wmaticBalance * wmaticPrice;
-      const valueEUR = valueUSD * 0.852;
-      
-      console.log(`   Calculated value: $${valueUSD.toFixed(2)} USD / €${valueEUR.toFixed(2)} EUR`);
-      
-      if (wmaticBalance === 0) {
-        console.log("⚠️ Pool is empty or all liquidity removed");
-      }
+    // Get token details
+    const [usdtName, usdtSymbol, usdtDecimals] = await Promise.all([
+      usdtContract.name(),
+      usdtContract.symbol(), 
+      usdtContract.decimals()
+    ]);
+    
+    const [wptName, wptSymbol, wptDecimals] = await Promise.all([
+      wptContract.name(),
+      wptContract.symbol(),
+      wptContract.decimals()
+    ]);
+    
+    console.log('🔍 DETTAGLI TOKEN:');
+    console.log(`   USDT: ${usdtName} (${usdtSymbol}) - ${usdtDecimals} decimals`);
+    console.log(`   WPT: ${wptName} (${wptSymbol}) - ${wptDecimals} decimals`);
+    console.log('');
+    
+    // Get balances in pool
+    const [usdtBalance, wptBalance] = await Promise.all([
+      usdtContract.balanceOf(POOL_ADDRESS),
+      wptContract.balanceOf(POOL_ADDRESS)
+    ]);
+    
+    // Format balances
+    const usdtFormatted = ethers.formatUnits(usdtBalance, usdtDecimals);
+    const wptFormatted = ethers.formatUnits(wptBalance, wptDecimals);
+    
+    console.log('💰 CONTENUTO REALE POOL:');
+    console.log(`   USDT nella pool: ${usdtFormatted} USDT`);
+    console.log(`   WPT nella pool: ${wptFormatted} WPT`);
+    console.log('');
+    console.log('📊 DETTAGLI RAW:');
+    console.log(`   USDT raw: ${usdtBalance.toString()}`);
+    console.log(`   WPT raw: ${wptBalance.toString()}`);
+    
+    console.log('');
+    console.log('✅ RISULTATO VERIFICA:');
+    
+    if (parseFloat(usdtFormatted) > 0) {
+      console.log(`✅ USDT presente: ${usdtFormatted} USDT`);
     } else {
-      console.log("❌ Could not get blockchain balance");
-      console.log(`   Response: ${JSON.stringify(balanceData)}`);
+      console.log('❌ USDT non presente nella pool');
     }
     
-    console.log("\n🎯 Comparison with user screenshot:");
-    console.log("   User screenshot shows: $63.11 USD");
-    console.log("   This suggests the user position value, not total pool TVL");
-    console.log("   The pool might have very low liquidity currently");
+    if (parseFloat(wptFormatted) > 0) {
+      console.log(`✅ WPT presente: ${wptFormatted} WPT`);
+    } else {
+      console.log('❌ WPT non presente nella pool');
+    }
+    
+    // Check pool contract existence
+    const poolCode = await provider.getCode(POOL_ADDRESS);
+    console.log('');
+    console.log('🔍 VERIFICA CONTRATTO:');
+    if (poolCode === '0x') {
+      console.log('❌ Indirizzo pool non è un contratto');
+    } else {
+      console.log('✅ Pool è un contratto valido');
+      console.log(`   Bytecode: ${poolCode.length} caratteri`);
+    }
+    
+    return { usdtFormatted, wptFormatted, poolExists: poolCode !== '0x' };
     
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error('❌ Errore test pool:', error.message);
+    return null;
   }
 }
 
-testAuthenticPool();
+// Execute
+testAuthenticPool().then(result => {
+  if (result) {
+    console.log('');
+    console.log('🎯 CONCLUSIONE:');
+    if (result.poolExists && (parseFloat(result.usdtFormatted) > 0 || parseFloat(result.wptFormatted) > 0)) {
+      console.log('✅ Pool funzionante con token reali');
+    } else {
+      console.log('❌ Pool vuota o problematica');
+    }
+    process.exit(0);
+  } else {
+    process.exit(1);
+  }
+});

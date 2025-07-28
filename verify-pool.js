@@ -1,89 +1,95 @@
 #!/usr/bin/env node
-
 /**
- * 🌊 Pool Verification Script
- * Verifies if the POL/WPT pool matches the 500 EUR pool created yesterday
+ * 🔍 VERIFICA DIRETTA POOL USDT/WPT
+ * Controlla cosa c'è veramente nella pool
  */
 
-import { Alchemy, Network } from 'alchemy-sdk';
+const { ethers } = require('ethers');
 
-console.log('🔍 Verifying POL/WPT Pool...\n');
-
-const POOL_ADDRESS = '0x1FF3b523ab413abFF55F409Ff4602C53e4fE70cd';
-const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-
-// Alchemy configuration
-const config = {
-  apiKey: process.env.ALCHEMY_API_KEY,
-  network: Network.MATIC_MAINNET,
-};
-
-const alchemy = new Alchemy(config);
-
-async function verifyPool() {
+async function verifyPoolContents() {
   try {
-    console.log('🎯 Pool Address:', POOL_ADDRESS);
-    console.log('🎯 WPT Contract:', WPT_CONTRACT);
+    console.log('🔍 VERIFICA DIRETTA CONTENUTO POOL...');
     
-    // Check pool existence
-    const poolCode = await alchemy.core.getCode(POOL_ADDRESS);
-    console.log('📋 Pool Contract Exists:', poolCode !== '0x' ? 'YES' : 'NO');
+    // Setup provider
+    const alchemyKey = process.env.ALCHEMY_API_KEY;
+    const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`);
     
+    // Pool USDT/WPT V2
+    const POOL_ADDRESS = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A';
+    const USDT_CONTRACT = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
+    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+    
+    const erc20ABI = [
+      'function balanceOf(address owner) view returns (uint256)',
+      'function decimals() view returns (uint8)',
+      'function symbol() view returns (string)'
+    ];
+    
+    const usdtContract = new ethers.Contract(USDT_CONTRACT, erc20ABI, provider);
+    const wptContract = new ethers.Contract(WPT_CONTRACT, erc20ABI, provider);
+    
+    console.log(`📋 Pool verificata: ${POOL_ADDRESS}`);
+    console.log('');
+    
+    // Get balances
+    const [usdtBalance, wptBalance, usdtDecimals, wptDecimals] = await Promise.all([
+      usdtContract.balanceOf(POOL_ADDRESS),
+      wptContract.balanceOf(POOL_ADDRESS),
+      usdtContract.decimals(),
+      wptContract.decimals()
+    ]);
+    
+    // Format balances
+    const usdtFormatted = ethers.utils.formatUnits(usdtBalance, usdtDecimals);
+    const wptFormatted = ethers.utils.formatUnits(wptBalance, wptDecimals);
+    
+    console.log('💰 CONTENUTO REALE POOL:');
+    console.log(`   USDT: ${usdtFormatted} USDT`);
+    console.log(`   WPT: ${wptFormatted} WPT`);
+    console.log('');
+    console.log('📊 DETTAGLI RAW:');
+    console.log(`   USDT raw: ${usdtBalance.toString()} (decimals: ${usdtDecimals})`);
+    console.log(`   WPT raw: ${wptBalance.toString()} (decimals: ${wptDecimals})`);
+    
+    // Check if tokens are actually there
+    console.log('');
+    console.log('✅ VERIFICHE:');
+    if (parseFloat(usdtFormatted) > 0) {
+      console.log('✅ USDT presente nella pool');
+    } else {
+      console.log('❌ USDT non presente nella pool');
+    }
+    
+    if (parseFloat(wptFormatted) > 0) {
+      console.log('✅ WPT presente nella pool');
+    } else {
+      console.log('❌ WPT non presente nella pool');
+    }
+    
+    // Check pool contract code
+    const poolCode = await provider.getCode(POOL_ADDRESS);
+    console.log('');
+    console.log('🔍 VERIFICA CONTRATTO POOL:');
     if (poolCode === '0x') {
-      console.log('❌ WARNING: Pool address has no contract code');
-      console.log('   This might not be a valid Uniswap V3 pool');
-      return;
-    }
-    
-    // Get pool balance
-    const poolBalance = await alchemy.core.getBalance(POOL_ADDRESS);
-    console.log('💰 Pool POL Balance:', poolBalance.toString(), 'wei');
-    console.log('💰 Pool POL Balance:', (Number(poolBalance) / 1e18).toFixed(6), 'POL');
-    
-    // Estimate USD value (POL ~$0.24)
-    const polPrice = 0.24;
-    const polAmount = Number(poolBalance) / 1e18;
-    const usdValue = polAmount * polPrice;
-    console.log('💵 Estimated USD Value:', usdValue.toFixed(2), 'USD');
-    
-    // Check if this matches ~500 EUR
-    const eurToUsd = 1.1; // Approximate EUR to USD rate
-    const expectedUsd = 500 * eurToUsd;
-    console.log('🎯 Expected USD (500 EUR):', expectedUsd.toFixed(2), 'USD');
-    
-    const difference = Math.abs(usdValue - expectedUsd);
-    const percentDiff = (difference / expectedUsd) * 100;
-    
-    console.log('\n📊 POOL VERIFICATION RESULTS:');
-    console.log('============================');
-    
-    if (percentDiff < 50) { // Within 50% tolerance
-      console.log('✅ MATCH: Pool value matches expected 500 EUR investment');
-      console.log(`   Difference: ${difference.toFixed(2)} USD (${percentDiff.toFixed(1)}%)`);
+      console.log('❌ Pool non è un contratto valido');
     } else {
-      console.log('⚠️  MISMATCH: Pool value differs significantly from 500 EUR');
-      console.log(`   Difference: ${difference.toFixed(2)} USD (${percentDiff.toFixed(1)}%)`);
-      console.log('   This might be a different pool or needs verification');
+      console.log('✅ Pool è un contratto valido');
+      console.log(`   Bytecode length: ${poolCode.length} chars`);
     }
     
-    // Additional verification - check recent transactions
-    console.log('\n🔍 Recent Activity Check:');
-    console.log('========================');
-    
-    // Get transaction count
-    const txCount = await alchemy.core.getTransactionCount(POOL_ADDRESS);
-    console.log('📈 Transaction Count:', txCount);
-    
-    if (txCount > 0) {
-      console.log('✅ Pool has transaction activity');
-    } else {
-      console.log('⚠️  Pool has no transactions yet');
-    }
+    return { usdtFormatted, wptFormatted };
     
   } catch (error) {
-    console.error('❌ Pool verification failed:', error.message);
+    console.error('❌ Errore verifica pool:', error.message);
+    return null;
   }
 }
 
-// Run verification
-verifyPool();
+// Execute
+verifyPoolContents().then(result => {
+  if (result) {
+    process.exit(0);
+  } else {
+    process.exit(1);
+  }
+});
