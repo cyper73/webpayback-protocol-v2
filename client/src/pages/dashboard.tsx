@@ -21,7 +21,7 @@ import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor
 import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
 import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtectionDashboard";
 
-import { Box, Wallet, Coins, Link, Shield, FileText } from "lucide-react";
+import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen } from "lucide-react";
 import { Link as RouterLink } from "wouter";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
@@ -104,6 +104,13 @@ export default function Dashboard() {
       <div className="bg-glass-dark/50 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-wrap items-center justify-center gap-3">
+            <RouterLink to="/getting-started">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-blue-500/30 hover:bg-blue-500/20 text-white">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Getting Started
+              </Button>
+            </RouterLink>
+            
             <RouterLink to="/automation">
               <Button variant="outline" size="sm" className="bg-glass-dark border-emerald-500/30 hover:bg-emerald-500/20 text-white">
                 <Box className="w-4 h-4 mr-2" />

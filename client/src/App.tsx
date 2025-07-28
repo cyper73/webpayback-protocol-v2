@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
+import GettingStarted from "@/pages/getting-started";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/terms";
 import TestConnectivity from "@/pages/test-connectivity";
@@ -19,6 +20,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
+      <Route path="/getting-started" component={GettingStarted} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />
       <Route path="/content-certificate" component={ContentCertificatePage} />
