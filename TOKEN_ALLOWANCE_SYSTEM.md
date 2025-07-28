@@ -1,106 +1,106 @@
 # Token Allowance Management System
 
 ## Overview
-Sistema di gestione automatica degli allowance per i token WPT del WebPayback Protocol, progettato per garantire rifornimenti automatici delle riserve token senza intervento manuale.
+Automated allowance management system for WPT tokens in the WebPayback Protocol, designed to ensure automatic token reserve refills without manual intervention.
 
-## Configurazione Attuale
+## Current Configuration
 
-### Parametri di Base
+### Base Parameters
 - **Max Allowance**: 2,000,000 WPT
-- **Utilizzo Corrente**: 0% (0 WPT utilizzati)
-- **Soglia di Ricarica**: 50,000 WPT
-- **Importo Ricarica**: 500,000 WPT per operazione
-- **Soglia di Allerta**: 100,000 WPT
+- **Current Usage**: 0% (0 WPT used)
+- **Refill Threshold**: 50,000 WPT
+- **Refill Amount**: 500,000 WPT per operation
+- **Alert Threshold**: 100,000 WPT
 
-### Indirizzi Configurati
+### Configured Addresses
 - **Wallet Address**: 0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8
 - **Contract Address**: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
 - **Token Address**: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
 
-## Funzionalità
+## Features
 
-### 1. Gestione Automatica Riserve
-- Monitoraggio continuo del balance delle riserve token
-- Ricarica automatica quando il balance scende sotto la soglia
-- Protezione contro il drain delle riserve
+### 1. Automatic Reserve Management
+- Continuous monitoring of token reserve balance
+- Automatic refill when balance drops below threshold
+- Protection against reserve drain attacks
 
-### 2. Sicurezza Multi-Layer
-- **Device Fingerprinting**: Solo Windows + Chrome/Firefox autorizzati
-- **Wallet Validation**: Accesso limitato al wallet del founder
-- **Session-Based Auth**: Protezione a livello di sessione
-- **IDOR Protection**: Prevenzione accessi non autorizzati
+### 2. Multi-Layer Security
+- **Device Fingerprinting**: Only Windows + Chrome/Firefox authorized
+- **Wallet Validation**: Access limited to founder wallet
+- **Session-Based Auth**: Session-level protection
+- **IDOR Protection**: Prevention of unauthorized access
 
-### 3. Monitoraggio Sicurezza
-- Tracciamento eventi di sicurezza
-- Alert automatici per comportamenti anomali
-- Log completo delle transazioni
+### 3. Security Monitoring
+- Security event tracking
+- Automatic alerts for anomalous behavior
+- Complete transaction logging
 
 ## Database Schema
 
 ### allowance_management
-- Configurazione principale degli allowance
-- Soglie e parametri operativi
-- Status e timestamp delle operazioni
+- Main allowance configuration
+- Operational thresholds and parameters
+- Status and operation timestamps
 
 ### allowance_transactions
-- Storico completo delle transazioni
+- Complete transaction history
 - Hash, gas used, block number
-- Status di conferma e eventuali errori
+- Confirmation status and error handling
 
 ### reserve_pool_status
-- Stato attuale delle riserve
-- Distribuzione giornaliera/settimanale/mensile
-- Proiezioni e livelli di allerta
+- Current reserve status
+- Daily/weekly/monthly distribution
+- Projections and alert levels
 
 ### allowance_security
-- Eventi di sicurezza rilevati
-- Livelli di rischio e azioni intraprese
-- Evidence e resolution tracking
+- Detected security events
+- Risk levels and actions taken
+- Evidence and resolution tracking
 
 ## API Endpoints
 
-### Configurazione
-- `GET /api/allowance/config/:walletAddress` - Recupera configurazione
-- `POST /api/allowance/setup` - Inizializza sistema allowance
-- `PUT /api/allowance/update/:walletAddress` - Aggiorna parametri
+### Configuration
+- `GET /api/allowance/config/:walletAddress` - Retrieve configuration
+- `POST /api/allowance/setup` - Initialize allowance system
+- `PUT /api/allowance/update/:walletAddress` - Update parameters
 
-### Monitoraggio
-- `GET /api/allowance/dashboard/:walletAddress` - Dashboard completa
-- `GET /api/allowance/transactions/:walletAddress` - Storico transazioni
-- `GET /api/allowance/security/:walletAddress` - Eventi sicurezza
+### Monitoring
+- `GET /api/allowance/dashboard/:walletAddress` - Complete dashboard
+- `GET /api/allowance/transactions/:walletAddress` - Transaction history
+- `GET /api/allowance/security/:walletAddress` - Security events
 
-### Operazioni
-- `POST /api/allowance/approve` - Approva allowance
-- `POST /api/allowance/revoke` - Revoca allowance
-- `POST /api/allowance/security-event` - Crea evento sicurezza
+### Operations
+- `POST /api/allowance/approve` - Approve allowance
+- `POST /api/allowance/revoke` - Revoke allowance
+- `POST /api/allowance/security-event` - Create security event
 
-## Sicurezza e Accesso
+## Security and Access
 
-### Accesso Founder-Only
-Il sistema è progettato esclusivamente per l'accesso del founder del protocollo:
+### Founder-Only Access
+The system is designed exclusively for protocol founder access:
 - Wallet: 0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8
 - Device: Windows + Chrome/Firefox
-- Tutti gli altri accessi vengono bloccati
+- All other access attempts are blocked
 
-### Protezioni Implementate
-- Middleware di autenticazione su tutti gli endpoint
-- Validazione wallet address su ogni richiesta
-- Device fingerprinting per prevenire accessi da dispositivi non autorizzati
-- Rate limiting e monitoraggio anomalie
+### Implemented Protections
+- Authentication middleware on all endpoints
+- Wallet address validation on every request
+- Device fingerprinting to prevent unauthorized device access
+- Rate limiting and anomaly monitoring
 
-## Status Implementazione
+## Implementation Status
 
-### ✅ Completato (28 Luglio 2025)
-- Database schema completo e sincronizzato
-- API backend completa con 8+ endpoints
-- Frontend dashboard funzionante
-- Sistema di sicurezza multi-layer attivo
-- Configurazione iniziale salvata e testata
-- Founder ha confermato funzionamento corretto
+### ✅ Completed (July 28, 2025)
+- Complete and synchronized database schema
+- Complete backend API with 8+ endpoints
+- Functional frontend dashboard
+- Active multi-layer security system
+- Initial configuration saved and tested
+- Founder confirmed correct functionality
 
-### 🔄 In Corso
-- Monitoraggio automatico pool ogni 12 ore
-- Alchemy API integration (192/1000 chiamate utilizzate)
+### 🔄 In Progress
+- Automatic pool monitoring every 12 hours
+- Alchemy API integration (252/1000 calls used)
 - Pool TVL tracking: $1 USDT/WPT, €219 WMATIC/WPT
 
 ## Contatti
@@ -109,5 +109,5 @@ Il sistema è progettato esclusivamente per l'accesso del founder del protocollo
 - Domain: webpayback.com
 
 ---
-*Documento aggiornato: 28 Luglio 2025*
-*Sistema testato e confermato funzionante dal founder Claudio*
+*Document updated: July 28, 2025*
+*System tested and confirmed working by founder Claudio*
