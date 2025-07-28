@@ -27,7 +27,7 @@ export default function GettingStarted() {
           <Coins className="h-8 w-8 text-blue-500" />
           <h1 className="text-3xl font-bold">Getting Started with WebPayback Protocol</h1>
         </div>
-        <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
+        <p className="text-gray-700 dark:text-gray-300 text-lg max-w-3xl mx-auto">
           Learn how to protect your content from AI scraping and earn WPT tokens when AI systems use your work
         </p>
       </div>
@@ -41,7 +41,7 @@ export default function GettingStarted() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
+          <p className="text-gray-700 dark:text-gray-300">
             WebPayback Protocol Token (WPT) is a revolutionary blockchain-based solution that automatically rewards content creators 
             when AI systems use their work. Built on Polygon network, WPT creates a fair economy where creators are compensated 
             for their intellectual property.
@@ -52,7 +52,7 @@ export default function GettingStarted() {
               <Shield className="h-5 w-5 text-blue-500 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-sm">Anti-AI Scraping</h4>
-                <p className="text-xs text-muted-foreground">Protect your content from unauthorized AI usage</p>
+                <p className="text-xs text-gray-700 dark:text-gray-300">Protect your content from unauthorized AI usage</p>
               </div>
             </div>
             
@@ -60,7 +60,7 @@ export default function GettingStarted() {
               <Coins className="h-5 w-5 text-green-500 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-sm">Automatic Rewards</h4>
-                <p className="text-xs text-muted-foreground">Earn WPT tokens when AI systems use your content</p>
+                <p className="text-xs text-gray-700 dark:text-gray-300">Earn WPT tokens when AI systems use your content</p>
               </div>
             </div>
             
@@ -68,7 +68,7 @@ export default function GettingStarted() {
               <FileText className="h-5 w-5 text-purple-500 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-sm">NFT Certificates</h4>
-                <p className="text-xs text-muted-foreground">Blockchain-verified content ownership</p>
+                <p className="text-xs text-gray-700 dark:text-gray-300">Blockchain-verified content ownership</p>
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function GettingStarted() {
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Domain Verification</h4>
-                <p className="text-muted-foreground mb-3">
+                <p className="text-gray-700 dark:text-gray-300 mb-3">
                   Verify ownership of your website or content domain to establish authenticity.
                 </p>
                 <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md border">
@@ -116,7 +116,7 @@ export default function GettingStarted() {
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Creator Profile Setup</h4>
-                <p className="text-muted-foreground mb-3">
+                <p className="text-gray-700 dark:text-gray-300 mb-3">
                   Complete your creator profile with relevant information about your content and channels.
                 </p>
                 <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border mb-3">
@@ -157,7 +157,7 @@ export default function GettingStarted() {
               </div>
               <div>
                 <h4 className="font-semibold mb-2">Start Earning WPT</h4>
-                <p className="text-muted-foreground">
+                <p className="text-gray-700 dark:text-gray-300">
                   Once verified, your content is automatically monitored. Earn WPT tokens when AI systems access your work.
                 </p>
               </div>
@@ -184,7 +184,7 @@ export default function GettingStarted() {
               <FileText className="h-4 w-4" />
               Enhanced Meta Tags Protection
             </h4>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
               Add these advanced meta tags to your content pages for enhanced AI detection and protection:
             </p>
             
@@ -226,14 +226,14 @@ export default function GettingStarted() {
               <Trophy className="h-4 w-4" />
               NFT Content Certificates
             </h4>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
               Mint blockchain certificates for your most valuable content to establish permanent ownership records.
             </p>
             
             <div className="grid md:grid-cols-2 gap-4">
               <div className="border rounded-lg p-4">
                 <h5 className="font-semibold mb-2">What are Content Certificate NFTs?</h5>
-                <ul className="text-sm text-muted-foreground space-y-1">
+                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                   <li>• Blockchain-verified ownership certificates</li>
                   <li>• SHA-256 content fingerprints</li>
                   <li>• Immutable timestamp records</li>
@@ -243,7 +243,7 @@ export default function GettingStarted() {
               
               <div className="border rounded-lg p-4">
                 <h5 className="font-semibold mb-2">Benefits of NFT Certificates</h5>
-                <ul className="text-sm text-muted-foreground space-y-1">
+                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                   <li>• Enhanced WPT reward rates</li>
                   <li>• Legal protection against content theft</li>
                   <li>• Priority in dispute resolution</li>
@@ -300,7 +300,7 @@ export default function GettingStarted() {
               href="https://github.com/cyper73/webpayback-protocol/tree/webpayback" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300 hover:text-foreground transition-colors"
             >
               <ExternalLink className="h-3 w-3" />
               View Documentation
