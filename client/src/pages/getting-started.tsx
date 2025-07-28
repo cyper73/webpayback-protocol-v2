@@ -96,9 +96,9 @@ export default function GettingStarted() {
                 <p className="text-muted-foreground mb-3">
                   Verify ownership of your website or content domain to establish authenticity.
                 </p>
-                <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-md">
-                  <p className="text-sm font-mono">Add this meta tag to your website's &lt;head&gt; section:</p>
-                  <code className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2 block">
+                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md border">
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Add this meta tag to your website's &lt;head&gt; section:</p>
+                  <code className="text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-3 rounded border block font-mono">
                     &lt;meta name="webpayback-verification" content="your-verification-code" /&gt;
                   </code>
                 </div>
@@ -117,23 +117,31 @@ export default function GettingStarted() {
                 <p className="text-muted-foreground mb-3">
                   Complete your creator profile with relevant information about your content and channels.
                 </p>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Website URL verification
+                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border mb-3">
+                  <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Required Information:</h5>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-gray-800 dark:text-gray-200">Website URL verification</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-gray-800 dark:text-gray-200">Content category selection</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-gray-800 dark:text-gray-200">Social media links (optional)</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-gray-800 dark:text-gray-200">Polygon wallet address for rewards</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Content category selection
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Social media links (optional)
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Wallet address for rewards
-                  </div>
+                </div>
+                <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Important:</strong> Make sure your wallet is connected to Polygon network to receive WPT token rewards automatically.
+                  </p>
                 </div>
               </div>
             </div>
@@ -178,26 +186,32 @@ export default function GettingStarted() {
               Add these advanced meta tags to your content pages for enhanced AI detection and protection:
             </p>
             
-            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-3">
+            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border space-y-4">
               <div>
-                <p className="text-sm font-semibold mb-2">Basic Protection Meta Tag:</p>
-                <code className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded block">
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Basic Protection Meta Tag:</p>
+                <code className="text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-3 rounded border block font-mono">
                   &lt;meta name="webpayback-protection" content="enabled" /&gt;
                 </code>
               </div>
               
               <div>
-                <p className="text-sm font-semibold mb-2">Content Fingerprint Meta Tag:</p>
-                <code className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded block">
-                  &lt;meta name="webpayback-fingerprint" content="sha256-hash-of-content" /&gt;
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Content Fingerprint Meta Tag:</p>
+                <code className="text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-3 rounded border block font-mono">
+                  &lt;meta name="webpayback-fingerprint" content="sha256-a1b2c3d4e5f6..." /&gt;
                 </code>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Replace with actual SHA-256 hash of your content
+                </p>
               </div>
               
               <div>
-                <p className="text-sm font-semibold mb-2">Creator Attribution Meta Tag:</p>
-                <code className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded block">
-                  &lt;meta name="webpayback-creator" content="your-creator-id" /&gt;
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Creator Attribution Meta Tag:</p>
+                <code className="text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-3 rounded border block font-mono">
+                  &lt;meta name="webpayback-creator" content="creator-12345" /&gt;
                 </code>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Use your unique Creator ID from the platform
+                </p>
               </div>
             </div>
           </div>
