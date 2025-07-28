@@ -134,13 +134,13 @@ export default function GettingStarted() {
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-gray-800 dark:text-gray-200">Polygon wallet address for rewards</span>
+                      <span className="text-gray-800 dark:text-gray-200">Digital wallet address for rewards</span>
                     </div>
                   </div>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>Important:</strong> Make sure your wallet is connected to Polygon network to receive WPT token rewards automatically.
+                    <strong>Important:</strong> Make sure your digital wallet (MetaMask, etc.) is connected to Polygon network to receive WPT token rewards automatically.
                   </p>
                 </div>
               </div>
