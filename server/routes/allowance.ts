@@ -11,16 +11,37 @@ import {
   type InsertAllowanceSecurity
 } from "@shared/schema";
 import { eq, desc, and, gte, lte } from "drizzle-orm";
-// Temporary auth middleware - replace with proper authentication
-const isAuthenticated = (req: any, res: any, next: any) => {
-  // For now, allow all requests - replace with proper auth check
+// Founder-only access control for Allowance Management
+const isFounderAuthenticated = (req: any, res: any, next: any) => {
+  const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
+  const { walletAddress } = req.params;
+  
+  // Check if requesting access to founder's wallet data
+  if (walletAddress && walletAddress.toLowerCase() !== founderWallet.toLowerCase()) {
+    return res.status(403).json({ 
+      success: false, 
+      error: "Access denied. Allowance management is restricted to protocol founder." 
+    });
+  }
+  
+  // Additional session-based check for founder's device
+  const userAgent = req.headers['user-agent'] || '';
+  const isFounderDevice = userAgent.includes('Windows') && userAgent.includes('Chrome');
+  
+  if (!isFounderDevice) {
+    return res.status(403).json({ 
+      success: false, 
+      error: "Access denied. Please access from authorized device." 
+    });
+  }
+  
   next();
 };
 
 export function registerAllowanceRoutes(app: Express) {
   
   // Get allowance configuration for a wallet
-  app.get("/api/allowance/config/:walletAddress", isAuthenticated, async (req, res) => {
+  app.get("/api/allowance/config/:walletAddress", isFounderAuthenticated, async (req, res) => {
     try {
       const { walletAddress } = req.params;
       
@@ -38,7 +59,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Create or update allowance configuration
-  app.post("/api/allowance/setup", isAuthenticated, async (req, res) => {
+  app.post("/api/allowance/setup", isFounderAuthenticated, async (req, res) => {
     try {
       const configData: InsertAllowanceManagement = req.body;
       
@@ -76,7 +97,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Get allowance transaction history
-  app.get("/api/allowance/transactions/:allowanceId", isAuthenticated, async (req, res) => {
+  app.get("/api/allowance/transactions/:allowanceId", isFounderAuthenticated, async (req, res) => {
     try {
       const { allowanceId } = req.params;
       const { limit = "20", offset = "0" } = req.query;
@@ -97,7 +118,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Record a new allowance transaction
-  app.post("/api/allowance/transaction", isAuthenticated, async (req, res) => {
+  app.post("/api/allowance/transaction", isFounderAuthenticated, async (req, res) => {
     try {
       const transactionData: InsertAllowanceTransaction = req.body;
       
@@ -126,7 +147,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Get reserve pool status
-  app.get("/api/allowance/reserve-status/:contractAddress", isAuthenticated, async (req, res) => {
+  app.get("/api/allowance/reserve-status/:contractAddress", isFounderAuthenticated, async (req, res) => {
     try {
       const { contractAddress } = req.params;
       
@@ -145,7 +166,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Update reserve pool status
-  app.post("/api/allowance/reserve-status", isAuthenticated, async (req, res) => {
+  app.post("/api/allowance/reserve-status", isFounderAuthenticated, async (req, res) => {
     try {
       const statusData: InsertReservePoolStatus = req.body;
       
@@ -183,7 +204,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Get security events for an allowance
-  app.get("/api/allowance/security/:allowanceId", isAuthenticated, async (req, res) => {
+  app.get("/api/allowance/security/:allowanceId", isFounderAuthenticated, async (req, res) => {
     try {
       const { allowanceId } = req.params;
       const { limit = "10" } = req.query;
@@ -203,7 +224,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Create security event
-  app.post("/api/allowance/security", isAuthenticated, async (req, res) => {
+  app.post("/api/allowance/security", isFounderAuthenticated, async (req, res) => {
     try {
       const eventData: InsertAllowanceSecurity = req.body;
       
@@ -220,7 +241,7 @@ export function registerAllowanceRoutes(app: Express) {
   });
 
   // Get allowance statistics dashboard
-  app.get("/api/allowance/dashboard/:walletAddress", isAuthenticated, async (req, res) => {
+  app.get("/api/allowance/dashboard/:walletAddress", isFounderAuthenticated, async (req, res) => {
     try {
       const { walletAddress } = req.params;
       

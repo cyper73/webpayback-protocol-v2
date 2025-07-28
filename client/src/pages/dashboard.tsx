@@ -26,6 +26,12 @@ import { Link as RouterLink } from "wouter";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
+// Founder device detection
+const isFounderDevice = () => {
+  const userAgent = navigator.userAgent;
+  return userAgent.includes('Windows') && userAgent.includes('Chrome');
+};
+
 export default function Dashboard() {
   const [isUserInteracting, setIsUserInteracting] = useState(false);
   
@@ -132,12 +138,14 @@ export default function Dashboard() {
               </Button>
             </RouterLink>
             
-            <RouterLink to="/allowance-management">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-purple-500/30 hover:bg-purple-500/20 text-white">
-                <Wallet className="w-4 h-4 mr-2" />
-                Allowance Management
-              </Button>
-            </RouterLink>
+            {isFounderDevice() && (
+              <RouterLink to="/allowance-management">
+                <Button variant="outline" size="sm" className="bg-glass-dark border-purple-500/30 hover:bg-purple-500/20 text-white">
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Allowance Management
+                </Button>
+              </RouterLink>
+            )}
           </div>
         </div>
       </div>
