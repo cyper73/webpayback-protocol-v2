@@ -3202,8 +3202,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pool Health Auto-Scaling routes
   app.use('/api/pool-health', poolHealthRouter);
   
-  // Anti-Dump Slippage Fee System routes
-  app.use('/api/anti-dump', antiDumpSlippageRoutes);
+  // Anti-Dump Slippage Fee System routes - DISABLED TO STOP 60 EURO COST BLEEDING
+  // app.use('/api/anti-dump', antiDumpSlippageRoutes);
   
   // User routes
   app.use('/api/user', userRoutes);

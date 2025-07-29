@@ -920,6 +920,47 @@ export type CitationTracking = typeof citationTracking.$inferSelect;
 
 export type InsertAiKnowledgeIndex = z.infer<typeof insertAiKnowledgeIndexSchema>;
 
+// Anti-dump slippage fee tracking
+export const slippageFeeEvents = pgTable("slippage_fee_events", {
+  id: serial("id").primaryKey(),
+  walletAddress: varchar("wallet_address", { length: 42 }).notNull(),
+  transactionHash: varchar("transaction_hash", { length: 66 }).notNull(),
+  transactionType: varchar("transaction_type", { length: 20 }).notNull(),
+  amount: decimal("amount", { precision: 18, scale: 6 }).notNull(),
+  slippageFeeApplied: decimal("slippage_fee_applied", { precision: 10, scale: 4 }).notNull(),
+  feeAmountWpt: decimal("fee_amount_wpt", { precision: 18, scale: 6 }).notNull(),
+  penaltyReason: text("penalty_reason"),
+  blockNumber: integer("block_number").notNull(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const walletCashoutVelocity = pgTable("wallet_cashout_velocity", {
+  id: serial("id").primaryKey(),
+  walletAddress: varchar("wallet_address", { length: 42 }).notNull().unique(),
+  totalRewardsAccumulated: decimal("total_rewards_accumulated", { precision: 18, scale: 6 }).notNull().default("0"),
+  totalCashoutAmount: decimal("total_cashout_amount", { precision: 18, scale: 6 }).notNull().default("0"),
+  velocityScore: decimal("velocity_score", { precision: 10, scale: 4 }).notNull().default("0"),
+  isHighRiskDumper: boolean("is_high_risk_dumper").notNull().default(false),
+  lastUpdated: timestamp("last_updated").defaultNow()
+});
+
+export const antiDumpConfig = pgTable("anti_dump_config", {
+  id: serial("id").primaryKey(),
+  configName: varchar("config_name", { length: 50 }).notNull().unique(),
+  baseSlippageFee: decimal("base_slippage_fee", { precision: 10, scale: 4 }).notNull().default("0.5"),
+  velocityThresholdLow: decimal("velocity_threshold_low", { precision: 10, scale: 4 }).notNull().default("2.0"),
+  velocityThresholdHigh: decimal("velocity_threshold_high", { precision: 10, scale: 4 }).notNull().default("5.0"),
+  penaltyFeeLight: decimal("penalty_fee_light", { precision: 10, scale: 4 }).notNull().default("1.0"),
+  penaltyFeeMedium: decimal("penalty_fee_medium", { precision: 10, scale: 4 }).notNull().default("2.5"),
+  penaltyFeeHeavy: decimal("penalty_fee_heavy", { precision: 10, scale: 4 }).notNull().default("5.0"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export type SlippageFeeEvent = typeof slippageFeeEvents.$inferSelect;
+export type WalletCashoutVelocity = typeof walletCashoutVelocity.$inferSelect;
+export type AntiDumpConfig = typeof antiDumpConfig.$inferSelect;
+
 // Insert schemas for Content Certificate NFTs
 export const insertContentCertificateNftSchema = createInsertSchema(contentCertificateNfts).omit({
   id: true,
