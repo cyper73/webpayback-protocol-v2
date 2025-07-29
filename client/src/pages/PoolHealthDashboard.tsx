@@ -246,16 +246,16 @@ export default function PoolHealthDashboard() {
               <div className="border-t pt-4">
                 <h4 className="font-semibold mb-2">Future Scaling (after $20K USDT):</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                  <div className="p-2 bg-green-50 dark:bg-green-950 rounded">
+                  <div className="p-2 bg-green-50 dark:bg-green-950 rounded text-gray-700 dark:text-gray-300">
                     <strong>Healthy (&gt;$50K):</strong> 105% rewards
                   </div>
-                  <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded">
+                  <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded text-gray-700 dark:text-gray-300">
                     <strong>Normal ($30-50K):</strong> 100% rewards
                   </div>
-                  <div className="p-2 bg-yellow-50 dark:bg-yellow-950 rounded">
+                  <div className="p-2 bg-yellow-50 dark:bg-yellow-950 rounded text-gray-700 dark:text-gray-300">
                     <strong>Warning ($20-30K):</strong> 95% rewards
                   </div>
-                  <div className="p-2 bg-gray-50 dark:bg-gray-950 rounded">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-950 rounded text-gray-700 dark:text-gray-300">
                     <strong>Below threshold:</strong> 60% rewards (current)
                   </div>
                 </div>
@@ -379,9 +379,9 @@ export default function PoolHealthDashboard() {
         <TabsContent value="thresholds" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Configurazione Soglie</CardTitle>
+              <CardTitle>Threshold Configuration</CardTitle>
               <CardDescription>
-                Soglie del sistema di equilibrio etico per entrambe le pools
+                System threshold configuration for ethical equilibrium in both pools
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -391,19 +391,19 @@ export default function PoolHealthDashboard() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">USDT Pool</h3>
                     {Object.entries(thresholds.data.usdt).map(([level, config]: [string, any]) => (
-                      <div key={level} className="border rounded p-3">
+                      <div key={level} className="border rounded p-3 bg-white dark:bg-gray-900">
                         <div className="flex justify-between items-center mb-2">
                           <Badge className={getHealthColor(level)}>
                             {level.charAt(0).toUpperCase() + level.slice(1)}
                           </Badge>
-                          <span className="font-bold">
+                          <span className="font-bold text-gray-700 dark:text-gray-300">
                             {Math.round(config.rewardFactor * 100)}%
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-1">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
                           {config.description}
                         </p>
-                        <p className="text-xs">
+                        <p className="text-xs text-gray-700 dark:text-gray-300">
                           {config.min ? `$${config.min}` : ''} 
                           {config.min && config.max ? ' - ' : ''}
                           {config.max ? `$${config.max}` : ''}
@@ -417,19 +417,19 @@ export default function PoolHealthDashboard() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">WMATIC Pool</h3>
                     {Object.entries(thresholds.data.wmatic).map(([level, config]: [string, any]) => (
-                      <div key={level} className="border rounded p-3">
+                      <div key={level} className="border rounded p-3 bg-white dark:bg-gray-900">
                         <div className="flex justify-between items-center mb-2">
                           <Badge className={getHealthColor(level)}>
                             {level.charAt(0).toUpperCase() + level.slice(1)}
                           </Badge>
-                          <span className="font-bold">
+                          <span className="font-bold text-gray-700 dark:text-gray-300">
                             {Math.round(config.rewardFactor * 100)}%
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-1">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
                           {config.description}
                         </p>
-                        <p className="text-xs">
+                        <p className="text-xs text-gray-700 dark:text-gray-300">
                           {config.min ? `$${config.min}` : ''} 
                           {config.min && config.max ? ' - ' : ''}
                           {config.max ? `$${config.max}` : ''}
