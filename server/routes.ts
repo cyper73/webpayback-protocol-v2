@@ -78,7 +78,7 @@ import { apiThrottling, getApiUsageStats } from "./security/apiThrottling";
 import { automationRouter } from "./routes/automation";
 import { contentCertificateRouter } from "./routes/contentCertificate";
 import { registerAllowanceRoutes } from "./routes/allowance";
-import { poolHealthRouter } from "./routes/poolHealth";
+import poolHealthRouter from "./routes/poolHealth";
 import userRoutes from "./routes/user";
 
 export async function registerRoutes(app: Express): Promise<Server> {

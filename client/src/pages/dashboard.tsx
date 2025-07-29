@@ -21,7 +21,7 @@ import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor
 import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
 import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtectionDashboard";
 
-import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen } from "lucide-react";
+import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen, Activity } from "lucide-react";
 import { Link as RouterLink } from "wouter";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -145,6 +145,13 @@ export default function Dashboard() {
               <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
                 <FileText className="w-4 h-4 mr-2" />
                 Citations Rewards
+              </Button>
+            </RouterLink>
+            
+            <RouterLink to="/pool-health">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-blue-500/30 hover:bg-blue-500/20 text-white">
+                <Activity className="w-4 h-4 mr-2" />
+                Pool Health
               </Button>
             </RouterLink>
             

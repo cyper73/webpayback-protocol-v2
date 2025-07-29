@@ -1,165 +1,217 @@
-/**
- * Pool Health API Routes - WebPayback Protocol
- * Auto-scaling reward system based on pool liquidity health
- */
-
-import { Router } from 'express';
-import { PoolHealthRewardScaler } from '../services/poolHealthRewardScaler';
+import { Router } from "express";
+import { PoolHealthRewardScaler } from "../services/poolHealthRewardScaler";
 
 const router = Router();
 
 /**
- * GET /api/pool-health/status
- * Get current pool health status and reward scaling factor
+ * Get current pool health status
+ * Returns TVL, health levels, and reward scaling factor
  */
-router.get('/status', async (req, res) => {
+router.get("/status", async (req, res) => {
   try {
-    const poolHealthScaler = PoolHealthRewardScaler.getInstance();
-    const healthStatus = await poolHealthScaler.getCurrentPoolHealth();
-    
-    res.json({
-      success: true,
-      data: {
-        usdtPool: {
-          tvl: healthStatus.usdtPoolTvl,
-          healthLevel: healthStatus.usdtHealthLevel,
-          threshold: healthStatus.usdtHealthLevel === 'healthy' ? '> $500' : 
-                    healthStatus.usdtHealthLevel === 'warning' ? '$400-500' :
-                    healthStatus.usdtHealthLevel === 'critical' ? '$200-400' : '< $200'
-        },
-        wmaticPool: {
-          tvl: healthStatus.wmaticPoolTvl,
-          healthLevel: healthStatus.wmaticHealthLevel,
-          threshold: healthStatus.wmaticHealthLevel === 'healthy' ? '> 10 WMATIC' :
-                    healthStatus.wmaticHealthLevel === 'warning' ? '8-10 WMATIC' :
-                    healthStatus.wmaticHealthLevel === 'critical' ? '5-8 WMATIC' : '< 5 WMATIC'
-        },
-        rewardScaling: {
-          currentFactor: healthStatus.rewardScaleFactor,
-          percentage: Math.round(healthStatus.rewardScaleFactor * 100),
-          status: healthStatus.rewardScaleFactor === 1.0 ? 'normal' :
-                  healthStatus.rewardScaleFactor >= 0.8 ? 'reduced' :
-                  healthStatus.rewardScaleFactor >= 0.5 ? 'critical' : 'emergency'
-        },
-        lastUpdated: healthStatus.lastUpdated
-      }
-    });
+    const scaler = PoolHealthRewardScaler.getInstance();
+    const healthStatus = await scaler.getCurrentPoolHealth();
+
+    // Format response for dashboard
+    const response = {
+      usdtPool: {
+        tvl: parseFloat(healthStatus.usdtPoolTvl.toString()),
+        healthLevel: healthStatus.usdtHealthLevel,
+        threshold: getThresholdDescription(healthStatus.usdtHealthLevel, "usdt")
+      },
+      wmaticPool: {
+        tvl: parseFloat(healthStatus.wmaticPoolTvl.toString()),
+        healthLevel: healthStatus.wmaticHealthLevel,
+        threshold: getThresholdDescription(healthStatus.wmaticHealthLevel, "wmatic")
+      },
+      rewardScaling: {
+        currentFactor: healthStatus.rewardScaleFactor,
+        percentage: Math.round(healthStatus.rewardScaleFactor * 100),
+        status: healthStatus.belowActivationThreshold ? "reduced" : "normal"
+      },
+      ethicalEquilibrium: {
+        isActive: !healthStatus.belowActivationThreshold,
+        activationThreshold: 20000,
+        currentUsdtTvl: parseFloat(healthStatus.usdtPoolTvl.toString()),
+        progressToActivation: Math.min(100, (parseFloat(healthStatus.usdtPoolTvl.toString()) / 20000) * 100)
+      },
+      lastUpdated: healthStatus.lastUpdated.toISOString()
+    };
+
+    res.json({ success: true, data: response });
   } catch (error) {
-    console.error('Pool health status error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch pool health status'
+    console.error("Pool health status error:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to fetch pool health status",
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });
 
 /**
- * GET /api/pool-health/alerts
- * Get current pool health alerts and recommendations
+ * Get pool health alerts and recommendations
  */
-router.get('/alerts', async (req, res) => {
+router.get("/alerts", async (req, res) => {
   try {
-    const poolHealthScaler = PoolHealthRewardScaler.getInstance();
-    const alertsData = await poolHealthScaler.getPoolHealthAlerts();
-    
-    res.json({
-      success: true,
-      data: {
-        alerts: alertsData.alerts,
-        overallStatus: alertsData.overallStatus,
-        totalAlerts: alertsData.alerts.length,
-        severityBreakdown: {
-          emergency: alertsData.alerts.filter(a => a.severity === 'emergency').length,
-          critical: alertsData.alerts.filter(a => a.severity === 'critical').length,
-          warning: alertsData.alerts.filter(a => a.severity === 'warning').length,
-          info: alertsData.alerts.filter(a => a.severity === 'info').length
+    const scaler = PoolHealthRewardScaler.getInstance();
+    const alerts = await scaler.getPoolHealthAlerts();
+
+    res.json({ success: true, data: alerts });
+  } catch (error) {
+    console.error("Pool health alerts error:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to fetch pool health alerts",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+/**
+ * Get pool health thresholds configuration
+ */
+router.get("/thresholds", async (req, res) => {
+  try {
+    const thresholds = {
+      usdt: {
+        healthy: {
+          min: 50000,
+          max: null,
+          rewardFactor: 1.05,
+          description: "Pool altamente liquida - bonus etico del 5%"
+        },
+        warning: {
+          min: 30000,
+          max: 50000,
+          rewardFactor: 1.0,
+          description: "Pool in stato normale - rewards standard"
+        },
+        critical: {
+          min: 20000,
+          max: 30000,
+          rewardFactor: 0.95,
+          description: "Pool vicina alla soglia - leggera riduzione"
+        },
+        emergency: {
+          min: null,
+          max: 20000,
+          rewardFactor: 0.6,
+          description: "Sotto soglia attivazione - rewards ridotti per protezione"
         }
+      },
+      wmatic: {
+        healthy: {
+          min: 40000,
+          max: null,
+          rewardFactor: 1.05,
+          description: "Pool WMATIC molto liquida - bonus etico"
+        },
+        warning: {
+          min: 25000,
+          max: 40000,
+          rewardFactor: 1.0,
+          description: "Pool WMATIC normale - rewards standard"
+        },
+        critical: {
+          min: 20000,
+          max: 25000,
+          rewardFactor: 0.95,
+          description: "Pool WMATIC in leggera difficoltà"
+        },
+        emergency: {
+          min: null,
+          max: 20000,
+          rewardFactor: 0.6,
+          description: "Pool WMATIC con liquidità limitata"
+        }
+      },
+      ethicalEquilibrium: {
+        activationThreshold: 20000,
+        description: "L'algoritmo di equilibrio etico si attiva solo quando la pool USDT supera $20,000",
+        currentLogic: "Sotto $20K = rewards ridotti al 60%. Sopra $20K = scaling graduale 95%-105%"
       }
-    });
+    };
+
+    res.json({ success: true, data: thresholds });
   } catch (error) {
-    console.error('Pool health alerts error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch pool health alerts'
+    console.error("Pool health thresholds error:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to fetch pool health thresholds",
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });
 
 /**
- * POST /api/pool-health/test-reward-scaling
- * Test reward scaling with different base amounts
+ * Get pool health history (last 24h)
  */
-router.post('/test-reward-scaling', async (req, res) => {
+router.get("/history", async (req, res) => {
+  try {
+    // TODO: Implement history tracking in database
+    // For now, return empty array
+    res.json({ 
+      success: true, 
+      data: [],
+      message: "History tracking will be implemented in next iteration" 
+    });
+  } catch (error) {
+    console.error("Pool health history error:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to fetch pool health history",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+/**
+ * Test reward scaling with a sample amount
+ */
+router.post("/test-scaling", async (req, res) => {
   try {
     const { baseReward } = req.body;
     
-    if (!baseReward || typeof baseReward !== 'number') {
+    if (!baseReward || isNaN(baseReward)) {
       return res.status(400).json({
         success: false,
-        error: 'baseReward is required and must be a number'
+        error: "Base reward amount is required and must be a number"
       });
     }
-    
-    const poolHealthScaler = PoolHealthRewardScaler.getInstance();
-    const scaledRewardData = await poolHealthScaler.scaleRewardByPoolHealth(baseReward);
-    
-    res.json({
-      success: true,
-      data: {
-        input: {
-          baseReward: baseReward,
-          scenario: 'current pool conditions'
-        },
-        output: {
-          originalReward: scaledRewardData.originalReward,
-          scaledReward: scaledRewardData.scaledReward,
-          scaleFactor: scaledRewardData.scaleFactor,
-          reductionPercentage: Math.round((1 - scaledRewardData.scaleFactor) * 100),
-          savings: scaledRewardData.originalReward - scaledRewardData.scaledReward
-        },
-        poolHealthContext: scaledRewardData.healthStatus
-      }
-    });
+
+    const scaler = PoolHealthRewardScaler.getInstance();
+    const result = await scaler.scaleRewardByPoolHealth(parseFloat(baseReward));
+
+    res.json({ success: true, data: result });
   } catch (error) {
-    console.error('Reward scaling test error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to test reward scaling'
+    console.error("Pool health test scaling error:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to test reward scaling",
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });
 
-/**
- * GET /api/pool-health/thresholds
- * Get pool health thresholds configuration
- */
-router.get('/thresholds', async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      data: {
-        usdt: {
-          healthy: { min: 500, rewardFactor: 1.0, description: "Full rewards (100%)" },
-          warning: { min: 400, max: 499, rewardFactor: 0.8, description: "Reduced rewards (80%)" },
-          critical: { min: 200, max: 399, rewardFactor: 0.5, description: "Critical rewards (50%)" },
-          emergency: { max: 199, rewardFactor: 0.25, description: "Emergency rewards (25%)" }
-        },
-        wmatic: {
-          healthy: { min: 10, rewardFactor: 1.0, description: "Full rewards (100%)" },
-          warning: { min: 8, max: 9.99, rewardFactor: 0.8, description: "Reduced rewards (80%)" },
-          critical: { min: 5, max: 7.99, rewardFactor: 0.5, description: "Critical rewards (50%)" },
-          emergency: { max: 4.99, rewardFactor: 0.25, description: "Emergency rewards (25%)" }
-        },
-        logic: "System uses the most restrictive health level from both pools"
-      }
-    });
-  } catch (error) {
-    console.error('Pool thresholds error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get pool thresholds'
-    });
-  }
-});
+// Helper function to get threshold descriptions
+function getThresholdDescription(healthLevel: string, poolType: string): string {
+  const thresholds = {
+    usdt: {
+      healthy: "> $50,000 (Bonus 5%)",
+      warning: "$30,000 - $50,000 (Normale)",
+      critical: "$20,000 - $30,000 (Ridotto 5%)",
+      emergency: "< $20,000 (Ridotto 40%)"
+    },
+    wmatic: {
+      healthy: "> $40,000 (Bonus 5%)",
+      warning: "$25,000 - $40,000 (Normale)",
+      critical: "$20,000 - $25,000 (Ridotto 5%)",
+      emergency: "< $20,000 (Ridotto 40%)"
+    }
+  };
 
-export { router as poolHealthRouter };
+  return thresholds[poolType as keyof typeof thresholds]?.[healthLevel as keyof typeof thresholds.usdt] || "Sconosciuto";
+}
+
+export default router;

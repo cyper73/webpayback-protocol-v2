@@ -16,6 +16,7 @@ import PoolDebugger from "@/pages/PoolDebugger";
 import AutomationPage from "@/pages/AutomationPage";
 import { ContentCertificatePage } from "@/pages/ContentCertificatePage";
 import AllowanceManagement from "@/pages/allowance-management";
+import PoolHealthDashboard from "@/pages/PoolHealthDashboard";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/automation" component={AutomationPage} />
       <Route path="/content-certificate" component={ContentCertificatePage} />
       <Route path="/allowance-management" component={AllowanceManagement} />
+      <Route path="/pool-health" component={PoolHealthDashboard} />
       <Route path="/pool-debug" component={PoolDebugger} />
       <Route path="/citations" component={Citations} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />

@@ -14,6 +14,7 @@ export interface PoolHealthStatus {
   wmaticHealthLevel: 'healthy' | 'warning' | 'critical' | 'emergency';
   rewardScaleFactor: number; // 0.5 = 50%, 1.0 = 100%
   lastUpdated: Date;
+  belowActivationThreshold?: boolean;
 }
 
 export interface PoolThresholds {
