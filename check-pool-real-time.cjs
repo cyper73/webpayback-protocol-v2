@@ -1,80 +1,140 @@
 #!/usr/bin/env node
 /**
- * 🔍 REAL-TIME POOL CHECK
- * Check the actual current state of the pool
+ * 🔍 VERIFICA POOL: Identifica quale pool usa quale contratto WPT
+ * ANALISI SICURA - SOLO LETTURA
  */
 
-const { ethers } = require('ethers');
-
-async function checkPoolRealTime() {
+async function checkPoolContracts() {
+  const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
+  
+  console.log('🔍 VERIFICA CONTRATTI WPT NELLE POOL');
+  console.log('=====================================');
+  console.log('');
+  
+  // Contratti WPT noti
+  const contracts = {
+    current: "0x9408f17a8b4666f8cb8231ba213de04137dc3825",
+    old: "0x9077051d318b614f915e8a07861090856fdec91e"
+  };
+  
+  // Pool da verificare
+  const pools = {
+    "USDT/WPT V2": "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+    "WMATIC/WPT V3": "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"
+  };
+  
   try {
-    console.log('🔍 CHECKING REAL-TIME POOL STATUS...');
-    
-    // Configuration
-    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-    const POOL_CONTRACT = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A';
-    
-    // Setup provider
-    const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
-    
-    // Get current block
-    const currentBlock = await provider.getBlockNumber();
-    console.log(`📋 Current block: ${currentBlock}`);
-    
-    // WPT contract
-    const wptABI = ['function balanceOf(address owner) view returns (uint256)'];
-    const wptContract = new ethers.Contract(WPT_CONTRACT, wptABI, provider);
-    
-    // Get real-time pool balance
-    const poolBalance = await wptContract.balanceOf(POOL_CONTRACT);
-    const poolBalanceFormatted = ethers.utils.formatUnits(poolBalance, 18);
-    
-    console.log('');
-    console.log('🏦 REAL-TIME POOL STATUS:');
-    console.log(`   Pool WPT Balance: ${poolBalanceFormatted} WPT`);
-    console.log(`   Raw Balance: ${poolBalance.toString()}`);
-    
-    // Check if this matches our injection
-    const originalBalance = ethers.utils.parseUnits('284012.17353', 18);
-    const injectedAmount = ethers.utils.parseUnits('1000000', 18);
-    const expectedBalance = originalBalance.add(injectedAmount);
-    const expectedFormatted = ethers.utils.formatUnits(expectedBalance, 18);
-    
-    console.log('');
-    console.log('📊 INJECTION ANALYSIS:');
-    console.log(`   Original balance: 284,012.17353 WPT`);
-    console.log(`   Injected amount: 1,000,000 WPT`);
-    console.log(`   Expected total: ${expectedFormatted} WPT`);
-    console.log(`   Actual total: ${poolBalanceFormatted} WPT`);
-    
-    const difference = poolBalance.sub(expectedBalance);
-    const differenceFormatted = ethers.utils.formatUnits(difference.abs(), 18);
-    
-    if (difference.abs().lt(ethers.utils.parseUnits('1', 18))) {
-      console.log('✅ INJECTION CONFIRMED - Token injection successful!');
-    } else {
-      console.log(`❌ MISMATCH - Difference: ${differenceFormatted} WPT`);
+    for (const [poolName, poolAddress] of Object.entries(pools)) {
+      console.log(`🎯 ANALIZZANDO ${poolName}`);
+      console.log(`📍 Pool: ${poolAddress}`);
+      
+      // Per pool V2 (coppia USDT/WPT)
+      if (poolName.includes("V2")) {
+        // Chiamata token0()
+        const token0Response = await fetch(alchemyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "eth_call",
+            params: [{
+              to: poolAddress,
+              data: "0x0dfe1681" // token0()
+            }, "latest"],
+            id: 1
+          })
+        });
+        
+        const token0Data = await token0Response.json();
+        const token0 = "0x" + token0Data.result.slice(-40);
+        
+        // Chiamata token1()
+        const token1Response = await fetch(alchemyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "eth_call",
+            params: [{
+              to: poolAddress,
+              data: "0xd21220a7" // token1()
+            }, "latest"],
+            id: 1
+          })
+        });
+        
+        const token1Data = await token1Response.json();
+        const token1 = "0x" + token1Data.result.slice(-40);
+        
+        console.log(`   Token0: ${token0}`);
+        console.log(`   Token1: ${token1}`);
+        
+        // Identifica quale è WPT
+        if (token0.toLowerCase() === contracts.current.toLowerCase()) {
+          console.log(`   ✅ WPT CORRENTE trovato come Token0`);
+        } else if (token0.toLowerCase() === contracts.old.toLowerCase()) {
+          console.log(`   ⚠️  WPT VECCHIO trovato come Token0`);
+        }
+        
+        if (token1.toLowerCase() === contracts.current.toLowerCase()) {
+          console.log(`   ✅ WPT CORRENTE trovato come Token1`);
+        } else if (token1.toLowerCase() === contracts.old.toLowerCase()) {
+          console.log(`   ⚠️  WPT VECCHIO trovato come Token1`);
+        }
+        
+      } else {
+        // Per pool V3 (usa interfaccia diversa)
+        console.log(`   ⚡ Pool V3 - interfaccia Uniswap V3`);
+        
+        // Ottieni informazioni pool V3
+        const factoryResponse = await fetch(alchemyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "eth_call",
+            params: [{
+              to: poolAddress,
+              data: "0x0dfe1681" // token0()
+            }, "latest"],
+            id: 1
+          })
+        });
+        
+        const factoryData = await factoryResponse.json();
+        if (factoryData.result && factoryData.result !== "0x") {
+          const token0 = "0x" + factoryData.result.slice(-40);
+          console.log(`   Token0: ${token0}`);
+          
+          if (token0.toLowerCase() === contracts.current.toLowerCase()) {
+            console.log(`   ✅ WPT CORRENTE trovato come Token0`);
+          } else if (token0.toLowerCase() === contracts.old.toLowerCase()) {
+            console.log(`   ⚠️  WPT VECCHIO trovato come Token0`);
+          }
+        }
+      }
+      
+      console.log('');
     }
     
-    // Check transaction status
+    console.log('📋 RIEPILOGO CONTRATTI:');
+    console.log(`   🟢 WPT CORRENTE: ${contracts.current}`);
+    console.log(`   🟡 WPT VECCHIO:  ${contracts.old}`);
     console.log('');
-    console.log('🔍 TRANSACTION VERIFICATION:');
-    
-    const txHash = '0x37a0d98f9245461d5ac0782cc66487b1d8c5cefc55121026914e1ea9391a08cf';
-    const tx = await provider.getTransactionReceipt(txHash);
-    
-    if (tx) {
-      console.log(`   Transaction confirmed in block: ${tx.blockNumber}`);
-      console.log(`   Gas used: ${tx.gasUsed.toString()}`);
-      console.log(`   Status: ${tx.status === 1 ? 'SUCCESS' : 'FAILED'}`);
-    } else {
-      console.log('   ❌ Transaction not found');
-    }
+    console.log('💡 INFORMAZIONI:');
+    console.log('   - WPT CORRENTE: Contratto attivo e sicuro');
+    console.log('   - WPT VECCHIO: Contratto deprecato (evitare)');
+    console.log('   - Pool V2: Più stabile, nessun "out of range"');
+    console.log('   - Pool V3: Più efficiente ma richiede gestione range');
     
   } catch (error) {
-    console.error('❌ Real-time check failed:', error.message);
+    console.error('❌ Errore durante la verifica:', error.message);
   }
 }
 
-// Run real-time check
-checkPoolRealTime();
+// Per Node.js 18+ con fetch built-in
+if (typeof fetch === 'undefined') {
+  global.fetch = require('node-fetch');
+}
+
+checkPoolContracts();
