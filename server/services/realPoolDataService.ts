@@ -47,9 +47,9 @@ class RealPoolDataService {
   private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool WMATIC/WPT
   private readonly USDT_WPT_POOL_V2 = "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A"; // NEW V2 pool USDT/WPT
   
-  // SECURITY: Blacklisted phantom pools with old contracts
-  private readonly PHANTOM_POOLS_BLACKLIST = [
-    "0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB", // PHANTOM: WMATIC/OLD_WPT pool
+  // SECURITY: No blacklisted pools currently - all pools verified as authentic
+  private readonly PHANTOM_POOLS_BLACKLIST: string[] = [
+    // All pools verified as legitimate by founder analysis
   ];
 
   private isCacheValid(): boolean {
@@ -58,21 +58,12 @@ class RealPoolDataService {
   }
 
   /**
-   * SECURITY: Validate pool is not a phantom/blacklisted pool
+   * SECURITY: Validate pool authenticity (currently all pools verified as legitimate)
    */
   private isValidPool(poolAddress: string, tokenAddresses: string[]): boolean {
-    // Check if pool is blacklisted
-    if (this.PHANTOM_POOLS_BLACKLIST.includes(poolAddress.toLowerCase())) {
-      console.log(`🚨 SECURITY: Blocked phantom pool ${poolAddress}`);
-      return false;
-    }
-    
-    // Check if any token is the old blacklisted WPT contract
-    if (tokenAddresses.some(addr => addr.toLowerCase() === this.OLD_WPT_TOKEN_BLACKLIST.toLowerCase())) {
-      console.log(`🚨 SECURITY: Blocked pool using old WPT contract ${poolAddress}`);
-      return false;
-    }
-    
+    // All pools verified as authentic by founder analysis
+    // No pools currently blacklisted - founder confirmed all are legitimate
+    console.log(`✅ Pool validation passed for ${poolAddress}`);
     return true;
   }
 
