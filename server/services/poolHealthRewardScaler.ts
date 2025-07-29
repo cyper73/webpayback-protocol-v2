@@ -34,28 +34,28 @@ export interface PoolThresholds {
 export class PoolHealthRewardScaler {
   private static instance: PoolHealthRewardScaler;
   
-  // Pool health thresholds (configurable)
+  // Pool health thresholds (ETHICAL EQUILIBRIUM - realistic for large-scale operation)
   private readonly POOL_THRESHOLDS: PoolThresholds = {
     usdt: {
-      healthy: 500,      // > $500 USDT = 100% rewards
-      warning: 400,      // $400-500 = 80% rewards
-      critical: 200,     // $200-400 = 50% rewards  
-      emergency: 100     // < $200 = 25% rewards
+      healthy: 20000,    // > $20,000 USDT = 100% rewards (realistic minimum pool)
+      warning: 15000,    // $15,000-20,000 = 90% rewards (slight reduction)
+      critical: 10000,   // $10,000-15,000 = 75% rewards (moderate protection)  
+      emergency: 5000    // < $10,000 = 60% rewards (conservative but not punitive)
     },
     wmatic: {
-      healthy: 10,       // > 10 WMATIC = 100% rewards
-      warning: 8,        // 8-10 WMATIC = 80% rewards
-      critical: 5,       // 5-8 WMATIC = 50% rewards
-      emergency: 2       // < 5 WMATIC = 25% rewards
+      healthy: 15000,    // > $15,000 WMATIC equivalent = 100% rewards
+      warning: 10000,    // $10,000-15,000 WMATIC = 90% rewards
+      critical: 7500,    // $7,500-10,000 WMATIC = 75% rewards
+      emergency: 5000    // < $7,500 WMATIC = 60% rewards
     }
   };
 
-  // Reward scale factors by health level
+  // Reward scale factors by health level (ETHICAL EQUILIBRIUM)
   private readonly REWARD_SCALE_FACTORS = {
-    healthy: 1.0,      // 100% rewards
-    warning: 0.8,      // 80% rewards
-    critical: 0.5,     // 50% rewards  
-    emergency: 0.25    // 25% rewards (minimum viable)
+    healthy: 1.0,      // 100% rewards (full ecosystem support)
+    warning: 0.9,      // 90% rewards (gentle adjustment)
+    critical: 0.75,    // 75% rewards (balanced protection)  
+    emergency: 0.6     // 60% rewards (conservative but fair)
   };
 
   public static getInstance(): PoolHealthRewardScaler {
