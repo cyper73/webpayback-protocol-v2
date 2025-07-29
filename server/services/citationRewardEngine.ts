@@ -23,28 +23,28 @@ export interface KnowledgeIndexEntry {
 export class CitationRewardEngine {
   private static instance: CitationRewardEngine;
   
-  // Citation reward multipliers based on type and AI model
+  // Citation reward multipliers based on type and AI model - SUSTAINABLE EDITION
   private readonly REWARD_MULTIPLIERS = {
-    // Citation type multipliers
+    // Citation type multipliers (sustainable rates)
     citationType: {
-      'direct_quote': 1.5,        // Highest reward for direct quotes
-      'content_reference': 1.2,   // Good reward for references
-      'paraphrase': 1.0,          // Standard reward for paraphrasing
+      'direct_quote': 1.5,        // +50% bonus: 0.015 WPT total
+      'content_reference': 1.2,   // +20% bonus: 0.012 WPT total  
+      'paraphrase': 1.0,          // Standard: 0.01 WPT
       'factual_data': 0.8,        // Lower reward for facts/data
     },
     
-    // AI model multipliers (different models have different usage patterns)
+    // AI model multipliers (reduced to sustainable levels)
     aiModel: {
-      'claude': 1.3,
-      'gpt': 1.2,
-      'grok': 1.25,
-      'gemini': 1.1,
-      'perplexity': 1.0,
-      'deepseek': 0.9,
+      'claude': 1.1,     // Max 0.011 WPT (was 1.3)
+      'gpt': 1.05,       // Max 0.0105 WPT (was 1.2) 
+      'grok': 1.08,      // Max 0.0108 WPT (was 1.25)
+      'gemini': 1.03,    // Max 0.0103 WPT (was 1.1)
+      'perplexity': 1.0, // Base rate: 0.01 WPT
+      'deepseek': 0.98,  // Slightly below base
     },
     
-    // Base citation reward amount
-    baseReward: 0.15, // 0.15 WPT per citation (vs 1.0+ for direct access)
+    // Base citation reward amount - DRASTICALLY REDUCED FOR SUSTAINABILITY
+    baseReward: 0.01, // 0.01 WPT per citation (15x reduction from 0.15!)
   };
 
   public static getInstance(): CitationRewardEngine {

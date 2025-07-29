@@ -130,24 +130,24 @@ export class CulturalRewardEngine {
   }
 
   /**
-   * Calculate base WPT reward (existing WebPayback logic)
+   * Calculate base WPT reward (SUSTAINABLE EDITION - aligned with Citation Engine)
    */
   private calculateBaseReward(aiModel: string): number {
     const aiModelMultipliers: Record<string, number> = {
-      'Claude': 1.22,
-      'GPT-4': 1.25,
-      'DeepSeek': 0.99,
-      'Mistral': 1.02,
-      'Grok': 1.15,
-      'Gemini': 1.10,
-      'Perplexity': 1.08,
-      'Llama': 0.95
+      'Claude': 1.1,     // Sustainable 0.011 WPT max (was 1.22)
+      'GPT-4': 1.05,     // Sustainable 0.0105 WPT max (was 1.25)
+      'DeepSeek': 0.98,  // Sustainable 0.0098 WPT (was 0.99)
+      'Mistral': 1.02,   // Sustainable 0.0102 WPT (was 1.02)  
+      'Grok': 1.08,      // Sustainable 0.0108 WPT max (was 1.15)
+      'Gemini': 1.03,    // Sustainable 0.0103 WPT (was 1.10)
+      'Perplexity': 1.0, // Base sustainable rate
+      'Llama': 0.95      // Slightly below base (was 0.95)
     };
 
-    const baseWPT = 1.0; // Base WPT per AI access
+    const baseWPT = 0.01; // DRASTICALLY REDUCED: 0.01 WPT per AI access (was 1.0!)
     const multiplier = aiModelMultipliers[aiModel] || 1.0;
     
-    return Math.round(baseWPT * multiplier * 100) / 100;
+    return Math.round(baseWPT * multiplier * 10000) / 10000; // Higher precision for small values
   }
 
   /**
