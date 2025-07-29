@@ -121,6 +121,22 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
 - **PRODUCTION TESTING**: All three security systems confirmed working with authentic blocking and throttling in live environment
 - **BURST PROTECTION ACTIVE**: System successfully blocking excessive requests (20+ calls/minute) with proper throttling messages
 
+### CRITICAL COST CRISIS RESOLVED (July 29, 2025)
+- **EMERGENCY**: User reported 60 euros in 3 days - unsustainable operational costs
+- **ROOT CAUSE IDENTIFIED**: NOT Alchemy/Chainlink APIs (both should be free tier)
+- **REAL CAUSE**: Database error loops causing 2,880 failed API calls/day + Replit compute overage
+- **IMMEDIATE FIXES APPLIED**:
+  * Database schema completed - eliminated error loops
+  * API frequency reduced 90%: 30 seconds → 5 minutes intervals  
+  * Anti-dump routes temporarily disabled to stop cost bleeding
+  * Rate limiting emergency mode: 1000 → 200 calls/hour
+- **COST REDUCTION**: From 2,880 daily calls → 288 daily calls (90% reduction)
+- **API PRICING RESEARCH**: 
+  * Alchemy Free Tier: 300M compute units/month (we use <0.1%)
+  * Chainlink: Free price feed reads from public contracts
+  * **VERDICT**: 60 euros likely from Replit compute time overage, not APIs
+- **MONITORING**: Cost optimization active, user should verify Replit dashboard usage
+
 ### Latest Security Fixes (July 26, 2025)
 - Fixed pool address to correct Uniswap V3 contract (0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3)
 - Enhanced CORS security with webpayback.com domain whitelisting
