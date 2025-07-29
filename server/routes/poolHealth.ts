@@ -79,25 +79,25 @@ router.get("/thresholds", async (req, res) => {
           min: 50000,
           max: null,
           rewardFactor: 1.05,
-          description: "Pool altamente liquida - bonus etico del 5%"
+          description: "Highly liquid pool - 5% ethical bonus"
         },
         warning: {
           min: 30000,
           max: 50000,
           rewardFactor: 1.0,
-          description: "Pool in stato normale - rewards standard"
+          description: "Pool in normal state - standard rewards"
         },
         critical: {
           min: 20000,
           max: 30000,
           rewardFactor: 0.95,
-          description: "Pool vicina alla soglia - leggera riduzione"
+          description: "Pool near threshold - slight reduction"
         },
         emergency: {
           min: null,
           max: 20000,
           rewardFactor: 0.6,
-          description: "Sotto soglia attivazione - rewards ridotti per protezione"
+          description: "Below activation threshold - reduced rewards for protection"
         }
       },
       wmatic: {
@@ -105,25 +105,25 @@ router.get("/thresholds", async (req, res) => {
           min: 40000,
           max: null,
           rewardFactor: 1.05,
-          description: "Pool WMATIC molto liquida - bonus etico"
+          description: "WMATIC pool very liquid - ethical bonus"
         },
         warning: {
           min: 25000,
           max: 40000,
           rewardFactor: 1.0,
-          description: "Pool WMATIC normale - rewards standard"
+          description: "WMATIC pool normal - standard rewards"
         },
         critical: {
           min: 20000,
           max: 25000,
           rewardFactor: 0.95,
-          description: "Pool WMATIC in leggera difficoltà"
+          description: "WMATIC pool in slight difficulty"
         },
         emergency: {
           min: null,
           max: 20000,
           rewardFactor: 0.6,
-          description: "Pool WMATIC con liquidità limitata"
+          description: "WMATIC pool with limited liquidity"
         }
       },
       ethicalEquilibrium: {
@@ -198,20 +198,20 @@ router.post("/test-scaling", async (req, res) => {
 function getThresholdDescription(healthLevel: string, poolType: string): string {
   const thresholds = {
     usdt: {
-      healthy: "> $50,000 (Bonus 5%)",
-      warning: "$30,000 - $50,000 (Normale)",
-      critical: "$20,000 - $30,000 (Ridotto 5%)",
-      emergency: "< $20,000 (Ridotto 40%)"
+      healthy: "> $50,000 (5% Bonus)",
+      warning: "$30,000 - $50,000 (Normal)",
+      critical: "$20,000 - $30,000 (5% Reduced)",
+      emergency: "< $20,000 (40% Reduced)"
     },
     wmatic: {
-      healthy: "> $40,000 (Bonus 5%)",
-      warning: "$25,000 - $40,000 (Normale)",
-      critical: "$20,000 - $25,000 (Ridotto 5%)",
-      emergency: "< $20,000 (Ridotto 40%)"
+      healthy: "> $40,000 (5% Bonus)",
+      warning: "$25,000 - $40,000 (Normal)",
+      critical: "$20,000 - $25,000 (5% Reduced)",
+      emergency: "< $20,000 (40% Reduced)"
     }
   };
 
-  return thresholds[poolType as keyof typeof thresholds]?.[healthLevel as keyof typeof thresholds.usdt] || "Sconosciuto";
+  return thresholds[poolType as keyof typeof thresholds]?.[healthLevel as keyof typeof thresholds.usdt] || "Unknown";
 }
 
 export default router;
