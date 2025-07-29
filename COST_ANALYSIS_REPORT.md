@@ -15,18 +15,19 @@
 - **VRF/Functions**: Richiede LINK token ma NON li usiamo
 - **VERDETTO**: Chainlink NON dovrebbe costare nulla
 
-## 🚨 VERA CAUSA DEI 60 EURO
+## 🚨 VERA CAUSA DEI 267$ IDENTIFICATA
 
-### IPOTESI PRINCIPALE: REPLIT COMPUTE TIME
-- **60 euro in 3 giorni** = 20 euro/giorno  
-- **Replit Hacker Plan**: $7/mese per 50 ore compute
-- **Replit Pro/Teams**: $20/mese per 200 ore compute
-- **Overage costs**: $0.50/ora oltre il limite
+### COLPEVOLE: REPLIT AI AGENT USAGE
+- **Agent Usage**: $267.63 (Dynamic pricing)
+- **PostgreSQL Compute**: $4.23 (26.42 ore)
+- **Autoscale Deployment**: $4.09 (1.28M compute units)
+- **Core Plan**: $25/mese utilizzato completamente
 
-### CALCOLO POSSIBILE:
-- Se usi più di 200 ore/mese → Overage
-- 60 euro = 120 ore extra → 4 ore/giorno di overage
-- **PROBABILE**: App sempre attiva 24/7 causa overage
+### ANALISI COSTI:
+- **267$ = Agent AI usage** → Probabilmente sessioni di coding intensive
+- **NON le nostre API** (Alchemy/Chainlink confermati gratuiti)
+- **NON compute time normale** (solo 930 minuti development)
+- **Replit AI Agent** ha consumato la maggior parte del budget
 
 ## 🔧 SOLUZIONI IMMEDIATE
 
@@ -50,8 +51,18 @@
 - Database errors: ELIMINATI
 - Background tasks: RIDOTTI 90%
 
-## PROSSIMI PASSI
-1. Verifica dashboard Replit compute usage
-2. Considera upgrade piano se necessario  
-3. Implementa sleep mode per ridurre compute time
-4. Monitor costi giornalieri per conferma riduzione
+## 🛑 AZIONI IMMEDIATE RICHIESTE
+1. **IMPOSTA USAGE BUDGET**: Settare limite spesa mensile (es. $50)
+2. **IMPOSTA USAGE ALERT**: Notifica quando raggiungi 80% budget  
+3. **DISABILITA AGENT AI**: Se non necessario per development
+4. **MONITORA GIORNALMENTE**: Controllare "Additional usage" ogni giorno
+
+## BUDGET CONSIGLIATI:
+- **Conservativo**: $50/mese budget (≈ €45)
+- **Moderato**: $100/mese budget (≈ €90)  
+- **Alert threshold**: 80% del budget scelto
+
+## PREVENZIONE FUTURA:
+- Evitare sessioni Agent AI intensive
+- Usare editor normale invece di AI quando possibile
+- Monitorare "Additional usage" settimanalmente

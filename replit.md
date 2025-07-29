@@ -135,7 +135,9 @@ Domain configuration: webpayback.com registered on Ionos with Domain Guard, redi
   * Alchemy Free Tier: 300M compute units/month (we use <0.1%)
   * Chainlink: Free price feed reads from public contracts
   * **VERDICT**: 60 euros likely from Replit compute time overage, not APIs
-- **MONITORING**: Cost optimization active, user should verify Replit dashboard usage
+- **COSTO REALE IDENTIFICATO**: $267.63 Agent Usage (AI sessioni intensive) + $25 Core Plan
+- **SOLUZIONE URGENTE**: Impostare Usage Budget $50-100/mese e Usage Alert 80%
+- **MONITORING**: User deve disabilitare Replit AI Agent se non necessario
 
 ### Latest Security Fixes (July 26, 2025)
 - Fixed pool address to correct Uniswap V3 contract (0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3)
