@@ -69,7 +69,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm">
                 <Wallet className="text-electric-blue" />
-                <span className="font-mono">0x9077...91e</span>
+                <span className="font-mono">0x9408...825</span>
               </div>
               <div className="flex items-center space-x-2 bg-glass-dark px-3 py-1 rounded-lg">
                 <Coins className="text-amber-400" />
