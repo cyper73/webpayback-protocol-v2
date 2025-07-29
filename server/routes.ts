@@ -79,6 +79,7 @@ import { automationRouter } from "./routes/automation";
 import { contentCertificateRouter } from "./routes/contentCertificate";
 import { registerAllowanceRoutes } from "./routes/allowance";
 import poolHealthRouter from "./routes/poolHealth";
+import antiDumpSlippageRoutes from "./routes/antiDumpSlippage";
 import userRoutes from "./routes/user";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -3200,6 +3201,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Pool Health Auto-Scaling routes
   app.use('/api/pool-health', poolHealthRouter);
+  
+  // Anti-Dump Slippage Fee System routes
+  app.use('/api/anti-dump', antiDumpSlippageRoutes);
   
   // User routes
   app.use('/api/user', userRoutes);
