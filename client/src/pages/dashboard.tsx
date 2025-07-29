@@ -23,6 +23,7 @@ import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtect
 
 import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen } from "lucide-react";
 import { Link as RouterLink } from "wouter";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
@@ -73,10 +74,19 @@ export default function Dashboard() {
     compliance: []
   };
   
-  const { agents, networks, creators, stats, rewards, pool, compliance } = data;
+  const { 
+    agents = [], 
+    networks = [], 
+    creators = [], 
+    stats = {}, 
+    rewards = [], 
+    pool = [], 
+    compliance = [] 
+  } = data || {};
 
   return (
-    <div className="min-h-screen bg-deep-space text-white">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-deep-space text-white">
       {/* Clean Navigation Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -442,6 +452,7 @@ export default function Dashboard() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

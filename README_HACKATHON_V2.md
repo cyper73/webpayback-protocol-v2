@@ -10,6 +10,7 @@ A cutting-edge multi-agent blockchain protocol that automatically rewards conten
 ## 🌟 Key Features
 
 - **🤖 Multi-Agent AI System**: WebPayback, Autoregolator, PoolAgent, and Transparent Agent working together
+- **🛡️ Content Certificate NFTs**: Revolutionary anti-AI scraping protection with blockchain-verified ownership certificates
 - **🔗 Multi-Chain Support**: Polygon, Ethereum, BSC, Arbitrum deployment capabilities
 - **💰 Automatic Rewards**: Real-time WPT token distribution when AI uses creator content
 - **🛡️ Gas Pool Protection**: Advanced gas management with emergency protections
@@ -103,6 +104,29 @@ A cutting-edge multi-agent blockchain protocol that automatically rewards conten
   - **TVL**: Active with balanced liquidity
   - **Type**: Uniswap V2 (Always Active)
   - **Status**: Backup trading pool
+
+## 🛡️ Content Certificate NFT System
+
+### Revolutionary Anti-AI Scraping Protection
+**Combat 15-40% traffic loss from Google AI Overview content theft**
+
+#### NFT-Based Content Ownership
+- **ERC-2981 Compliant**: Industry-standard royalty NFTs for content ownership
+- **SHA-256 Fingerprinting**: Cryptographic content identification and theft detection
+- **Blockchain Certificates**: Immutable proof of content creation and ownership
+- **Legal Framework**: Smart contracts provide legal basis for content protection claims
+
+#### Automatic Detection & Rewards
+- **Google AI Overview Monitoring**: Real-time detection of unauthorized content usage
+- **WPT Token Rewards**: Automatic compensation when AI systems use protected content
+- **Similarity Analysis**: Advanced algorithms detect content theft with high accuracy
+- **Dashboard Management**: Complete NFT certificate management at `/content-certificate`
+
+#### Production Implementation
+- **Live System**: Fully operational NFT minting and monitoring system
+- **Creator Portal Integration**: Seamless integration with creator registration flow
+- **IDOR Protection**: Secure access control ensuring data privacy
+- **Real-time Analytics**: Track detection rates, rewards earned, and protection status
 
 ## 🤖 AI Agent System
 

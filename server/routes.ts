@@ -73,12 +73,18 @@ import {
   getSuspiciousAddresses,
   clearSuspiciousAddress
 } from "./security/reentrancyProtection";
+import { sessionThrottling, getSessionStats } from "./security/sessionThrottling";
+import { apiThrottling, getApiUsageStats } from "./security/apiThrottling";
 import { automationRouter } from "./routes/automation";
 import { contentCertificateRouter } from "./routes/contentCertificate";
 import { registerAllowanceRoutes } from "./routes/allowance";
 import userRoutes from "./routes/user";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Apply NEW security middlewares globally - TEMPORARILY DISABLED FOR DASHBOARD LOADING
+  // app.use(sessionThrottling);    // Throttle unauthenticated sessions
+  // app.use(apiThrottling);        // Protect API call limits
   
   // Apply emergency rate limiting and IP abuse protection globally
   // TEMPORARILY DISABLED FOR WALLET TESTING
@@ -3110,6 +3116,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: true,
         testResults: analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  // SECURITY MONITORING ENDPOINTS
+  
+  // Get session throttling statistics
+  app.get('/api/security/session-stats', async (req, res) => {
+    try {
+      const stats = getSessionStats();
+      res.json({
+        success: true,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+  
+  // Get API usage statistics
+  app.get('/api/security/api-usage', async (req, res) => {
+    try {
+      const stats = getApiUsageStats();
+      res.json({
+        success: true,
+        usage: stats,
         timestamp: new Date().toISOString()
       });
     } catch (error) {
