@@ -116,7 +116,7 @@ export default function PoolHealthDashboard() {
             Pool Health Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Algoritmo di Equilibrio Etico - Monitoraggio in tempo reale
+            Ethical Equilibrium Algorithm - Real-time Monitoring
           </p>
         </div>
       </div>
@@ -125,21 +125,21 @@ export default function PoolHealthDashboard() {
       <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
         <Target className="h-4 w-4" />
         <AlertTitle className="text-blue-800 dark:text-blue-200">
-          Algoritmo Equilibrio Etico ATTIVO
+          Ethical Equilibrium Algorithm ACTIVE
         </AlertTitle>
         <AlertDescription className="text-blue-700 dark:text-blue-300">
-          <strong>Soglia Attivazione:</strong> $20,000 USDT • 
-          <strong> Liquidità Attuale:</strong> ${status?.usdtPool.tvl?.toFixed(2)} USDT • 
-          <strong> Status:</strong> Rewards mantenuti ai valori ridotti (60%) fino al raggiungimento della soglia
+          <strong>Activation Threshold:</strong> $20,000 USDT • 
+          <strong> Current Liquidity:</strong> ${status?.usdtPool.tvl?.toFixed(2)} USDT • 
+          <strong> Status:</strong> Rewards maintained at reduced values (60%) until threshold is reached
         </AlertDescription>
       </Alert>
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Panoramica</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="pools">Pools Status</TabsTrigger>
           <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="thresholds">Soglie</TabsTrigger>
+          <TabsTrigger value="thresholds">Thresholds</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -148,7 +148,7 @@ export default function PoolHealthDashboard() {
             {/* Current Reward Factor */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Fattore Reward Attuale</CardTitle>
+                <CardTitle className="text-sm font-medium">Current Reward Factor</CardTitle>
                 <Zap className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -162,8 +162,8 @@ export default function PoolHealthDashboard() {
                     'bg-red-100 text-red-800'
                   }`}
                 >
-                  {status?.rewardScaling.status === 'normal' ? 'Normale' :
-                   status?.rewardScaling.status === 'reduced' ? 'Ridotto' : 'Critico'}
+                  {status?.rewardScaling.status === 'normal' ? 'Normal' :
+                   status?.rewardScaling.status === 'reduced' ? 'Reduced' : 'Critical'}
                 </Badge>
                 <Progress 
                   value={status?.rewardScaling.percentage} 
@@ -189,7 +189,7 @@ export default function PoolHealthDashboard() {
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Soglia attivazione: $20,000
+                  Activation threshold: $20,000
                 </p>
               </CardContent>
             </Card>
@@ -211,7 +211,7 @@ export default function PoolHealthDashboard() {
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Equivalente USD
+                  USD equivalent
                 </p>
               </CardContent>
             </Card>
@@ -220,31 +220,31 @@ export default function PoolHealthDashboard() {
           {/* Reward Scaling Explanation */}
           <Card>
             <CardHeader>
-              <CardTitle>Algoritmo di Equilibrio Etico</CardTitle>
+              <CardTitle>Ethical Equilibrium Algorithm</CardTitle>
               <CardDescription>
-                Come funziona il sistema di scaling automatico dei rewards
+                How the automatic reward scaling system works
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-green-600">🎯 Stato Attuale (&lt; $20K)</h4>
+                  <h4 className="font-semibold text-green-600">🎯 Current State (&lt; $20K)</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Rewards mantenuti al <strong>60%</strong> dei valori originali per proteggere le riserve WPT.
-                    Questo assicura la sostenibilità del protocollo.
+                    Rewards maintained at <strong>60%</strong> of original values to protect WPT reserves.
+                    This ensures protocol sustainability.
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-blue-600">🚀 Futuro (&gt; $20K)</h4>
+                  <h4 className="font-semibold text-blue-600">🚀 Future State (&gt; $20K)</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Quando la liquidità supererà $20,000 USDT, l'algoritmo potrà aumentare gradualmente 
-                    i rewards fino al <strong>105%</strong> mantenendo l'equilibrio etico.
+                    When liquidity exceeds $20,000 USDT, the algorithm can gradually increase 
+                    rewards up to <strong>105%</strong> while maintaining ethical equilibrium.
                   </p>
                 </div>
               </div>
               
               <div className="border-t pt-4">
-                <h4 className="font-semibold mb-2">Scaling Futuro (dopo $20K USDT):</h4>
+                <h4 className="font-semibold mb-2">Future Scaling (after $20K USDT):</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                   <div className="p-2 bg-green-50 dark:bg-green-950 rounded">
                     <strong>Healthy (&gt;$50K):</strong> 105% rewards
@@ -256,7 +256,7 @@ export default function PoolHealthDashboard() {
                     <strong>Warning ($20-30K):</strong> 95% rewards
                   </div>
                   <div className="p-2 bg-gray-50 dark:bg-gray-950 rounded">
-                    <strong>Sotto soglia:</strong> 60% rewards (attuale)
+                    <strong>Below threshold:</strong> 60% rewards (current)
                   </div>
                 </div>
               </div>
@@ -273,11 +273,11 @@ export default function PoolHealthDashboard() {
                   <DollarSign className="w-5 h-5 mr-2" />
                   USDT/WPT Pool
                 </CardTitle>
-                <CardDescription>Pool primario per il sistema di rewards</CardDescription>
+                <CardDescription>Primary pool for rewards system</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">TVL Attuale:</span>
+                  <span className="text-sm font-medium">Current TVL:</span>
                   <span className="text-lg font-bold">${status?.usdtPool.tvl?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -287,7 +287,7 @@ export default function PoolHealthDashboard() {
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Soglia:</span>
+                  <span className="text-sm font-medium">Threshold:</span>
                   <span className="text-sm">{status?.usdtPool.threshold}</span>
                 </div>
                 <Progress 
@@ -295,7 +295,7 @@ export default function PoolHealthDashboard() {
                   className="mt-3"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Progresso verso soglia attivazione ($20,000)
+                  Progress toward activation threshold ($20,000)
                 </p>
               </CardContent>
             </Card>
@@ -307,11 +307,11 @@ export default function PoolHealthDashboard() {
                   <BarChart3 className="w-5 h-5 mr-2" />
                   WMATIC/WPT Pool
                 </CardTitle>
-                <CardDescription>Pool secondario per diversificazione</CardDescription>
+                <CardDescription>Secondary pool for diversification</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">TVL Attuale:</span>
+                  <span className="text-sm font-medium">Current TVL:</span>
                   <span className="text-lg font-bold">${status?.wmaticPool.tvl?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -321,7 +321,7 @@ export default function PoolHealthDashboard() {
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Soglia:</span>
+                  <span className="text-sm font-medium">Threshold:</span>
                   <span className="text-sm">{status?.wmaticPool.threshold}</span>
                 </div>
                 <Progress 
@@ -329,7 +329,7 @@ export default function PoolHealthDashboard() {
                   className="mt-3"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Pool di supporto per il sistema
+                  Support pool for the system
                 </p>
               </CardContent>
             </Card>
@@ -341,7 +341,7 @@ export default function PoolHealthDashboard() {
             <CardHeader>
               <CardTitle>Pool Health Alerts</CardTitle>
               <CardDescription>
-                Notifiche e raccomandazioni per il mantenimento dell'equilibrio
+                Notifications and recommendations for maintaining equilibrium
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -369,7 +369,7 @@ export default function PoolHealthDashboard() {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Shield className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Nessun alert attivo. Sistema in stato stabile.</p>
+                  <p>No active alerts. System in stable state.</p>
                 </div>
               )}
             </CardContent>
@@ -443,12 +443,12 @@ export default function PoolHealthDashboard() {
 
               <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                  Logica del Sistema
+                  System Logic
                 </h4>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Il sistema utilizza il livello di salute più restrittivo tra le due pools. 
-                  L'algoritmo di equilibrio etico si attiva solo quando la pool USDT supera i $20,000, 
-                  garantendo sostenibilità e protezione delle riserve WPT.
+                  The system uses the most restrictive health level between the two pools. 
+                  The ethical equilibrium algorithm activates only when the USDT pool exceeds $20,000, 
+                  ensuring sustainability and protection of WPT reserves.
                 </p>
               </div>
             </CardContent>
@@ -458,7 +458,7 @@ export default function PoolHealthDashboard() {
 
       {/* Last Updated */}
       <div className="text-center text-sm text-muted-foreground">
-        Ultimo aggiornamento: {status?.lastUpdated ? new Date(status.lastUpdated).toLocaleString('it-IT') : 'N/A'}
+        Last updated: {status?.lastUpdated ? new Date(status.lastUpdated).toLocaleString('en-US') : 'N/A'}
       </div>
     </div>
   );
