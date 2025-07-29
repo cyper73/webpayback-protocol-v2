@@ -1,6 +1,7 @@
 import { db } from "../db";
 import { citationTracking, aiKnowledgeIndex, creators, rewardDistributions, contentTracking } from "@shared/schema";
 import { eq, sql, and, desc } from "drizzle-orm";
+import { PoolHealthRewardScaler } from "./poolHealthRewardScaler";
 
 export interface CitationEvent {
   sourceUrl: string;
@@ -75,8 +76,13 @@ export class CitationRewardEngine {
         return { success: false, rewardAmount: 0, error: 'Creator not found for URL' };
       }
 
-      // Calculate reward amount
-      const rewardAmount = this.calculateCitationReward(citation);
+      // Calculate base reward amount
+      const baseReward = this.calculateCitationReward(citation);
+      
+      // Apply pool health scaling for sustainability
+      const poolHealthScaler = PoolHealthRewardScaler.getInstance();
+      const scaledRewardData = await poolHealthScaler.scaleRewardByPoolHealth(baseReward);
+      const rewardAmount = scaledRewardData.scaledReward;
 
       // Insert citation tracking record
       const [citationRecord] = await db
@@ -98,6 +104,9 @@ export class CitationRewardEngine {
               baseReward: this.REWARD_MULTIPLIERS.baseReward,
               citationTypeMultiplier: this.REWARD_MULTIPLIERS.citationType[citation.citationType],
               aiModelMultiplier: this.REWARD_MULTIPLIERS.aiModel[citation.aiModel] || 1.0,
+              originalReward: scaledRewardData.originalReward,
+              poolHealthScaleFactor: scaledRewardData.scaleFactor,
+              poolHealthStatus: scaledRewardData.healthStatus
             }
           }
         })

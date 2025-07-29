@@ -4,6 +4,7 @@
  */
 
 import { qlooService, type QlooContentAnalysis, type QlooRewardCalculation } from './qlooService';
+import { PoolHealthRewardScaler } from './poolHealthRewardScaler';
 
 interface CulturalAnalysisRequest {
   creatorId: number;
@@ -61,11 +62,24 @@ export class CulturalRewardEngine {
       const baseReward = this.calculateBaseReward(request.aiModelUsed);
 
       // Step 3: Apply cultural intelligence multipliers
-      const rewardCalculation = await qlooService.calculateCulturalReward(
+      const culturalReward = await qlooService.calculateCulturalReward(
         baseReward,
         culturalAnalysis,
         request.userLocation
       );
+
+      // Step 4: Apply pool health scaling for sustainability
+      const poolHealthScaler = PoolHealthRewardScaler.getInstance();
+      const scaledRewardData = await poolHealthScaler.scaleRewardByPoolHealth(culturalReward.final_reward_amount);
+      
+      // Update reward calculation with pool health scaling
+      const rewardCalculation = {
+        ...culturalReward,
+        original_cultural_reward: culturalReward.final_reward_amount,
+        pool_health_scale_factor: scaledRewardData.scaleFactor,
+        final_reward_amount: scaledRewardData.scaledReward,
+        pool_health_status: scaledRewardData.healthStatus
+      };
 
       // Step 4: Generate cultural insights and recommendations
       const culturalInsights = this.generateCulturalInsights(culturalAnalysis);

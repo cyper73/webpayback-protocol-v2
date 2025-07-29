@@ -78,6 +78,7 @@ import { apiThrottling, getApiUsageStats } from "./security/apiThrottling";
 import { automationRouter } from "./routes/automation";
 import { contentCertificateRouter } from "./routes/contentCertificate";
 import { registerAllowanceRoutes } from "./routes/allowance";
+import { poolHealthRouter } from "./routes/poolHealth";
 import userRoutes from "./routes/user";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -3196,6 +3197,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Content Certificate NFT routes (Anti-Google AI Overview)
   app.use('/api/content-certificate', contentCertificateRouter);
+  
+  // Pool Health Auto-Scaling routes
+  app.use('/api/pool-health', poolHealthRouter);
   
   // User routes
   app.use('/api/user', userRoutes);

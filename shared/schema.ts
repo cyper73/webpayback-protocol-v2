@@ -434,6 +434,18 @@ export const aiKnowledgeIndex = pgTable("ai_knowledge_index", {
   metadata: jsonb("metadata").default({}),
 });
 
+// Pool Health Metrics - tracks pool liquidity health for auto-scaling rewards
+export const poolHealthMetrics = pgTable("pool_health_metrics", {
+  id: serial("id").primaryKey(),
+  usdtPoolTvl: decimal("usdt_pool_tvl", { precision: 18, scale: 8 }).notNull(),
+  wmaticPoolTvl: decimal("wmatic_pool_tvl", { precision: 18, scale: 8 }).notNull(),
+  usdtHealthLevel: text("usdt_health_level").notNull(), // healthy, warning, critical, emergency
+  wmaticHealthLevel: text("wmatic_health_level").notNull(), // healthy, warning, critical, emergency
+  rewardScaleFactor: decimal("reward_scale_factor", { precision: 5, scale: 4 }).notNull(), // 0.25-1.0
+  alertsGenerated: jsonb("alerts_generated").default([]),
+  checkedAt: timestamp("checked_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   creators: many(creators),
