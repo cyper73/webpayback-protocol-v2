@@ -34,29 +34,35 @@ export interface PoolThresholds {
 export class PoolHealthRewardScaler {
   private static instance: PoolHealthRewardScaler;
   
-  // Pool health thresholds (ETHICAL EQUILIBRIUM - realistic for large-scale operation)
+  // ETHICAL EQUILIBRIUM ALGORITHM - Activation only after $20K USDT threshold
+  private readonly MINIMUM_ACTIVATION_THRESHOLD = 20000; // $20,000 USDT minimum
+  
+  // Pool health thresholds (ONLY active above $20K threshold)
   private readonly POOL_THRESHOLDS: PoolThresholds = {
     usdt: {
-      healthy: 20000,    // > $20,000 USDT = 100% rewards (realistic minimum pool)
-      warning: 15000,    // $15,000-20,000 = 90% rewards (slight reduction)
-      critical: 10000,   // $10,000-15,000 = 75% rewards (moderate protection)  
-      emergency: 5000    // < $10,000 = 60% rewards (conservative but not punitive)
+      healthy: 50000,    // > $50,000 USDT = 105% rewards (slight bonus for high liquidity)
+      warning: 30000,    // $30,000-50,000 = 100% rewards (normal)
+      critical: 20000,   // $20,000-30,000 = 95% rewards (gentle reduction)  
+      emergency: 10000   // Below activation threshold = use REDUCED values from previous setup
     },
     wmatic: {
-      healthy: 15000,    // > $15,000 WMATIC equivalent = 100% rewards
-      warning: 10000,    // $10,000-15,000 WMATIC = 90% rewards
-      critical: 7500,    // $7,500-10,000 WMATIC = 75% rewards
-      emergency: 5000    // < $7,500 WMATIC = 60% rewards
+      healthy: 40000,    // > $40,000 WMATIC equivalent = 105% rewards
+      warning: 25000,    // $25,000-40,000 WMATIC = 100% rewards
+      critical: 20000,   // $20,000-25,000 WMATIC = 95% rewards
+      emergency: 10000   // Below threshold = use previous REDUCED values
     }
   };
 
   // Reward scale factors by health level (ETHICAL EQUILIBRIUM)
   private readonly REWARD_SCALE_FACTORS = {
-    healthy: 1.0,      // 100% rewards (full ecosystem support)
-    warning: 0.9,      // 90% rewards (gentle adjustment)
-    critical: 0.75,    // 75% rewards (balanced protection)  
-    emergency: 0.6     // 60% rewards (conservative but fair)
+    healthy: 1.05,     // 105% rewards (slight bonus for high liquidity - ethical bonus)
+    warning: 1.0,      // 100% rewards (normal operation)
+    critical: 0.95,    // 95% rewards (gentle protection)  
+    emergency: 0.6     // BELOW THRESHOLD: Use previous REDUCED reward values
   };
+
+  // REDUCED reward values (used when below $20K threshold)
+  private readonly REDUCED_REWARD_FACTOR = 0.6; // Current reduced state
 
   public static getInstance(): PoolHealthRewardScaler {
     if (!PoolHealthRewardScaler.instance) {
@@ -67,13 +73,28 @@ export class PoolHealthRewardScaler {
 
   /**
    * Get current pool health status and reward scale factor
+   * ETHICAL EQUILIBRIUM: Only activate scaling above $20K USDT threshold
    */
   async getCurrentPoolHealth(): Promise<PoolHealthStatus> {
     try {
       // Fetch latest pool TVL data (from existing pool monitoring system)
       const poolData = await this.fetchPoolTvlData();
       
-      // Calculate health levels for each pool
+      // CHECK ACTIVATION THRESHOLD FIRST
+      if (poolData.usdtTvl < this.MINIMUM_ACTIVATION_THRESHOLD) {
+        // Below $20K threshold - use REDUCED rewards (previous setup values)
+        return {
+          usdtPoolTvl: poolData.usdtTvl,
+          wmaticPoolTvl: poolData.wmaticTvl,
+          usdtHealthLevel: 'emergency',
+          wmaticHealthLevel: 'emergency',
+          rewardScaleFactor: this.REDUCED_REWARD_FACTOR, // 60% - previous reduced values
+          lastUpdated: new Date(),
+          belowActivationThreshold: true
+        };
+      }
+      
+      // Above $20K threshold - use ETHICAL EQUILIBRIUM algorithm
       const usdtHealthLevel = this.calculateHealthLevel(poolData.usdtTvl, 'usdt');
       const wmaticHealthLevel = this.calculateHealthLevel(poolData.wmaticTvl, 'wmatic');
       
@@ -87,7 +108,8 @@ export class PoolHealthRewardScaler {
         usdtHealthLevel,
         wmaticHealthLevel,
         rewardScaleFactor,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
+        belowActivationThreshold: false
       };
 
       // Store health metrics in database for monitoring
@@ -103,14 +125,16 @@ export class PoolHealthRewardScaler {
         wmaticPoolTvl: 0,
         usdtHealthLevel: 'emergency',
         wmaticHealthLevel: 'emergency',
-        rewardScaleFactor: 0.25,
-        lastUpdated: new Date()
+        rewardScaleFactor: this.REDUCED_REWARD_FACTOR,
+        lastUpdated: new Date(),
+        belowActivationThreshold: true
       };
     }
   }
 
   /**
    * Apply pool health scaling to a base reward amount
+   * ETHICAL EQUILIBRIUM: Maintains reduced rewards until $20K threshold
    */
   async scaleRewardByPoolHealth(baseReward: number): Promise<{
     originalReward: number;
@@ -125,7 +149,11 @@ export class PoolHealthRewardScaler {
       originalReward: baseReward,
       scaledReward: Math.round(scaledReward * 10000) / 10000, // 4 decimal precision
       scaleFactor: healthStatus.rewardScaleFactor,
-      healthStatus
+      healthStatus: {
+        ...healthStatus,
+        activationThreshold: this.MINIMUM_ACTIVATION_THRESHOLD,
+        isEthicalEquilibriumActive: !healthStatus.belowActivationThreshold
+      }
     };
   }
 

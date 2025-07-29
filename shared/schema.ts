@@ -441,10 +441,14 @@ export const poolHealthMetrics = pgTable("pool_health_metrics", {
   wmaticPoolTvl: decimal("wmatic_pool_tvl", { precision: 18, scale: 8 }).notNull(),
   usdtHealthLevel: text("usdt_health_level").notNull(), // healthy, warning, critical, emergency
   wmaticHealthLevel: text("wmatic_health_level").notNull(), // healthy, warning, critical, emergency
-  rewardScaleFactor: decimal("reward_scale_factor", { precision: 5, scale: 4 }).notNull(), // 0.25-1.0
+  rewardScaleFactor: decimal("reward_scale_factor", { precision: 5, scale: 4 }).notNull(), // 0.6-1.05
+  belowActivationThreshold: boolean("below_activation_threshold").default(true), // Below $20K threshold
   alertsGenerated: jsonb("alerts_generated").default([]),
   checkedAt: timestamp("checked_at").defaultNow(),
 });
+
+export type PoolHealthMetrics = typeof poolHealthMetrics.$inferSelect;
+export type InsertPoolHealthMetrics = typeof poolHealthMetrics.$inferInsert;
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
