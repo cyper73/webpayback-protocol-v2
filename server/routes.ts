@@ -81,6 +81,7 @@ import { registerAllowanceRoutes } from "./routes/allowance";
 import poolHealthRouter from "./routes/poolHealth";
 import antiDumpSlippageRoutes from "./routes/antiDumpSlippage";
 import userRoutes from "./routes/user";
+import contractReservesRouter from "./routes/contractReserves";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -3210,6 +3211,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Allowance Management routes
   registerAllowanceRoutes(app);
+
+  // Contract reserves management
+  app.use("/api/contract-reserves", contractReservesRouter);
 
   const httpServer = createServer(app);
   return httpServer;
