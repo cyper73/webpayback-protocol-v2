@@ -17,6 +17,7 @@ import { citationRewardEngine } from "./services/citationRewardEngine";
 import { authenticityLayer } from "./services/authenticitylayer";
 import { aiQueryProtection } from "./services/aiQueryProtection";
 import { vpnDetection } from "./services/vpnDetection";
+import { walletVerificationService } from "./services/walletVerification";
 import { db } from "./db";
 import { authenticateAdmin, adminLogin } from "./adminAuth";
 import { creators, contentTracking } from "@shared/schema";
@@ -566,6 +567,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== WALLET CRYPTOGRAPHIC VERIFICATION ENDPOINTS =====
+  
+  // Generate verification message for wallet signing
+  app.post("/api/wallet/generate-verification", csrfProtection, async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Wallet address is required" 
+        });
+      }
+
+      if (!walletVerificationService.isValidWalletAddress(walletAddress)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid wallet address format" 
+        });
+      }
+
+      const { message, timestamp } = walletVerificationService.generateVerificationMessage();
+      
+      res.json({
+        success: true,
+        message,
+        timestamp,
+        walletAddress,
+        instructions: {
+          step1: "Copy the message above",
+          step2: "Sign it with your wallet (MetaMask, WalletConnect, etc.)",
+          step3: "Paste the signature in the creator registration form",
+          expiresIn: "10 minutes"
+        }
+      });
+    } catch (error) {
+      console.error('Wallet verification generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // Verify wallet signature
+  app.post("/api/wallet/verify-signature", csrfProtection, async (req, res) => {
+    try {
+      const { walletAddress, message, signature } = req.body;
+      
+      if (!walletAddress || !message || !signature) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Wallet address, message, and signature are required" 
+        });
+      }
+
+      // Check if message is still valid (not expired)
+      if (!walletVerificationService.isVerificationMessageValid(message)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Verification message has expired. Please generate a new one." 
+        });
+      }
+
+      // Verify the cryptographic signature
+      const verificationResult = await walletVerificationService.verifyWalletSignature(
+        walletAddress, 
+        message, 
+        signature
+      );
+
+      if (verificationResult.isValid) {
+        res.json({
+          success: true,
+          verified: true,
+          message: "Wallet ownership verified successfully",
+          walletAddress,
+          canProceedWithRegistration: true
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          verified: false,
+          error: verificationResult.error || "Signature verification failed",
+          canProceedWithRegistration: false
+        });
+      }
+    } catch (error) {
+      console.error('Wallet signature verification error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // Check wallet verification status for existing creators
+  app.get("/api/wallet/verification-status/:walletAddress", async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      
+      if (!walletVerificationService.isValidWalletAddress(walletAddress)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid wallet address format" 
+        });
+      }
+
+      // Find creators with this wallet address
+      const creatorsResult = await db.select({
+        id: creators.id,
+        walletAddress: creators.walletAddress,
+        walletSignature: creators.walletSignature,
+        verificationMessage: creators.verificationMessage,
+        signatureVerified: creators.signatureVerified,
+        signatureVerifiedAt: creators.signatureVerifiedAt
+      }).from(creators).where(eq(creators.walletAddress, walletAddress));
+
+      if (creatorsResult.length === 0) {
+        return res.json({
+          success: true,
+          isRegistered: false,
+          verificationStatus: "not_registered",
+          message: "No creators found with this wallet address"
+        });
+      }
+
+      const creator = creatorsResult[0];
+      const verificationSummary = walletVerificationService.getVerificationSummary(creator);
+
+      res.json({
+        success: true,
+        isRegistered: true,
+        verificationStatus: verificationSummary,
+        walletAddress,
+        verifiedAt: creator.signatureVerifiedAt
+      });
+    } catch (error) {
+      console.error('Wallet verification status error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
   // Register creator with XSS, CSRF and Rate Limiting protection
   app.post("/api/creators", csrfProtection, creatorRegistrationRateLimit, async (req, res) => {
     try {
@@ -578,6 +725,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract channel information from the URL
       const channelInfo = channelMonitoringService.extractChannelInfo(schemaValidatedData.websiteUrl);
       
+      // CRYPTOGRAPHIC WALLET VERIFICATION - Verify wallet signature before allowing registration
+      if (schemaValidatedData.walletSignature && schemaValidatedData.verificationMessage) {
+        const verificationResult = await walletVerificationService.verifyWalletSignature(
+          schemaValidatedData.walletAddress, 
+          schemaValidatedData.verificationMessage, 
+          schemaValidatedData.walletSignature
+        );
+
+        if (!verificationResult.isValid) {
+          return res.status(400).json({ 
+            error: `Wallet verification failed: ${verificationResult.error || 'Invalid signature'}` 
+          });
+        }
+
+        console.log('✅ Wallet signature verified for registration:', schemaValidatedData.walletAddress);
+      } else {
+        return res.status(400).json({ 
+          error: "Wallet signature verification is required. Please sign the verification message." 
+        });
+      }
+
       // Enhanced creator data with channel information
       const creatorData = {
         ...schemaValidatedData,
@@ -585,7 +753,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         channelId: channelInfo?.channelId || null,
         channelName: channelInfo?.channelName || null,
         channelVerificationUrl: schemaValidatedData.websiteUrl,
-        monitoringScope: channelInfo ? 'full_channel' : 'single_url'
+        monitoringScope: channelInfo ? 'full_channel' : 'single_url',
+        signatureVerified: true,
+        signatureVerifiedAt: new Date()
       };
       
       const creator = await storage.createCreator(creatorData);
@@ -712,6 +882,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ referralCode: code });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // WALLET CRYPTOGRAPHIC VERIFICATION ROUTES
+  
+  // Generate verification message for wallet ownership proof
+  app.post("/api/wallet/generate-verification", async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress || typeof walletAddress !== 'string') {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Valid wallet address is required" 
+        });
+      }
+      
+      const result = await walletVerificationService.generateVerificationMessage(walletAddress);
+      res.json(result);
+    } catch (error) {
+      console.error("Wallet verification generation error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to generate verification message" 
+      });
+    }
+  });
+
+  // Verify wallet signature
+  app.post("/api/wallet/verify-signature", async (req, res) => {
+    try {
+      const { walletAddress, message, signature } = req.body;
+      
+      if (!walletAddress || !message || !signature) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Wallet address, message, and signature are required" 
+        });
+      }
+      
+      const result = await walletVerificationService.verifySignature(
+        walletAddress, 
+        message, 
+        signature
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Wallet signature verification error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to verify signature" 
+      });
     }
   });
 

@@ -14,6 +14,9 @@ export const creators = pgTable("creators", {
   userId: integer("user_id").references(() => users.id),
   websiteUrl: text("website_url").notNull(),
   walletAddress: text("wallet_address").notNull(),
+  walletSignature: text("wallet_signature"), // Cryptographic signature proving wallet ownership
+  verificationMessage: text("verification_message"), // Message that was signed
+  isWalletVerified: boolean("is_wallet_verified").default(false), // True if signature is valid
   contentCategory: text("content_category").notNull(),
   isVerified: boolean("is_verified").default(false),
   isEarlyAdopter: boolean("is_early_adopter").default(false),
@@ -627,6 +630,9 @@ export const insertCreatorSchema = createInsertSchema(creators).pick({
   userId: true,
   websiteUrl: true,
   walletAddress: true,
+  walletSignature: true,
+  verificationMessage: true,
+  isWalletVerified: true,
   contentCategory: true,
   platformType: true,
   channelId: true,
