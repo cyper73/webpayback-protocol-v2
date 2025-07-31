@@ -127,13 +127,6 @@ export default function Dashboard() {
               </Button>
             </RouterLink>
             
-            <RouterLink to="/automation">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-emerald-500/30 hover:bg-emerald-500/20 text-white">
-                <Box className="w-4 h-4 mr-2" />
-                Auto Pool Manager
-              </Button>
-            </RouterLink>
-            
             <RouterLink to="/content-certificate">
               <Button variant="outline" size="sm" className="bg-glass-dark border-orange-500/30 hover:bg-orange-500/20 text-white">
                 <Shield className="w-4 h-4 mr-2" />
@@ -154,15 +147,6 @@ export default function Dashboard() {
                 Pool Health
               </Button>
             </RouterLink>
-            
-            {isFounderDevice() && (
-              <RouterLink to="/allowance-management">
-                <Button variant="outline" size="sm" className="bg-glass-dark border-purple-500/30 hover:bg-purple-500/20 text-white">
-                  <Wallet className="w-4 h-4 mr-2" />
-                  Allowance Management
-                </Button>
-              </RouterLink>
-            )}
           </div>
         </div>
       </div>
