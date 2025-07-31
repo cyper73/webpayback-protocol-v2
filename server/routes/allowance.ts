@@ -43,6 +43,30 @@ const isFounderAuthenticated = (req: any, res: any, next: any) => {
 
 export function registerAllowanceRoutes(app: Express) {
   
+  // Add auth check endpoint for frontend authorization
+  app.get("/api/allowance/auth-check", (req, res) => {
+    const userAgent = req.headers['user-agent'] || '';
+    const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
+    
+    // Check device fingerprint
+    const isFounderDevice = userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
+    
+    if (!isFounderDevice) {
+      return res.json({ 
+        authorized: false, 
+        error: "Access denied. Please access from authorized device (Windows + Chrome/Firefox)." 
+      });
+    }
+    
+    // Additional IP/session checks could be added here
+    
+    res.json({ 
+      authorized: true,
+      founderWallet: founderWallet,
+      message: "Authorization successful" 
+    });
+  });
+  
   // Get allowance configuration for a wallet
   app.get("/api/allowance/config/:walletAddress", isFounderAuthenticated, async (req, res) => {
     try {

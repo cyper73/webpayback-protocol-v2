@@ -2,7 +2,7 @@
 
 ## Overview
 
-WebPayback Protocol is a sophisticated multi-agent blockchain application that automatically rewards content creators when AI systems use their work. The platform combines React frontend with Node.js backend, PostgreSQL database, and extensive blockchain integration across multiple networks (Ethereum, Polygon, BSC, Arbitrum). It features advanced AI agent orchestration, comprehensive fraud detection, and real-time pool monitoring with authentic data sources.
+WebPayback Protocol is a multi-agent blockchain application designed to automatically reward content creators when AI systems utilize their work. It aims to establish a self-sustaining creator economy, combining advanced AI orchestration with robust blockchain integration across multiple networks. The platform's vision is to ensure creators are fairly compensated, foster a vibrant creator community, and address the economic implications of AI content consumption.
 
 ## User Preferences
 
@@ -10,286 +10,54 @@ Preferred communication style: Simple, everyday language.
 Interface language: English-only for better international understanding and system stability.
 Domain configuration: webpayback.com registered on Ionos with Domain Guard, redirects to Replit app.
 
-## Recent Deployment Status
-
-**WebPayback Token v2 LIVE**: Contract successfully deployed and verified on Polygon mainnet
-- Contract Address: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
-- Security Score: 95/100 (Excellent)
-- PolygonScan Verification: ✅ COMPLETED with Name Tag "WebPayback Protocol"
-- Pool Address: 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3 (POL/WPT - 500 EUR)
-- Status: Production ready with comprehensive security monitoring active
-- Domain: webpayback.com successfully connected with SSL security
-- Date: July 26, 2025
-
-## Recent Security Updates
-
-### Email Contact Update (July 27, 2025)
-- Updated business contact email from claudiob73@hotmail.com to info@webpayback.com across all documentation
-- Professional domain-based email now reflects webpayback.com domain integration
-- Updated contact information in docs/README.md and attached_assets/README_1753056355845.md
-
-### GitHub Repository Migration (July 27, 2025)
-- **NEW REPOSITORY**: Migrated to dedicated webpayback-protocol repository at https://github.com/cyper73/webpayback-protocol/tree/webpayback
-- **LINK UPDATES COMPLETED**: Updated all GitHub repository links across documentation and codebase
-- **FILES UPDATED**: replit.md, docs/README.md, PrivacyPolicy.tsx, dashboard.tsx, dashboard-static.tsx, dashboard-working.tsx
-- **ARCHIVE READY**: webpayback-protocol-v2.tar.gz prepared with .gitignore for GitHub upload (540KB optimized)
-- **PROFESSIONAL BRANDING**: New repository provides better SEO and professional presentation for WebPayback Protocol
-
-### Licensing Protection Implementation (July 27, 2025)
-- **CUSTOM LICENSE CREATED**: WebPayback Protocol License v1.0 with commercial use restrictions  
-- **INTELLECTUAL PROPERTY PROTECTION**: Prevents unauthorized commercial use while allowing educational/research use
-- **TOKEN SEPARATION**: License covers only source code - WPT token operations remain completely unrestricted
-- **COMMERCIAL LICENSING**: Requires written permission from copyright holder for commercial use
-- **CLEAR TERMS**: Non-commercial use (education, research, personal projects) fully permitted
-- **CONTACT**: Commercial licensing inquiries directed to info@webpayback.com
-- **DOCUMENTATION UPDATED**: README.md updated to reflect new licensing terms and restrictions
-
-### Allowance Management System (July 28, 2025)
-- **FOUNDER-ONLY ACCESS**: Comprehensive token allowance management system with multi-layer security
-- **DATABASE INFRASTRUCTURE**: Created complete database schema (allowance_management, allowance_transactions, reserve_pool_status, allowance_security)
-- **BACKEND API**: Full REST API with 8+ endpoints for configuration, monitoring, and transaction history
-- **SECURITY IMPLEMENTATION**: Multi-layer founder authentication system:
-  * Device fingerprinting (Windows + Firefox/Chrome detection)
-  * Wallet address validation (0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8 only)
-  * Server-side middleware protection on all routes
-  * Frontend conditional rendering (button hidden for non-founders)
-- **DASHBOARD FEATURES**: Real-time statistics, configuration controls, transaction history, security monitoring
-- **DATABASE SCHEMA SYNCHRONIZATION**: Fixed database schema mismatches by adding missing columns (gas_used, security_event_type, etc.) to match TypeScript definitions
-- **PRODUCTION READY**: System tested and confirmed working by founder Claudio - displays correct parameters (2M WPT max allowance, 0% utilization)
-- **POOL STATUS UPDATE**: USDT/WPT V2 pool shows authentic blockchain data - USDT depleted through trading activity (283,013 WPT remaining, original $1,000 liquidity mostly consumed)
-- **ROUTE**: /allowance-management with comprehensive allowance configuration interface
-- **SAFE OPERATION COMPLETED (July 28, 2025)**: Successfully injected 1M WPT tokens into USDT/WPT pool with proper safety controls. Founder wisely stopped second injection to maintain pool balance. System operates correctly with authentic blockchain verification (wallet balance: 9.716.986 WPT, pool TVL: $539). Allowance system reset to 0% utilization for security.
-- **TOKEN INJECTION FAILURE (July 28, 2025)**: Transaction technically succeeded (block 74531834, hash: 0x37a0d98f9245461d5ac0782cc66487b1d8c5cefc55121026914e1ea9391a08cf) but 1M WPT tokens were sent to wrong contract address (0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A). Tokens are LOST - not recoverable from unknown contract. Pool remains unchanged at 284K WPT. Founder correctly identified economic risk of insufficient liquidity before loss occurred. Wallet reduced from 9.7M to 8.7M WPT (~€1,600 loss).
-- **FOUNDER CONFIRMATION RECEIVED (July 28, 2025)**: Founder confirmed correct pool address (0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A) and authentic token valuation showing €15.926,37 for 9,72 Mln WPT tokens. System displaying accurate market pricing and pool liquidity data. WebPayback Protocol functioning perfectly with authentic blockchain integration.
-- **WPT CONTRACT RESERVES TRANSFER EXECUTED (July 30, 2025)**: Successfully executed 1M WPT transfer from founder wallet to WPT contract reserves to reduce dump risk alerts. Transaction hash: 0x0f0cdac19f162fceebc42daf155c75db1fc977de007f5cd048440bb65d6039e0 (pending confirmation due to network congestion). Transfer will reduce founder balance from 8.7M to 7.7M WPT and create 1M WPT contract reserve buffer for improved protocol stability.
-- **POOL STRATEGY OPTIMIZATION (July 30, 2025)**: Analyzed WMATIC/WPT V3 pool issue - 265 WMATIC (€223) remain in pool 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3 but with zero liquidity due to expired/closed positions. Founder agreed to focus on stable USDT/WPT V2 pool ($540 TVL) which operates without range limitations. V3 pool tokens considered acceptable loss (<1% of portfolio) for system simplification.
-- **UNISWAP POOLS REAPPEARED (July 30, 2025)**: After hours of invisibility, both WMATIC/WPT and USDT/WPT pools suddenly reappeared on Uniswap interface. This is typical DeFi behavior due to subgraph indexing delays, cache refresh cycles, or network congestion resolution. Blockchain data was always correct - only frontend visibility was temporarily affected. DEX token registration strategy remains valid for ensuring consistent visibility across all platforms.
-- **POOL VERIFICATION COMPLETED (July 29, 2025)**: All pools verified as authentic through comprehensive blockchain analysis. Previously flagged pool `0x823C0b22b2eaD1A3A857F2300C8259d1695C5AAB` confirmed as legitimate by founder verification. **SECURITY ALERTS CORRECTED**: Removed false positive blacklist entries and restored access to all authentic pools. System now properly validates all legitimate pool addresses without blocking founder's actual positions. **ALL POOLS OPERATIONAL** - complete transparency with authentic blockchain data from verified sources. **FOUNDER PHANTOM WALLET ANALYSIS**: Confirmed 4 distinct WPT positions in Phantom wallet represent legitimate LP tokens and rewards, not lost tokens. All 1M+ WPT positions accounted for and secure.
-- **PLATFORM HEADER UPDATED (July 29, 2025)**: Fixed platform header to display current WPT v2 contract address (0x9408...825) instead of deprecated v1 contract (0x9077...91e). Updated all 4 dashboard components (dashboard.tsx, dashboard-new.tsx, dashboard-working.tsx, dashboard-static.tsx) to show correct token contract ID. Header now accurately reflects live WPT v2 deployment on Polygon mainnet.
-- **MULTI-POOL STRATEGY CONFIRMED (July 29, 2025)**: Founder confirmed maintaining all three WMATIC/WPT pools as strategic diversification: V2 primary (0xe021...), V3 secondary (0x572a...), and V2 backup (0x823C...). Each serves different market conditions - "che il tempo sia giudice e sovrano". System optimized for maximum liquidity coverage across different trading scenarios.
-
-### WebPayback Economy Manifesto Implementation (July 28, 2025)
-- **SELF-SUSTAINING ECONOMY STRATEGY**: Created comprehensive manifesto document (WEBPAYBACK_ECONOMY_MANIFESTO.md) outlining revolutionary creator economy model
-- **SMART INVESTMENT FRAMEWORK**: Developed tiered system - Bronze (€50+), Silver (€200+), Gold (€500+) with 2x-5x reward multipliers for investor-creators
-- **MATHEMATICAL ADVANTAGE MODEL**: Documented price progression strategy from €0.0016 (today) to €0.016 (1,000 creators) to €1.6 (10,000 creators) 
-- **ACTIVATION THRESHOLD**: Strategy programmed to activate at 1,000 registered creators to ensure critical mass
-- **INTEGRATED UI DISPLAY**: Added manifesto preview to Getting Started page with visual design highlighting VIP benefits, ROI potential, and early investor advantages
-- **CREATOR EDUCATION**: Comprehensive explanation of difference between "investor-creators" (who buy WPT and strengthen ecosystem) vs "receiver-only creators" (who only drain value)
-- **SOCIAL MEDIA READY**: Manifesto formatted for sharing across platforms to attract intelligent creators who understand investment value
-- **FOUNDER INSIGHT**: User demonstrated excellent understanding of crypto economics - theoretical vs actual value, liquidity constraints, and profit realization mechanisms
-- **SUSTAINABLE APPROACH ADOPTED (July 28, 2025)**: Revised manifesto from speculative investment model to sustainable community-driven ecosystem. Focus shifted from "Ponzi-like" growth promises to transparent, fair creator economy powered by real usage and community strength. Premium Creator model starts from $10 minimum support, Basic Creator remains completely free.
-- **ENGLISH VERSION CREATED**: Complete English manifesto (WEBPAYBACK_ECONOMY_MANIFESTO_EN.md) following user requirement for all platform/git documentation in English
-- **UI UPDATED**: Getting Started page refreshed with sustainable messaging - green theme instead of orange, community focus instead of investment hype, realistic expectations instead of speculative promises
-
-### Getting Started Module Addition (July 28, 2025)
-- **NEW FEATURE**: Complete "Getting Started" module created in English language
-- **USER INTERFACE**: Added blue "Getting Started" button to Quick Actions Bar with consistent design
-- **COMPREHENSIVE CONTENT**: Full guide covering WPT token explanation, platform registration, meta tag implementation, and NFT certificates
-- **IMPROVED VISIBILITY**: Fixed text contrast issues in code examples - white backgrounds with dark text for optimal readability
-- **PRACTICAL EXAMPLES**: Added realistic examples for meta tags (creator-12345, sha256-a1b2c3d4e5f6...) with explanatory text
-- **PROFESSIONAL LAYOUT**: Step-by-step registration process with visual indicators and requirements checklist
-- **INTEGRATED NAVIGATION**: Direct links to main platform features (Creator Registration, Content Certificate, Auto Pool Manager)
-- **ROUTE**: Accessible at /getting-started with proper App.tsx routing integration
-
-### Platform-Wide Text Readability Enhancement (July 28, 2025)
-- **CONSISTENT STYLING**: Applied optimal text contrast styling across entire platform using Meta Tags section as reference standard
-- **IMPROVED LEGIBILITY**: Replaced all `text-muted-foreground` with `text-gray-700 dark:text-gray-300` for better readability on white/light backgrounds
-- **COMPONENTS UPDATED**: Enhanced readability in FraudDetectionRules, GettingStarted, AlchemyUsageMonitor, and all other white background components
-- **USER CONFIRMATION**: User confirmed excellent visibility and readability across all platform sections
-- **DESIGN CONSISTENCY**: All text on light backgrounds now follows same high-contrast standard for optimal user experience
-
-### Favicon and SEO Implementation (July 28, 2025)
-- **CUSTOM FAVICON**: Added personalized favicon.ico to enhance brand recognition and professional appearance
-- **BROWSER COMPATIBILITY**: Implemented complete favicon support with multiple link tags for cross-browser compatibility
-- **SEO OPTIMIZATION**: Added comprehensive meta tags including title, description, and structured data
-- **SOCIAL MEDIA INTEGRATION**: Implemented Open Graph and Twitter Cards for enhanced social sharing
-- **PROFESSIONAL BRANDING**: Favicon now visible in browser tabs, bookmarks, and search results
-- **USER CONFIRMATION**: User confirmed favicon displays perfectly with "straordinario!" feedback
-
-### Pool Data Authentication Fix (July 28, 2025)  
-- **CRITICAL TVL ACCURACY RESOLVED**: Fixed major TVL calculation error from $1 to authentic $539 TVL
-- **AUTHENTIC BLOCKCHAIN INTEGRATION**: Implemented direct Uniswap V2 contract queries using getReserves() method
-- **TOKEN ORDER CORRECTION**: Fixed token0=WPT, token1=USDT order in USDT/WPT pool with proper decimal handling
-- **DECIMAL PRECISION**: Corrected USDT (6 decimals) vs WPT (18 decimals) calculations for accurate balance reporting  
-- **VERIFIED AUTHENTIC DATA**: Pool reserves now show exact match with Uniswap interface: 538.02 USDT + 283,013 WPT
-- **ZERO SIMULATION**: Eliminated all cached/simulated data - system reads 100% authentic blockchain state
-- **USER CONFIRMED**: Direct verification against user's Uniswap interface screenshot showing identical 538,02 USDT value
-
-### Security Implementation Completed (July 29, 2025)
-- **SESSION THROTTLING SYSTEM**: Implemented comprehensive unauthenticated session throttling (50 requests/15min window, 30min block)
-- **API THROTTLING PROTECTION**: Dynamic API call throttling with daily limits (1000/day), hourly limits (150/hour), and burst protection (20/minute)
-- **DASHBOARD ERROR BOUNDARY**: Complete error boundary system with automatic retry, reload options, and detailed error reporting
-- **SECURITY MONITORING**: Added `/api/security/session-stats` and `/api/security/api-usage` endpoints for real-time monitoring
-- **README HACKATHON UPDATED**: Enhanced with comprehensive NFT Content Certificate section highlighting anti-AI scraping protection
-- **PRODUCTION TESTING**: All three security systems confirmed working with authentic blocking and throttling in live environment
-- **BURST PROTECTION ACTIVE**: System successfully blocking excessive requests (20+ calls/minute) with proper throttling messages
-
-### CRITICAL COST CRISIS RESOLVED (July 29, 2025)
-- **EMERGENCY**: User reported 60 euros in 3 days - unsustainable operational costs
-- **ROOT CAUSE IDENTIFIED**: NOT Alchemy/Chainlink APIs (both should be free tier)
-- **REAL CAUSE**: Database error loops causing 2,880 failed API calls/day + Replit compute overage
-- **IMMEDIATE FIXES APPLIED**:
-  * Database schema completed - eliminated error loops
-  * API frequency reduced 90%: 30 seconds → 5 minutes intervals  
-  * Anti-dump routes temporarily disabled to stop cost bleeding
-  * Rate limiting emergency mode: 1000 → 200 calls/hour
-- **COST REDUCTION**: From 2,880 daily calls → 288 daily calls (90% reduction)
-- **API PRICING RESEARCH**: 
-  * Alchemy Free Tier: 300M compute units/month (we use <0.1%)
-  * Chainlink: Free price feed reads from public contracts
-  * **VERDICT**: 60 euros likely from Replit compute time overage, not APIs
-- **COSTO REALE IDENTIFICATO**: $267.63 Agent Usage (AI sessioni intensive) + $25 Core Plan
-- **SOLUZIONE URGENTE**: Impostare Usage Budget $50-100/mese e Usage Alert 80%
-- **MONITORING**: User deve disabilitare Replit AI Agent se non necessario
-
-### Latest Security Fixes (July 26, 2025)
-- Fixed pool address to correct Uniswap V3 contract (0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3)
-- Enhanced CORS security with webpayback.com domain whitelisting
-- Implemented comprehensive Content Security Policy (CSP)
-- Upgraded authentication system with session-based security
-- Added rate limiting protection against DDoS attacks
-- Verified authentic blockchain integration with real liquidity data
-
-### Pool Monitoring System (July 27, 2025)
-- Fixed TVL synchronization with authentic blockchain data (€219 real vs €535 cached)
-- Implemented direct blockchain balance queries via Alchemy API
-- Real-time USD/EUR conversion for accurate TVL display
-- User identified "out of range" issues with WMATIC/WPT position
-- Analyzed USDT/WPT pool strategy as solution for range stability
-- Created comprehensive pool creation tools and documentation
-
-- **Uniswap V2 Alternative**: Configured optimal pool parameters for user's 10M WPT tokens using authentic market pricing (525,762 WPT = 1 USDT) for stable liquidity without range management
-- **Pool Creation Ready**: User prepared $1,000 investment (500 USDT + 262,881 WPT) for V2 pool that eliminates all "out of range" issues permanently
-- **USDT/WPT V2 Pool LIVE**: Successfully created at address 0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A on July 27, 2025 with authentic $539 TVL verified from blockchain - NO MORE "OUT OF RANGE" ISSUES!
-- **SYSTEM INTEGRATION COMPLETE**: Full multi-pool monitoring active for both WMATIC/WPT V3 and USDT/WPT V2 pools with authentic blockchain data refresh every 12 hours. Real-time TVL tracking shows €219 for V3 pool and authentic balance monitoring for V2 pool (263,033 WPT detected).
-- **USDT/WPT V2 NOW PRIMARY**: Made USDT/WPT V2 pool the default/primary pool in system due to zero "out of range" issues, USDT stability, and superior user experience. V3 WMATIC pool remains available as secondary option.
-- **UNIFIED POOL MONITORING**: Completed unification of pool monitoring components into single "Pool Data Monitoring" system with full pool addresses visible (break-all CSS), eliminated duplications, authentic TVL display ($1 USDT, €219 WMATIC), and unified refresh functionality.
-- **COMPONENT FIXES COMPLETED**: Fixed WMATIC/WPT Liquidity Pool component in TokenInfo.tsx to use correct API endpoint (?type=wmatic), now displays authentic WMATIC pool data (€219 TVL, correct pool address 0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3) instead of incorrect USDT data. All pool components now show accurate authentic blockchain data confirmed by user testing.
-- **NAVIGATION REORGANIZATION (July 27, 2025)**: Completely reorganized overcrowded navigation header for better mobile/desktop experience. Moved Auto Pool Manager, Content Certificate, and Citations Rewards buttons from main header to dedicated Quick Actions Bar below header. Reduced header text sizes and compacted status indicators. Now mobile-friendly with responsive flex-wrap layout and proper text sizing that doesn't overflow on smartphone screens.
-- **CRITICAL IDOR SECURITY FIX COMPLETED (July 27, 2025)**: Successfully resolved severe IDOR vulnerability in Content Certificate system. Implemented comprehensive device fingerprinting session system that distinguishes between founder's desktop (Windows Chrome = User ID 1 with full creator access) and external devices (smartphones = unique User IDs 2-1001 with zero creator access). System now properly blocks external devices from accessing founder's GitHub data, showing registration portal instead. User confirmed complete resolution and security protection working correctly.
-- **AUTOMATED POOL MANAGER LIVE**: Complete zero-touch pool management system deployed on July 27, 2025. Features: server-side automation using private key, intelligent range management, spending cap protection ($50/daily), real-time monitoring, emergency stop controls. System actively monitors pools every 2 minutes with automated rebalancing and MetaMask-free operation. Dashboard accessible at /automation with live status tracking and configuration controls.
-
-### Anti-AI Scraping Protection System (July 27, 2025)
-- **CONTENT CERTIFICATE NFT SYSTEM TESTED**: Successfully implemented and tested comprehensive anti-Google AI Overview protection system
-- **Complete Implementation**: SHA-256 fingerprinting, automatic detection of unauthorized AI usage, WPT rewards for content theft, legal framework via blockchain ownership certificates
-- **Test Results**: System successfully mints NFT certificates (WPT-CERT format), generates cryptographic fingerprints, detects content similarity in AI responses
-- **Production Ready**: Full dashboard at /content-certificate with minting, monitoring, and legal documentation features
-- **Database Schema**: Temporary tables created and tested, then cleaned up as requested by user
-- **Security**: All test data removed, no virtual users or test certificates remain in production database
-- **CREATOR PORTAL INTEGRATION COMPLETED**: Content Certificate system now requires Creator Portal registration before access. User automatically recognized as founder through existing GitHub creator profile (ID: 7, websiteUrl: https://github.com/cyper73/webpayback-protocol/tree/webpayback). System implements proper IDOR protection and logical flow: registration → content protection → WPT rewards.
-
-### Domain Integration Completed
-- **webpayback.com**: Successfully connected with SSL security
-- **DNS Configuration**: Ionos DNS properly configured to Replit app
-- **HTTPS Enforcement**: Strict Transport Security implemented
-- **Performance**: Optimized for international accessibility
-- **Security Headers**: Full CSP and security headers deployed
-
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: React 18 with TypeScript and Vite for fast development
-- **UI Components**: Radix UI primitives with shadcn/ui component library
-- **Styling**: Tailwind CSS with custom WebPayback dark theme and CSS variables
-- **State Management**: TanStack Query (React Query) for server state management
-- **Routing**: Wouter for lightweight client-side routing
-- **Form Management**: React Hook Form with Zod validation and Hookform resolvers
+- **Framework**: React 18 with TypeScript and Vite.
+- **UI Components**: Radix UI primitives with shadcn/ui.
+- **Styling**: Tailwind CSS with custom WebPayback dark theme.
+- **State Management**: TanStack Query (React Query).
+- **Routing**: Wouter.
+- **Form Management**: React Hook Form with Zod validation.
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js framework using ES modules
-- **Language**: Full TypeScript with shared schemas between client and server
-- **Database**: PostgreSQL with Drizzle ORM and Neon Database serverless driver
-- **Session Management**: PostgreSQL-based sessions using connect-pg-simple
-- **Security**: Comprehensive CSRF protection, rate limiting, IDOR protection, and input validation
+- **Runtime**: Node.js with Express.js (ES modules).
+- **Language**: Full TypeScript with shared schemas.
+- **Database**: PostgreSQL with Drizzle ORM and Neon Database serverless driver.
+- **Session Management**: PostgreSQL-based sessions using connect-pg-simple.
+- **Security**: Comprehensive CSRF protection, rate limiting, IDOR protection, and input validation.
 
 ### Development Environment
-- **Monorepo Structure**: Shared TypeScript schemas in `/shared` directory
-- **Path Aliases**: TypeScript path mapping for clean imports (@/, @shared/)
-- **Build System**: Vite for frontend, esbuild for backend bundling
-- **Database Migrations**: Drizzle Kit for schema management and PostgreSQL dialect
+- **Monorepo Structure**: Shared TypeScript schemas in `/shared`.
+- **Path Aliases**: TypeScript path mapping (`@/`, `@shared/`).
+- **Build System**: Vite for frontend, esbuild for backend.
+- **Database Migrations**: Drizzle Kit for schema management.
 
-## Key Components
-
-### AI Agent System
-- **Four Specialized Agents**: WebPayback (protocol orchestration), Autoregolator (AI tracking), PoolAgent (liquidity management), and TransparentAgent (transparency monitoring)
-- **Performance Tracking**: Real-time metrics including accuracy (98.9-99.8%), uptime (99.5-99.9%), and task completion counts
-- **Inter-Agent Communication**: Database-backed messaging system for agent coordination
-- **Level 280 Expertise**: High-level AI agents with specialized capabilities for each domain
-
-### Blockchain Infrastructure
-- **Multi-Chain Support**: Deployed across Ethereum, BSC, Polygon, and Arbitrum networks
-- **WPT Token Management**: ERC-20 token with configurable fee structures and creator rewards
-- **Smart Contract Deployment**: Automated deployment system with gas optimization and transaction monitoring
-- **Real-time Network Monitoring**: Live tracking of deployment status and blockchain interactions
-
-### Content Creator Economy
-- **Creator Registration**: Website verification, wallet integration, and content category classification
-- **Channel Monitoring**: Support for YouTube channels, Instagram profiles, TikTok accounts, and Twitter/X profiles
-- **Referral System**: Multi-level referral tracking with bonus calculations
-- **Reputation Scoring**: Dynamic creator reputation based on authenticity and engagement
-
-### Security & Fraud Detection
-- **Multi-Layer Protection**: CSRF tokens, rate limiting, input validation, and IDOR protection
-- **Fraud Detection Engine**: Real-time analysis of suspicious patterns, IP tracking, and reputation scoring
-- **Pool Drain Protection**: Advanced monitoring to prevent malicious liquidity withdrawals
-- **Reentrancy Protection**: Smart contract security measures against callback attacks
-
-## Data Flow
-
-### Content Monitoring Flow
-1. **AI Detection**: Monitor for AI agent access to creator content via user-agent analysis
-2. **Content Fingerprinting**: Generate unique hashes for content identification
-3. **Reward Calculation**: Determine WPT token rewards based on usage patterns and creator reputation
-4. **Distribution**: Automated token distribution through smart contracts
-5. **Tracking**: Comprehensive logging of all interactions for transparency
-
-### Verification Pipeline
-1. **Domain Verification**: Multiple methods including DNS TXT records, HTML meta tags, and file uploads
-2. **Social Proof**: Integration with major platforms for identity verification
-3. **Channel Mapping**: Automatic detection and mapping of content URLs to creator channels
-4. **Reputation Building**: Continuous scoring based on authentic content and community engagement
-
-### Security Event Processing
-1. **Real-time Monitoring**: Continuous analysis of access patterns and behavior
-2. **Risk Scoring**: Multi-factor risk assessment using machine learning patterns
-3. **Alert Generation**: Automated alerts for suspicious activities with severity levels
-4. **Response Actions**: Automated blocking, flagging, or manual review triggers
+### Core Features
+- **AI Agent System**: Four specialized agents (WebPayback, Autoregolator, PoolAgent, TransparentAgent) with database-backed communication and real-time performance tracking.
+- **Blockchain Infrastructure**: Multi-chain support (Ethereum, BSC, Polygon, Arbitrum) for WPT token management (ERC-20), automated smart contract deployment, and real-time network monitoring.
+- **Content Creator Economy**: Features creator registration, website verification, wallet integration, channel monitoring (YouTube, Instagram, TikTok, Twitter/X), a multi-level referral system, and dynamic reputation scoring.
+- **Security & Fraud Detection**: Multi-layer protection including CSRF tokens, rate limiting, input validation, IDOR protection, a real-time fraud detection engine, pool drain protection, and reentrancy protection. This includes advanced allowance management with multi-layer founder authentication.
+- **Content Certificate System**: NFT-based system for anti-AI scraping, SHA-256 fingerprinting, unauthorized AI usage detection, and WPT rewards for content theft, integrated with the Creator Portal.
+- **Automated Pool Management**: Zero-touch system with server-side automation, intelligent range management, spending caps, real-time monitoring, and emergency stop controls.
+- **Data Flow**: Includes AI detection for content access, content fingerprinting, reward calculation and distribution, and comprehensive logging. Verification pipeline covers domain verification, social proof, channel mapping, and reputation building. Security event processing involves real-time monitoring, risk scoring, alert generation, and automated response actions.
+- **UI/UX Decisions**: Consistent styling with improved text contrast (e.g., `text-gray-700 dark:text-gray-300`), personalized favicon, comprehensive SEO meta tags (Open Graph, Twitter Cards), and reorganized navigation for mobile-friendliness.
 
 ## External Dependencies
 
 ### Blockchain Services
-- **Neon Database**: Serverless PostgreSQL hosting with WebSocket support
-- **Alchemy SDK**: Ethereum and Polygon blockchain data and real-time monitoring
-- **Chainlink Integration**: Price feeds, VRF randomness, and external data oracles
-- **Web3 Providers**: Multiple RPC endpoints for blockchain network connectivity
+- **Neon Database**: Serverless PostgreSQL hosting.
+- **Alchemy SDK**: Ethereum and Polygon blockchain data and real-time monitoring.
+- **Chainlink**: Price feeds, VRF randomness, and external data oracles.
+- **Web3 Providers**: Multiple RPC endpoints for blockchain network connectivity.
 
 ### AI & Content Analysis
-- **Multiple AI Model Detection**: Support for Claude, GPT, Gemini, DeepSeek, Grok, and 25+ other AI models
-- **Content Fingerprinting**: Advanced hashing algorithms for content uniqueness
-- **Natural Language Processing**: Text analysis for content categorization and quality assessment
+- **Multiple AI Model Detection**: Supports Claude, GPT, Gemini, DeepSeek, Grok, and 25+ other AI models.
+- **Content Fingerprinting**: Utilizes advanced hashing algorithms.
+- **Natural Language Processing**: For content categorization and quality assessment.
 
 ### External APIs
-- **Domain Verification**: DNS lookup services and domain reputation checking
-- **IP Geolocation**: VPN detection and geographic analysis
-- **Social Media APIs**: Integration with YouTube, Instagram, Twitter for verification
-- **Price Data**: Real-time cryptocurrency price feeds for WPT valuation
-
-## Deployment Strategy
-
-### Production Architecture
-- **Frontend**: Static assets served via Vite build with optimized bundles
-- **Backend**: Node.js server with Express middleware and TypeScript compilation
-- **Database**: PostgreSQL with Drizzle schema migrations and connection pooling
-- **Environment**: Replit hosting with custom domain support and SSL certificates
-
-### Scalability Considerations
-- **Database**: Connection pooling with Neon serverless for automatic scaling
-- **Caching**: Intelligent caching for blockchain data and expensive API calls
-- **Rate Limiting**: Tiered rate limiting to handle traffic spikes
-- **Load Balancing**: Ready for horizontal scaling with stateless backend design
-
-### Monitoring & Analytics
-- **Real-time Dashboards**: Live monitoring of all system components
-- **Performance Metrics**: Agent performance, API response times, and error rates
-- **Security Monitoring**: Continuous fraud detection and security event tracking
-- **Business Intelligence**: Creator analytics, reward distribution, and platform growth metrics
+- **Domain Verification**: DNS lookup services.
+- **IP Geolocation**: For VPN detection and geographic analysis.
+- **Social Media APIs**: Integrations with YouTube, Instagram, and Twitter for verification.
+- **Price Data**: Real-time cryptocurrency price feeds for WPT valuation.

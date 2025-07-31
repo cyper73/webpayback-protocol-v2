@@ -80,6 +80,8 @@ const isFounderDevice = () => {
 export default function AllowanceManagementPage() {
   const [walletAddress, setWalletAddress] = useState(DEFAULT_WALLET);
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [newConfig, setNewConfig] = useState({
     maxAllowance: "2000000", // 2M WPT - Configurazione suggerita
     refillThreshold: "50000", // 50k WPT - Soglia ricarica automatica
@@ -94,10 +96,16 @@ export default function AllowanceManagementPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch dashboard data
+  // First check authorization via server API
+  const { data: authData, isLoading: authLoading } = useQuery({
+    queryKey: ["/api/allowance/auth-check"],
+    retry: false,
+  });
+
+  // Only fetch dashboard data if authorized
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ["/api/allowance/dashboard", walletAddress],
-    enabled: !!walletAddress,
+    enabled: !!walletAddress && (authData as any)?.authorized === true,
   });
 
   // Setup allowance mutation
@@ -157,8 +165,20 @@ export default function AllowanceManagementPage() {
     }
   };
 
-  // Check founder access authorization
-  if (!isFounderDevice()) {
+  // Show loading during auth check
+  if (authLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <RefreshCw className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Verifying authorization...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Check server-side authorization
+  if (!(authData as any)?.authorized) {
     return (
       <div className="container mx-auto p-6">
         <div className="max-w-md mx-auto">
@@ -175,13 +195,13 @@ export default function AllowanceManagementPage() {
                 <AlertDescription>
                   <strong>Allowance Management Access Denied</strong>
                   <br />
-                  This functionality is restricted to the WebPayback Protocol founder only. 
-                  Automated token reserve management requires highest security clearance.
+                  {(authData as any)?.error || "This functionality is restricted to the WebPayback Protocol founder only. Automated token reserve management requires highest security clearance."}
                 </AlertDescription>
               </Alert>
               <div className="mt-4 text-sm text-gray-600">
                 <h4 className="font-semibold mb-2">Security Features:</h4>
                 <ul className="list-disc list-inside space-y-1">
+                  <li>Server-side authentication validation</li>
                   <li>Device fingerprint authentication</li>
                   <li>Wallet address validation</li>
                   <li>Session-based access control</li>
