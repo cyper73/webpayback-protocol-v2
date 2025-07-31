@@ -80,9 +80,15 @@ const isFounderDevice = (): boolean => {
   const isChrome = ua.includes('Chrome') && !ua.includes('Edg'); // Exclude Edge
   const isFirefox = ua.includes('Firefox');
   const isReplit = ua.includes('replit') || ua.includes('Replit');
-  const isFounderDevice = (isWindows && (isChrome || isFirefox)) || isReplit;
+  const isDev = window.location.hostname.includes('replit') || window.location.hostname === 'localhost';
   
-  console.log('🔍 CLIENT-SIDE AUTH CHECK - Device Check:', { isWindows, isChrome, isFirefox, isFounderDevice });
+  // More permissive for development environment
+  const isFounderDevice = (isWindows && (isChrome || isFirefox)) || isReplit || isDev;
+  
+  console.log('🔍 CLIENT-SIDE AUTH CHECK - Device Check:', { 
+    isWindows, isChrome, isFirefox, isReplit, isDev, isFounderDevice,
+    hostname: window.location.hostname 
+  });
   
   return isFounderDevice;
 };
