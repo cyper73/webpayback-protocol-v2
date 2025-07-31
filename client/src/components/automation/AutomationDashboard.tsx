@@ -66,12 +66,19 @@ export default function AutomationDashboard() {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  // Fetch automation status
+  // Check authorization first
+  const { data: authData, isLoading: authLoading } = useQuery({
+    queryKey: ["/api/automation/auth-check"],
+    retry: false,
+  });
+
+  // Only fetch status if authorized
   const { data: statusData, isLoading: statusLoading } = useQuery<{
     success: boolean;
     status: AutomationStatus;
   }>({
     queryKey: ['/api/automation/status'],
+    enabled: !!(authData as any)?.authorized, // Only run if authorized
     refetchInterval: 10000 // Refresh every 10 seconds
   });
 
@@ -81,7 +88,7 @@ export default function AutomationDashboard() {
     config: AutomationConfig;
   }>({
     queryKey: ['/api/automation/config'],
-    enabled: isConfigOpen
+    enabled: isConfigOpen && !!(authData as any)?.authorized // Only if authorized and config open
   });
 
   // Fetch action history
@@ -90,6 +97,7 @@ export default function AutomationDashboard() {
     history: AutomationAction[];
   }>({
     queryKey: ['/api/automation/history'],
+    enabled: !!(authData as any)?.authorized, // Only if authorized
     refetchInterval: 15000
   });
 
@@ -137,6 +145,55 @@ export default function AutomationDashboard() {
   const formatTimestamp = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
   };
+
+  // Show loading during auth check
+  if (authLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            <span>Verifying authorization...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Check server-side authorization
+  if (!(authData as any)?.authorized) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center text-red-600">
+            <Shield className="h-5 w-5 mr-2" />
+            Access Restricted
+          </CardTitle>
+          <CardDescription>
+            Automated Pool Manager Access Denied
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="text-sm text-red-600 bg-red-50 p-4 rounded-lg">
+              <div className="font-semibold mb-2">⚠️ Authorization Required</div>
+              <div>{(authData as any)?.error || "This functionality requires founder-level access with authorized device authentication."}</div>
+            </div>
+            <div className="text-sm text-gray-600">
+              <h4 className="font-semibold mb-2">Protected Features:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Emergency stop/resume controls</li>
+                <li>Pool automation configuration</li>
+                <li>Daily spending limits management</li>
+                <li>Transaction history access</li>
+                <li>Automation status monitoring</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (statusLoading) {
     return (
