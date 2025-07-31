@@ -48,16 +48,28 @@ export function registerAllowanceRoutes(app: Express) {
     const userAgent = req.headers['user-agent'] || '';
     const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
     
-    // Check device fingerprint
-    const isFounderDevice = userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
+    // LOG FOR DEBUGGING
+    console.log('🔍 ALLOWANCE AUTH CHECK - User Agent:', userAgent);
+    
+    // Check device fingerprint - More flexible for founder access
+    const isWindows = userAgent.includes('Windows');
+    const isChrome = userAgent.includes('Chrome') && !userAgent.includes('Edg');
+    const isFirefox = userAgent.includes('Firefox');
+    const isReplit = userAgent.includes('replit') || userAgent.includes('Replit');
+    const isFounderDevice = isWindows && (isChrome || isFirefox) || isReplit;
+    
+    console.log('🔍 ALLOWANCE AUTH CHECK - Device Check:', { isWindows, isChrome, isFirefox, isFounderDevice });
     
     if (!isFounderDevice) {
+      console.log('🚫 ALLOWANCE ACCESS DENIED:', { userAgent, isWindows, isChrome, isFirefox });
       return res.json({ 
         authorized: false, 
-        error: "Access denied. Please access from authorized device (Windows + Chrome/Firefox)." 
+        error: "Access denied. Please access from authorized device (Windows + Chrome/Firefox).",
+        userAgent: userAgent  // Include for debugging
       });
     }
     
+    console.log('✅ ALLOWANCE ACCESS GRANTED:', { userAgent, isWindows, isChrome, isFirefox });
     // Additional IP/session checks could be added here
     
     res.json({ 

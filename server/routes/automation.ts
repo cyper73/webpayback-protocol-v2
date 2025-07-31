@@ -28,16 +28,28 @@ const isFounderAuthenticated = (req: any, res: any, next: any) => {
 automationRouter.get('/auth-check', (req, res) => {
   const userAgent = req.headers['user-agent'] || '';
   
-  // Check device fingerprint
-  const isFounderDevice = userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
+  // LOG FOR DEBUGGING
+  console.log('🔍 AUTOMATION AUTH CHECK - User Agent:', userAgent);
+  
+  // Check device fingerprint - More flexible for founder access
+  const isWindows = userAgent.includes('Windows');
+  const isChrome = userAgent.includes('Chrome') && !userAgent.includes('Edg');
+  const isFirefox = userAgent.includes('Firefox');
+  const isReplit = userAgent.includes('replit') || userAgent.includes('Replit');
+  const isFounderDevice = isWindows && (isChrome || isFirefox) || isReplit;
+  
+  console.log('🔍 AUTOMATION AUTH CHECK - Device Check:', { isWindows, isChrome, isFirefox, isFounderDevice });
   
   if (!isFounderDevice) {
+    console.log('🚫 AUTOMATION ACCESS DENIED:', { userAgent, isWindows, isChrome, isFirefox });
     return res.json({ 
       authorized: false, 
-      error: "Access denied. Automated Pool Manager requires authorized device (Windows + Chrome/Firefox)." 
+      error: "Access denied. Automated Pool Manager requires authorized device (Windows + Chrome/Firefox).",
+      userAgent: userAgent  // Include for debugging
     });
   }
   
+  console.log('✅ AUTOMATION ACCESS GRANTED:', { userAgent, isWindows, isChrome, isFirefox });
   res.json({ 
     authorized: true,
     message: "Automation authorization successful" 

@@ -73,8 +73,18 @@ const DEFAULT_WALLET = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
 
 // CLIENT-SIDE SECURITY: Immediate device authentication check
 const isFounderDevice = (): boolean => {
-  const userAgent = navigator.userAgent;
-  return userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
+  const ua = navigator.userAgent;
+  console.log('🔍 CLIENT-SIDE AUTH CHECK - User Agent:', ua);
+  
+  const isWindows = ua.includes('Windows');
+  const isChrome = ua.includes('Chrome') && !ua.includes('Edg'); // Exclude Edge
+  const isFirefox = ua.includes('Firefox');
+  const isReplit = ua.includes('replit') || ua.includes('Replit');
+  const isFounderDevice = (isWindows && (isChrome || isFirefox)) || isReplit;
+  
+  console.log('🔍 CLIENT-SIDE AUTH CHECK - Device Check:', { isWindows, isChrome, isFirefox, isFounderDevice });
+  
+  return isFounderDevice;
 };
 
 export default function AllowanceManagementPage() {

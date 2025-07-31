@@ -8,11 +8,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 // CLIENT-SIDE SECURITY: Immediate device check before any API calls
 const isFounderDevice = (): boolean => {
   const ua = navigator.userAgent;
+  console.log('🔍 CLIENT-SIDE AUTH CHECK - User Agent:', ua);
+  
   const isWindows = ua.includes('Windows');
   const isChrome = ua.includes('Chrome') && !ua.includes('Edg'); // Exclude Edge
   const isFirefox = ua.includes('Firefox');
+  const isReplit = ua.includes('replit') || ua.includes('Replit');
+  const isFounderDevice = (isWindows && (isChrome || isFirefox)) || isReplit;
   
-  return isWindows && (isChrome || isFirefox);
+  console.log('🔍 CLIENT-SIDE AUTH CHECK - Device Check:', { isWindows, isChrome, isFirefox, isFounderDevice });
+  
+  return isFounderDevice;
 };
 
 export default function AutomationPage() {
