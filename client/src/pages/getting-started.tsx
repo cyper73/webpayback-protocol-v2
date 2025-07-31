@@ -282,12 +282,7 @@ export default function GettingStarted() {
               </Button>
             </Link>
             
-            <Link href="/automation">
-              <Button className="w-full h-12 flex items-center gap-2" variant="outline">
-                <Shield className="h-4 w-4" />
-                Auto Pool Manager
-              </Button>
-            </Link>
+
           </div>
           
           <div className="mt-6 flex flex-col sm:flex-row gap-4 items-center justify-center">

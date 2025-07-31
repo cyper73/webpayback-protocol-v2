@@ -15,7 +15,7 @@ import CitationsByWallet from "@/pages/CitationsByWallet";
 import PoolDebugger from "@/pages/PoolDebugger";
 import AutomationPage from "@/pages/AutomationPage";
 import { ContentCertificatePage } from "@/pages/ContentCertificatePage";
-import AllowanceManagement from "@/pages/allowance-management";
+
 import PoolHealthDashboard from "@/pages/PoolHealthDashboard";
 import AntiDumpSlippageDashboard from "@/pages/AntiDumpSlippageDashboard";
 import ContractReserves from "@/pages/ContractReserves";
