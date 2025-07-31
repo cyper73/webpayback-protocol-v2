@@ -188,11 +188,10 @@ export default function AdminLogin() {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button
-                onClick={() => testModule("/api/allowance/config/0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8")}
+                onClick={() => window.location.href = "/admin/allowance"}
                 className="w-full bg-green-600 hover:bg-green-700"
-                disabled={testModuleMutation.isPending}
               >
-                Test Allowance Config Access
+                Access Allowance Management
               </Button>
               <div className="text-sm text-gray-400">
                 Test access to founder wallet allowance configuration
@@ -217,11 +216,10 @@ export default function AdminLogin() {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button
-                onClick={() => testModule("/api/auto-pool-manager/status")}
+                onClick={() => window.location.href = "/admin/auto-pool"}
                 className="w-full bg-blue-600 hover:bg-blue-700"
-                disabled={testModuleMutation.isPending}
               >
-                Test Pool Manager Status
+                Access Auto Pool Manager
               </Button>
               <div className="text-sm text-gray-400">
                 Check auto pool manager system status

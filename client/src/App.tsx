@@ -20,6 +20,8 @@ import PoolHealthDashboard from "@/pages/PoolHealthDashboard";
 import AntiDumpSlippageDashboard from "@/pages/AntiDumpSlippageDashboard";
 import ContractReserves from "@/pages/ContractReserves";
 import AdminLogin from "@/pages/AdminLogin";
+import AllowanceAdmin from "@/pages/admin/AllowanceAdmin";
+import AutoPoolAdmin from "@/pages/admin/AutoPoolAdmin";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
@@ -29,11 +31,13 @@ function Router() {
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />
       <Route path="/content-certificate" component={ContentCertificatePage} />
-      <Route path="/allowance-management" component={AllowanceManagement} />
+
       <Route path="/pool-health" component={PoolHealthDashboard} />
       <Route path="/anti-dump" component={AntiDumpSlippageDashboard} />
       <Route path="/contract-reserves" component={ContractReserves} />
       <Route path="/admin" component={AdminLogin} />
+      <Route path="/admin/allowance" component={AllowanceAdmin} />
+      <Route path="/admin/auto-pool" component={AutoPoolAdmin} />
       <Route path="/pool-debug" component={PoolDebugger} />
       <Route path="/citations" component={Citations} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />
