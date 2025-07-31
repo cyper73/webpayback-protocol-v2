@@ -504,28 +504,6 @@ Steps:
       return false;
     }
   }
-      
-      // Safe verification without dynamic RegExp construction
-      for (const format of verificationFormats) {
-        if (pageContent.toLowerCase().includes(format.toLowerCase())) {
-          isVerified = true;
-          matchedPattern = format;
-          break;
-        }
-      }
-      
-      console.log('🔗 SECURE verification result:', isVerified);
-      console.log('🔗 Matched pattern:', matchedPattern || 'NONE');
-      console.log('🔗 All patterns tested:', verificationFormats.length);
-      console.log('🔗 Page content snippet (sanitized):', pageContent.substring(0, 200) + '...');
-      console.log('🔗 Looking for token in content:', sanitizedToken);
-      
-      return isVerified;
-    } catch (error) {
-      console.error('❌ Meta tag verification failed:', error);
-      return false;
-    }
-  }
 
   private async simulatePageContentFetch(url: string, domain: string, verificationToken?: string): Promise<string> {
     // REAL HTTP FETCH IMPLEMENTATION

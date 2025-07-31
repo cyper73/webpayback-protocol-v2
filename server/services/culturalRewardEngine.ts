@@ -77,7 +77,7 @@ export class CulturalRewardEngine {
         ...culturalReward,
         original_cultural_reward: culturalReward.final_reward,
         pool_health_scale_factor: scaledRewardData.scaleFactor,
-        final_reward_amount: scaledRewardData.scaled_reward,
+        final_reward_amount: scaledRewardData.scaledReward,
         pool_health_status: scaledRewardData.healthStatus
       };
 
@@ -115,33 +115,7 @@ export class CulturalRewardEngine {
       .map(result => result.value);
   }
 
-  /**
-   * Get trending cultural categories for creator recommendations
-   */
-  async getTrendingCulturalOpportunities(): Promise<{
-    trending_categories: string[];
-    high_reward_potential: string[];
-    underrepresented_cultures: string[];
-    cross_cultural_opportunities: string[];
-  }> {
-    const trendingCategories = await qlooService.getTrendingCulturalCategories();
-    
-    return {
-      trending_categories: trendingCategories.slice(0, 8),
-      high_reward_potential: [
-        'vegan_cuisine', 'sustainable_fashion', 'indigenous_art',
-        'urban_gardening', 'cultural_fusion', 'social_activism'
-      ],
-      underrepresented_cultures: [
-        'indigenous_american', 'african_diaspora', 'pacific_islander',
-        'middle_eastern', 'eastern_european', 'central_asian'
-      ],
-      cross_cultural_opportunities: [
-        'fusion_cooking', 'multicultural_music', 'diaspora_stories',
-        'cross_cultural_collaboration', 'global_sustainability'
-      ]
-    };
-  }
+
 
   /**
    * Calculate base WPT reward (SUSTAINABLE EDITION - aligned with Citation Engine)
@@ -385,7 +359,7 @@ export class CulturalRewardEngine {
   }
 
   /**
-   * Get trending cultural opportunities with dynamic data
+   * Get trending cultural opportunities with enhanced dynamic data
    */
   async getTrendingCulturalOpportunities(): Promise<{
     trending_categories: Array<{ name: string; growth_rate: number; potential_reward: number }>;
