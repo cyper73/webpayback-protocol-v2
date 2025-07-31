@@ -20,8 +20,6 @@ import ReentrancyProtection from "@/components/security/ReentrancyProtection";
 import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
 import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
 import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtectionDashboard";
-import AutomationDashboard from "@/components/automation/AutomationDashboard";
-import AllowanceManagementDashboard from "@/components/allowance/AllowanceManagementDashboard";
 
 import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen, Activity } from "lucide-react";
 import { Link as RouterLink } from "wouter";
@@ -29,26 +27,10 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
 import { useState, useEffect } from "react";
 
-// Founder device detection (Enhanced security check)
-const isFounderDevice = (): boolean => {
-  const ua = navigator.userAgent;
-  console.log('🔍 DASHBOARD FOUNDER CHECK - User Agent:', ua);
-  
-  const isWindows = ua.includes('Windows');
-  const isChrome = ua.includes('Chrome') && !ua.includes('Edg'); // Exclude Edge
-  const isFirefox = ua.includes('Firefox');
-  const isReplit = ua.includes('replit') || ua.includes('Replit');
-  const isDev = window.location.hostname.includes('replit') || window.location.hostname === 'localhost';
-  
-  // Enhanced security check - requires Windows + Chrome/Firefox OR development environment
-  const isFounderDevice = (isWindows && (isChrome || isFirefox)) || isReplit || isDev;
-  
-  console.log('🔍 DASHBOARD FOUNDER CHECK - Device Check:', { 
-    isWindows, isChrome, isFirefox, isReplit, isDev, isFounderDevice,
-    hostname: window.location.hostname 
-  });
-  
-  return isFounderDevice;
+// Founder device detection (Firefox + Windows OK)
+const isFounderDevice = () => {
+  const userAgent = navigator.userAgent;
+  return userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
 };
 
 export default function Dashboard() {
@@ -328,56 +310,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </section>
-
-        {/* 🤖 AUTOMATED POOL MANAGER - FOUNDER ACCESS */}
-        {isFounderDevice() && (
-          <section className="dashboard-section">
-            <Card className="glass-card rounded-2xl shadow-neon-green border-emerald-500/30">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl font-bold gradient-text text-emerald-400">
-                    🤖 Automated Pool Manager
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-emerald-400 rounded-full pulse-animation"></div>
-                    <span className="text-sm text-gray-300">Founder Access Granted</span>
-                  </div>
-                </div>
-                <p className="text-gray-400">Advanced Pool Management & Automation Controls</p>
-              </CardHeader>
-              <CardContent>
-                <ErrorBoundary>
-                  <AutomationDashboard />
-                </ErrorBoundary>
-              </CardContent>
-            </Card>
-          </section>
-        )}
-
-        {/* 💰 ALLOWANCE MANAGEMENT - FOUNDER ACCESS */}
-        {isFounderDevice() && (
-          <section className="dashboard-section">
-            <Card className="glass-card rounded-2xl shadow-neon-purple border-purple-500/30">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl font-bold gradient-text text-purple-400">
-                    💰 Token Allowance Management
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-purple-400 rounded-full pulse-animation"></div>
-                    <span className="text-sm text-gray-300">Founder Access Granted</span>
-                  </div>
-                </div>
-                <p className="text-gray-400">WPT Allowance Monitoring & Security Controls</p>
-              </CardHeader>
-              <CardContent>
-                <ErrorBoundary>
-                  <AllowanceManagementDashboard />
-                </ErrorBoundary>
-              </CardContent>
-            </Card>
-          </section>
-        )}
 
         {/* Creator Registration Portal - Priority Section */}
         <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">

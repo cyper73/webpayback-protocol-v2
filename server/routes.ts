@@ -85,16 +85,6 @@ import contractReservesRouter from "./routes/contractReserves";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  console.log('🚀 REGISTERROUTES: Starting route registration...');
-  console.log('🔓 TEMPORARY: Server-side route protection DISABLED for debugging');
-  
-  // FORCE REACT SPA TO HANDLE /automation AND /allowance-management
-  app.get(['/automation', '/allowance-management'], (req, res, next) => {
-    console.log('🔧 FORCING REACT SPA for', req.path);
-    // Don't send any response here, let Vite handle it
-    next();
-  });
-  
   // Apply NEW security middlewares globally - TEMPORARILY DISABLED FOR DASHBOARD LOADING
   // app.use(sessionThrottling);    // Throttle unauthenticated sessions
   // app.use(apiThrottling);        // Protect API call limits

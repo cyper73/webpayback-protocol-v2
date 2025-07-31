@@ -71,34 +71,15 @@ interface DashboardData {
 // Default wallet address for WebPayback Protocol founder
 const DEFAULT_WALLET = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
 
-// CLIENT-SIDE SECURITY: Immediate device authentication check
-const isFounderDevice = (): boolean => {
-  const ua = navigator.userAgent;
-  console.log('🔍 CLIENT-SIDE AUTH CHECK - User Agent:', ua);
-  
-  const isWindows = ua.includes('Windows');
-  const isChrome = ua.includes('Chrome') && !ua.includes('Edg'); // Exclude Edge
-  const isFirefox = ua.includes('Firefox');
-  const isReplit = ua.includes('replit') || ua.includes('Replit');
-  const isDev = window.location.hostname.includes('replit') || window.location.hostname === 'localhost';
-  
-  // More permissive for development environment
-  const isFounderDevice = (isWindows && (isChrome || isFirefox)) || isReplit || isDev;
-  
-  console.log('🔍 CLIENT-SIDE AUTH CHECK - Device Check:', { 
-    isWindows, isChrome, isFirefox, isReplit, isDev, isFounderDevice,
-    hostname: window.location.hostname 
-  });
-  
-  return isFounderDevice;
+// Founder device detection (Firefox + Windows OK)
+const isFounderDevice = () => {
+  const userAgent = navigator.userAgent;
+  return userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
 };
 
 export default function AllowanceManagementPage() {
-  const [clientSideAccess, setClientSideAccess] = useState<boolean | null>(null);
   const [walletAddress, setWalletAddress] = useState(DEFAULT_WALLET);
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [newConfig, setNewConfig] = useState({
     maxAllowance: "2000000", // 2M WPT - Configurazione suggerita
     refillThreshold: "50000", // 50k WPT - Soglia ricarica automatica
@@ -113,75 +94,10 @@ export default function AllowanceManagementPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // IMMEDIATE CLIENT-SIDE SECURITY CHECK
-  useEffect(() => {
-    const hasAccess = isFounderDevice();
-    setClientSideAccess(hasAccess);
-    
-    if (!hasAccess) {
-      console.log('🔒 SECURITY: Unauthorized device blocked from accessing Allowance Management');
-    }
-  }, []);
-
-  // Block immediately if client-side check fails
-  if (clientSideAccess === false) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-red-900 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle className="flex items-center text-red-600">
-              <Shield className="h-6 w-6 mr-2" />
-              Access Denied - Security Block
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Allowance Management - Unauthorized Access Blocked</strong>
-                <br />
-                This module is restricted to the WebPayback Protocol founder only. 
-                Token allowance management requires highest security clearance.
-              </AlertDescription>
-            </Alert>
-            <div className="mt-4 text-sm text-gray-700 bg-gray-50 p-3 rounded">
-              <h4 className="font-semibold mb-2 text-red-800">🛡️ Security Requirements:</h4>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Authorized device (Windows + Chrome/Firefox)</li>
-                <li>Founder-level authentication required</li>
-                <li>Device fingerprint validation</li>
-                <li>Multi-layer security verification</li>
-                <li>Founder wallet: {DEFAULT_WALLET}</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show loading while performing client-side checks
-  if (clientSideAccess === null) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Verifying device authorization...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // First check authorization via server API
-  const { data: authData, isLoading: authLoading } = useQuery({
-    queryKey: ["/api/allowance/auth-check"],
-    retry: false,
-  });
-
-  // Only fetch dashboard data if authorized
+  // Fetch dashboard data
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ["/api/allowance/dashboard", walletAddress],
-    enabled: !!walletAddress && (authData as any)?.authorized === true,
+    enabled: !!walletAddress,
   });
 
   // Setup allowance mutation
@@ -241,20 +157,8 @@ export default function AllowanceManagementPage() {
     }
   };
 
-  // Show loading during auth check
-  if (authLoading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin" />
-          <span className="ml-2">Verifying authorization...</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Check server-side authorization
-  if (!(authData as any)?.authorized) {
+  // Check founder access authorization
+  if (!isFounderDevice()) {
     return (
       <div className="container mx-auto p-6">
         <div className="max-w-md mx-auto">
@@ -271,13 +175,13 @@ export default function AllowanceManagementPage() {
                 <AlertDescription>
                   <strong>Allowance Management Access Denied</strong>
                   <br />
-                  {(authData as any)?.error || "This functionality is restricted to the WebPayback Protocol founder only. Automated token reserve management requires highest security clearance."}
+                  This functionality is restricted to the WebPayback Protocol founder only. 
+                  Automated token reserve management requires highest security clearance.
                 </AlertDescription>
               </Alert>
               <div className="mt-4 text-sm text-gray-600">
                 <h4 className="font-semibold mb-2">Security Features:</h4>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Server-side authentication validation</li>
                   <li>Device fingerprint authentication</li>
                   <li>Wallet address validation</li>
                   <li>Session-based access control</li>

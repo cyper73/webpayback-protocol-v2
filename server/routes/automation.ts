@@ -3,61 +3,8 @@ import automatedPoolManager from "../services/automatedPoolManager";
 
 export const automationRouter = Router();
 
-// Founder-only access control for Automation Management
-const isFounderAuthenticated = (req: any, res: any, next: any) => {
-  const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
-  
-  // Check device fingerprint for founder device
-  const userAgent = req.headers['user-agent'] || '';
-  const isFounderDevice = userAgent.includes('Windows') && (userAgent.includes('Chrome') || userAgent.includes('Firefox'));
-  
-  if (!isFounderDevice) {
-    return res.status(403).json({ 
-      success: false, 
-      error: "Access denied. Automated Pool Manager requires authorized device access." 
-    });
-  }
-  
-  // Additional security: Check for specific sessions or IP patterns
-  // This can be enhanced with more sophisticated auth
-  
-  next();
-};
-
-// Add auth check endpoint for frontend authorization
-automationRouter.get('/auth-check', (req, res) => {
-  const userAgent = req.headers['user-agent'] || '';
-  
-  // LOG FOR DEBUGGING
-  console.log('🔍 AUTOMATION AUTH CHECK - User Agent:', userAgent);
-  
-  // Check device fingerprint - More flexible for founder access
-  const isWindows = userAgent.includes('Windows');
-  const isChrome = userAgent.includes('Chrome') && !userAgent.includes('Edg');
-  const isFirefox = userAgent.includes('Firefox');
-  const isReplit = userAgent.includes('replit') || userAgent.includes('Replit');
-  const isFounderDevice = isWindows && (isChrome || isFirefox) || isReplit;
-  
-  console.log('🔍 AUTOMATION AUTH CHECK - Device Check:', { isWindows, isChrome, isFirefox, isFounderDevice });
-  
-  if (!isFounderDevice) {
-    console.log('🚫 AUTOMATION ACCESS DENIED:', { userAgent, isWindows, isChrome, isFirefox });
-    return res.json({ 
-      authorized: false, 
-      error: "Access denied. Automated Pool Manager requires authorized device (Windows + Chrome/Firefox).",
-      userAgent: userAgent  // Include for debugging
-    });
-  }
-  
-  console.log('✅ AUTOMATION ACCESS GRANTED:', { userAgent, isWindows, isChrome, isFirefox });
-  res.json({ 
-    authorized: true,
-    message: "Automation authorization successful" 
-  });
-});
-
 // Get automation status
-automationRouter.get('/status', isFounderAuthenticated, (req, res) => {
+automationRouter.get('/status', (req, res) => {
   try {
     const status = automatedPoolManager.getStatus();
     res.json({
@@ -73,7 +20,7 @@ automationRouter.get('/status', isFounderAuthenticated, (req, res) => {
 });
 
 // Get automation configuration
-automationRouter.get('/config', isFounderAuthenticated, (req, res) => {
+automationRouter.get('/config', (req, res) => {
   try {
     const config = automatedPoolManager.getConfig();
     res.json({
@@ -89,7 +36,7 @@ automationRouter.get('/config', isFounderAuthenticated, (req, res) => {
 });
 
 // Update automation configuration
-automationRouter.post('/config', isFounderAuthenticated, (req, res) => {
+automationRouter.post('/config', (req, res) => {
   try {
     const updates = req.body;
     automatedPoolManager.updateConfig(updates);
@@ -108,7 +55,7 @@ automationRouter.post('/config', isFounderAuthenticated, (req, res) => {
 });
 
 // Get action history
-automationRouter.get('/history', isFounderAuthenticated, (req, res) => {
+automationRouter.get('/history', (req, res) => {
   try {
     const history = automatedPoolManager.getActionHistory();
     res.json({
@@ -124,7 +71,7 @@ automationRouter.get('/history', isFounderAuthenticated, (req, res) => {
 });
 
 // Get daily spend status
-automationRouter.get('/spend-status', isFounderAuthenticated, (req, res) => {
+automationRouter.get('/spend-status', (req, res) => {
   try {
     const spendStatus = automatedPoolManager.getDailySpendStatus();
     res.json({
@@ -140,7 +87,7 @@ automationRouter.get('/spend-status', isFounderAuthenticated, (req, res) => {
 });
 
 // Emergency stop
-automationRouter.post('/emergency-stop', isFounderAuthenticated, (req, res) => {
+automationRouter.post('/emergency-stop', (req, res) => {
   try {
     automatedPoolManager.emergencyStop();
     res.json({
@@ -156,7 +103,7 @@ automationRouter.post('/emergency-stop', isFounderAuthenticated, (req, res) => {
 });
 
 // Resume automation
-automationRouter.post('/resume', isFounderAuthenticated, (req, res) => {
+automationRouter.post('/resume', (req, res) => {
   try {
     automatedPoolManager.resume();
     res.json({
@@ -172,7 +119,7 @@ automationRouter.post('/resume', isFounderAuthenticated, (req, res) => {
 });
 
 // Manual trigger for testing
-automationRouter.post('/manual-check', isFounderAuthenticated, (req, res) => {
+automationRouter.post('/manual-check', (req, res) => {
   try {
     // This would trigger a manual automation cycle
     res.json({
