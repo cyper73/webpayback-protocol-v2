@@ -19,6 +19,7 @@ import AllowanceManagement from "@/pages/allowance-management";
 import PoolHealthDashboard from "@/pages/PoolHealthDashboard";
 import AntiDumpSlippageDashboard from "@/pages/AntiDumpSlippageDashboard";
 import ContractReserves from "@/pages/ContractReserves";
+import AdminLogin from "@/pages/AdminLogin";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/pool-health" component={PoolHealthDashboard} />
       <Route path="/anti-dump" component={AntiDumpSlippageDashboard} />
       <Route path="/contract-reserves" component={ContractReserves} />
+      <Route path="/admin" component={AdminLogin} />
       <Route path="/pool-debug" component={PoolDebugger} />
       <Route path="/citations" component={Citations} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />

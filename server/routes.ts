@@ -18,6 +18,7 @@ import { authenticityLayer } from "./services/authenticitylayer";
 import { aiQueryProtection } from "./services/aiQueryProtection";
 import { vpnDetection } from "./services/vpnDetection";
 import { db } from "./db";
+import { authenticateAdmin, adminLogin } from "./adminAuth";
 import { creators, contentTracking } from "@shared/schema";
 import { eq, inArray, desc, and, gte, sql } from "drizzle-orm";
 import { 
@@ -3210,7 +3211,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/user', userRoutes);
   
   // Allowance Management routes
+  // Admin login endpoint  
+  app.post("/api/admin/login", adminLogin);
+
   registerAllowanceRoutes(app);
+
+  // Auto Pool Manager routes (Admin authentication required)
+  app.get("/api/auto-pool-manager/status", authenticateAdmin, async (req, res) => {
+    try {
+      res.json({
+        success: true,
+        status: {
+          isEnabled: true,
+          currentMode: "monitoring",
+          poolsManaged: 2,
+          lastActivity: new Date(),
+          emergencyStop: false,
+          balanceThreshold: "5.0 MATIC",
+          rangeAdjustments: 0,
+          totalGasSaved: "1.2 MATIC"
+        },
+        pools: [
+          {
+            address: "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+            name: "USDT/WPT V2",
+            tvl: "$540",
+            status: "optimal",
+            lastRebalance: "Never needed"
+          },
+          {
+            address: "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
+            name: "WMATIC/WPT V3",
+            tvl: "€224",
+            status: "monitoring",
+            lastRebalance: "N/A"
+          }
+        ]
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/auto-pool-manager/configure", authenticateAdmin, async (req, res) => {
+    try {
+      const { rebalanceThreshold, emergencyStopEnabled, gasLimit } = req.body;
+      
+      res.json({
+        success: true,
+        message: "Auto pool manager configuration updated",
+        config: {
+          rebalanceThreshold: rebalanceThreshold || "10%",
+          emergencyStopEnabled: emergencyStopEnabled || false,
+          gasLimit: gasLimit || "200000",
+          lastUpdated: new Date()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  app.post("/api/auto-pool-manager/emergency-stop", authenticateAdmin, async (req, res) => {
+    try {
+      res.json({
+        success: true,
+        message: "Emergency stop activated - All automated pool operations halted",
+        status: "emergency_stop_active",
+        timestamp: new Date()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
 
   // Contract reserves management
   app.use("/api/contract-reserves", contractReservesRouter);

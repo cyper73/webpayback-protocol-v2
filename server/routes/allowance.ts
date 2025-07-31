@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { db } from "../db";
 import { tokenInjectionService } from "../services/tokenInjection";
+import { authenticateAdmin } from "../adminAuth";
 import { 
   allowanceManagement, 
   allowanceTransactions, 
@@ -43,8 +44,8 @@ const isFounderAuthenticated = (req: any, res: any, next: any) => {
 
 export function registerAllowanceRoutes(app: Express) {
   
-  // Get allowance configuration for a wallet
-  app.get("/api/allowance/config/:walletAddress", isFounderAuthenticated, async (req, res) => {
+  // Get allowance configuration for a wallet (Admin authentication required)
+  app.get("/api/allowance/config/:walletAddress", authenticateAdmin, async (req, res) => {
     try {
       const { walletAddress } = req.params;
       
@@ -61,8 +62,8 @@ export function registerAllowanceRoutes(app: Express) {
     }
   });
 
-  // Create or update allowance configuration
-  app.post("/api/allowance/setup", isFounderAuthenticated, async (req, res) => {
+  // Create or update allowance configuration (Admin authentication required)
+  app.post("/api/allowance/setup", authenticateAdmin, async (req, res) => {
     try {
       const configData: InsertAllowanceManagement = req.body;
       
@@ -99,8 +100,8 @@ export function registerAllowanceRoutes(app: Express) {
     }
   });
 
-  // Get allowance transaction history
-  app.get("/api/allowance/transactions/:allowanceId", isFounderAuthenticated, async (req, res) => {
+  // Get allowance transaction history (Admin authentication required)
+  app.get("/api/allowance/transactions/:allowanceId", authenticateAdmin, async (req, res) => {
     try {
       const { allowanceId } = req.params;
       const { limit = "20", offset = "0" } = req.query;
@@ -120,8 +121,8 @@ export function registerAllowanceRoutes(app: Express) {
     }
   });
 
-  // Record a new allowance transaction
-  app.post("/api/allowance/transaction", isFounderAuthenticated, async (req, res) => {
+  // Record a new allowance transaction (Admin authentication required)
+  app.post("/api/allowance/transaction", authenticateAdmin, async (req, res) => {
     try {
       const transactionData: InsertAllowanceTransaction = req.body;
       
