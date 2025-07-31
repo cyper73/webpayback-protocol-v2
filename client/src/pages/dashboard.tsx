@@ -20,6 +20,7 @@ import ReentrancyProtection from "@/components/security/ReentrancyProtection";
 import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor";
 import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
 import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtectionDashboard";
+import AutomationDashboard from "@/components/automation/AutomationDashboard";
 
 import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen, Activity } from "lucide-react";
 import { Link as RouterLink } from "wouter";
@@ -310,6 +311,31 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </section>
+
+        {/* 🤖 AUTOMATED POOL MANAGER - FOUNDER ACCESS */}
+        {isFounderDevice() && (
+          <section className="dashboard-section">
+            <Card className="glass-card rounded-2xl shadow-neon-green border-emerald-500/30">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-2xl font-bold gradient-text text-emerald-400">
+                    🤖 Automated Pool Manager
+                  </CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-emerald-400 rounded-full pulse-animation"></div>
+                    <span className="text-sm text-gray-300">Founder Access Granted</span>
+                  </div>
+                </div>
+                <p className="text-gray-400">Advanced Pool Management & Automation Controls</p>
+              </CardHeader>
+              <CardContent>
+                <ErrorBoundary>
+                  <AutomationDashboard />
+                </ErrorBoundary>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Creator Registration Portal - Priority Section */}
         <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
