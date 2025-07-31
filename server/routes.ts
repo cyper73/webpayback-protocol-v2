@@ -2372,6 +2372,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Block suspicious wallet (SECURITY ENDPOINT)
+  app.post('/api/pool/drain-protection/block-wallet', async (req, res) => {
+    try {
+      const { walletAddress, reason } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ error: 'Wallet address is required' });
+      }
+      
+      // Add to security events table
+      await storage.createRewardPoolSecurity({
+        walletAddress,
+        suspiciousActivity: reason || 'Wallet blocked for security reasons',
+        riskScore: '1.0',
+        alertLevel: 'critical',
+        actionTaken: 'blocked',
+        isResolved: false
+      });
+      
+      // Also disable any associated creators
+      const creators = await storage.getAllCreators();
+      const blockedCreators = creators.filter(c => c.walletAddress === walletAddress);
+      
+      for (const creator of blockedCreators) {
+        await storage.updateCreator(creator.id, { isVerified: false });
+      }
+      
+      res.json({
+        success: true,
+        message: `Wallet ${walletAddress} blocked successfully`,
+        blockedCreators: blockedCreators.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   // Force cache bypass test
   app.get("/api/test/cache-bypass", (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
