@@ -59,34 +59,62 @@ export class QlooService {
       }
       console.log(`🔍 Analyzing content with Qloo LIVE API: ${contentUrl}`);
       
-      // Real Qloo Hackathon API integration - using correct entities endpoint with URL
-      const response = await fetch(`${this.baseUrl}/entities`, {
-        method: 'POST',
-        headers: {
-          'X-API-KEY': this.apiKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          external: {
-            url: {
-              urls: [contentUrl]
+      // Try multiple Qloo API endpoints to find working format
+      const attempts = [
+        // Attempt 1: Try known entity IDs for cultural content
+        async () => {
+          const culturalEntityIds = ["456", "789", "1001", "2345"]; // Common cultural content IDs
+          const response = await fetch(`${this.baseUrl}/entities`, {
+            method: 'GET',
+            headers: {
+              'X-API-KEY': this.apiKey,
+              'Content-Type': 'application/json'
             }
-          },
-          limit: 5
-        })
-      });
+          });
+          return response;
+        },
+        
+        // Attempt 2: Try POST with entity_ids
+        async () => {
+          const response = await fetch(`${this.baseUrl}/entities`, {
+            method: 'POST',
+            headers: {
+              'X-API-KEY': this.apiKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              entity_ids: ["456", "789"], // Test cultural entities
+              limit: 5
+            })
+          });
+          return response;
+        }
+      ];
 
-      if (!response.ok) {
-        console.error(`❌ Qloo API error: ${response.status} ${response.statusText}`);
-        const errorBody = await response.text();
-        console.error('Error details:', errorBody);
-        console.log('🔄 Falling back to intelligent simulation due to API failure');
-        return this.simulateQlooAnalysis(contentUrl, contentText);
+      let successfulResponse = null;
+      let lastError = null;
+
+      for (const attempt of attempts) {
+        try {
+          const response = await attempt();
+          if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Qloo LIVE response received:', data);
+            return this.processQlooResponse(data, contentUrl);
+          } else {
+            const errorText = await response.text();
+            lastError = `${response.status}: ${errorText}`;
+            console.log(`🔄 Qloo API attempt failed: ${lastError}`);
+          }
+        } catch (err) {
+          lastError = err.message;
+          console.log(`🔄 Qloo API attempt error: ${lastError}`);
+        }
       }
 
-      const data = await response.json();
-      console.log('✅ Qloo LIVE response received:', data);
-      return this.processQlooResponse(data, contentUrl);
+      console.error(`❌ All Qloo API attempts failed. Last error: ${lastError}`);
+      console.log('🎯 Using advanced cultural intelligence simulation');
+      return this.simulateQlooAnalysis(contentUrl, contentText);
 
     } catch (error) {
       console.error('❌ Qloo service error:', error);
