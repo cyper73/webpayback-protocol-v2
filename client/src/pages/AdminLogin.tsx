@@ -39,7 +39,7 @@ export default function AdminLogin() {
       });
       
       if (!response.ok) {
-        throw new Error("Invalid credentials");
+        throw new Error("Login failed");
       }
       
       return response.json();
@@ -47,16 +47,15 @@ export default function AdminLogin() {
     onSuccess: (data) => {
       setIsAuthenticated(true);
       setAuthToken(data.token);
-      localStorage.setItem("admin_token", data.token);
       toast({
-        title: "Login successful",
-        description: "Access granted to admin modules"
+        title: "✅ Login OK",
+        description: "Admin access granted"
       });
     },
     onError: () => {
       toast({
-        title: "Login failed",
-        description: "Invalid credentials",
+        title: "❌ Login failed",
+        description: "Check credentials",
         variant: "destructive"
       });
     }
@@ -70,22 +69,18 @@ export default function AdminLogin() {
         }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
       return response.json();
     },
-    onSuccess: (data, endpoint) => {
+    onSuccess: () => {
       toast({
-        title: "Module access successful",
-        description: `${endpoint} returned data successfully`
+        title: "✅ Module OK",
+        description: "Access working"
       });
     },
-    onError: (error, endpoint) => {
+    onError: () => {
       toast({
-        title: "Module access failed",
-        description: `${endpoint}: ${error.message}`,
+        title: "❌ Module failed",
+        description: "Access denied",
         variant: "destructive"
       });
     }
