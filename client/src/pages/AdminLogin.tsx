@@ -18,8 +18,13 @@ const adminLoginSchema = z.object({
 type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
 export default function AdminLogin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authToken, setAuthToken] = useState<string>("");
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem("admin_token");
+    return !!token;
+  });
+  const [authToken, setAuthToken] = useState<string>(() => {
+    return localStorage.getItem("admin_token") || "";
+  });
   const { toast } = useToast();
 
   const form = useForm<AdminLoginForm>({
@@ -47,6 +52,7 @@ export default function AdminLogin() {
     onSuccess: (data) => {
       setIsAuthenticated(true);
       setAuthToken(data.token);
+      localStorage.setItem("admin_token", data.token);
       toast({
         title: "✅ Login OK",
         description: "Admin access granted"
@@ -92,6 +98,16 @@ export default function AdminLogin() {
 
   const testModule = (endpoint: string) => {
     testModuleMutation.mutate(endpoint);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    setIsAuthenticated(false);
+    setAuthToken("");
+    toast({
+      title: "🔓 Logged out",
+      description: "Admin session ended"
+    });
   };
 
   if (!isAuthenticated) {
