@@ -9,6 +9,7 @@ Interface language: English-only for better international understanding and syst
 Admin Authentication: Successfully implemented secure admin system with Sirio/Flender73 credentials, localStorage token management, and protected module access (July 31, 2025).
 MetaMask Wallet Verification: Fully implemented cryptographic signature verification with automatic MetaMask integration and manual fallback options. Uses ethereumjs-util for proper signature validation with Ethereum message prefix. Content Certificate NFTs now use wallet-based authentication bypassing IDOR session issues for streamlined access (August 1, 2025).
 Wallet Security Audit: Completed comprehensive security audit of all 22 registered wallet entries. Removed 1 malicious XSS attempt entry, confirmed 8 unique legitimate wallets with no suspicious exchange connections. Database schema corrected with missing verification fields for automatic wallet verification system (August 1, 2025).
+Critical Wallet Security Fix: Identified and corrected wrong founder wallet address in multiple system files (0x742d35Cc→0xca5Ea48C). Fixed allowance system, admin interface, and token injection scripts. All wallet addresses redacted from documentation for enhanced security (August 1, 2025).
 
 ## System Architecture
 
