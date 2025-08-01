@@ -7,7 +7,7 @@
 // Use built-in node fetch (Node 18+) or curl for analysis
 
 async function analyzeWPTTokens() {
-  const walletAddress = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
+  const walletAddress = "0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba";
   const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
   
   console.log('🔍 ANALISI SICURA DEI TOKEN WPT');
