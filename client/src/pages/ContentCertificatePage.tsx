@@ -98,10 +98,17 @@ export function ContentCertificatePage() {
                 </CardTitle>
                 <CardDescription className="text-green-700 dark:text-green-300">
                   <div className="space-y-1">
-                    <div><strong>Name:</strong> {userCreator.name || 'Creator Profile'}</div>
                     <div><strong>Website:</strong> {userCreator.websiteUrl}</div>
                     <div><strong>Wallet:</strong> {userCreator.walletAddress}</div>
                     <div><strong>Category:</strong> {userCreator.contentCategory?.replace('_', ' ').toUpperCase()}</div>
+                    <div className="flex items-center gap-2">
+                      <strong>Wallet Verified:</strong> 
+                      {userCreator.isWalletVerified ? (
+                        <Badge className="bg-green-600 text-white">✓ Cryptographically Verified</Badge>
+                      ) : (
+                        <Badge className="bg-red-600 text-white">✗ Not Verified</Badge>
+                      )}
+                    </div>
                   </div>
                 </CardDescription>
               </CardHeader>
@@ -126,8 +133,25 @@ export function ContentCertificatePage() {
               </CardContent>
             </Card>
 
-            {/* Content Certificate Manager */}
-            <ContentCertificateManager creatorId={userCreator.id} />
+            {/* Wallet Verification Required */}
+            {!userCreator.isWalletVerified ? (
+              <Card className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                    <Shield className="h-5 w-5" />
+                    Wallet Verification Required
+                  </CardTitle>
+                  <CardDescription className="text-red-700 dark:text-red-300">
+                    <strong>SECURITY REQUIREMENT:</strong> Before minting Content Certificate NFTs, you must complete cryptographic wallet verification. 
+                    This prevents impersonation and ensures only the true wallet owner can mint certificates.
+                    <br /><br />
+                    Please return to the Creator Portal and complete the wallet signature verification process.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            ) : (
+              <ContentCertificateManager creatorId={userCreator.id} />
+            )}
           </div>
         )}
         
