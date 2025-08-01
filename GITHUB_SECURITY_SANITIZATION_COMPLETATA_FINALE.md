@@ -32,6 +32,11 @@
 
 ### 🔍 VERIFICHE DI SICUREZZA COMPLETATE
 
+#### 0. CREDENZIALI ADMIN AGGIORNATE E OSCURATE ⚠️
+- **NUOVE CREDENZIALI LIVE**: Username "Sirio16" / Password "Matisse73"
+- **CREDENZIALI GITHUB**: Completamente oscurate con [REDACTED_FOR_GITHUB_SECURITY]
+- **Vecchie credenziali**: Completamente rimosse da tutti i file GitHub
+
 #### 1. Scan Finale Wallet Address
 ```bash
 # Verifica finale - ZERO occorrenze nel codebase

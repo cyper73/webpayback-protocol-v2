@@ -2,8 +2,8 @@ import { RequestHandler } from "express";
 
 // Admin credentials for allowance management and pool manager
 const ADMIN_CREDENTIALS = {
-  username: "Sirio",
-  password: "Flender73"
+  username: "Sirio16",
+  password: "Matisse73"
 };
 
 // Admin authentication middleware
