@@ -687,7 +687,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         walletSignature: creators.walletSignature,
         verificationMessage: creators.verificationMessage,
         signatureVerified: creators.signatureVerified,
-        signatureVerifiedAt: creators.signatureVerifiedAt
+        signatureVerifiedAt: creators.signatureVerifiedAt,
+        isWalletVerified: creators.isWalletVerified
       }).from(creators).where(eq(creators.walletAddress, walletAddress));
 
       if (creatorsResult.length === 0) {
@@ -760,7 +761,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         channelVerificationUrl: schemaValidatedData.websiteUrl,
         monitoringScope: channelInfo ? 'full_channel' : 'single_url',
         signatureVerified: true,
-        signatureVerifiedAt: new Date()
+        signatureVerifiedAt: new Date(),
+        isWalletVerified: true // Ensure both fields are set for compatibility
       };
       
       const creator = await storage.createCreator(creatorData);
