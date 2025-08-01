@@ -200,23 +200,49 @@ export function WalletVerification({
 
             <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
               <AlertDescription>
-                <strong>How to sign the message:</strong>
-                <ol className="list-decimal list-inside mt-2 space-y-2">
-                  <li><strong>Copy the message above</strong> using the "Copy" button</li>
-                  <li><strong>Open MetaMask</strong> (or your wallet)</li>
-                  <li>
-                    <strong>Sign the message:</strong>
-                    <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
-                      <li>In MetaMask: go to "⋮" menu → "Sign Data"</li>
-                      <li>Or use keyboard shortcut <code>Ctrl+Shift+S</code> in MetaMask</li>
-                      <li>Paste the message and click "Sign"</li>
-                    </ul>
-                  </li>
-                  <li><strong>Copy the signature</strong> and paste it below</li>
-                </ol>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  ⚠️ Important: This is not a transaction, just proving wallet ownership.
-                </p>
+                <div className="space-y-3">
+                  <div className="font-semibold text-blue-700 dark:text-blue-300">📋 Step-by-Step MetaMask Guide:</div>
+                  
+                  <ol className="list-decimal list-inside space-y-3 text-sm">
+                    <li>
+                      <strong>Copy the message</strong> using the "Copy" button above
+                    </li>
+                    <li>
+                      <strong>Open MetaMask extension</strong> in your browser
+                    </li>
+                    <li>
+                      <strong>Click the three dots menu (⋮)</strong> in the top-right corner
+                    </li>
+                    <li>
+                      <strong>Select "Account Details"</strong> from the dropdown
+                    </li>
+                    <li>
+                      <strong>Click "Sign Message"</strong> button (not "Send" or "Swap")
+                    </li>
+                    <li>
+                      <strong>Paste the verification message</strong> in the text field
+                    </li>
+                    <li>
+                      <strong>Click "Sign"</strong> to generate the signature
+                    </li>
+                    <li>
+                      <strong>Copy the signature</strong> and paste it in the field below
+                    </li>
+                  </ol>
+                  
+                  <div className="bg-amber-100 dark:bg-amber-900/30 p-3 rounded-md border border-amber-300 dark:border-amber-700">
+                    <div className="flex items-center gap-2">
+                      <span className="text-amber-600 dark:text-amber-400">⚠️</span>
+                      <div>
+                        <div className="font-semibold text-amber-800 dark:text-amber-200">Important:</div>
+                        <div className="text-amber-700 dark:text-amber-300 text-sm">
+                          This is NOT a transaction - you're only proving wallet ownership. No gas fees required.
+                          Look for "Sign Message" not "Send Transaction".
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </AlertDescription>
             </Alert>
 
