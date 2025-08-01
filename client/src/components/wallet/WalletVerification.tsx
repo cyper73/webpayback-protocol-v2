@@ -192,7 +192,7 @@ export function WalletVerification({
               <Textarea
                 value={verificationMessage}
                 readOnly
-                className="font-mono text-xs bg-gray-50 dark:bg-gray-900"
+                className="font-mono text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                 rows={8}
                 placeholder="Verification message will appear here..."
               />
@@ -226,7 +226,7 @@ export function WalletVerification({
                 value={signature}
                 onChange={(e) => setSignature(e.target.value)}
                 placeholder="Paste the signature from your wallet here..."
-                className="font-mono text-sm"
+                className="font-mono text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                 rows={3}
               />
             </div>
