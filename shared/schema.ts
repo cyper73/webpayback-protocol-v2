@@ -16,6 +16,8 @@ export const creators = pgTable("creators", {
   walletAddress: text("wallet_address").notNull(),
   walletSignature: text("wallet_signature"), // Cryptographic signature proving wallet ownership
   verificationMessage: text("verification_message"), // Message that was signed
+  signatureVerified: boolean("signature_verified").default(false), // Backend compatibility field
+  signatureVerifiedAt: timestamp("signature_verified_at"), // Verification timestamp
   isWalletVerified: boolean("is_wallet_verified").default(false), // True if signature is valid
   contentCategory: text("content_category").notNull(),
   isVerified: boolean("is_verified").default(false),
