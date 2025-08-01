@@ -581,7 +581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      if (!walletVerificationService.isValidWalletAddress(walletAddress)) {
+      // Basic validation: check if it's a string starting with 0x and has correct length
+      if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
         return res.status(400).json({ 
           success: false, 
           error: "Invalid wallet address format" 
