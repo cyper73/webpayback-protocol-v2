@@ -1171,9 +1171,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await channelMonitoringService.createChannelMapping(creator.id, schemaValidatedData.websiteUrl);
         console.log(`Channel-level monitoring enabled for creator ${creator.id}: ${channelInfo.platformType}`);
       }
+
+      // AUTOMATIC 2FA SETUP: Generate 2FA configuration immediately after registration
+      let twoFactorSetup = null;
+      try {
+        const twoFactorConfig = await twoFactorAuthService.generateTwoFactorSecret(
+          creator.websiteUrl, // Use website as identifier
+          creator.websiteUrl
+        );
+        
+        // Store the secret temporarily (not enabled yet)
+        await storage.updateCreator(creator.id, {
+          twoFactorSecret: twoFactorConfig.secret,
+          twoFactorBackupCodes: twoFactorConfig.backupCodes,
+          twoFactorEnabled: false // Not enabled until verified
+        });
+
+        twoFactorSetup = {
+          qrCodeUrl: twoFactorConfig.qrCodeUrl,
+          manualEntryCode: twoFactorConfig.manualEntryCode,
+          backupCodes: twoFactorConfig.backupCodes,
+          instructions: twoFactorAuthService.getSetupInstructions()
+        };
+
+        console.log(`🔐 2FA setup auto-generated for new creator ${creator.id}`);
+      } catch (error) {
+        console.error('Failed to auto-generate 2FA setup:', error);
+        // Don't fail registration if 2FA setup fails
+      }
       
       res.json({
         ...creator,
+        twoFactorSetup, // Include 2FA setup in response
+        requiresImmediateTwoFactorSetup: true, // Flag to trigger frontend 2FA flow
         channelMonitoring: channelInfo ? {
           enabled: true,
           platformType: channelInfo.platformType,

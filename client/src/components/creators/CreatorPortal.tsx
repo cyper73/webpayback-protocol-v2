@@ -41,6 +41,7 @@ export default function CreatorPortal() {
   const [isWalletVerified, setIsWalletVerified] = useState(false);
   const [activeTab, setActiveTab] = useState("registration");
   const [currentCreatorId, setCurrentCreatorId] = useState<number | null>(null);
+  const [preGeneratedTwoFactorSetup, setPreGeneratedTwoFactorSetup] = useState<any>(null);
 
   const {
     register,
@@ -174,17 +175,28 @@ export default function CreatorPortal() {
     },
     onSuccess: (data) => {
       toast({
-        title: "Registration Successful",
-        description: "You have been successfully registered as a content creator!",
+        title: "Registration Successful", 
+        description: "Now setting up mandatory 2FA security for your account...",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/dashboard"] });
       reset();
       setDomainVerification(null);
       setIsDomainVerified(false);
-      // Set creator ID for 2FA setup
-      if (data?.id) {
+      
+      // AUTOMATIC 2FA SETUP: Check if 2FA setup was generated
+      if (data?.id && data?.requiresImmediateTwoFactorSetup) {
         setCurrentCreatorId(data.id);
+        setPreGeneratedTwoFactorSetup(data.twoFactorSetup);
         setActiveTab("security");
+        
+        // Show security requirement message
+        setTimeout(() => {
+          toast({
+            title: "Security Setup Required",
+            description: "2FA is mandatory for all users. Please complete Google Authenticator setup to secure your account.",
+            variant: "default",
+          });
+        }, 1000);
       }
     },
     onError: (error) => {
@@ -655,11 +667,14 @@ export default function CreatorPortal() {
                 <TwoFactorAuthSetup 
                   creatorId={currentCreatorId}
                   creatorEmail={demoEmail}
+                  preGeneratedSetup={preGeneratedTwoFactorSetup}
                   onSetupComplete={() => {
                     toast({
                       title: "Security Enhanced!",
                       description: "Your account is now protected with 2FA",
                     });
+                    // Clear pre-generated setup after completion
+                    setPreGeneratedTwoFactorSetup(null);
                   }}
                 />
               ) : (

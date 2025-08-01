@@ -24,6 +24,7 @@ interface TwoFactorAuthSetupProps {
   creatorId: number;
   creatorEmail: string;
   onSetupComplete?: () => void;
+  preGeneratedSetup?: TwoFactorSetup; // Support auto-generated setup from registration
 }
 
 interface TwoFactorSetup {
@@ -41,11 +42,17 @@ interface SetupInstructions {
 export default function TwoFactorAuthSetup({ 
   creatorId, 
   creatorEmail, 
-  onSetupComplete 
+  onSetupComplete,
+  preGeneratedSetup 
 }: TwoFactorAuthSetupProps) {
-  const [step, setStep] = useState<'start' | 'setup' | 'verify' | 'complete'>('start');
-  const [setup, setSetup] = useState<TwoFactorSetup | null>(null);
-  const [instructions, setInstructions] = useState<SetupInstructions | null>(null);
+  // If pre-generated setup is available, skip to setup step automatically
+  const [step, setStep] = useState<'start' | 'setup' | 'verify' | 'complete'>(
+    preGeneratedSetup ? 'setup' : 'start'
+  );
+  const [setup, setSetup] = useState<TwoFactorSetup | null>(preGeneratedSetup || null);
+  const [instructions, setInstructions] = useState<SetupInstructions | null>(
+    preGeneratedSetup?.instructions || null
+  );
   const [verificationToken, setVerificationToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
