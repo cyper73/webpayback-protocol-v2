@@ -135,7 +135,6 @@ A revolutionary blockchain protocol that automatically rewards content creators 
 │   └── security/        # Security middleware
 ├── shared/              # Shared TypeScript schemas
 ├── contracts/           # Smart contracts (Hardhat)
-├── deployments/         # Deployment configurations
 └── docs/               # Project documentation
 ```
 
@@ -217,9 +216,10 @@ npx hardhat verify --network polygon <contract-address>
 Detailed documentation is available in the `docs/` folder:
 
 - [Deployment Guide](docs/DEPLOYMENT_PARAMETERS.md)
-- [Pool Strategy](docs/UNISWAP_V3_POOL_STRATEGY.md)
+- [Pool Strategy](docs/UNISWAP_V3_POOL_STRATEGY.md) 
 - [Security Features](docs/POOL_DRAIN_PROTECTION_UPDATE.md)
-- [API Reference](docs/API_DOCUMENTATION.md)
+- [Pool Manual Guide](docs/UNISWAP_POOL_MANUAL_GUIDE.md)
+- [Fee Revenue Analysis](docs/FEE_REVENUE_ANALYSIS.md)
 
 ## Support & Community
 
