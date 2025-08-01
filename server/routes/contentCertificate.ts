@@ -6,6 +6,73 @@ import { urlValidationSchema, escapeHtml } from "../security/inputValidation";
 
 const router = Router();
 
+// Wallet-based access verification
+router.post('/verify-wallet', async (req, res) => {
+  try {
+    const { walletAddress } = req.body;
+    
+    if (!walletAddress || typeof walletAddress !== 'string') {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Wallet address is required' 
+      });
+    }
+
+    // Validate wallet address format
+    if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid wallet address format' 
+      });
+    }
+
+    // Get creators by wallet address from storage
+    const { storage } = await import('../storage');
+    const creators = await storage.getAllCreators();
+    
+    // Find creator with matching wallet address
+    const matchingCreator = creators.find(creator => 
+      creator.walletAddress?.toLowerCase() === walletAddress.toLowerCase()
+    );
+
+    if (!matchingCreator) {
+      return res.status(404).json({
+        success: false,
+        error: 'Wallet address not found in Creator Portal. Please register as a creator first.',
+        action: 'register'
+      });
+    }
+
+    // Check if wallet is cryptographically verified
+    if (!matchingCreator.isWalletVerified) {
+      return res.status(403).json({
+        success: false,
+        error: 'Wallet verification required. Please complete cryptographic signature verification in Creator Portal.',
+        action: 'verify',
+        creator: {
+          id: matchingCreator.id,
+          websiteUrl: matchingCreator.websiteUrl,
+          walletAddress: matchingCreator.walletAddress
+        }
+      });
+    }
+
+    // Success - wallet is registered and verified
+    res.json({
+      success: true,
+      message: 'Wallet verification successful',
+      creator: matchingCreator
+    });
+
+  } catch (error) {
+    console.error('Wallet verification failed:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
+  }
+});
+
 // Mint Content Certificate NFT with IDOR protection
 router.post('/mint', async (req, res) => {
   try {
