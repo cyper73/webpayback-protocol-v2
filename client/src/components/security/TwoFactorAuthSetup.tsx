@@ -64,11 +64,20 @@ export default function TwoFactorAuthSetup({
 
   const setupMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/auth/2fa/setup', { 
-        creatorId, 
-        email: creatorEmail 
-      });
-      return response.json();
+      try {
+        const response = await apiRequest('POST', '/api/auth/2fa/setup', { 
+          creatorId, 
+          email: creatorEmail 
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP ${response.status}`);
+        }
+        return data;
+      } catch (error) {
+        console.error('2FA setup API error:', error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -83,8 +92,9 @@ export default function TwoFactorAuthSetup({
         setError(data.error || 'Failed to generate 2FA setup');
       }
     },
-    onError: () => {
-      setError('Network error occurred. Please try again.');
+    onError: (error: any) => {
+      console.error('2FA setup mutation error:', error);
+      setError(`Setup error: ${error?.message || 'Please try again.'}`);
     }
   });
 
@@ -95,11 +105,20 @@ export default function TwoFactorAuthSetup({
 
   const verifyMutation = useMutation({
     mutationFn: async (token: string) => {
-      const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', { 
-        creatorId, 
-        token: token.replace(/\s/g, '') 
-      });
-      return response.json();
+      try {
+        const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', { 
+          creatorId, 
+          token: token.replace(/\s/g, '') 
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP ${response.status}`);
+        }
+        return data;
+      } catch (error) {
+        console.error('2FA verify API error:', error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -113,8 +132,9 @@ export default function TwoFactorAuthSetup({
         setError(data.error || 'Invalid verification code');
       }
     },
-    onError: () => {
-      setError('Network error occurred. Please try again.');
+    onError: (error: any) => {
+      console.error('2FA verify mutation error:', error);
+      setError(`Verification error: ${error?.message || 'Please try again.'}`);
     }
   });
 
