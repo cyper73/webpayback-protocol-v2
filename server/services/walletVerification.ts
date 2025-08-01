@@ -11,11 +11,19 @@ export class WalletVerificationService {
   /**
    * Generate a random verification message for wallet signing
    */
-  generateVerificationMessage(): { message: string; timestamp: number } {
+  generateVerificationMessage(walletAddress: string): { message: string; timestamp: number } {
     const timestamp = Date.now();
     const randomCode = crypto.randomBytes(16).toString('hex');
     
-    const message = `WebPayback Protocol - Wallet Ownership Verification\n\nBy signing this message, you prove ownership of your wallet.\n\nVerification Code: ${randomCode}\nTimestamp: ${timestamp}\n\nThis signature does not authorize any transactions.`;
+    const message = `WebPayback Protocol - Wallet Ownership Verification
+
+By signing this message, you prove ownership of your wallet address.
+
+Wallet Address: ${walletAddress}
+Verification Code: ${randomCode}
+Timestamp: ${timestamp}
+
+This signature does not authorize any transactions.`;
     
     return { message, timestamp };
   }

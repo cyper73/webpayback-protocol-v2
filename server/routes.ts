@@ -588,7 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const { message, timestamp } = walletVerificationService.generateVerificationMessage();
+      const { message, timestamp } = walletVerificationService.generateVerificationMessage(walletAddress);
       
       res.json({
         success: true,
