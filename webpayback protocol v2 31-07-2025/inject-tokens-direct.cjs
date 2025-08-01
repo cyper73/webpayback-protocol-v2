@@ -14,7 +14,7 @@ async function injectTokens() {
     const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
     const TARGET_CONTRACT = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A'; // USDT/WPT Pool
     const AMOUNT = '1000000'; // 1 million WPT
-    const FOUNDER_WALLET = '0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8';
+    const FOUNDER_WALLET = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba';
     
     console.log(`📋 Configuration:`);
     console.log(`   WPT Contract: ${WPT_CONTRACT}`);

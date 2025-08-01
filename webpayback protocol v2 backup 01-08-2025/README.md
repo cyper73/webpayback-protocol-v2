@@ -160,7 +160,7 @@ npm run db:studio
 ```bash
 # Required environment variables
 DATABASE_URL=postgresql://...
-ALCHEMY_API_KEY=your_alchemy_key
+[REDACTED_API_KEY]=your_alchemy_key
 PRIVATE_KEY=your_wallet_private_key
 POLYGONSCAN_API_KEY=your_polygonscan_key
 ```

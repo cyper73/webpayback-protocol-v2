@@ -195,7 +195,7 @@ npm run dev
 DATABASE_URL=postgresql://username:password@localhost:5432/webpayback
 
 # API Keys
-ALCHEMY_API_KEY=your_alchemy_key
+[REDACTED_API_KEY]=your_alchemy_key
 POLYGONSCAN_API_KEY=your_polygonscan_key
 QLOO_API_KEY=your_qloo_api_key
 
