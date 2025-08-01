@@ -135,17 +135,29 @@ export function ContentCertificatePage() {
 
             {/* Wallet Verification Required */}
             {!userCreator.isWalletVerified ? (
-              <Card className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
+              <Card className="bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                  <CardTitle className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
                     <Shield className="h-5 w-5" />
-                    Wallet Verification Required
+                    🔐 Next Step: Verify Your Wallet with MetaMask
                   </CardTitle>
-                  <CardDescription className="text-red-700 dark:text-red-300">
-                    <strong>SECURITY REQUIREMENT:</strong> Before minting Content Certificate NFTs, you must complete cryptographic wallet verification. 
-                    This prevents impersonation and ensures only the true wallet owner can mint certificates.
-                    <br /><br />
-                    Please return to the Creator Portal and complete the wallet signature verification process.
+                  <CardDescription className="text-orange-700 dark:text-orange-300">
+                    <div className="space-y-3">
+                      <p><strong>STEP 2 OF 2:</strong> Complete cryptographic wallet verification to unlock NFT creation.</p>
+                      
+                      <div className="bg-orange-100 dark:bg-orange-900 p-4 rounded-lg">
+                        <p className="font-semibold mb-2">🚀 How to proceed:</p>
+                        <ol className="list-decimal list-inside space-y-1 text-sm">
+                          <li>Go to <strong>Creator Portal</strong> (in navigation menu)</li>
+                          <li>Find your creator profile: <strong>{userCreator.websiteUrl}</strong></li>
+                          <li>Click <strong>"Sign Automatically with MetaMask"</strong> (orange button)</li>
+                          <li>Confirm signature in MetaMask popup</li>
+                          <li>Return here to start creating Content Certificate NFTs!</li>
+                        </ol>
+                      </div>
+                      
+                      <p className="text-sm">This prevents wallet address spoofing and ensures only you can mint certificates for your content.</p>
+                    </div>
                   </CardDescription>
                 </CardHeader>
               </Card>
