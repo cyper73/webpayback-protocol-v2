@@ -591,6 +591,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { message, timestamp } = walletVerificationService.generateVerificationMessage(walletAddress);
       
+      console.log('🔐 Generated verification message for wallet:', walletAddress);
+      console.log('🔐 Message length:', message.length);
+      console.log('🔐 Message preview:', message.substring(0, 100) + '...');
+      
       res.json({
         success: true,
         message,
@@ -886,58 +890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // WALLET CRYPTOGRAPHIC VERIFICATION ROUTES
-  
-  // Generate verification message for wallet ownership proof
-  app.post("/api/wallet/generate-verification", async (req, res) => {
-    try {
-      const { walletAddress } = req.body;
-      
-      if (!walletAddress || typeof walletAddress !== 'string') {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Valid wallet address is required" 
-        });
-      }
-      
-      const result = await walletVerificationService.generateVerificationMessage(walletAddress);
-      res.json(result);
-    } catch (error) {
-      console.error("Wallet verification generation error:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: error instanceof Error ? error.message : "Failed to generate verification message" 
-      });
-    }
-  });
 
-  // Verify wallet signature
-  app.post("/api/wallet/verify-signature", async (req, res) => {
-    try {
-      const { walletAddress, message, signature } = req.body;
-      
-      if (!walletAddress || !message || !signature) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Wallet address, message, and signature are required" 
-        });
-      }
-      
-      const result = await walletVerificationService.verifySignature(
-        walletAddress, 
-        message, 
-        signature
-      );
-      
-      res.json(result);
-    } catch (error) {
-      console.error("Wallet signature verification error:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: error instanceof Error ? error.message : "Failed to verify signature" 
-      });
-    }
-  });
 
   // Track content usage with CSRF and Rate Limiting protection
   app.post("/api/content/track", csrfProtection, contentTrackingRateLimit, async (req, res) => {

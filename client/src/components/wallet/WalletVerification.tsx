@@ -44,9 +44,11 @@ export function WalletVerification({
       const result = await response.json();
       console.log('🔐 Server response:', result);
 
-      if (result.success) {
+      if (result.success && result.message) {
         console.log('🔐 Setting verification message:', result.message);
-        setVerificationMessage(result.message);
+        console.log('🔐 Message length:', result.message.length);
+        // Force update without sanitization for display
+        setVerificationMessage(String(result.message));
         toast({
           title: "Verification message generated",
           description: "Copy the message and sign it with your wallet",
@@ -192,27 +194,28 @@ export function WalletVerification({
                 readOnly
                 className="font-mono text-xs bg-gray-50 dark:bg-gray-900"
                 rows={8}
+                placeholder="Verification message will appear here..."
               />
             </div>
 
             <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
               <AlertDescription>
-                <strong>Come firmare il messaggio:</strong>
+                <strong>How to sign the message:</strong>
                 <ol className="list-decimal list-inside mt-2 space-y-2">
-                  <li><strong>Copia il messaggio sopra</strong> usando il pulsante "Copy"</li>
-                  <li><strong>Apri MetaMask</strong> (o il tuo wallet)</li>
+                  <li><strong>Copy the message above</strong> using the "Copy" button</li>
+                  <li><strong>Open MetaMask</strong> (or your wallet)</li>
                   <li>
-                    <strong>Firma il messaggio:</strong>
+                    <strong>Sign the message:</strong>
                     <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
-                      <li>In MetaMask: vai su "⋮" menu → "Signed Data"</li>
-                      <li>Oppure usa i tasti <code>Ctrl+Shift+S</code> in MetaMask</li>
-                      <li>Incolla il messaggio e clicca "Sign"</li>
+                      <li>In MetaMask: go to "⋮" menu → "Sign Data"</li>
+                      <li>Or use keyboard shortcut <code>Ctrl+Shift+S</code> in MetaMask</li>
+                      <li>Paste the message and click "Sign"</li>
                     </ul>
                   </li>
-                  <li><strong>Copia la signature</strong> che appare e incollala sotto</li>
+                  <li><strong>Copy the signature</strong> and paste it below</li>
                 </ol>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  ⚠️ Importante: Non stai inviando una transazione, solo provando la proprietà del wallet.
+                  ⚠️ Important: This is not a transaction, just proving wallet ownership.
                 </p>
               </AlertDescription>
             </Alert>
