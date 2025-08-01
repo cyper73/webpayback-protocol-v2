@@ -47,10 +47,10 @@ const WALLET_CONFIGS: Record<WalletType, WalletConfiguration> = {
   [WalletType.PHANTOM]: {
     name: 'Phantom',
     signingMethods: ['signMessage', 'signTransaction'],
-    messagePrefix: '\x16Solana Signed Message:\n',
-    verificationNotes: 'Solana-based wallet with different message prefix handling',
+    messagePrefix: 'SOLANA_INCOMPATIBLE',
+    verificationNotes: 'Phantom is primarily a Solana wallet. Ethereum features have limited compatibility. Please use MetaMask, Coinbase, or Trust Wallet for full Ethereum support.',
     isHardwareWallet: false,
-    supportedChains: ['solana', 'ethereum', 'polygon']
+    supportedChains: ['solana']
   },
   [WalletType.WALLET_CONNECT]: {
     name: 'WalletConnect',
@@ -293,24 +293,13 @@ This signature does not authorize any transactions.`;
         console.log(`🔐 Manual method failed for ${config.name}:`, manualError);
       }
 
-      // Method 3: Phantom-specific verification (if needed)
+      // Method 3: Phantom-specific verification (limited compatibility)
       if (walletType === WalletType.PHANTOM) {
-        try {
-          // Phantom uses different signing mechanism for Solana
-          // For Ethereum compatibility, try standard methods but with different handling
-          const messageBytes = new TextEncoder().encode(message);
-          const messageHex = Array.from(messageBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-          
-          // Try to verify with different message encoding
-          const recoveredAddress = ethers.utils.verifyMessage(messageHex, signature);
-          
-          if (recoveredAddress.toLowerCase() === walletAddress.toLowerCase()) {
-            console.log('✅ Phantom signature verification SUCCESS (hex encoding)');
-            return { isValid: true, method: 'phantom-hex' };
-          }
-        } catch (phantomError) {
-          console.log('🔐 Phantom-specific method failed:', phantomError);
-        }
+        console.log('⚠️ Phantom wallet detected - limited Ethereum compatibility');
+        return { 
+          isValid: false, 
+          error: 'Phantom wallet is primarily for Solana. For full Ethereum support, please use MetaMask, Coinbase Wallet, or Trust Wallet.' 
+        };
       }
 
       // Method 4: Try without prefix (some wallets don't add it)

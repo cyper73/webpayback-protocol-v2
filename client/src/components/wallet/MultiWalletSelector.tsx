@@ -71,6 +71,12 @@ export function MultiWalletSelector({ onWalletSelect, selectedWalletType }: Mult
       if (typeof window !== 'undefined') {
         if ((window as any).phantom?.solana) {
           walletInfo.name = 'phantom';
+          // Show compatibility warning for Phantom
+          toast({
+            title: "Phantom Wallet Detected",
+            description: "Phantom is primarily for Solana. For full Ethereum support, please use MetaMask, Coinbase, or Trust Wallet.",
+            variant: "destructive",
+          });
         } else if ((window as any).ethereum?.isMetaMask) {
           walletInfo.name = 'metamask';
         } else if ((window as any).ethereum?.isCoinbaseWallet) {
