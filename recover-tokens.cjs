@@ -13,7 +13,7 @@ async function recoverTokens() {
     // Configuration
     const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
     const WRONG_ADDRESS = '0xe021e5817e8867d7cea10f63bc47e118f3ab9e4a'; // Where tokens went
-    const WALLET_ADDRESS = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'; // Our wallet
+    const WALLET_ADDRESS = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]'; // Our wallet
     
     console.log(`📋 WPT Contract: ${WPT_CONTRACT}`);
     console.log(`📋 Wrong Address: ${WRONG_ADDRESS}`);

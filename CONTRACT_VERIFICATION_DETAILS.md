@@ -36,14 +36,14 @@ The main contract file is `contracts/WPTv2.sol` with the following key details:
 - **Symbol**: "WPT"
 - **Decimals**: 18
 - **Fee Rate**: 0.1% (10 basis points, hardcoded)
-- **Creator Wallet**: `0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba` (immutable)
+- **Creator Wallet**: `[REDACTED_FOR_GITHUB_SECURITY]` (immutable)
 
 ### Constructor Parameters
 The contract constructor takes no parameters - all values are hardcoded for security.
 
 ### Deployment Transaction
 - **Transaction Hash**: Check your wallet history for the deployment transaction
-- **Deployer Address**: `0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba`
+- **Deployer Address**: `[REDACTED_FOR_GITHUB_SECURITY]`
 - **Gas Used**: Approximately 1,200,000 gas
 
 ## PolygonScan Verification Steps

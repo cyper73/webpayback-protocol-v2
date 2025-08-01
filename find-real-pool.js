@@ -15,7 +15,7 @@ async function findRealPool() {
     const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`);
     
     const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-    const WALLET_ADDRESS = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba';
+    const WALLET_ADDRESS = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]';
     
     // Check transaction hash from database
     const TX_HASH = '0x846cc33656ae78eb5e8764f9dd74bab5e0509441fd2448f418ee434715316324';

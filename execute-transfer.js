@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 const WPT_CONTRACT_ADDRESS = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-const FOUNDER_WALLET = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba';
+const FOUNDER_WALLET = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]';
 
 const ERC20_ABI = [
   'function balanceOf(address owner) view returns (uint256)',

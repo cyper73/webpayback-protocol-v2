@@ -4,7 +4,7 @@
 
 ### Problem Discovered
 - **Wrong founder wallet** found in multiple files: `0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8`
-- **Correct founder wallet**: `0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba`
+- **Correct founder wallet**: `[REDACTED_FOR_GITHUB_SECURITY]`
 - **Security Risk**: Allowance system configured for unauthorized wallet
 
 ### Files Corrected

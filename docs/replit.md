@@ -149,7 +149,7 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - **ANALYZED ORIGINAL CONTRACT**: Reviewed existing WPT V1 code structure and identified security scanner issues
   - **ELIMINATED OWNER FUNCTIONS**: Removed all `onlyOwner` modifiers, `setCreatorFee()`, `setCreatorWallet()`, and ownership system
   - **OPTIMIZED FEE STRUCTURE**: Reduced creator fee from 3% (300 basis points) to 0.1% (10 basis points) for scanner compatibility
-  - **MAINTAINED REVENUE STREAM**: Fee collection still goes to user's wallet (0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba) but at lower rate
+  - **MAINTAINED REVENUE STREAM**: Fee collection still goes to user's wallet ([REDACTED_FOR_GITHUB_SECURITY]) but at lower rate
   - **HARDCODED IMMUTABLE PARAMETERS**: All settings now constants - cannot be modified by anyone after deployment
   - **SCANNER-FRIENDLY DESIGN**: Contract structure optimized to pass TokenSniffer, HoneyPot, and GoPlus security scanners
   - **UNISWAP COMPATIBILITY**: 0.1% fee rate ensures no blocking from DEX platforms due to high fees
@@ -189,7 +189,7 @@ The architecture emphasizes modularity, type safety, and real-time capabilities 
   - **SOLUTION VERIFIED**: All components updated with correct WPT contract address and optimized parameters for successful liquidity addition
 
 - **POOL DRAIN PROTECTION SYSTEM FULLY OPERATIONAL WITH SECURITY EVENTS DASHBOARD** (January 24, 2025):
-  - **COMPLETE RESOLUTION**: Pool Drain Protection founder wallet bug completely resolved with zero restrictions for founder wallet (0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba)
+  - **COMPLETE RESOLUTION**: Pool Drain Protection founder wallet bug completely resolved with zero restrictions for founder wallet ([REDACTED_FOR_GITHUB_SECURITY])
   - **SECURITY EVENTS DASHBOARD IMPLEMENTED**: Recent Security Events section now fully visible and functional in Pool Drain Protection dashboard
   - **AUTHENTIC DATA INTEGRATION**: Security events display 3 active events with authentic wallet addresses, risk scores (0.55-0.75), and activity details
   - **BACKEND-FRONTEND ALIGNMENT**: Fixed TypeScript interfaces to match PostgreSQL database structure and API response format

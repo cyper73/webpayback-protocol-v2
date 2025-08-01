@@ -9,7 +9,7 @@ import { ethers } from 'ethers';
 const POOL_ADDRESS = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3";
 const WPT_TOKEN = "0x9408f17a8B4666f8cb8231BA213DE04137dc3825";
 const WMATIC_TOKEN = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
-const USER_WALLET = "0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba"; // Deployer wallet
+const USER_WALLET = process.env.FOUNDER_WALLET || "0x***********************************************[FOUNDER]"; // Deployer wallet
 
 // ERC20 ABI for balance checking
 const ERC20_ABI = [

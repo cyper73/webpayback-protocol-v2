@@ -14,7 +14,7 @@ console.log('🛡️ Starting WebPayback Contract Security Tests...\n');
 const CONTRACTS = {
   WPT_V2: '0x9408f17a8B4666f8cb8231BA213DE04137dc3825', // WebPayback Token v2 DEPLOYED
   UNISWAP_V3_POOL: '0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3', // CORRECT POL/WPT Pool (500 EUR)
-  CREATOR_WALLET: '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba'
+  CREATOR_WALLET: process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]'
 };
 
 // Alchemy configuration for authentic data
