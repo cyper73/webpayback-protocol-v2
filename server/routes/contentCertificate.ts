@@ -2,6 +2,7 @@ import { Router } from "express";
 import { contentCertificateNftService } from "../services/contentCertificateNft";
 import { getUserSession } from "../security/idorProtection";
 import { z } from "zod";
+import { urlValidationSchema, escapeHtml } from "../security/inputValidation";
 
 const router = Router();
 
@@ -10,9 +11,9 @@ router.post('/mint', async (req, res) => {
   try {
     const mintSchema = z.object({
       creatorId: z.number(),
-      contentUrl: z.string().url(),
-      contentTitle: z.string().min(1),
-      contentText: z.string().min(50), // Minimum 50 characters
+      contentUrl: urlValidationSchema, // Use secure URL validation with XSS protection
+      contentTitle: z.string().min(1).max(200).transform(escapeHtml), // Sanitize title
+      contentText: z.string().min(50).max(50000).transform(escapeHtml), // Sanitize content with length limit
       royaltyPercentage: z.number().min(0).max(50).optional() // Max 50% royalty
     });
 
@@ -48,9 +49,9 @@ router.post('/mint', async (req, res) => {
 router.post('/detect-usage', async (req, res) => {
   try {
     const detectionSchema = z.object({
-      querySearched: z.string().min(1),
-      aiOverviewText: z.string().min(10),
-      detectionMethod: z.string().optional()
+      querySearched: z.string().min(1).max(500).transform(escapeHtml), // Sanitize query
+      aiOverviewText: z.string().min(10).max(10000).transform(escapeHtml), // Sanitize AI text
+      detectionMethod: z.string().max(100).optional().transform(val => val ? escapeHtml(val) : val) // Sanitize method
     });
 
     const data = detectionSchema.parse(req.body);
