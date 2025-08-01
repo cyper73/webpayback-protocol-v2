@@ -22,12 +22,14 @@ import ContractReserves from "@/pages/ContractReserves";
 import AdminLogin from "@/pages/AdminLogin";
 import AllowanceAdmin from "@/pages/admin/AllowanceAdmin";
 import AutoPoolAdmin from "@/pages/admin/AutoPoolAdmin";
+import CreatorPage from "@/pages/CreatorPage";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/getting-started" component={GettingStarted} />
+      <Route path="/creators" component={CreatorPage} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />
       <Route path="/content-certificate" component={ContentCertificatePage} />

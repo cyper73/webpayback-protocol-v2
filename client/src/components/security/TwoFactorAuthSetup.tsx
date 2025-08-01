@@ -65,11 +65,30 @@ export default function TwoFactorAuthSetup({
   const setupMutation = useMutation({
     mutationFn: async () => {
       try {
-        const response = await apiRequest('POST', '/api/auth/2fa/setup', { 
-          creatorId, 
-          email: creatorEmail 
+        console.log('Starting 2FA setup for creator:', creatorId, 'email:', creatorEmail);
+        
+        // Get CSRF token first
+        const tokenResponse = await fetch('/api/csrf/token', { credentials: 'include' });
+        const tokenData = await tokenResponse.json();
+        console.log('CSRF token obtained:', tokenData.csrfToken?.substring(0, 10) + '...');
+        
+        const response = await fetch('/api/auth/2fa/setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': tokenData.csrfToken
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            creatorId,
+            email: creatorEmail
+          })
         });
+        
+        console.log('2FA setup response status:', response.status);
         const data = await response.json();
+        console.log('2FA setup response data:', data);
+        
         if (!response.ok) {
           throw new Error(data.error || `HTTP ${response.status}`);
         }
@@ -106,11 +125,30 @@ export default function TwoFactorAuthSetup({
   const verifyMutation = useMutation({
     mutationFn: async (token: string) => {
       try {
-        const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', { 
-          creatorId, 
-          token: token.replace(/\s/g, '') 
+        console.log('Starting 2FA verification for creator:', creatorId, 'token:', token);
+        
+        // Get CSRF token first
+        const tokenResponse = await fetch('/api/csrf/token', { credentials: 'include' });
+        const tokenData = await tokenResponse.json();
+        console.log('CSRF token obtained for verification:', tokenData.csrfToken?.substring(0, 10) + '...');
+        
+        const response = await fetch('/api/auth/2fa/verify-setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': tokenData.csrfToken
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            creatorId,
+            token: token.replace(/\s/g, '')
+          })
         });
+        
+        console.log('2FA verify response status:', response.status);
         const data = await response.json();
+        console.log('2FA verify response data:', data);
+        
         if (!response.ok) {
           throw new Error(data.error || `HTTP ${response.status}`);
         }

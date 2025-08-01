@@ -12,7 +12,6 @@ import { channelMonitoringService } from "./services/channelMonitoring";
 import { aiKnowledgeTrackingService } from "./services/aiKnowledgeTracking";
 import { poolDrainProtectionService } from "./services/poolDrainProtection";
 import { fakeCreatorDetection } from "./services/fakeCreatorDetection";
-import { reentrancyProtection } from "./services/reentrancyProtection";
 import { citationRewardEngine } from "./services/citationRewardEngine";
 import { authenticityLayer } from "./services/authenticitylayer";
 import { aiQueryProtection } from "./services/aiQueryProtection";
