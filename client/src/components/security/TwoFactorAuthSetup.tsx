@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 interface TwoFactorAuthSetupProps {
   creatorId: number;
@@ -63,10 +64,9 @@ export default function TwoFactorAuthSetup({
 
   const setupMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/auth/2fa/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creatorId, email: creatorEmail })
+      const response = await apiRequest('POST', '/api/auth/2fa/setup', { 
+        creatorId, 
+        email: creatorEmail 
       });
       return response.json();
     },
@@ -95,10 +95,9 @@ export default function TwoFactorAuthSetup({
 
   const verifyMutation = useMutation({
     mutationFn: async (token: string) => {
-      const response = await fetch('/api/auth/2fa/verify-setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creatorId, token: token.replace(/\s/g, '') })
+      const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', { 
+        creatorId, 
+        token: token.replace(/\s/g, '') 
       });
       return response.json();
     },
