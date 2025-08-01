@@ -18,17 +18,12 @@ interface TwoFactorOptions {
 }
 
 /**
- * Middleware to require 2FA verification
+ * Middleware to require 2FA verification for ALL users (NO EXCEPTIONS)
  */
 export function require2FA(options: TwoFactorOptions = { requireFor: 'all' }) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { creatorId, token, backupCode } = req.body;
-
-      // Skip 2FA for certain endpoints if configured
-      if (options.skipFor && options.skipFor.includes(req.path)) {
-        return next();
-      }
+      const { creatorId, token, backupCode, walletAddress } = req.body;
 
       if (!creatorId) {
         return res.status(400).json({
@@ -46,18 +41,15 @@ export function require2FA(options: TwoFactorOptions = { requireFor: 'all' }) {
         });
       }
 
-      // Check if 2FA is enabled for this creator
+      // SECURITY REQUIREMENT: 2FA is MANDATORY for ALL users including founder wallet
       if (!creator.twoFactorEnabled || !creator.twoFactorSecret) {
-        // If 2FA is not enabled but required for sensitive operations
-        if (options.requireFor === 'sensitive') {
-          return res.status(403).json({
-            success: false,
-            error: 'Two-Factor Authentication is required for this operation. Please enable 2FA first.',
-            requireSetup: true
-          });
-        }
-        // If 2FA not required, proceed
-        return next();
+        console.log(`❌ 2FA NOT ENABLED for creator ${creatorId} (wallet: ${walletAddress || 'unknown'})`);
+        return res.status(403).json({
+          success: false,
+          error: 'Two-Factor Authentication is required for this operation. Please enable 2FA first.',
+          requireSetup: true,
+          message: 'Security policy requires 2FA for all users including founders. Please set up Google Authenticator first.'
+        });
       }
 
       // 2FA is enabled, check for token or backup code

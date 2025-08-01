@@ -1456,8 +1456,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Distribute rewards with CSRF, IDOR, Rate Limiting and Reentrancy protection (CRITICAL FINANCIAL OPERATION)
-  app.post("/api/rewards/distribute", enhancedCSRFProtection, authorizeBulkCreatorAccess, financialRateLimit, rewardReentrancyProtection, async (req, res) => {
+  // Distribute rewards with CSRF, IDOR, Rate Limiting, Reentrancy protection and MANDATORY 2FA (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards/distribute", enhancedCSRFProtection, require2FA({ requireFor: 'all' }), authorizeBulkCreatorAccess, financialRateLimit, rewardReentrancyProtection, async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Queue reward for batch processing instead of immediate distribution
@@ -1683,8 +1683,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create reward distribution with enhanced CSRF protection (CRITICAL FINANCIAL OPERATION)
-  app.post("/api/rewards", enhancedCSRFProtection, async (req, res) => {
+  // Create reward distribution with enhanced CSRF protection and MANDATORY 2FA (CRITICAL FINANCIAL OPERATION)
+  app.post("/api/rewards", enhancedCSRFProtection, require2FA({ requireFor: 'all' }), async (req, res) => {
     try {
       const validatedData = insertRewardDistributionSchema.parse(req.body);
       // Use gas manager for new rewards with protection

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { contentCertificateNftService } from "../services/contentCertificateNft";
 import { getUserSession } from "../security/idorProtection";
+import { require2FA } from "../middleware/twoFactorProtection";
 import { z } from "zod";
 import { urlValidationSchema, escapeHtml } from "../security/inputValidation";
 
@@ -73,8 +74,8 @@ router.post('/verify-wallet', async (req, res) => {
   }
 });
 
-// Mint Content Certificate NFT with IDOR protection
-router.post('/mint', async (req, res) => {
+// Mint Content Certificate NFT with IDOR protection and MANDATORY 2FA
+router.post('/mint', require2FA({ requireFor: 'all' }), async (req, res) => {
   try {
     const mintSchema = z.object({
       creatorId: z.number(),
