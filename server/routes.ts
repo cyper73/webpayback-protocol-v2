@@ -18,6 +18,7 @@ import { authenticityLayer } from "./services/authenticitylayer";
 import { aiQueryProtection } from "./services/aiQueryProtection";
 import { vpnDetection } from "./services/vpnDetection";
 import { walletVerificationService } from "./services/walletVerification";
+import { multiWalletVerificationService, WalletType } from "./services/multiWalletVerification";
 import { db } from "./db";
 import { authenticateAdmin, adminLogin } from "./adminAuth";
 import { creators, contentTracking } from "@shared/schema";
@@ -712,6 +713,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Wallet verification status error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // ===== MULTI-WALLET VERIFICATION ENDPOINTS =====
+  
+  // Get supported wallet types
+  app.get("/api/wallet/supported-types", async (req, res) => {
+    try {
+      const supportedWallets = multiWalletVerificationService.getSupportedWallets();
+      res.json({
+        success: true,
+        supportedWallets,
+        totalSupported: supportedWallets.length
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // Detect wallet type from user agent or wallet info
+  app.post("/api/wallet/detect-type", csrfProtection, async (req, res) => {
+    try {
+      const { userAgent, walletInfo } = req.body;
+      const detectedType = multiWalletVerificationService.detectWalletType(userAgent, walletInfo);
+      const config = multiWalletVerificationService.getWalletConfig(detectedType);
+      
+      res.json({
+        success: true,
+        walletType: detectedType,
+        walletName: config.name,
+        isHardwareWallet: config.isHardwareWallet,
+        supportedChains: config.supportedChains,
+        verificationNotes: config.verificationNotes
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // Generate verification message for specific wallet type
+  app.post("/api/wallet/generate-verification-multi", csrfProtection, async (req, res) => {
+    try {
+      const { walletAddress, walletType, userAgent, walletInfo } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Wallet address is required" 
+        });
+      }
+
+      // Basic validation
+      if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid wallet address format" 
+        });
+      }
+
+      // Detect wallet type if not provided
+      const detectedType = walletType || multiWalletVerificationService.detectWalletType(userAgent, walletInfo);
+      
+      const { message, timestamp, walletType: finalWalletType } = multiWalletVerificationService.generateVerificationMessage(
+        walletAddress, 
+        detectedType
+      );
+      
+      const instructions = multiWalletVerificationService.getSigningInstructions(finalWalletType);
+      const config = multiWalletVerificationService.getWalletConfig(finalWalletType);
+      
+      console.log(`🔐 Generated multi-wallet verification message for ${config.name}:`, walletAddress);
+      console.log('🔐 Message length:', message.length);
+      console.log('🔐 Wallet type:', finalWalletType);
+      
+      res.json({
+        success: true,
+        message,
+        timestamp,
+        walletAddress,
+        walletType: finalWalletType,
+        walletName: config.name,
+        isHardwareWallet: config.isHardwareWallet,
+        instructions,
+        expiresIn: "10 minutes"
+      });
+    } catch (error) {
+      console.error('Multi-wallet verification generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // Verify wallet signature with multi-wallet support
+  app.post("/api/wallet/verify-signature-multi", csrfProtection, async (req, res) => {
+    try {
+      const { walletAddress, message, signature, walletType, userAgent, walletInfo } = req.body;
+      
+      if (!walletAddress || !message || !signature) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Wallet address, message, and signature are required" 
+        });
+      }
+
+      // Check if message is still valid (not expired)
+      if (!multiWalletVerificationService.isVerificationMessageValid(message)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Verification message has expired. Please generate a new one." 
+        });
+      }
+
+      // Detect wallet type if not provided
+      const detectedType = walletType || multiWalletVerificationService.detectWalletType(userAgent, walletInfo);
+      const config = multiWalletVerificationService.getWalletConfig(detectedType);
+
+      // Verify the cryptographic signature with wallet-specific method
+      const verificationResult = await multiWalletVerificationService.verifyWalletSignature(
+        walletAddress, 
+        message, 
+        signature,
+        detectedType
+      );
+
+      if (verificationResult.isValid) {
+        console.log(`✅ ${config.name} wallet signature verified successfully using ${verificationResult.method} method`);
+        res.json({
+          success: true,
+          verified: true,
+          message: `${config.name} wallet ownership verified successfully`,
+          walletAddress,
+          walletType: detectedType,
+          walletName: config.name,
+          verificationMethod: verificationResult.method,
+          canProceedWithRegistration: true
+        });
+      } else {
+        console.log(`❌ ${config.name} wallet signature verification failed:`, verificationResult.error);
+        res.status(400).json({
+          success: false,
+          verified: false,
+          error: verificationResult.error || "Signature verification failed",
+          walletType: detectedType,
+          walletName: config.name,
+          canProceedWithRegistration: false
+        });
+      }
+    } catch (error) {
+      console.error('Multi-wallet signature verification error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // Get wallet-specific signing instructions
+  app.get("/api/wallet/signing-instructions/:walletType", async (req, res) => {
+    try {
+      const { walletType } = req.params;
+      const instructions = multiWalletVerificationService.getSigningInstructions(walletType as any);
+      const config = multiWalletVerificationService.getWalletConfig(walletType as any);
+      
+      res.json({
+        success: true,
+        walletType,
+        walletName: config.name,
+        instructions,
+        isHardwareWallet: config.isHardwareWallet,
+        supportedChains: config.supportedChains
+      });
+    } catch (error) {
       res.status(500).json({ 
         success: false, 
         error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
