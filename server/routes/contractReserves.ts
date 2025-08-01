@@ -31,7 +31,7 @@ const founderOnly = (req: any, res: any, next: any) => {
 // Check current balances
 router.get('/balances', founderOnly, async (req: any, res) => {
   try {
-    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
+    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`); // [REDACTED_FOR_GITHUB_SECURITY]
     const contract = new ethers.Contract(WPT_CONTRACT_ADDRESS, ERC20_ABI, provider);
 
     // Get balances
@@ -82,8 +82,8 @@ router.post('/transfer-to-reserves', founderOnly, async (req: any, res) => {
     const amountWei = ethers.parseUnits(amount.toString(), 18);
     
     // Setup provider and signer
-    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
-    const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`); // [REDACTED_FOR_GITHUB_SECURITY]
+    const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider); // [REDACTED_FOR_GITHUB_SECURITY]
     const contract = new ethers.Contract(WPT_CONTRACT_ADDRESS, ERC20_ABI, signer);
 
     // Check founder's balance first

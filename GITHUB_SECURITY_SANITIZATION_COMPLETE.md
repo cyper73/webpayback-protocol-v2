@@ -13,7 +13,7 @@
 
 #### Wallet Founder Address
 - **Status**: ✅ COMPLETAMENTE RIMOSSO
-- **Wallet**: `0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba`
+- **Wallet**: `[REDACTED_FOR_GITHUB_SECURITY]`
 - **Files Sanitizzati**: Contratti Solidity, componenti React, script di deployment, documentazione
 
 #### API Keys & Secrets
