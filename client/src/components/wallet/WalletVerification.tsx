@@ -37,21 +37,26 @@ export function WalletVerification({
     setError('');
     
     try {
+      console.log('🔐 Generating verification message for wallet:', walletAddress);
       const response = await apiRequest('POST', '/api/wallet/generate-verification', { 
         walletAddress 
       });
       const result = await response.json();
+      console.log('🔐 Server response:', result);
 
       if (result.success) {
+        console.log('🔐 Setting verification message:', result.message);
         setVerificationMessage(result.message);
         toast({
           title: "Verification message generated",
           description: "Copy the message and sign it with your wallet",
         });
       } else {
+        console.error('🔐 Server error:', result.error);
         setError(result.error || 'Failed to generate verification message');
       }
     } catch (err) {
+      console.error('🔐 Network error:', err);
       setError(err instanceof Error ? err.message : 'Network error');
     } finally {
       setIsGenerating(false);
@@ -190,15 +195,25 @@ export function WalletVerification({
               />
             </div>
 
-            <Alert>
+            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
               <AlertDescription>
-                <strong>Instructions:</strong>
-                <ol className="list-decimal list-inside mt-2 space-y-1">
-                  <li>Copy the message above</li>
-                  <li>Open your wallet (MetaMask, WalletConnect, etc.)</li>
-                  <li>Sign the message (this doesn't send any transaction)</li>
-                  <li>Paste the signature below</li>
+                <strong>Come firmare il messaggio:</strong>
+                <ol className="list-decimal list-inside mt-2 space-y-2">
+                  <li><strong>Copia il messaggio sopra</strong> usando il pulsante "Copy"</li>
+                  <li><strong>Apri MetaMask</strong> (o il tuo wallet)</li>
+                  <li>
+                    <strong>Firma il messaggio:</strong>
+                    <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
+                      <li>In MetaMask: vai su "⋮" menu → "Signed Data"</li>
+                      <li>Oppure usa i tasti <code>Ctrl+Shift+S</code> in MetaMask</li>
+                      <li>Incolla il messaggio e clicca "Sign"</li>
+                    </ul>
+                  </li>
+                  <li><strong>Copia la signature</strong> che appare e incollala sotto</li>
                 </ol>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  ⚠️ Importante: Non stai inviando una transazione, solo provando la proprietà del wallet.
+                </p>
               </AlertDescription>
             </Alert>
 
