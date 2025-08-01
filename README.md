@@ -216,10 +216,9 @@ npx hardhat verify --network polygon <contract-address>
 Detailed documentation is available in the `docs/` folder:
 
 - [Deployment Guide](docs/DEPLOYMENT_PARAMETERS.md)
-- [Pool Strategy](docs/UNISWAP_V3_POOL_STRATEGY.md) 
-- [Security Features](docs/POOL_DRAIN_PROTECTION_UPDATE.md)
-- [Pool Manual Guide](docs/UNISWAP_POOL_MANUAL_GUIDE.md)
-- [Fee Revenue Analysis](docs/FEE_REVENUE_ANALYSIS.md)
+- [Pool Strategy](docs/UNISWAP_V3_POOL_STRATEGY.md)
+- [Deployment Results](docs/DEPLOYMENT_RESULTS.md)
+- [Token V1 Disabling Guide](docs/WPT_V1_DISABLING_GUIDE.md)
 
 ## Support & Community
 
