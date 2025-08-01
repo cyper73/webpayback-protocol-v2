@@ -18,7 +18,7 @@ import {
   Unlock
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { useMutation } from '@tanstack/react-query';
 
 interface TwoFactorAuthSetupProps {
   creatorId: number;
@@ -54,65 +54,71 @@ export default function TwoFactorAuthSetup({
 
   const { toast } = useToast();
 
-  const generateSetup = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await apiRequest('/api/auth/2fa/setup', {
+  const setupMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/2fa/setup', {
         method: 'POST',
-        body: { creatorId, email: creatorEmail }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId, email: creatorEmail })
       });
-
-      if (response.success) {
-        setSetup(response.setup);
-        setInstructions(response.instructions);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        setSetup(data.setup);
+        setInstructions(data.instructions);
         setStep('setup');
         toast({
           title: "2FA Setup Generated",
           description: "Your QR code and backup codes are ready",
         });
       } else {
-        setError(response.error || 'Failed to generate 2FA setup');
+        setError(data.error || 'Failed to generate 2FA setup');
       }
-    } catch (err) {
+    },
+    onError: () => {
       setError('Network error occurred. Please try again.');
-    } finally {
-      setLoading(false);
     }
+  });
+
+  const generateSetup = () => {
+    setError(null);
+    setupMutation.mutate();
   };
 
-  const verifySetup = async () => {
-    if (!verificationToken.trim()) {
-      setError('Please enter the 6-digit code from your authenticator app');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await apiRequest('/api/auth/2fa/verify-setup', {
+  const verifyMutation = useMutation({
+    mutationFn: async (token: string) => {
+      const response = await fetch('/api/auth/2fa/verify-setup', {
         method: 'POST',
-        body: { creatorId, token: verificationToken.replace(/\s/g, '') }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId, token: token.replace(/\s/g, '') })
       });
-
-      if (response.success) {
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
         setStep('complete');
         toast({
           title: "2FA Enabled Successfully!",
           description: "Your account is now protected with Two-Factor Authentication",
-          variant: "default",
         });
         onSetupComplete?.();
       } else {
-        setError(response.error || 'Invalid verification code');
+        setError(data.error || 'Invalid verification code');
       }
-    } catch (err) {
+    },
+    onError: () => {
       setError('Network error occurred. Please try again.');
-    } finally {
-      setLoading(false);
     }
+  });
+
+  const verifySetup = () => {
+    if (!verificationToken.trim()) {
+      setError('Please enter the 6-digit code from your authenticator app');
+      return;
+    }
+    setError(null);
+    verifyMutation.mutate(verificationToken);
   };
 
   const copyToClipboard = async (text: string, type: 'code' | 'backup', index?: number) => {
@@ -200,10 +206,10 @@ export default function TwoFactorAuthSetup({
           <div className="flex justify-center">
             <Button 
               onClick={generateSetup}
-              disabled={loading}
+              disabled={setupMutation.isPending}
               size="lg"
             >
-              {loading ? 'Generating...' : 'Start 2FA Setup'}
+              {setupMutation.isPending ? 'Generating...' : 'Start 2FA Setup'}
             </Button>
           </div>
         </CardContent>
@@ -340,9 +346,9 @@ export default function TwoFactorAuthSetup({
               />
               <Button 
                 onClick={verifySetup}
-                disabled={loading || verificationToken.length !== 6}
+                disabled={verifyMutation.isPending || verificationToken.length !== 6}
               >
-                {loading ? 'Verifying...' : 'Verify & Enable'}
+                {verifyMutation.isPending ? 'Verifying...' : 'Verify & Enable'}
               </Button>
             </div>
 

@@ -8,197 +8,137 @@ export interface TwoFactorConfig {
   backupCodes: string[];
 }
 
-export interface TwoFactorVerification {
-  isValid: boolean;
-  error?: string;
-  wasBackupCode?: boolean;
+export interface SetupInstructions {
+  steps: string[];
+  recommendedApps: string[];
+  troubleshooting: string[];
 }
 
 export class TwoFactorAuthService {
-  private readonly SERVICE_NAME = 'WebPayback Protocol';
-  
   /**
    * Generate a new 2FA secret and QR code for a user
    */
-  async generateTwoFactorSecret(userEmail: string, userName?: string): Promise<TwoFactorConfig> {
-    try {
-      // Generate a new secret
-      const secret = speakeasy.generateSecret({
-        name: `${this.SERVICE_NAME} (${userEmail})`,
-        issuer: this.SERVICE_NAME,
-        length: 32 // 32 character secret for extra security
-      });
+  async generateTwoFactorSecret(email: string, serviceName: string): Promise<TwoFactorConfig> {
+    // Generate secret
+    const secret = speakeasy.generateSecret({
+      name: email,
+      issuer: `WebPayback Protocol - ${serviceName}`,
+      length: 32
+    });
 
-      if (!secret.base32) {
-        throw new Error('Failed to generate secret');
-      }
+    // Generate QR code
+    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url!);
 
-      // Generate QR code for easy setup
-      const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url || '');
-      
-      // Generate backup codes (10 single-use codes)
-      const backupCodes = this.generateBackupCodes(10);
+    // Generate backup codes
+    const backupCodes = this.generateBackupCodes();
 
-      console.log(`🔐 Generated 2FA secret for user: ${userEmail}`);
-      
-      return {
-        secret: secret.base32,
-        qrCodeUrl,
-        manualEntryCode: secret.base32,
-        backupCodes
-      };
-    } catch (error) {
-      console.error('2FA secret generation error:', error);
-      throw new Error('Failed to generate 2FA configuration');
-    }
+    return {
+      secret: secret.base32!,
+      qrCodeUrl,
+      manualEntryCode: secret.base32!,
+      backupCodes
+    };
   }
 
   /**
-   * Verify a 2FA token from user's authenticator app
+   * Validate a TOTP token during setup
    */
-  verifyTwoFactorToken(secret: string, token: string, window?: number): TwoFactorVerification {
-    try {
-      if (!secret || !token) {
-        return {
-          isValid: false,
-          error: '2FA secret and token are required'
-        };
-      }
-
-      // Clean the token (remove spaces, hyphens)
-      const cleanToken = token.replace(/[\s-]/g, '');
-      
-      // Verify the token
-      const verified = speakeasy.totp.verify({
-        secret,
-        encoding: 'base32',
-        token: cleanToken,
-        window: window || 2, // Allow 2 time steps before/after for clock drift
-        step: 30 // 30 second window
-      });
-
-      if (verified) {
-        console.log('✅ 2FA token verified successfully');
-        return { isValid: true };
-      } else {
-        console.log('❌ 2FA token verification failed');
-        return {
-          isValid: false,
-          error: 'Invalid 2FA token. Please check your authenticator app.'
-        };
-      }
-    } catch (error) {
-      console.error('2FA verification error:', error);
-      return {
-        isValid: false,
-        error: 'Failed to verify 2FA token'
-      };
-    }
+  async validateSetup(secret: string, token: string): Promise<boolean> {
+    return speakeasy.totp.verify({
+      secret,
+      encoding: 'base32',
+      token,
+      window: 2, // Allow 2-step time drift (30 sec x 2 = 60 sec window)
+    });
   }
 
   /**
-   * Verify a backup code
+   * Validate a TOTP token for authentication
    */
-  verifyBackupCode(providedCode: string, validBackupCodes: string[]): TwoFactorVerification {
-    try {
-      const cleanCode = providedCode.replace(/[\s-]/g, '').toUpperCase();
-      
-      if (validBackupCodes.includes(cleanCode)) {
-        console.log('✅ Backup code verified successfully');
-        return { 
-          isValid: true, 
-          wasBackupCode: true 
-        };
-      } else {
-        return {
-          isValid: false,
-          error: 'Invalid backup code'
-        };
-      }
-    } catch (error) {
-      console.error('Backup code verification error:', error);
-      return {
-        isValid: false,
-        error: 'Failed to verify backup code'
-      };
-    }
+  async validateToken(secret: string, token: string): Promise<boolean> {
+    return speakeasy.totp.verify({
+      secret,
+      encoding: 'base32',
+      token,
+      window: 1, // Stricter window for regular auth
+    });
   }
 
   /**
-   * Generate secure backup codes
+   * Validate a backup code
    */
-  private generateBackupCodes(count: number): string[] {
+  validateBackupCode(backupCodes: string[], providedCode: string): { isValid: boolean; remainingCodes: string[] } {
+    const normalizedCode = providedCode.replace(/[-\s]/g, '').toUpperCase();
+    const codeIndex = backupCodes.findIndex(code => 
+      code.replace(/[-\s]/g, '').toUpperCase() === normalizedCode
+    );
+
+    if (codeIndex === -1) {
+      return { isValid: false, remainingCodes: backupCodes };
+    }
+
+    // Remove used backup code
+    const remainingCodes = [...backupCodes];
+    remainingCodes.splice(codeIndex, 1);
+
+    return { isValid: true, remainingCodes };
+  }
+
+  /**
+   * Generate backup codes
+   */
+  private generateBackupCodes(): string[] {
     const codes: string[] = [];
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < 10; i++) {
       let code = '';
       for (let j = 0; j < 8; j++) {
         code += chars.charAt(Math.floor(Math.random() * chars.length));
       }
-      // Format as XXXX-XXXX for readability
-      const formattedCode = code.substring(0, 4) + '-' + code.substring(4);
-      codes.push(formattedCode);
+      // Format as XXXX-XXXX
+      codes.push(code.substring(0, 4) + '-' + code.substring(4));
     }
     
     return codes;
   }
 
   /**
-   * Generate a current TOTP token (for testing/development)
-   */
-  generateCurrentToken(secret: string): string {
-    return speakeasy.totp({
-      secret,
-      encoding: 'base32'
-    });
-  }
-
-  /**
-   * Check if 2FA is properly configured for a user
-   */
-  is2FAConfigured(twoFactorSecret?: string, twoFactorEnabled?: boolean): boolean {
-    return !!(twoFactorSecret && twoFactorEnabled);
-  }
-
-  /**
-   * Validate 2FA setup by requiring a token verification
-   */
-  async validateSetup(secret: string, verificationToken: string): Promise<boolean> {
-    const result = this.verifyTwoFactorToken(secret, verificationToken);
-    return result.isValid;
-  }
-
-  /**
    * Get setup instructions for users
    */
-  getSetupInstructions(): {
-    steps: string[];
-    recommendedApps: string[];
-    troubleshooting: string[];
-  } {
+  getSetupInstructions(): SetupInstructions {
     return {
       steps: [
-        'Install a 2FA app like Google Authenticator, Authy, or Microsoft Authenticator',
-        'Scan the QR code with your authenticator app',
-        'If you cannot scan, manually enter the secret code',
-        'Enter the 6-digit code from your app to verify setup',
-        'Save your backup codes in a secure location'
+        "Download and install a TOTP authenticator app on your smartphone",
+        "Open the app and tap 'Add Account' or 'Scan QR Code'",
+        "Scan the QR code displayed above with your phone's camera",
+        "If you can't scan the QR code, manually enter the secret code",
+        "Your app will generate a 6-digit code that changes every 30 seconds",
+        "Enter the current 6-digit code below to verify the setup",
+        "Save your backup codes in a secure location"
       ],
       recommendedApps: [
-        'Google Authenticator (Free)',
-        'Authy (Free, supports backup)',
-        'Microsoft Authenticator (Free)',
-        '1Password (Paid, integrated password manager)',
-        'Bitwarden (Free/Paid, integrated password manager)'
+        "Google Authenticator",
+        "Authy",
+        "Microsoft Authenticator",
+        "1Password",
+        "LastPass Authenticator"
       ],
       troubleshooting: [
-        'Make sure your device time is synchronized',
-        'Try generating a new code if the current one doesn\'t work',
-        'Use backup codes if your authenticator is unavailable',
-        'Contact support if you\'ve lost access to both your device and backup codes'
+        "Make sure your phone's time is synchronized",
+        "Try refreshing the QR code if it doesn't scan",
+        "Ensure your authenticator app supports TOTP (Time-based OTP)",
+        "Check that you entered the complete 6-digit code",
+        "Contact support if you continue having issues"
       ]
     };
+  }
+
+  /**
+   * Generate new backup codes
+   */
+  regenerateBackupCodes(): string[] {
+    return this.generateBackupCodes();
   }
 }
 

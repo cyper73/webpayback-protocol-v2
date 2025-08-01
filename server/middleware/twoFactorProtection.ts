@@ -2,48 +2,43 @@ import { Request, Response, NextFunction } from 'express';
 import { twoFactorAuthService } from '../services/twoFactorAuth';
 import { storage } from '../storage';
 
-// Extend Express Request type to include 2FA info
+// Extend Request interface to include 2FA status
 declare global {
   namespace Express {
     interface Request {
-      creator?: any;
-      requires2FA?: boolean;
       twoFactorPassed?: boolean;
+      twoFactorRequired?: boolean;
     }
   }
 }
 
-export interface TwoFactorMiddlewareOptions {
-  requireFor?: 'all' | 'sensitive' | 'admin';
-  sensitiveActions?: string[];
-  skipIfNoSecret?: boolean;
+interface TwoFactorOptions {
+  requireFor?: 'all' | 'sensitive' | 'none';
+  skipFor?: string[]; // Array of endpoints to skip 2FA
 }
 
 /**
- * Middleware to enforce 2FA for sensitive operations
+ * Middleware to require 2FA verification
  */
-export function require2FA(options: TwoFactorMiddlewareOptions = {}) {
+export function require2FA(options: TwoFactorOptions = { requireFor: 'all' }) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        requireFor = 'sensitive',
-        sensitiveActions = ['create', 'update', 'delete', 'transfer', 'mint', 'claim'],
-        skipIfNoSecret = false
-      } = options;
+      const { creatorId, token, backupCode } = req.body;
 
-      // Get creator from session or request
-      const creatorId = req.session?.user?.id || req.body?.creatorId || req.params?.creatorId;
-      
+      // Skip 2FA for certain endpoints if configured
+      if (options.skipFor && options.skipFor.includes(req.path)) {
+        return next();
+      }
+
       if (!creatorId) {
-        return res.status(401).json({
+        return res.status(400).json({
           success: false,
-          error: 'Authentication required',
-          requires2FA: false
+          error: 'Creator ID required for 2FA verification'
         });
       }
 
-      // Get creator info with 2FA settings
-      const creator = await storage.getCreator(creatorId);
+      // Get creator from storage
+      const creator = await storage.getCreator(parseInt(creatorId));
       if (!creator) {
         return res.status(404).json({
           success: false,
@@ -51,180 +46,139 @@ export function require2FA(options: TwoFactorMiddlewareOptions = {}) {
         });
       }
 
-      req.creator = creator;
-
-      // Check if 2FA is required for this operation
-      const is2FARequired = should2FABeRequired(req, requireFor, sensitiveActions);
-      req.requires2FA = is2FARequired;
-
-      // If 2FA is not required, continue
-      if (!is2FARequired) {
+      // Check if 2FA is enabled for this creator
+      if (!creator.twoFactorEnabled || !creator.twoFactorSecret) {
+        // If 2FA is not enabled but required for sensitive operations
+        if (options.requireFor === 'sensitive') {
+          return res.status(403).json({
+            success: false,
+            error: 'Two-Factor Authentication is required for this operation. Please enable 2FA first.',
+            requireSetup: true
+          });
+        }
+        // If 2FA not required, proceed
         return next();
       }
 
-      // If creator doesn't have 2FA setup and we allow skipping
-      if (!creator.twoFactorEnabled && skipIfNoSecret) {
-        console.log(`⚠️ 2FA required but not setup for creator ${creatorId}, allowing due to skipIfNoSecret`);
-        return next();
-      }
-
-      // If creator doesn't have 2FA setup but it's required
-      if (!creator.twoFactorEnabled) {
+      // 2FA is enabled, check for token or backup code
+      if (!token && !backupCode) {
         return res.status(403).json({
           success: false,
-          error: '2FA setup required for this operation',
-          requires2FA: true,
-          setup2FA: true,
-          message: 'Please setup Two-Factor Authentication to access sensitive features'
+          error: 'Two-Factor Authentication token required',
+          require2FA: true
         });
       }
 
-      // Check for 2FA token in request
-      const twoFactorToken = req.headers['x-2fa-token'] as string || req.body?.twoFactorToken;
-      const backupCode = req.headers['x-backup-code'] as string || req.body?.backupCode;
+      let isValid = false;
 
-      if (!twoFactorToken && !backupCode) {
-        return res.status(403).json({
-          success: false,
-          error: '2FA token required',
-          requires2FA: true,
-          message: 'Please provide your 2FA token or backup code'
-        });
+      // Verify TOTP token
+      if (token) {
+        isValid = await twoFactorAuthService.validateToken(creator.twoFactorSecret, token);
+        
+        if (isValid) {
+          // Update last used timestamp
+          await storage.updateCreator(creator.id, {
+            lastTwoFactorUsed: new Date()
+          });
+        }
       }
 
-      let verification;
-      let usedBackupCode = false;
-
-      // Verify 2FA token or backup code
-      if (backupCode && creator.twoFactorBackupCodes) {
-        verification = twoFactorAuthService.verifyBackupCode(backupCode, creator.twoFactorBackupCodes);
-        usedBackupCode = verification.wasBackupCode || false;
-      } else if (twoFactorToken && creator.twoFactorSecret) {
-        verification = twoFactorAuthService.verifyTwoFactorToken(creator.twoFactorSecret, twoFactorToken);
-      } else {
-        return res.status(403).json({
-          success: false,
-          error: 'Invalid 2FA configuration',
-          requires2FA: true
-        });
-      }
-
-      if (!verification.isValid) {
-        console.log(`❌ 2FA verification failed for creator ${creatorId}: ${verification.error}`);
-        return res.status(403).json({
-          success: false,
-          error: verification.error || '2FA verification failed',
-          requires2FA: true
-        });
-      }
-
-      // If backup code was used, remove it from available codes
-      if (usedBackupCode && backupCode && creator.twoFactorBackupCodes) {
-        const updatedBackupCodes = creator.twoFactorBackupCodes.filter(code => 
-          code !== backupCode.replace(/[\s-]/g, '').toUpperCase()
+      // Verify backup code if TOTP failed or not provided
+      if (!isValid && backupCode && creator.twoFactorBackupCodes) {
+        const backupResult = twoFactorAuthService.validateBackupCode(
+          creator.twoFactorBackupCodes, 
+          backupCode
         );
         
-        await storage.updateCreator(creatorId, {
-          twoFactorBackupCodes: updatedBackupCodes,
-          lastTwoFactorUsed: new Date()
-        });
+        if (backupResult.isValid) {
+          isValid = true;
+          
+          // Update backup codes (remove used one)
+          await storage.updateCreator(creator.id, {
+            twoFactorBackupCodes: backupResult.remainingCodes,
+            lastTwoFactorUsed: new Date()
+          });
+          
+          console.log(`🔐 Backup code used for creator ${creator.id}. Remaining codes: ${backupResult.remainingCodes.length}`);
+        }
+      }
 
-        console.log(`🔐 Backup code used and removed for creator ${creatorId}. ${updatedBackupCodes.length} codes remaining.`);
-      } else {
-        // Update last 2FA use timestamp
-        await storage.updateCreator(creatorId, {
-          lastTwoFactorUsed: new Date()
+      if (!isValid) {
+        return res.status(403).json({
+          success: false,
+          error: 'Invalid 2FA token or backup code'
         });
       }
 
+      // Mark 2FA as passed for this request
       req.twoFactorPassed = true;
-      console.log(`✅ 2FA verification successful for creator ${creatorId}`);
+      console.log(`✅ 2FA verification passed for creator ${creator.id}`);
+      
       next();
-
     } catch (error) {
       console.error('2FA middleware error:', error);
       res.status(500).json({
         success: false,
-        error: 'Internal server error during 2FA verification'
+        error: 'Two-Factor Authentication verification failed'
       });
     }
   };
 }
 
 /**
- * Determine if 2FA should be required for this request
- */
-function should2FABeRequired(
-  req: Request, 
-  requireFor: string, 
-  sensitiveActions: string[]
-): boolean {
-  // Always require for admin operations
-  if (requireFor === 'admin' || req.path.includes('/admin/')) {
-    return true;
-  }
-
-  // Always require for all operations
-  if (requireFor === 'all') {
-    return true;
-  }
-
-  // Check for sensitive operations
-  if (requireFor === 'sensitive') {
-    const method = req.method.toLowerCase();
-    const path = req.path.toLowerCase();
-    
-    // High-value operations that always need 2FA
-    const criticalPaths = [
-      '/api/rewards/claim',
-      '/api/content-certificate/mint',
-      '/api/creators/wallet/update',
-      '/api/allowance/transfer',
-      '/api/pool/emergency'
-    ];
-
-    if (criticalPaths.some(criticalPath => path.includes(criticalPath))) {
-      return true;
-    }
-
-    // Check if method matches sensitive actions
-    if (method === 'post' && sensitiveActions.includes('create')) return true;
-    if (method === 'put' && sensitiveActions.includes('update')) return true;
-    if (method === 'patch' && sensitiveActions.includes('update')) return true;
-    if (method === 'delete' && sensitiveActions.includes('delete')) return true;
-
-    // Check for sensitive keywords in path
-    const sensitiveKeywords = ['claim', 'mint', 'transfer', 'withdraw', 'emergency'];
-    if (sensitiveKeywords.some(keyword => path.includes(keyword))) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * Optional 2FA middleware - suggests 2FA but doesn't enforce it
+ * Middleware to suggest 2FA setup for sensitive operations
  */
 export function suggest2FA() {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const creatorId = req.session?.user?.id;
-      if (!creatorId) return next();
+      const { creatorId } = req.body;
 
-      const creator = await storage.getCreator(creatorId);
-      if (!creator || creator.twoFactorEnabled) return next();
+      if (!creatorId) {
+        return next(); // Skip if no creator ID
+      }
 
-      // Add suggestion header
-      res.set('X-2FA-Suggestion', 'Setup 2FA for enhanced security');
-      res.set('X-2FA-Setup-URL', '/creator-portal/security/2fa-setup');
-      
+      const creator = await storage.getCreator(parseInt(creatorId));
+      if (!creator) {
+        return next(); // Skip if creator not found
+      }
+
+      // Add suggestion header if 2FA is not enabled
+      if (!creator.twoFactorEnabled) {
+        res.setHeader('X-Suggest-2FA', 'true');
+        res.setHeader('X-2FA-Setup-URL', '/creator-portal?tab=security');
+      }
+
+      req.twoFactorRequired = !creator.twoFactorEnabled;
       next();
     } catch (error) {
-      // Don't block request if suggestion fails
-      next();
+      console.error('2FA suggestion middleware error:', error);
+      next(); // Don't block the request if suggestion fails
     }
   };
 }
 
-export default require2FA;
+/**
+ * Check if 2FA is required for a specific creator
+ */
+export async function check2FAStatus(creatorId: number): Promise<{
+  enabled: boolean;
+  required: boolean;
+  setupUrl?: string;
+}> {
+  try {
+    const creator = await storage.getCreator(creatorId);
+    
+    if (!creator) {
+      return { enabled: false, required: false };
+    }
+
+    return {
+      enabled: creator.twoFactorEnabled || false,
+      required: false, // Could be configurable based on creator tier/settings
+      setupUrl: creator.twoFactorEnabled ? undefined : '/creator-portal?tab=security'
+    };
+  } catch (error) {
+    console.error('2FA status check error:', error);
+    return { enabled: false, required: false };
+  }
+}
