@@ -12,7 +12,7 @@ The WebPayback Protocol founder has successfully injected **1 million WPT tokens
 - **Amount**: 1,000,000 WPT tokens
 - **Transaction Hash**: `0x846cc33656ae78eb5e8764f9dd74bab5e0509441fd2448f418ee434715316324`
 - **Target Contract**: `0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A` (USDT/WPT Pool)
-- **Source Wallet**: `0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba`
+- **Source Wallet**: `0x***********************************************[FOUNDER]`
 - **Gas Used**: 51,492 gas units
 - **Status**: Confirmed on Polygon blockchain
 
@@ -35,8 +35,8 @@ The injection was completed using a direct script approach after resolving ES mo
 ### Code Implementation
 ```javascript
 // Ethers v5 API Usage
-const provider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+const provider = new ethers.providers.JsonRpcProvider([REDACTED_ALCHEMY_URL]);
+const wallet = new ethers.Wallet([REDACTED_PRIVATE_KEY], provider);
 const amountWei = ethers.utils.parseUnits(amount, 18);
 ```
 

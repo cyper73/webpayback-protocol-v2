@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function AllowanceAdmin() {
   const { toast } = useToast();
-  const [selectedWallet, setSelectedWallet] = useState("0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba");
+  const [selectedWallet, setSelectedWallet] = useState("0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8");
   
   const authToken = localStorage.getItem("admin_token") || "";
 

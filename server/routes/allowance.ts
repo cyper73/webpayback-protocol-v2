@@ -15,7 +15,7 @@ import {
 import { eq, desc, and, gte, lte } from "drizzle-orm";
 // Founder-only access control for Allowance Management
 const isFounderAuthenticated = (req: any, res: any, next: any) => {
-  const founderWallet = "0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba";
+  const founderWallet = "0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8";
   
   // Get wallet address from params (GET requests) or body (POST requests)
   const walletAddress = req.params?.walletAddress || req.body?.walletAddress;

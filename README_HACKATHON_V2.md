@@ -61,6 +61,7 @@ A cutting-edge multi-agent blockchain protocol that automatically rewards conten
 - **Features**: Real-time pool monitoring, transaction processing, smart contract interactions
 - **Usage**: Authentic TVL calculations, pool data validation, transaction monitoring
 - **Networks**: Polygon mainnet for WPT v2 token operations
+- **API Key**: [REDACTED_FOR_GITHUB_SECURITY]
 
 ### 🔗 Chainlink Oracle Network
 **Price Feeds & Automation** - Decentralized oracle services
@@ -73,6 +74,7 @@ A cutting-edge multi-agent blockchain protocol that automatically rewards conten
 - **Service**: Polygon blockchain explorer and analytics
 - **Features**: Contract verification, transaction history, address analytics
 - **Usage**: Smart contract verification, transaction monitoring, audit trails
+- **API Key**: [REDACTED_FOR_GITHUB_SECURITY]
 
 ### 🌍 DNS & Domain APIs
 **Domain Verification Services** - Creator website validation
