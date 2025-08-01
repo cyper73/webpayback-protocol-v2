@@ -4,9 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle, XCircle, Copy, Shield } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Copy, Shield, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+
+// MetaMask types
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: any[] }) => Promise<any>;
+    };
+  }
+}
 
 interface WalletVerificationProps {
   walletAddress: string;
@@ -25,6 +34,7 @@ export function WalletVerification({
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [isSigningWithMetaMask, setIsSigningWithMetaMask] = useState(false);
   const { toast } = useToast();
 
   const generateVerificationMessage = async () => {
@@ -71,6 +81,92 @@ export function WalletVerification({
       title: "Message copied",
       description: "Paste it in your wallet to sign",
     });
+  };
+
+  // Sign message automatically with MetaMask
+  const signWithMetaMask = async () => {
+    if (!verificationMessage) {
+      setError('No verification message available');
+      return;
+    }
+
+    if (!window.ethereum) {
+      setError('MetaMask is not installed. Please install MetaMask extension.');
+      return;
+    }
+
+    setIsSigningWithMetaMask(true);
+    setError('');
+
+    try {
+      // Request account access
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      
+      // Get the accounts
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      const account = accounts[0];
+
+      if (account.toLowerCase() !== walletAddress.toLowerCase()) {
+        throw new Error(`MetaMask account (${account}) does not match the entered wallet address (${walletAddress})`);
+      }
+
+      // Sign the message
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [verificationMessage, account],
+      });
+
+      console.log('🔐 MetaMask signature generated:', signature);
+      setSignature(signature);
+      
+      toast({
+        title: "Message signed successfully!",
+        description: "Now verifying the signature...",
+      });
+
+      // Auto-verify the signature
+      await verifySignatureAutomatically(signature);
+
+    } catch (err: any) {
+      console.error('🔐 MetaMask signing error:', err);
+      if (err.code === 4001) {
+        setError('User rejected the signature request');
+      } else {
+        setError(err.message || 'Failed to sign message with MetaMask');
+      }
+    } finally {
+      setIsSigningWithMetaMask(false);
+    }
+  };
+
+  const verifySignatureAutomatically = async (sig: string) => {
+    setIsVerifying(true);
+    
+    try {
+      const response = await apiRequest('POST', '/api/wallet/verify-signature', {
+        walletAddress,
+        message: verificationMessage,
+        signature: sig
+      });
+      const result = await response.json();
+
+      if (result.success && result.verified) {
+        setVerificationStatus('success');
+        onVerificationComplete(sig, verificationMessage);
+        toast({
+          title: "Wallet verified!",
+          description: "Your wallet ownership has been cryptographically verified",
+        });
+      } else {
+        setError(result.error || 'Signature verification failed');
+        setVerificationStatus('error');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+      setVerificationStatus('error');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const verifySignature = async () => {
@@ -246,8 +342,37 @@ export function WalletVerification({
               </AlertDescription>
             </Alert>
 
+            {/* Automatic Signing Options */}
+            <div className="space-y-3">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-3">Choose your preferred method:</div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button 
+                    onClick={signWithMetaMask}
+                    disabled={isSigningWithMetaMask || isVerifying}
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                    size="lg"
+                  >
+                    {isSigningWithMetaMask && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Zap className="mr-2 h-4 w-4" />
+                    Sign Automatically with MetaMask
+                  </Button>
+                  <div className="text-sm text-muted-foreground self-center px-3">or</div>
+                  <Button 
+                    onClick={copyToClipboard}
+                    variant="outline"
+                    className="flex-1"
+                    size="lg"
+                  >
+                    <Copy className="mr-2 h-4 w-4" />
+                    Manual Signing (Copy Message)
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <label className="text-sm font-medium">Signature from Wallet</label>
+              <label className="text-sm font-medium">Signature from Wallet (for manual signing)</label>
               <Textarea
                 value={signature}
                 onChange={(e) => setSignature(e.target.value)}
