@@ -19,6 +19,8 @@ import { aiQueryProtection } from "./services/aiQueryProtection";
 import { vpnDetection } from "./services/vpnDetection";
 import { walletVerificationService } from "./services/walletVerification";
 import { multiWalletVerificationService, WalletType } from "./services/multiWalletVerification";
+import { twoFactorAuthService } from "./services/twoFactorAuth";
+import { require2FA, suggest2FA } from "./middleware/twoFactorProtection";
 import { db } from "./db";
 import { authenticateAdmin, adminLogin } from "./adminAuth";
 import { creators, contentTracking } from "@shared/schema";
@@ -900,6 +902,218 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false, 
         error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
+  // === 2FA AUTHENTICATION ENDPOINTS ===
+  
+  // Generate 2FA setup (QR code and backup codes)
+  app.post("/api/auth/2fa/setup", csrfProtection, async (req, res) => {
+    try {
+      const { creatorId, email } = req.body;
+      
+      if (!creatorId || !email) {
+        return res.status(400).json({
+          success: false,
+          error: "Creator ID and email are required"
+        });
+      }
+
+      // Check if creator exists
+      const creator = await storage.getCreator(creatorId);
+      if (!creator) {
+        return res.status(404).json({
+          success: false,
+          error: "Creator not found"
+        });
+      }
+
+      // Generate 2FA configuration
+      const twoFactorConfig = await twoFactorAuthService.generateTwoFactorSecret(email, creator.websiteUrl);
+      
+      // Store the secret temporarily (not enabled yet)
+      await storage.updateCreator(creatorId, {
+        twoFactorSecret: twoFactorConfig.secret,
+        twoFactorBackupCodes: twoFactorConfig.backupCodes,
+        twoFactorEnabled: false // Not enabled until verified
+      });
+
+      console.log(`🔐 2FA setup generated for creator ${creatorId}`);
+
+      res.json({
+        success: true,
+        setup: {
+          qrCodeUrl: twoFactorConfig.qrCodeUrl,
+          manualEntryCode: twoFactorConfig.manualEntryCode,
+          backupCodes: twoFactorConfig.backupCodes
+        },
+        instructions: twoFactorAuthService.getSetupInstructions()
+      });
+    } catch (error) {
+      console.error('2FA setup error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to setup 2FA'
+      });
+    }
+  });
+
+  // Verify 2FA setup and enable it
+  app.post("/api/auth/2fa/verify-setup", csrfProtection, async (req, res) => {
+    try {
+      const { creatorId, token } = req.body;
+      
+      if (!creatorId || !token) {
+        return res.status(400).json({
+          success: false,
+          error: "Creator ID and verification token are required"
+        });
+      }
+
+      const creator = await storage.getCreator(creatorId);
+      if (!creator || !creator.twoFactorSecret) {
+        return res.status(400).json({
+          success: false,
+          error: "2FA setup not found. Please generate setup first."
+        });
+      }
+
+      // Verify the token
+      const isValid = await twoFactorAuthService.validateSetup(creator.twoFactorSecret, token);
+      
+      if (!isValid) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid verification code. Please try again."
+        });
+      }
+
+      // Enable 2FA
+      await storage.updateCreator(creatorId, {
+        twoFactorEnabled: true,
+        twoFactorSetupAt: new Date()
+      });
+
+      console.log(`✅ 2FA enabled for creator ${creatorId}`);
+
+      res.json({
+        success: true,
+        message: "2FA successfully enabled for your account"
+      });
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to verify 2FA setup'
+      });
+    }
+  });
+
+  // Disable 2FA (requires current 2FA token)
+  app.post("/api/auth/2fa/disable", csrfProtection, require2FA(), async (req, res) => {
+    try {
+      const { creatorId } = req.body;
+      
+      // req.twoFactorPassed is set by the middleware if 2FA verification succeeded
+      if (!req.twoFactorPassed) {
+        return res.status(403).json({
+          success: false,
+          error: "2FA verification required to disable 2FA"
+        });
+      }
+
+      await storage.updateCreator(creatorId, {
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        twoFactorBackupCodes: null,
+        twoFactorSetupAt: null
+      });
+
+      console.log(`🔐 2FA disabled for creator ${creatorId}`);
+
+      res.json({
+        success: true,
+        message: "2FA has been disabled for your account"
+      });
+    } catch (error) {
+      console.error('2FA disable error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to disable 2FA'
+      });
+    }
+  });
+
+  // Get 2FA status
+  app.get("/api/auth/2fa/status/:creatorId", async (req, res) => {
+    try {
+      const { creatorId } = req.params;
+      
+      const creator = await storage.getCreator(parseInt(creatorId));
+      if (!creator) {
+        return res.status(404).json({
+          success: false,
+          error: "Creator not found"
+        });
+      }
+
+      res.json({
+        success: true,
+        status: {
+          enabled: creator.twoFactorEnabled,
+          setupAt: creator.twoFactorSetupAt,
+          lastUsed: creator.lastTwoFactorUsed,
+          backupCodesRemaining: creator.twoFactorBackupCodes?.length || 0
+        }
+      });
+    } catch (error) {
+      console.error('2FA status error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get 2FA status'
+      });
+    }
+  });
+
+  // Generate new backup codes (requires current 2FA)
+  app.post("/api/auth/2fa/regenerate-backup-codes", csrfProtection, require2FA(), async (req, res) => {
+    try {
+      const { creatorId } = req.body;
+      
+      if (!req.twoFactorPassed) {
+        return res.status(403).json({
+          success: false,
+          error: "2FA verification required"
+        });
+      }
+
+      // Generate new backup codes
+      const newBackupCodes = Array.from({ length: 10 }, () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 8; i++) {
+          code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code.substring(0, 4) + '-' + code.substring(4);
+      });
+
+      await storage.updateCreator(parseInt(creatorId), {
+        twoFactorBackupCodes: newBackupCodes
+      });
+
+      console.log(`🔐 New backup codes generated for creator ${creatorId}`);
+
+      res.json({
+        success: true,
+        backupCodes: newBackupCodes,
+        message: "New backup codes generated. Please store them securely."
+      });
+    } catch (error) {
+      console.error('Backup codes regeneration error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate new backup codes'
       });
     }
   });

@@ -9,7 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
-export const creators = pgTable("creators", {
+export const creators: any = pgTable("creators", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   websiteUrl: text("website_url").notNull(),
@@ -24,9 +24,15 @@ export const creators = pgTable("creators", {
   isEarlyAdopter: boolean("is_early_adopter").default(false),
   earlyAdopterRank: integer("early_adopter_rank"),
   referralCode: text("referral_code").unique(),
-  referredBy: integer("referred_by").references(() => creators.id),
+  referredBy: integer("referred_by").references((): any => creators.id),
   totalReferrals: integer("total_referrals").default(0),
   referralBonus: decimal("referral_bonus", { precision: 18, scale: 8 }).default("0"),
+  // Two-Factor Authentication fields for enhanced security
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  twoFactorSecret: text("two_factor_secret"), // Base32 encoded secret for TOTP
+  twoFactorBackupCodes: text("two_factor_backup_codes").array(), // Array of backup codes
+  twoFactorSetupAt: timestamp("two_factor_setup_at"), // When 2FA was enabled
+  lastTwoFactorUsed: timestamp("last_two_factor_used"), // Last successful 2FA verification
   // Channel-level monitoring fields
   platformType: text("platform_type").default("single_page"), // single_page, youtube_channel, instagram_profile, etc.
   channelId: text("channel_id"), // YouTube channel ID, Instagram username, etc.
