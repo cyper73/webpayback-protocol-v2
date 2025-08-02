@@ -664,19 +664,24 @@ export default function CreatorPortal() {
               </div>
               
               {currentCreatorId ? (
-                <TwoFactorAuthSetup 
-                  creatorId={currentCreatorId}
-                  creatorEmail={demoEmail}
-                  preGeneratedSetup={preGeneratedTwoFactorSetup}
-                  onSetupComplete={() => {
-                    toast({
-                      title: "Security Enhanced!",
-                      description: "Your account is now protected with 2FA",
-                    });
-                    // Clear pre-generated setup after completion
-                    setPreGeneratedTwoFactorSetup(null);
-                  }}
-                />
+                <>
+                  <div className="text-xs text-gray-500 mb-2">
+                    Debug: CreatorID={currentCreatorId}, Email={demoEmail}
+                  </div>
+                  <TwoFactorAuthSetup 
+                    creatorId={currentCreatorId}
+                    creatorEmail={demoEmail}
+                    preGeneratedSetup={preGeneratedTwoFactorSetup}
+                    onSetupComplete={() => {
+                      toast({
+                        title: "Security Enhanced!",
+                        description: "Your account is now protected with 2FA",
+                      });
+                      // Clear pre-generated setup after completion
+                      setPreGeneratedTwoFactorSetup(null);
+                    }}
+                  />
+                </>
               ) : (
                 <Card className="w-full">
                   <CardContent className="p-6 text-center">

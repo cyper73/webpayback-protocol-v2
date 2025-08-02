@@ -118,6 +118,7 @@ export default function TwoFactorAuthSetup({
   });
 
   const generateSetup = () => {
+    console.log('🔐 generateSetup clicked for creator:', creatorId, 'email:', creatorEmail);
     setError(null);
     setupMutation.mutate();
   };
