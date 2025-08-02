@@ -33,10 +33,10 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
       const userId = 1; // Demo user ID
       console.log('🔍 Checking existing 2FA for user:', userId);
       
-      const response = await apiRequest('GET', `/api/2fa/status/${userId}`);
+      const response = await apiRequest('GET', `/api/auth/2fa/status/${userId}`);
       const data = await response.json();
       
-      if (data.success && data.enabled) {
+      if (data.success && data.status?.enabled) {
         console.log('✅ 2FA already enabled, showing verification step');
         setStep('verify');
       } else {
@@ -58,7 +58,7 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
       
       console.log('🔄 Generating 2FA setup for user:', userId);
       
-      const response = await apiRequest('POST', '/api/2fa/generate', {
+      const response = await apiRequest('POST', '/api/auth/2fa/setup', {
         userId,
         email
       });
@@ -114,7 +114,7 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
       
       console.log('🔄 Verifying 2FA code for user:', userId);
       
-      const response = await apiRequest('POST', '/api/2fa/verify', {
+      const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', {
         userId,
         token: verificationCode
       });
@@ -173,7 +173,7 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
       
       console.log('🔄 Completing 2FA setup for user:', userId);
       
-      const response = await apiRequest('POST', '/api/2fa/enable', {
+      const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', {
         userId,
         token: verificationCode
       });
