@@ -721,6 +721,214 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== WALLET LOGIN ENDPOINTS =====
+  
+  // Check if wallet is registered (Step 1 of login)
+  app.post("/api/auth/wallet/check", authRateLimit, async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress || typeof walletAddress !== 'string') {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Wallet address is required' 
+        });
+      }
+
+      // Validate wallet address format
+      if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Invalid wallet address format' 
+        });
+      }
+
+      // Get all creators for this wallet
+      const creators = await storage.getAllCreators();
+      const matchingCreators = creators.filter(creator => 
+        creator.walletAddress?.toLowerCase() === walletAddress.toLowerCase()
+      );
+
+      if (matchingCreators.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Wallet not registered. Please register in Creator Portal first.',
+          action: 'register'
+        });
+      }
+
+      // Filter only verified wallets
+      const verifiedCreators = matchingCreators.filter(creator => creator.isWalletVerified);
+      
+      if (verifiedCreators.length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: 'Wallet found but not cryptographically verified. Please complete wallet verification in Creator Portal.',
+          action: 'verify'
+        });
+      }
+
+      // Return verified creators info
+      res.json({
+        success: true,
+        message: `Found ${verifiedCreators.length} verified site(s) for this wallet`,
+        creators: verifiedCreators.map(creator => ({
+          id: creator.id,
+          websiteUrl: creator.websiteUrl,
+          walletAddress: creator.walletAddress,
+          isWalletVerified: creator.isWalletVerified,
+          twoFactorEnabled: creator.twoFactorEnabled,
+          contentCategory: creator.contentCategory
+        }))
+      });
+
+    } catch (error) {
+      console.error('Wallet check failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Create authenticated session after wallet + 2FA verification
+  app.post("/api/auth/wallet/login", authRateLimit, async (req, res) => {
+    try {
+      const { walletAddress, creatorIds } = req.body;
+      
+      if (!walletAddress || !Array.isArray(creatorIds)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Wallet address and creator IDs are required' 
+        });
+      }
+
+      // Verify all creators belong to this wallet
+      const creators = await storage.getAllCreators();
+      const matchingCreators = creators.filter(creator => 
+        creator.walletAddress?.toLowerCase() === walletAddress.toLowerCase() &&
+        creatorIds.includes(creator.id) &&
+        creator.isWalletVerified
+      );
+
+      if (matchingCreators.length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: 'No verified creators found for this wallet'
+        });
+      }
+
+      // Generate session token
+      const sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      
+      // Store session in request for immediate use
+      const sessionData = {
+        sessionToken,
+        walletAddress,
+        authenticatedCreatorIds: matchingCreators.map(c => c.id),
+        loginTime: new Date(),
+        isAuthenticated: true
+      };
+
+      // In a real app, you'd store this in Redis/database
+      // For now, we'll use in-memory storage via session
+      req.session = {
+        ...req.session,
+        authenticated: true,
+        walletAddress,
+        creatorIds: matchingCreators.map(c => c.id),
+        loginTime: new Date().toISOString()
+      };
+
+      console.log(`✅ Wallet login successful: ${walletAddress} with ${matchingCreators.length} creators`);
+
+      res.json({
+        success: true,
+        message: 'Login successful',
+        sessionToken,
+        walletAddress,
+        creators: matchingCreators.map(creator => ({
+          id: creator.id,
+          websiteUrl: creator.websiteUrl,
+          contentCategory: creator.contentCategory
+        }))
+      });
+
+    } catch (error) {
+      console.error('Wallet login failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Verify 2FA code during login
+  app.post("/api/auth/2fa/verify", authRateLimit, async (req, res) => {
+    try {
+      const { creatorId, token } = req.body;
+      
+      if (!creatorId || !token) {
+        return res.status(400).json({ 
+          success: false, 
+          error: '2FA code and creator ID are required' 
+        });
+      }
+
+      // Validate token format (6 digits)
+      if (!/^\d{6}$/.test(token)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Invalid 2FA code format. Please enter a 6-digit code.' 
+        });
+      }
+
+      // Get creator and verify 2FA is enabled
+      const creators = await storage.getAllCreators();
+      const creator = creators.find(c => c.id === creatorId);
+      
+      if (!creator) {
+        return res.status(404).json({
+          success: false,
+          error: 'Creator not found'
+        });
+      }
+
+      if (!creator.twoFactorEnabled || !creator.twoFactorSecret) {
+        return res.status(400).json({
+          success: false,
+          error: '2FA is not enabled for this account'
+        });
+      }
+
+      // Verify the 2FA token
+      const isValid = twoFactorAuthService.verifyToken(creator.twoFactorSecret, token);
+      
+      if (isValid) {
+        console.log(`✅ 2FA verification successful for creator ${creatorId}`);
+        res.json({
+          success: true,
+          message: '2FA verification successful',
+          verified: true
+        });
+      } else {
+        console.log(`❌ 2FA verification failed for creator ${creatorId}`);
+        res.status(400).json({
+          success: false,
+          error: 'Invalid 2FA code. Please check your authenticator app and try again.',
+          verified: false
+        });
+      }
+
+    } catch (error) {
+      console.error('2FA verification failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
   // ===== MULTI-WALLET VERIFICATION ENDPOINTS =====
   
   // Get supported wallet types

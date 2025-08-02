@@ -15,6 +15,7 @@ import CitationsByWallet from "@/pages/CitationsByWallet";
 import PoolDebugger from "@/pages/PoolDebugger";
 import AutomationPage from "@/pages/AutomationPage";
 import { ContentCertificatePage } from "@/pages/ContentCertificatePage";
+import Login from "@/pages/Login";
 
 import PoolHealthDashboard from "@/pages/PoolHealthDashboard";
 import AntiDumpSlippageDashboard from "@/pages/AntiDumpSlippageDashboard";
@@ -32,6 +33,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/getting-started" component={GettingStarted} />
+      <Route path="/login" component={Login} />
       <Route path="/creators" component={CreatorPage} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />

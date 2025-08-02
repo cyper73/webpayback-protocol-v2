@@ -22,12 +22,14 @@ interface WalletVerificationProps {
   walletAddress: string;
   onVerificationComplete: (signature: string, message: string) => void;
   onWalletChange: (address: string) => void;
+  showMultiWalletSupport?: boolean;
 }
 
 export function WalletVerification({ 
   walletAddress, 
   onVerificationComplete, 
-  onWalletChange 
+  onWalletChange,
+  showMultiWalletSupport = false
 }: WalletVerificationProps) {
   const [verificationMessage, setVerificationMessage] = useState('');
   const [signature, setSignature] = useState('');
