@@ -112,6 +112,7 @@ export const DEX_PUBLIC_WALLETS = [
   '0x123456789abcdef0123456789abcdef012345678', // Fake Hex Address
   '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // Dead Beef Address
   '0xcafebabecafebabecafebabecafebabecafebabe', // Cafe Babe Address
+  '0x742d35Cc6634C0532925a3b8D7a6d88b86e5f9a8', // 🚨 MALICIOUS BASTARD WALLET - PERMANENTLY BLACKLISTED
 ];
 
 /**
