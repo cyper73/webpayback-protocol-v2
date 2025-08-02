@@ -2726,9 +2726,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     res.json({
       status: 'healthy',
-      coordinator: '0xAE975071Be8F8eE67addBC1A82488F1C24858067',
-      keyHash: '0x6e099d640cde6de9d40ac749b4b594126b0169747122711109c9985d47751f93',
-      subscriptionId: '1',
+      coordinator: process.env.CHAINLINK_VRF_COORDINATOR || '0x***HIDDEN***',
+      keyHash: process.env.CHAINLINK_VRF_KEY_HASH || '0x***HIDDEN***',
+      subscriptionId: process.env.CHAINLINK_VRF_SUBSCRIPTION_ID || '***HIDDEN***',
       requestConfirmations: 3,
       callbackGasLimit: 300000,
       pendingRequests: 2,

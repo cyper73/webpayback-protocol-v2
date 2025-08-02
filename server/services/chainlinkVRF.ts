@@ -1,10 +1,10 @@
 import { ethers } from 'ethers';
 
-// Chainlink VRF V2 Configuration for Polygon
+// Chainlink VRF V2 Configuration for Polygon - ALL VALUES SECURED IN ENV VARS
 const VRF_CONFIG = {
-  coordinator: '0xAE975071Be8F8eE67addBC1A82488F1C24858067', // Polygon VRF Coordinator
-  keyHash: '0x6e099d640cde6de9d40ac749b4b594126b0169747122711109c9985d47751f93', // 30 gwei key hash
-  subscriptionId: process.env.CHAINLINK_VRF_SUBSCRIPTION_ID || '1', // To be configured
+  coordinator: process.env.CHAINLINK_VRF_COORDINATOR || '', // Polygon VRF Coordinator from ENV
+  keyHash: process.env.CHAINLINK_VRF_KEY_HASH || '', // 30 gwei key hash from ENV
+  subscriptionId: process.env.CHAINLINK_VRF_SUBSCRIPTION_ID || '', // Subscription ID from ENV
   requestConfirmations: 3,
   callbackGasLimit: 300000,
   numWords: 1
