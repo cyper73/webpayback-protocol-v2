@@ -902,7 +902,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify the 2FA token
-      const isValid = twoFactorAuthService.verifyToken(creator.twoFactorSecret, token);
+      const isValid = await twoFactorAuthService.validateToken(creator.twoFactorSecret, token);
       
       if (isValid) {
         console.log(`✅ 2FA verification successful for creator ${creatorId}`);
