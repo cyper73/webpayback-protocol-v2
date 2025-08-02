@@ -13,138 +13,111 @@ interface TwoFactorGateProps {
   requiredFor: string; // "Creator Portal", "NFT Module", "Rewards Module"
 }
 
-interface WalletInputStepProps {
-  onWalletSubmit: (walletAddress: string) => void;
-  isLoading: boolean;
-}
-
 export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: TwoFactorGateProps) {
   const { toast } = useToast();
-  const [step, setStep] = useState<'wallet-input' | 'setup' | 'verify'>('wallet-input');
+  const [step, setStep] = useState<'wallet-auth' | 'setup-2fa' | 'verify-2fa'>('wallet-auth');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [secret, setSecret] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [setupGenerated, setSetupGenerated] = useState(false);
-  const [walletInputValue, setWalletInputValue] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
+  const [creatorId, setCreatorId] = useState<number | null>(null);
 
   // Check if user has a verified wallet first, then check 2FA
   useEffect(() => {
-    checkWalletAndTwoFA();
+    // Start with wallet authentication check
+    checkStoredWallet();
   }, []);
 
-  const checkWalletAndTwoFA = async () => {
-    try {
-      // First check if we have a wallet address in localStorage or context
-      const walletAddress = localStorage.getItem('webpayback_wallet_address');
-      
-      if (!walletAddress) {
-        console.log('❌ No wallet address found, showing wallet input');
-        setStep('wallet-input');
-        return;
-      }
-
-      console.log('🔍 Checking wallet verification for:', walletAddress);
-      
-      // Verify wallet is registered and get creator info
-      const walletResponse = await fetch('/api/content-certificate/verify-wallet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress }),
-      });
-      
-      if (!walletResponse.ok) {
-        console.log('❌ Wallet not verified, showing setup');
-        setStep('setup');
-        return;
-      }
-      
-      const walletData = await walletResponse.json();
-      if (!walletData.success || !walletData.creator) {
-        console.log('❌ Creator not found, showing setup');
-        setStep('setup');
-        return;
-      }
-
-      const creatorId = walletData.creator.id;
-      console.log('🔍 Checking existing 2FA for creator:', creatorId);
-      
-      const response = await apiRequest('GET', `/api/auth/2fa/status/${creatorId}`);
-      const data = await response.json();
-      
-      if (data.success && data.status?.enabled) {
-        console.log('✅ 2FA already enabled, showing verification step');
-        setStep('verify');
-      } else {
-        console.log('❌ 2FA not enabled, showing setup step');
-        setStep('setup');
-      }
-    } catch (error) {
-      console.error('❌ Error checking wallet/2FA status:', error);
-      // Default to wallet input if check fails
-      setStep('wallet-input');
+  const checkStoredWallet = () => {
+    const storedWallet = localStorage.getItem('webpayback_wallet_address');
+    if (storedWallet) {
+      setWalletAddress(storedWallet);
+      // Auto-start wallet verification
+      verifyWalletAndCheck2FA(storedWallet);
+    } else {
+      // No wallet stored, start with wallet auth
+      setStep('wallet-auth');
     }
   };
 
-  const handleWalletSubmit = async (walletAddress: string) => {
+  const verifyWalletAndCheck2FA = async (wallet: string) => {
+    setIsLoading(true);
     try {
-      // Validate wallet address format
-      if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
-        toast({
-          title: "Invalid Wallet",
-          description: "Please enter a valid Ethereum wallet address",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Store wallet address and check verification
-      localStorage.setItem('webpayback_wallet_address', walletAddress);
+      // Step 1: Verify wallet ownership through signature
+      const walletResponse = await fetch('/api/content-certificate/verify-wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: wallet }),
+      });
       
-      // Restart the check process
-      await checkWalletAndTwoFA();
+      if (!walletResponse.ok) {
+        throw new Error('Wallet not verified as registered creator');
+      }
+      
+      const walletData = await walletResponse.json();
+      const creatorIdFound = walletData.creator.id;
+      setCreatorId(creatorIdFound);
+      
+      console.log('✅ Wallet verified for creator:', creatorIdFound);
+
+      // Step 2: Check 2FA status for this creator
+      const response = await fetch(`/api/auth/2fa/status/${creatorIdFound}`);
+      const data = await response.json();
+      
+      if (data.success && data.enabled) {
+        console.log('✅ 2FA enabled, requiring verification');
+        setStep('verify-2fa');
+      } else {
+        console.log('❌ 2FA not setup, starting setup process');
+        setStep('setup-2fa');
+      }
     } catch (error) {
+      console.error('❌ Wallet verification failed:', error);
       toast({
-        title: "Error",
-        description: "Failed to process wallet address",
+        title: "Wallet Verification Failed",
+        description: error instanceof Error ? error.message : "Please ensure your wallet is registered",
         variant: "destructive",
       });
+      setStep('wallet-auth');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleWalletAuth = async (inputWallet: string) => {
+    if (!inputWallet.startsWith('0x') || inputWallet.length !== 42) {
+      toast({
+        title: "Invalid Wallet",
+        description: "Please enter a valid Ethereum wallet address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setWalletAddress(inputWallet);
+    localStorage.setItem('webpayback_wallet_address', inputWallet);
+    await verifyWalletAndCheck2FA(inputWallet);
   };
 
   const generateSetup = async () => {
+    if (!creatorId) {
+      toast({
+        title: "Setup Failed",
+        description: "Creator ID not found. Please verify your wallet first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Get wallet and creator info first
-      const walletAddress = localStorage.getItem('webpayback_wallet_address');
-      if (!walletAddress) {
-        throw new Error('Please connect your wallet first');
-      }
-
-      const walletResponse = await fetch('/api/content-certificate/verify-wallet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress }),
-      });
-      
-      if (!walletResponse.ok) {
-        throw new Error('Wallet not verified. Please register as a creator first.');
-      }
-      
-      const walletData = await walletResponse.json();
-      if (!walletData.success || !walletData.creator) {
-        throw new Error('Creator not found. Please register as a creator first.');
-      }
-
-      const creatorId = walletData.creator.id;
-      const email = walletData.creator.websiteUrl; // Use website as identifier
-      
       console.log('🔄 Generating 2FA setup for creator:', creatorId);
       
       const response = await apiRequest('POST', '/api/auth/2fa/setup', {
         creatorId,
-        email
+        email: `creator-${creatorId}@webpayback.com`
       });
       
       if (!response.ok) {
@@ -161,7 +134,6 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
         // Generate QR code
         const qrUrl = await QRCode.toDataURL(data.setup.qrCodeUrl);
         setQrCodeUrl(qrUrl);
-        setSetupGenerated(true);
         
         toast({
           title: "2FA Setup Generated",
@@ -174,7 +146,7 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
       console.error('❌ Error generating 2FA setup:', error);
       toast({
         title: "Setup Failed",
-        description: error instanceof Error ? error.message : "Failed to generate 2FA setup",
+        description: error instanceof Error ? error.message : "Failed to generate setup",
         variant: "destructive",
       });
     } finally {
@@ -192,27 +164,17 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
       return;
     }
 
+    if (!creatorId) {
+      toast({
+        title: "Verification Failed",
+        description: "Creator ID not found. Please verify your wallet first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Get wallet and creator info
-      const walletAddress = localStorage.getItem('webpayback_wallet_address');
-      if (!walletAddress) {
-        throw new Error('Please connect your wallet first');
-      }
-
-      const walletResponse = await fetch('/api/content-certificate/verify-wallet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress }),
-      });
-      
-      if (!walletResponse.ok) {
-        throw new Error('Wallet not verified');
-      }
-      
-      const walletData = await walletResponse.json();
-      const creatorId = walletData.creator.id;
-      
       console.log('🔄 Verifying 2FA code for creator:', creatorId);
       
       const response = await apiRequest('POST', '/api/auth/2fa/verify-setup', {
@@ -334,57 +296,10 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
     }
   };
 
-  const WalletInputStep = ({ onWalletSubmit, isLoading }: WalletInputStepProps) => (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md glass-card">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-electric-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-electric-blue" />
-          </div>
-          <CardTitle className="text-xl font-bold gradient-text">
-            Connect Your Wallet
-          </CardTitle>
-          <p className="text-gray-400 text-sm mt-2">
-            Please enter your verified wallet address to access <strong>{requiredFor}</strong>
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="wallet-address" className="text-sm font-medium text-gray-300">
-                Wallet Address
-              </Label>
-              <Input
-                id="wallet-address"
-                type="text"
-                placeholder="0x..."
-                value={walletInputValue}
-                onChange={(e) => setWalletInputValue(e.target.value)}
-                className="mt-1 bg-gray-800 border-gray-700 text-white"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Must be a registered creator wallet with cryptographic verification
-              </p>
-            </div>
-            
-            <Button 
-              onClick={() => onWalletSubmit(walletInputValue)}
-              disabled={isLoading || !walletInputValue}
-              className="w-full bg-electric-blue hover:bg-electric-blue/80"
-            >
-              {isLoading ? 'Verifying...' : 'Continue with Wallet'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  if (step === 'wallet-input') {
-    return <WalletInputStep onWalletSubmit={handleWalletSubmit} isLoading={isLoading} />;
-  }
-
-  if (step === 'verify') {
+  // Wallet Authentication Component - Step 1
+  const WalletAuthStep = () => {
+    const [inputWallet, setInputWallet] = useState('');
+    
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <Card className="w-full max-w-md glass-card">
@@ -393,10 +308,62 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
               <Shield className="w-8 h-8 text-electric-blue" />
             </div>
             <CardTitle className="text-xl font-bold gradient-text">
-              Two-Factor Authentication Required
+              Step 1: Wallet Authentication
             </CardTitle>
             <p className="text-gray-400 text-sm mt-2">
-              Access to <strong>{requiredFor}</strong> requires 2FA verification
+              Enter your registered creator wallet to access <strong>{requiredFor}</strong>
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="wallet-address" className="text-sm font-medium text-gray-300">
+                  Ethereum Wallet Address
+                </Label>
+                <Input
+                  id="wallet-address"
+                  type="text"
+                  placeholder="0x..."
+                  value={inputWallet}
+                  onChange={(e) => setInputWallet(e.target.value)}
+                  className="mt-1 bg-gray-800 border-gray-700 text-white"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Must be a registered creator wallet with verified ownership
+                </p>
+              </div>
+              
+              <Button 
+                onClick={() => handleWalletAuth(inputWallet)}
+                disabled={isLoading || !inputWallet}
+                className="w-full bg-electric-blue hover:bg-electric-blue/80"
+              >
+                {isLoading ? 'Verifying Wallet...' : 'Verify Wallet Ownership'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  if (step === 'wallet-auth') {
+    return <WalletAuthStep />;
+  }
+
+  if (step === 'verify-2fa') {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <Card className="w-full max-w-md glass-card">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-electric-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-electric-blue" />
+            </div>
+            <CardTitle className="text-xl font-bold gradient-text">
+              Step 2: Two-Factor Authentication
+            </CardTitle>
+            <p className="text-gray-400 text-sm mt-2">
+              Wallet verified ✓ | Now enter your 2FA code to access <strong>{requiredFor}</strong>
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -432,7 +399,7 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setStep('setup')}
+                onClick={() => setStep('setup-2fa')}
                 className="text-gray-400 hover:text-white"
               >
                 Need to setup 2FA?
@@ -452,14 +419,14 @@ export default function TwoFactorGate({ onAuthenticationSuccess, requiredFor }: 
             <Lock className="w-8 h-8 text-electric-blue" />
           </div>
           <CardTitle className="text-xl font-bold gradient-text">
-            Setup Two-Factor Authentication
+            Step 2: Setup Two-Factor Authentication
           </CardTitle>
           <p className="text-gray-400 text-sm mt-2">
-            Required for accessing <strong>{requiredFor}</strong>
+            Wallet verified ✓ | Setup 2FA to secure your access to <strong>{requiredFor}</strong>
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {!setupGenerated ? (
+          {!qrCodeUrl ? (
             <div className="text-center space-y-4">
               <Key className="w-12 h-12 mx-auto text-gray-400" />
               <p className="text-gray-300 text-sm">
