@@ -295,7 +295,7 @@ export default function TwoFactorAuthSetup({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* QR Code Section */}
             <div className="space-y-4">
-              <div className="bg-white p-6 rounded-lg border-2 border-gray-200 text-center">
+              <div className="bg-white dark:bg-white p-6 rounded-lg border-2 border-gray-200 text-center">
                 <img 
                   src={setup.qrCodeUrl} 
                   alt="2FA QR Code" 
@@ -439,13 +439,13 @@ export default function TwoFactorAuthSetup({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Alert>
-            <Lock className="h-4 w-4" />
-            <AlertDescription>
+          <Alert className="text-gray-900 dark:text-gray-100">
+            <Lock className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+            <AlertDescription className="text-gray-800 dark:text-gray-200">
               <div className="space-y-2">
-                <div className="font-semibold">Your account is now protected</div>
-                <div>Two-Factor Authentication has been enabled for your Creator Portal account. You'll need to provide a 6-digit code from your authenticator app when accessing sensitive features like:</div>
-                <ul className="list-disc list-inside ml-4 space-y-1 text-sm mt-2">
+                <div className="font-semibold text-gray-900 dark:text-gray-100">Your account is now protected</div>
+                <div className="text-gray-700 dark:text-gray-300">Two-Factor Authentication has been enabled for your Creator Portal account. You'll need to provide a 6-digit code from your authenticator app when accessing sensitive features like:</div>
+                <ul className="list-disc list-inside ml-4 space-y-1 text-sm mt-2 text-gray-700 dark:text-gray-300">
                   <li>Claiming WPT rewards</li>
                   <li>Minting Content Certificate NFTs</li>
                   <li>Updating wallet addresses</li>
@@ -456,8 +456,8 @@ export default function TwoFactorAuthSetup({
           </Alert>
 
           <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Important Reminders:</h3>
-            <ul className="text-sm space-y-1">
+            <h3 className="font-semibold mb-2 text-blue-900 dark:text-blue-100">Important Reminders:</h3>
+            <ul className="text-sm space-y-1 text-blue-800 dark:text-blue-200">
               <li>• Keep your backup codes safe and secure</li>
               <li>• Your authenticator app will generate new codes every 30 seconds</li>
               <li>• Contact support if you lose access to your device</li>
