@@ -171,7 +171,7 @@ export default function CreatorPortal() {
     mutationFn: async (data: any) => {
       const { termsAccepted, ...creatorData } = data;
       const response = await apiRequest("POST", "/api/creators", creatorData);
-      return response;
+      return response.json(); // Parse JSON to get the data with 2FA setup
     },
     onSuccess: (data) => {
       toast({
