@@ -32,12 +32,10 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/getting-started" component={GettingStarted} />
-      <Route path="/creators" component={ProtectedCreatorPortal} />
-      <Route path="/nft" component={ProtectedNFTModule} />
-      <Route path="/rewards" component={ProtectedRewardsModule} />
+      <Route path="/creators" component={CreatorPage} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />
-      <Route path="/content-certificate" component={ContentCertificatePage} />
+      <Route path="/content-certificate" component={ProtectedNFTModule} />
 
       <Route path="/pool-health" component={PoolHealthDashboard} />
       <Route path="/anti-dump" component={AntiDumpSlippageDashboard} />
@@ -46,7 +44,7 @@ function Router() {
       <Route path="/admin/allowance" component={AllowanceAdmin} />
       <Route path="/admin/auto-pool" component={AutoPoolAdmin} />
       <Route path="/pool-debug" component={PoolDebugger} />
-      <Route path="/citations" component={Citations} />
+      <Route path="/citations" component={ProtectedRewardsModule} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />

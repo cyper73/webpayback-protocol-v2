@@ -127,38 +127,17 @@ export default function Dashboard() {
               </Button>
             </RouterLink>
             
-            <RouterLink to="/creators">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
-                <User className="w-4 h-4 mr-2" />
-                Creator Portal (2FA)
-              </Button>
-            </RouterLink>
-            
-            <RouterLink to="/nft">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-purple-500/30 hover:bg-purple-500/20 text-white">
-                <Shield className="w-4 h-4 mr-2" />
-                NFT Module (2FA)
-              </Button>
-            </RouterLink>
-            
-            <RouterLink to="/rewards">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-neon-green/30 hover:bg-neon-green/20 text-white">
-                <Coins className="w-4 h-4 mr-2" />
-                Rewards (2FA)
-              </Button>
-            </RouterLink>
-            
             <RouterLink to="/content-certificate">
               <Button variant="outline" size="sm" className="bg-glass-dark border-orange-500/30 hover:bg-orange-500/20 text-white">
                 <Shield className="w-4 h-4 mr-2" />
-                Content Certificate
+                Content Certificate (2FA)
               </Button>
             </RouterLink>
             
             <RouterLink to="/citations">
               <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
                 <FileText className="w-4 h-4 mr-2" />
-                Citations Rewards
+                Citations Rewards (2FA)
               </Button>
             </RouterLink>
             
