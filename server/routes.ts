@@ -40,6 +40,7 @@ import {
   sanitizeRequestBody, 
   validateApiParams 
 } from "./security/inputValidation";
+import { shouldRickrollWallet, RICKROLL_URL } from "./security/dexBlacklist";
 import { 
   csrfProtection, 
   enhancedCSRFProtection,
@@ -569,6 +570,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== WALLET SECURITY & VERIFICATION ENDPOINTS =====
+  
+  // Security check for DEX wallet blacklist (prevents rickroll attempts)
+  app.post("/api/wallet/security-check", csrfProtection, async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Wallet address is required" 
+        });
+      }
+
+      // Check if wallet should be rickrolled
+      if (shouldRickrollWallet(walletAddress)) {
+        console.log(`🚨 SECURITY ALERT: DEX/fake wallet detected ${walletAddress}`);
+        return res.status(200).json({
+          success: false,
+          isBlacklisted: true,
+          redirectUrl: RICKROLL_URL,
+          message: "This wallet address is not eligible for registration",
+          rickrollActivated: true
+        });
+      }
+
+      res.json({
+        success: true,
+        isBlacklisted: false,
+        message: "Wallet address passed security check"
+      });
+    } catch (error) {
+      console.error('Wallet security check error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: sanitizeErrorMessage(error instanceof Error ? error.message : 'Unknown error') 
+      });
+    }
+  });
+
   // ===== WALLET CRYPTOGRAPHIC VERIFICATION ENDPOINTS =====
   
   // Generate verification message for wallet signing
@@ -740,6 +781,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ 
           success: false, 
           error: 'Invalid wallet address format' 
+        });
+      }
+
+      // 🚨 DEX WALLET SECURITY CHECK - Block malicious login attempts
+      if (shouldRickrollWallet(walletAddress)) {
+        console.log(`🚨 RICKROLL LOGIN ATTEMPT: Blocking DEX/fake wallet ${walletAddress}`);
+        return res.status(302).json({
+          success: false,
+          error: "Nice try! 🎵",
+          redirectUrl: RICKROLL_URL,
+          rickrolled: true
         });
       }
 
@@ -1333,6 +1385,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Schema validation with Qloo-compatible categories
       const schemaValidatedData = insertCreatorSchema.parse(sanitizedBody);
+      
+      // 🚨 DEX WALLET SECURITY CHECK - Rickroll malicious wallet addresses
+      if (schemaValidatedData.walletAddress && shouldRickrollWallet(schemaValidatedData.walletAddress)) {
+        console.log(`🚨 RICKROLL ACTIVATED: Blocking DEX/fake wallet ${schemaValidatedData.walletAddress}`);
+        return res.status(302).json({
+          success: false,
+          error: "Invalid wallet detected",
+          redirectUrl: RICKROLL_URL,
+          message: "Never gonna give you up, never gonna let you down! 🎵",
+          rickrolled: true
+        });
+      }
       
       // Extract channel information from the URL
       const channelInfo = channelMonitoringService.extractChannelInfo(schemaValidatedData.websiteUrl);

@@ -28,6 +28,7 @@ import ProtectedCreatorPortal from "@/components/auth/ProtectedCreatorPortal";
 import ProtectedNFTModule from "@/components/auth/ProtectedNFTModule";
 import ProtectedRewardsModule from "@/components/auth/ProtectedRewardsModule";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
+import { SecurityTest } from "@/pages/SecurityTest";
 function Router() {
   return (
     <Switch>
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/pool-debug" component={PoolDebugger} />
       <Route path="/citations" component={ProtectedRewardsModule} />
       <Route path="/citations/:walletAddress" component={CitationsByWallet} />
+      <Route path="/security-test" component={SecurityTest} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route component={NotFound} />
