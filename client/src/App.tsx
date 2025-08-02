@@ -23,13 +23,18 @@ import AdminLogin from "@/pages/AdminLogin";
 import AllowanceAdmin from "@/pages/admin/AllowanceAdmin";
 import AutoPoolAdmin from "@/pages/admin/AutoPoolAdmin";
 import CreatorPage from "@/pages/CreatorPage";
+import ProtectedCreatorPortal from "@/components/auth/ProtectedCreatorPortal";
+import ProtectedNFTModule from "@/components/auth/ProtectedNFTModule";
+import ProtectedRewardsModule from "@/components/auth/ProtectedRewardsModule";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/getting-started" component={GettingStarted} />
-      <Route path="/creators" component={CreatorPage} />
+      <Route path="/creators" component={ProtectedCreatorPortal} />
+      <Route path="/nft" component={ProtectedNFTModule} />
+      <Route path="/rewards" component={ProtectedRewardsModule} />
       <Route path="/staking" component={PolStakingPage} />
       <Route path="/automation" component={AutomationPage} />
       <Route path="/content-certificate" component={ContentCertificatePage} />

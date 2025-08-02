@@ -21,7 +21,7 @@ import { AlchemyUsageMonitor } from "@/components/monitoring/AlchemyUsageMonitor
 import QlooCulturalDashboard from "@/components/cultural/QlooCulturalDashboard";
 import { AIQueryProtectionDashboard } from "@/components/security/AIQueryProtectionDashboard";
 
-import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen, Activity } from "lucide-react";
+import { Box, Wallet, Coins, Link, Shield, FileText, BookOpen, Activity, User, TrendingUp, AlertTriangle, CheckCircle, Zap, Users, Globe, ArrowUpRight, DollarSign, PieChart, BarChart3, Clock, RefreshCw, Eye, Rocket } from "lucide-react";
 import { Link as RouterLink } from "wouter";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import wptLogo from "@assets/wpt-logo_1752556131899.png";
@@ -124,6 +124,27 @@ export default function Dashboard() {
               <Button variant="outline" size="sm" className="bg-glass-dark border-blue-500/30 hover:bg-blue-500/20 text-white">
                 <BookOpen className="w-4 h-4 mr-2" />
                 Getting Started
+              </Button>
+            </RouterLink>
+            
+            <RouterLink to="/creators">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
+                <User className="w-4 h-4 mr-2" />
+                Creator Portal (2FA)
+              </Button>
+            </RouterLink>
+            
+            <RouterLink to="/nft">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-purple-500/30 hover:bg-purple-500/20 text-white">
+                <Shield className="w-4 h-4 mr-2" />
+                NFT Module (2FA)
+              </Button>
+            </RouterLink>
+            
+            <RouterLink to="/rewards">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-neon-green/30 hover:bg-neon-green/20 text-white">
+                <Coins className="w-4 h-4 mr-2" />
+                Rewards (2FA)
               </Button>
             </RouterLink>
             
