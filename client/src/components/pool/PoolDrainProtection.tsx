@@ -56,7 +56,7 @@ export default function PoolDrainProtection() {
 
   const { data: stats, isLoading: statsLoading } = useQuery<PoolProtectionStats>({
     queryKey: ['/api/pool/drain-protection/stats'],
-    refetchInterval: 10000, // Refresh every 10 seconds
+    refetchInterval: 120000, // Reduced from 10s to 2 minutes - protection stats are stable
   });
 
   const { data: securityEvents, isLoading: eventsLoading } = useQuery<{ 
@@ -65,7 +65,7 @@ export default function PoolDrainProtection() {
     timestamp: string; 
   }>({
     queryKey: ['/api/pool/drain-protection/security-events'],
-    refetchInterval: 15000, // Refresh every 15 seconds
+    refetchInterval: 180000, // Reduced from 15s to 3 minutes - events are rare
   });
 
 

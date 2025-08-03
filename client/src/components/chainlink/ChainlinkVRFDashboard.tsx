@@ -83,7 +83,7 @@ export function ChainlinkVRFDashboard() {
 
   useEffect(() => {
     fetchVRFData();
-    const interval = setInterval(fetchVRFData, 15000); // Refresh every 15 seconds
+    const interval = setInterval(fetchVRFData, 120000); // Reduced from 15s to 2 minutes - VRF requests are infrequent
     return () => clearInterval(interval);
   }, []);
 

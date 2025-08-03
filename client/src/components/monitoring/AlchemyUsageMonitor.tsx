@@ -31,12 +31,12 @@ interface AlchemyUsageData {
 export function AlchemyUsageMonitor() {
   const { data: usageData, refetch } = useQuery<AlchemyUsageData>({
     queryKey: ['/api/reentrancy/alchemy/usage'],
-    refetchInterval: 30000, // Update every 30 seconds
+    refetchInterval: 300000, // Reduced from 30s to 5 minutes - usage accumulates gradually
   });
 
   const { data: statusData } = useQuery({
     queryKey: ['/api/reentrancy/alchemy/status'],
-    refetchInterval: 30000,
+    refetchInterval: 300000, // Reduced from 30s to 5 minutes
   });
 
   if (!usageData?.success) {

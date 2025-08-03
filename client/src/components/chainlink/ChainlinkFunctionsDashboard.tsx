@@ -89,7 +89,7 @@ export function ChainlinkFunctionsDashboard() {
 
   useEffect(() => {
     fetchFunctionsData();
-    const interval = setInterval(fetchFunctionsData, 20000); // Refresh every 20 seconds
+    const interval = setInterval(fetchFunctionsData, 180000); // Reduced from 20s to 3 minutes - functions data is stable
     return () => clearInterval(interval);
   }, []);
 

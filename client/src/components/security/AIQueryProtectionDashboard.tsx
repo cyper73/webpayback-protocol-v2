@@ -40,13 +40,13 @@ export function AIQueryProtectionDashboard() {
   // Fetch AI Query Stats
   const { data: queryStats, isLoading: queryStatsLoading } = useQuery({
     queryKey: ['/api/ai-query/stats'],
-    refetchInterval: 10000 // Refresh every 10 seconds
+    refetchInterval: 60000 // Reduced from 10s to 1 minute - stats accumulate slowly
   });
 
   // Fetch VPN Stats
   const { data: vpnStats, isLoading: vpnStatsLoading } = useQuery({
     queryKey: ['/api/vpn/stats'],
-    refetchInterval: 10000
+    refetchInterval: 60000 // Reduced from 10s to 1 minute
   });
 
 

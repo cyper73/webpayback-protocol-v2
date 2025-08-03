@@ -62,7 +62,7 @@ const FakeCreatorDetection: React.FC = () => {
     };
 
     loadData();
-    const interval = setInterval(loadData, 30000); // Refresh ogni 30 secondi
+    const interval = setInterval(loadData, 300000); // Reduced from 30s to 5 minutes - fake creator detection is background process
     return () => clearInterval(interval);
   }, []);
 

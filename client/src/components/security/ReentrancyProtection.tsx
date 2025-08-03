@@ -37,7 +37,7 @@ const ReentrancyProtection: React.FC = () => {
     };
 
     loadStats();
-    const interval = setInterval(loadStats, 30000); // Refresh ogni 30 secondi
+    const interval = setInterval(loadStats, 300000); // Reduced from 30s to 5 minutes - security stats are stable
     return () => clearInterval(interval);
   }, []);
 

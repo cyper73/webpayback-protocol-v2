@@ -33,7 +33,7 @@ export default function SimpleInfrastructure() {
   // Gas Pool data
   const { data: gasStatus } = useQuery<GasSystemStatus>({
     queryKey: ['/api/gas/status'],
-    refetchInterval: 5000,
+    refetchInterval: 60000, // Reduced from 5s to 1 minute - infrastructure data is stable
     retry: 1
   });
 
