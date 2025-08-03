@@ -41,14 +41,14 @@ export default function UnifiedPoolDisplay() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Get both pools data
-  const { data: usdtPoolInfo } = useQuery<PoolInfo>({
+  const { data: usdtPoolInfo, refetch: refetchUsdt } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info?type=usdt'],
-    refetchInterval: 30000
+    refetchInterval: 15000
   });
 
-  const { data: wmaticPoolInfo } = useQuery<PoolInfo>({
+  const { data: wmaticPoolInfo, refetch: refetchWmatic } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info?type=wmatic'],
-    refetchInterval: 30000
+    refetchInterval: 15000
   });
 
   const { data: networkStatus } = useQuery<NetworkStatus>({
@@ -59,13 +59,14 @@ export default function UnifiedPoolDisplay() {
     setIsRefreshing(true);
     try {
       await apiRequest('/api/web3/refresh-pools', 'POST');
-      // Refresh after 2 seconds to allow backend processing
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      // Refresh queries after 1 second to allow backend processing
+      setTimeout(async () => {
+        await refetchUsdt();
+        await refetchWmatic();
+        setIsRefreshing(false);
+      }, 1000);
     } catch (error) {
       console.error('Failed to refresh pools:', error);
-    } finally {
       setIsRefreshing(false);
     }
   };
@@ -111,7 +112,7 @@ export default function UnifiedPoolDisplay() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Liquidity Pools Monitor</h2>
-          <p className="text-gray-500">Monitoraggio completo di tutte le pool WebPayback</p>
+          <p className="text-gray-700 dark:text-gray-300">Monitoraggio completo di tutte le pool WebPayback</p>
         </div>
         <Button 
           onClick={handleForceRefresh}
@@ -206,7 +207,7 @@ export default function UnifiedPoolDisplay() {
                     <Activity className="h-4 w-4 text-purple-600" />
                     <span className="text-sm font-medium">Prezzo</span>
                   </div>
-                  <div className="text-sm font-mono">
+                  <div className="text-sm font-mono text-gray-800 dark:text-gray-200">
                     {pool.price} {pool.token0 === 'USDT' ? 'USDT/WPT' : 'WMATIC/WPT'}
                   </div>
                 </div>
@@ -226,12 +227,12 @@ export default function UnifiedPoolDisplay() {
               <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-500">Fee Tier:</span>
-                    <div className="font-medium">{pool.fee}</div>
+                    <span className="text-gray-700 dark:text-gray-300">Fee Tier:</span>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{pool.fee}</div>
                   </div>
                   <div>
-                    <span className="text-gray-500">Pair:</span>
-                    <div className="font-medium">{pool.token0}/{pool.token1}</div>
+                    <span className="text-gray-700 dark:text-gray-300">Pair:</span>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{pool.token0}/{pool.token1}</div>
                   </div>
                 </div>
               </div>
@@ -245,11 +246,11 @@ export default function UnifiedPoolDisplay() {
                     ) : (
                       <AlertTriangle className="h-4 w-4 text-yellow-500" />
                     )}
-                    <span className="capitalize">
+                    <span className="capitalize text-gray-800 dark:text-gray-200 font-medium">
                       {pool.status === 'active' ? 'Attiva' : 'Fuori Range'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-gray-500">
+                  <div className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
                     <Clock className="h-4 w-4" />
                     {pool.lastUpdated && formatLastUpdate(pool.lastUpdated)}
                   </div>
@@ -257,7 +258,7 @@ export default function UnifiedPoolDisplay() {
               </div>
 
               {/* Pool Description */}
-              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm">
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm text-gray-800 dark:text-gray-200">
                 {pool.description}
               </div>
             </CardContent>
@@ -268,13 +269,13 @@ export default function UnifiedPoolDisplay() {
       {/* Data Source Info */}
       <Card className="border-gray-300">
         <CardContent className="pt-4">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
               <span>Dati autentici dalla blockchain Polygon</span>
             </div>
             <Badge variant="outline">
-              Refresh ogni 12 ore
+              Aggiornamento automatico ogni 15 secondi
             </Badge>
           </div>
         </CardContent>
