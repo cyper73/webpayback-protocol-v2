@@ -53,9 +53,6 @@ interface ProtectionTestResult {
 }
 
 export default function PoolDrainProtection() {
-  const [testResult, setTestResult] = useState<ProtectionTestResult | null>(null);
-  const [testLoading, setTestLoading] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState("");
 
   const { data: stats, isLoading: statsLoading } = useQuery<PoolProtectionStats>({
     queryKey: ['/api/pool/drain-protection/stats'],
@@ -71,29 +68,7 @@ export default function PoolDrainProtection() {
     refetchInterval: 15000, // Refresh every 15 seconds
   });
 
-  const testProtection = async (simulationType: string) => {
-    setTestLoading(true);
-    try {
-      const response = await apiRequest('/api/pool/drain-protection/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: selectedWallet,
-          rewardAmount: 1.0,
-          simulationType
-        })
-      });
 
-      if (response.ok) {
-        const result = await response.json();
-        setTestResult(result);
-      }
-    } catch (error) {
-      console.error('Protection test failed:', error);
-    } finally {
-      setTestLoading(false);
-    }
-  };
 
   const getRiskColor = (riskScore: number) => {
     if (riskScore >= 80) return 'text-red-600';
@@ -273,96 +248,6 @@ export default function PoolDrainProtection() {
           </CardContent>
         </Card>
       )}
-
-      {/* Protection Testing */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <DollarSign className="h-4 w-4 text-green-500" />
-            <span>Protection Testing</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                onClick={() => testProtection('normal')}
-                disabled={testLoading}
-                variant="outline"
-                size="sm"
-              >
-                Normal Test
-              </Button>
-              <Button 
-                onClick={() => testProtection('high_frequency')}
-                disabled={testLoading}
-                variant="outline"
-                size="sm"
-              >
-                High Frequency
-              </Button>
-              <Button 
-                onClick={() => testProtection('large_amount')}
-                disabled={testLoading}
-                variant="outline"
-                size="sm"
-              >
-                Large Amount
-              </Button>
-              <Button 
-                onClick={() => testProtection('drain_attempt')}
-                disabled={testLoading}
-                variant="destructive"
-                size="sm"
-              >
-                Drain Attempt
-              </Button>
-            </div>
-
-            {testResult && (
-              <Alert className={testResult.protection.canDistribute ? "border-green-200" : "border-red-200"}>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Test Type:</span>
-                      <Badge variant="outline">{testResult.simulationType}</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Amount:</span>
-                      <span>{testResult.testAmount} WPT</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Result:</span>
-                      <Badge variant={testResult.protection.canDistribute ? "default" : "destructive"}>
-                        {testResult.protection.canDistribute ? "ALLOWED" : "BLOCKED"}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Risk Score:</span>
-                      <span className={getRiskColor(testResult.protection.riskScore)}>
-                        {testResult.protection.riskScore.toFixed(1)}%
-                      </span>
-                    </div>
-                    {testResult.protection.securityAlerts.length > 0 && (
-                      <div className="mt-2">
-                        <div className="text-sm font-medium mb-1">Security Alerts:</div>
-                        <div className="space-y-1">
-                          {testResult.protection.securityAlerts.map((alert, index) => (
-                            <div key={index} className="text-xs text-red-600 bg-red-50 p-1 rounded">
-                              {alert}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

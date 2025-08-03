@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, AlertTriangle, Check, X, TestTube, Search, Target } from "lucide-react";
+import { Shield, AlertTriangle, Search, Target, X } from "lucide-react";
 
 interface FakeCreatorStats {
   totalBlocked: number;
@@ -40,10 +36,6 @@ interface FakeCreatorAlert {
 const FakeCreatorDetection: React.FC = () => {
   const [stats, setStats] = useState<FakeCreatorStats | null>(null);
   const [alerts, setAlerts] = useState<FakeCreatorAlert[]>([]);
-  const [testUrl, setTestUrl] = useState('');
-  const [simulationType, setSimulationType] = useState('');
-  const [testResult, setTestResult] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Carica statistiche e alert
@@ -74,41 +66,7 @@ const FakeCreatorDetection: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Esegui test di rilevamento
-  const runTest = async () => {
-    if (!simulationType) {
-      setError('Please select a simulation type');
-      return;
-    }
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/fake-creator/test', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          testUrl,
-          simulationType,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setTestResult(result);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Test failed');
-      }
-    } catch (err) {
-      setError('Failed to run test');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Ottieni colore per il livello di rischio
   const getRiskColor = (level: string) => {
@@ -212,106 +170,6 @@ const FakeCreatorDetection: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Testing Interface */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TestTube className="h-4 w-4 mr-2" />
-            Detection Testing
-          </CardTitle>
-          <CardDescription>
-            Test the fake creator detection system with different scenarios
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Enter URL to test (optional)"
-                value={testUrl}
-                onChange={(e) => setTestUrl(e.target.value)}
-                className="flex-1"
-              />
-              <Select value={simulationType} onValueChange={setSimulationType}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select test type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="typosquatting">Typosquatting</SelectItem>
-                  <SelectItem value="homograph">Homograph Attack</SelectItem>
-                  <SelectItem value="subdomain">Subdomain Fake</SelectItem>
-                  <SelectItem value="legitimate">Legitimate Domain</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button onClick={runTest} disabled={isLoading}>
-                {isLoading ? 'Testing...' : 'Test'}
-              </Button>
-            </div>
-
-            {error && (
-              <Alert className="border-red-200 bg-red-50">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {testResult && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Test Results</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Test Domain:</span>
-                      <span className="font-mono text-sm">{testResult.testDomain}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Suspicious:</span>
-                      <div className="flex items-center space-x-2">
-                        {testResult.detection.isSuspicious ? (
-                          <X className="h-4 w-4 text-red-500" />
-                        ) : (
-                          <Check className="h-4 w-4 text-green-500" />
-                        )}
-                        <span className={testResult.detection.isSuspicious ? 'text-red-600' : 'text-green-600'}>
-                          {testResult.detection.isSuspicious ? 'Yes' : 'No'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Similarity Score:</span>
-                      <span className="font-semibold">{testResult.detection.similarity?.toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Risk Level:</span>
-                      {getRiskBadge(testResult.detection.riskLevel)}
-                    </div>
-                    {testResult.detection.matchedDomain && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Matched Domain:</span>
-                        <span className="font-mono text-sm">{testResult.detection.matchedDomain}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Would Block:</span>
-                      <span className={testResult.detection.wouldBlock ? 'text-red-600' : 'text-green-600'}>
-                        {testResult.detection.wouldBlock ? 'Yes' : 'No'}
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t">
-                      <p className="text-xs text-gray-600">
-                        <strong>Evidence:</strong> {testResult.detection.evidence}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Top Suspicious URLs */}
       <Card>
