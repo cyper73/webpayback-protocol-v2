@@ -48,9 +48,9 @@ export default function PoolHealthDashboard() {
   const [testReward, setTestReward] = useState(1000);
 
   // Fetch pool health status
-  const { data: healthStatus, isLoading: statusLoading } = useQuery({
+  const { data: healthStatus, isLoading: statusLoading, refetch: refetchStatus } = useQuery({
     queryKey: ['/api/pool-health/status'],
-    refetchInterval: 3600000, // Reduced from 30s to 1 hour - pool health is stable
+    refetchInterval: 300000, // Reduced to 5 minutes for better balance
   });
 
   // Fetch pool health alerts
@@ -119,6 +119,12 @@ export default function PoolHealthDashboard() {
             Ethical Equilibrium Algorithm - Real-time Monitoring
           </p>
         </div>
+        <Button
+          onClick={() => refetchStatus()}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          Aggiorna Dati
+        </Button>
       </div>
 
       {/* Ethical Equilibrium Status Alert */}
@@ -148,11 +154,11 @@ export default function PoolHealthDashboard() {
             {/* Current Reward Factor */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-800 dark:text-gray-200">Current Reward Factor</CardTitle>
-                <Zap className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">Current Reward Factor</CardTitle>
+                <Zap className="h-4 w-4 text-gray-700 dark:text-gray-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <div className="text-2xl font-bold text-black dark:text-white">
                   {status?.rewardScaling.percentage}%
                 </div>
                 <Badge 
@@ -175,11 +181,11 @@ export default function PoolHealthDashboard() {
             {/* USDT Pool TVL */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-800 dark:text-gray-200">USDT Pool TVL</CardTitle>
-                <DollarSign className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">USDT Pool TVL</CardTitle>
+                <DollarSign className="h-4 w-4 text-gray-700 dark:text-gray-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <div className="text-2xl font-bold text-black dark:text-white">
                   ${status?.usdtPool.tvl?.toFixed(2)}
                 </div>
                 <div className="flex items-center mt-2">
@@ -197,11 +203,11 @@ export default function PoolHealthDashboard() {
             {/* WMATIC Pool TVL */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-800 dark:text-gray-200">WMATIC Pool TVL</CardTitle>
-                <BarChart3 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">WMATIC Pool TVL</CardTitle>
+                <BarChart3 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <div className="text-2xl font-bold text-black dark:text-white">
                   ${status?.wmaticPool.tvl?.toFixed(2)}
                 </div>
                 <div className="flex items-center mt-2">
