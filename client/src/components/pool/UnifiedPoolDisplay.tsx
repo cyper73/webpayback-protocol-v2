@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,16 +39,21 @@ interface NetworkStatus {
 
 export default function UnifiedPoolDisplay() {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
   // Get both pools data
   const { data: usdtPoolInfo, refetch: refetchUsdt } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info?type=usdt'],
-    refetchInterval: 3600000 // 1 hour
+    refetchInterval: 3600000, // 1 hour
+    staleTime: 0,
+    gcTime: 0
   });
 
   const { data: wmaticPoolInfo, refetch: refetchWmatic } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info?type=wmatic'],
-    refetchInterval: 3600000 // 1 hour
+    refetchInterval: 3600000, // 1 hour
+    staleTime: 0,
+    gcTime: 0
   });
 
   const { data: networkStatus } = useQuery<NetworkStatus>({
@@ -58,13 +63,21 @@ export default function UnifiedPoolDisplay() {
   const handleForceRefresh = async () => {
     setIsRefreshing(true);
     try {
+      // Invalidate all pool data cache
+      await queryClient.invalidateQueries({ 
+        queryKey: ['/api/web3/pool-info'],
+        exact: false 
+      });
+      
+      // Force refresh pools
       await apiRequest('/api/web3/refresh-pools', 'POST');
-      // Refresh queries after 1 second to allow backend processing
+      
+      // Wait and refresh data
       setTimeout(async () => {
         await refetchUsdt();
         await refetchWmatic();
         setIsRefreshing(false);
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error('Failed to refresh pools:', error);
       setIsRefreshing(false);
