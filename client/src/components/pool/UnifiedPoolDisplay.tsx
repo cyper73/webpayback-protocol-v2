@@ -43,12 +43,12 @@ export default function UnifiedPoolDisplay() {
   // Get both pools data
   const { data: usdtPoolInfo, refetch: refetchUsdt } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info?type=usdt'],
-    refetchInterval: 15000
+    refetchInterval: 3600000 // 1 hour
   });
 
   const { data: wmaticPoolInfo, refetch: refetchWmatic } = useQuery<PoolInfo>({
     queryKey: ['/api/web3/pool-info?type=wmatic'],
-    refetchInterval: 15000
+    refetchInterval: 3600000 // 1 hour
   });
 
   const { data: networkStatus } = useQuery<NetworkStatus>({
@@ -275,7 +275,7 @@ export default function UnifiedPoolDisplay() {
               <span>Dati autentici dalla blockchain Polygon</span>
             </div>
             <Badge variant="outline">
-              Aggiornamento automatico ogni 15 secondi
+              Aggiornamento automatico ogni ora
             </Badge>
           </div>
         </CardContent>
