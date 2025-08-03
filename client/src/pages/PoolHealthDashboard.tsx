@@ -50,13 +50,13 @@ export default function PoolHealthDashboard() {
   // Fetch pool health status
   const { data: healthStatus, isLoading: statusLoading } = useQuery({
     queryKey: ['/api/pool-health/status'],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 3600000, // Reduced from 30s to 1 hour - pool health is stable
   });
 
   // Fetch pool health alerts
   const { data: alertsData, isLoading: alertsLoading } = useQuery({
     queryKey: ['/api/pool-health/alerts'],
-    refetchInterval: 30000,
+    refetchInterval: 600000, // Reduced from 30s to 10 minutes - alerts are infrequent
   });
 
   // Fetch pool health thresholds
@@ -112,10 +112,10 @@ export default function PoolHealthDashboard() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
             Pool Health Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-gray-700 dark:text-gray-300 mt-2">
             Ethical Equilibrium Algorithm - Real-time Monitoring
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function PoolHealthDashboard() {
         <AlertTitle className="text-blue-800 dark:text-blue-200">
           Ethical Equilibrium Algorithm ACTIVE
         </AlertTitle>
-        <AlertDescription className="text-blue-700 dark:text-blue-300">
+        <AlertDescription className="text-blue-800 dark:text-blue-200">
           <strong>Activation Threshold:</strong> $20,000 USDT • 
           <strong> Current Liquidity:</strong> ${status?.usdtPool.tvl?.toFixed(2)} USDT • 
           <strong> Status:</strong> Rewards maintained at reduced values (60%) until threshold is reached
@@ -148,11 +148,11 @@ export default function PoolHealthDashboard() {
             {/* Current Reward Factor */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Current Reward Factor</CardTitle>
-                <Zap className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-800 dark:text-gray-200">Current Reward Factor</CardTitle>
+                <Zap className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {status?.rewardScaling.percentage}%
                 </div>
                 <Badge 
@@ -175,11 +175,11 @@ export default function PoolHealthDashboard() {
             {/* USDT Pool TVL */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">USDT Pool TVL</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-800 dark:text-gray-200">USDT Pool TVL</CardTitle>
+                <DollarSign className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   ${status?.usdtPool.tvl?.toFixed(2)}
                 </div>
                 <div className="flex items-center mt-2">
@@ -197,11 +197,11 @@ export default function PoolHealthDashboard() {
             {/* WMATIC Pool TVL */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">WMATIC Pool TVL</CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-gray-800 dark:text-gray-200">WMATIC Pool TVL</CardTitle>
+                <BarChart3 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   ${status?.wmaticPool.tvl?.toFixed(2)}
                 </div>
                 <div className="flex items-center mt-2">
