@@ -59,33 +59,42 @@ export class QlooService {
       }
       console.log(`🔍 Analyzing content with Qloo LIVE API: ${contentUrl}`);
       
-      // Try multiple Qloo API endpoints to find working format
+      // Try multiple Qloo API endpoints according to hackathon forum guidelines
       const attempts = [
-        // Attempt 1: Try known entity IDs for cultural content
+        // Attempt 1: Use the CORRECT search endpoint with proper type parameter (from forum)
         async () => {
-          const culturalEntityIds = ["456", "789", "1001", "2345"]; // Common cultural content IDs
-          const response = await fetch(`${this.baseUrl}/entities`, {
+          const searchQuery = encodeURIComponent('cultural content');
+          const response = await fetch(`${this.baseUrl}/search?query=${searchQuery}&type=urn%3Aentity%3Abrand`, {
             method: 'GET',
             headers: {
-              'X-API-KEY': this.apiKey,
+              'X-Api-Key': this.apiKey,
               'Content-Type': 'application/json'
             }
           });
           return response;
         },
         
-        // Attempt 2: Try POST with entity_ids
+        // Attempt 2: Try with different search terms
+        async () => {
+          const searchQuery = encodeURIComponent('entertainment');
+          const response = await fetch(`${this.baseUrl}/search?query=${searchQuery}&type=urn%3Aentity%3Abrand`, {
+            method: 'GET',
+            headers: {
+              'X-Api-Key': this.apiKey,
+              'Content-Type': 'application/json'
+            }
+          });
+          return response;
+        },
+        
+        // Attempt 3: Fallback to entities endpoint
         async () => {
           const response = await fetch(`${this.baseUrl}/entities`, {
-            method: 'POST',
+            method: 'GET',
             headers: {
-              'X-API-KEY': this.apiKey,
+              'X-Api-Key': this.apiKey,
               'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              entity_ids: ["456", "789"], // Test cultural entities
-              limit: 5
-            })
+            }
           });
           return response;
         }
