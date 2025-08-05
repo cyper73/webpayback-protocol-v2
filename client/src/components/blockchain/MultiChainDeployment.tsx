@@ -126,7 +126,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Supply:</span>
-                            <span>1,000,000 WPT</span>
+                            <span>10,000,000 WPT</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Gas Used:</span>
