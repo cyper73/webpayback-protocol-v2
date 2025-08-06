@@ -1,18 +1,50 @@
 import express from 'express';
 import { walletFingerprintingService } from '../services/walletFingerprinting';
+import { blockchainMonitoring } from '../services/blockchainRealtimeMonitoring';
+import { dexPatternDetection } from '../services/dexTradingPatternDetection';
 
 const router = express.Router();
 
-// Analyze wallet for suspicious patterns
+// Severe rate limiting - 10 requests per 5 minutes
+const rateLimits = new Map<string, number[]>();
+const RATE_LIMIT_REQUESTS = 10;
+const RATE_LIMIT_WINDOW = 5 * 60 * 1000; // 5 minutes
+
+function checkSevereRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const requests = rateLimits.get(ip) || [];
+  
+  // Remove old requests outside the window
+  const validRequests = requests.filter(time => now - time < RATE_LIMIT_WINDOW);
+  
+  if (validRequests.length >= RATE_LIMIT_REQUESTS) {
+    return false; // Rate limit exceeded
+  }
+  
+  validRequests.push(now);
+  rateLimits.set(ip, validRequests);
+  return true;
+}
+
+// Severe rate limiting for analysis endpoint
 router.post('/analyze/:address', async (req, res) => {
   try {
+    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+    
+    if (!checkSevereRateLimit(clientIP)) {
+      return res.status(429).json({
+        success: false,
+        error: 'Rate limit exceeded'
+      });
+    }
+
     const { address } = req.params;
     const { transactions } = req.body;
 
     if (!address || !transactions) {
       return res.status(400).json({
         success: false,
-        error: 'Address and transaction data required'
+        error: 'Invalid request'
       });
     }
 
@@ -24,7 +56,6 @@ router.post('/analyze/:address', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Wallet fingerprinting analysis failed:', error);
     res.status(500).json({
       success: false,
       error: 'Analysis failed'
@@ -105,6 +136,66 @@ router.post('/internal-security-check', async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Internal process failed'
+    });
+  }
+});
+
+// Initialize real-time monitoring systems
+router.post('/init-monitoring', async (req, res) => {
+  try {
+    // Start blockchain real-time monitoring
+    await blockchainMonitoring.startRealtimeMonitoring();
+    
+    // Start DEX trading pattern detection
+    await dexPatternDetection.startPatternDetection();
+    
+    console.log('🚀 Advanced Security Systems INITIALIZED');
+    
+    res.json({
+      status: 'initialized',
+      systems: ['blockchain-monitoring', 'dex-pattern-detection'],
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Initialization failed'
+    });
+  }
+});
+
+// Get wallet risk assessment (internal use only)
+router.get('/risk-profile/:address', async (req, res) => {
+  try {
+    const { address } = req.params;
+    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+    
+    if (!checkSevereRateLimit(clientIP)) {
+      return res.status(429).json({
+        error: 'Rate limit exceeded'
+      });
+    }
+    
+    const blockchainProfile = await blockchainMonitoring.getWalletRiskProfile(address);
+    const dexPattern = dexPatternDetection.getDetectedPattern(address);
+    
+    const combinedRisk = Math.max(
+      blockchainProfile?.riskScore || 0,
+      dexPattern?.botProbability || 0
+    );
+    
+    res.json({
+      address,
+      riskScore: combinedRisk,
+      hasBlockchainProfile: !!blockchainProfile,
+      hasDexPattern: !!dexPattern,
+      riskLevel: combinedRisk >= 80 ? 'CRITICAL' : 
+                 combinedRisk >= 60 ? 'HIGH' : 'MEDIUM',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Profile retrieval failed'
     });
   }
 });
