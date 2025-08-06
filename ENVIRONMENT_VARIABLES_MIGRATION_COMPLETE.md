@@ -55,6 +55,12 @@ Migrazione completa di tutti i dati sensibili hardcoded verso variabili d'ambien
 - ✅ Solo il founder ha accesso ai moduli critici
 - ✅ Zero esposizione di dati sensibili nel codice
 
+### 🛡️ **PROTEZIONE IP ADMIN (NUOVA)**
+- ✅ Credenziali admin accessibili **SOLO da IP del founder autorizzato**
+- ✅ Doppio controllo: IP whitelisting + credenziali
+- ✅ Blocco automatico per IP non autorizzati
+- ✅ Log di sicurezza per tutti i tentativi di accesso admin
+
 ### 🔧 FUNZIONALITÀ MANTENUTE
 
 **Sistema Completamente Operativo:**
