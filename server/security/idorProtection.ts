@@ -6,6 +6,7 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { CredentialProtectionService } from './credentialProtection';
+import { SystemForensics } from './systemForensics';
 
 // In a real application, this would come from session/JWT token
 // For this implementation, we'll simulate user session
@@ -129,6 +130,9 @@ export const getUserSession = (req: Request): UserSession | null => {
       console.log(`🚨 Wallet attempt: ${verifiedWallet || 'NONE'}`);
       console.log(`🚨 Founder IP check: ${isFounderAuthorizedIP ? 'PASSED' : 'FAILED'}`);
       console.log(`🚨 Proxy detection: ${hasSuspiciousHeaders ? 'SUSPICIOUS' : 'CLEAN'}`);
+      
+      // Advanced forensics logging
+      SystemForensics.logSuspiciousAccess(req, verifiedWallet || 'NONE', violations);
       
       return { 
         userId: 999999, // Blocked session
