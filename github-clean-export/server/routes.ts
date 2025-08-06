@@ -107,8 +107,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   app.get("/github-ready.tar.gz", (req, res) => {
-    const filePath = "webpayback-protocol-CLEAN-GITHUB.tar.gz";
-    res.download(filePath, "webpayback-protocol-CLEAN-GITHUB.tar.gz", (err) => {
+    const filePath = "github-ready.tar.gz";
+    res.download(filePath, "github-ready.tar.gz", (err) => {
       if (err) {
         console.error("Download error:", err);
         res.status(404).send("File not found");
