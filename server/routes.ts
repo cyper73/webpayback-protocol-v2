@@ -101,6 +101,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // app.use(ipAbuseProtection);
   // app.use(emergencyRateLimit);
   
+  // Static file serving for downloads
+  app.get("/download.html", (req, res) => {
+    res.sendFile("download.html", { root: process.cwd() });
+  });
+  
+  app.get("/github-ready.tar.gz", (req, res) => {
+    const filePath = "github-ready.tar.gz";
+    res.download(filePath, "github-ready.tar.gz", (err) => {
+      if (err) {
+        console.error("Download error:", err);
+        res.status(404).send("File not found");
+      }
+    });
+  });
+  
   // Initialize blockchain networks on startup
   await blockchainService.initializeNetworks();
   
