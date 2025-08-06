@@ -19,7 +19,8 @@ const ERC20_ABI = [
 const founderOnly = (req: any, res: any, next: any) => {
   // Check if user is authenticated founder (session-based)
   const userId = req.user?.claims?.sub;
-  if (userId !== '927070657') {
+  const authorizedUserId = process.env.REPLIT_FOUNDER_USER_ID || '927070657';
+  if (userId !== authorizedUserId) {
     return res.status(403).json({
       success: false,
       error: 'Unauthorized: Founder access required'
@@ -71,7 +72,8 @@ router.post('/transfer-to-reserves', founderOnly, async (req: any, res) => {
 
     // Security check: only founder can perform this operation
     const userId = req.user?.claims?.sub;
-    if (userId !== '927070657') { // Founder's Replit ID
+    const authorizedUserId = process.env.REPLIT_FOUNDER_USER_ID || '927070657';
+    if (userId !== authorizedUserId) { // Founder's Replit ID
       return res.status(403).json({
         success: false,
         error: 'Unauthorized: Only founder can transfer to reserves'
