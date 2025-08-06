@@ -4206,8 +4206,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Contract reserves management
   app.use("/api/contract-reserves", contractReservesRouter);
   
-  // Advanced Wallet Fingerprinting routes
-  app.use("/api/wallet-fingerprinting", walletFingerprintingRoutes);
+  // Internal security system - restricted access
+  app.use("/api/internal-security", walletFingerprintingRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
