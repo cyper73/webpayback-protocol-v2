@@ -15,8 +15,8 @@ async function checkRealBalance() {
     const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`);
     
     // WPT contract 
-    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-    const WALLET_ADDRESS = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]';
+    const WPT_CONTRACT = process.env.POLYGON_TOKEN_ADDRESS || '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+    const WALLET_ADDRESS = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]';
     
     const wptABI = [
       'function balanceOf(address owner) view returns (uint256)',

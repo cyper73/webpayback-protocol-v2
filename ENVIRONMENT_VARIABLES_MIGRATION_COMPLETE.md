@@ -24,7 +24,7 @@ Migrazione completa di tutti i dati sensibili hardcoded verso variabili d'ambien
 - ✅ `WPT_TOKEN_DECIMALS`: Decimali token (18)
 - ✅ `WPT_TOKEN_SYMBOL`: Simbolo token (WPT)
 
-### 📁 FILE AGGIORNATI
+### 📁 FILE AGGIORNATI (18 TOTALI)
 
 #### **Servizi Backend**
 1. ✅ `server/services/web3.ts` - Configurazione multi-chain
@@ -35,8 +35,20 @@ Migrazione completa di tutti i dati sensibili hardcoded verso variabili d'ambien
 6. ✅ `server/security/credentialProtection.ts` - Protezione credenziali
 7. ✅ `server/routes/contractReserves.ts` - Gestione riserve contratto
 
+#### **Script Root Directory**
+8. ✅ `inject-tokens-direct.cjs` - Iniezione token diretta
+9. ✅ `inject-tokens-final.cjs` - Iniezione token finale
+10. ✅ `inject-tokens-retry.cjs` - Retry iniezione token
+11. ✅ `analyze-wpt-tokens.cjs` - Analisi token WPT
+12. ✅ `check-real-balance.cjs` - Verifica balance reale
+13. ✅ `withdraw-tokens.cjs` - Prelievo token
+14. ✅ `recover-tokens.cjs` - Recupero token emergenza
+15. ✅ `check-pool-real-time.cjs` - Monitoraggio pool real-time
+16. ✅ `scripts/computePoolAddress.js` - Calcolo indirizzi pool
+17. ✅ `scripts/create-usdt-wpt-pool.js` - Creazione pool USDT/WPT
+
 #### **Configurazione**
-8. ✅ `.env.example` - Template aggiornato con nuove variabili
+18. ✅ `.env.example` - Template aggiornato con nuove variabili
 
 ### 🔧 FUNZIONALITÀ MANTENUTE
 

@@ -9,7 +9,7 @@ import { ethers } from 'ethers';
 
 // Token addresses on Polygon
 const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-const WPT_TOKEN = "0x9408f17a8B4666f8cb8231BA213DE04137dc3825";
+const WPT_TOKEN = process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8B4666f8cb8231BA213DE04137dc3825";
 
 // Uniswap V3 addresses on Polygon
 const UNISWAP_V3_FACTORY = "0x1F98431c8aD98523631AE4a59f267346ea31F984";

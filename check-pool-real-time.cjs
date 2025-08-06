@@ -13,14 +13,14 @@ async function checkPoolContracts() {
   
   // Contratti WPT noti
   const contracts = {
-    current: "0x9408f17a8b4666f8cb8231ba213de04137dc3825",
+    current: process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8b4666f8cb8231ba213de04137dc3825",
     old: "0x9077051d318b614f915e8a07861090856fdec91e"
   };
   
   // Pool da verificare
   const pools = {
-    "USDT/WPT V2": "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
-    "WMATIC/WPT V3": "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"
+    "USDT/WPT V2": process.env.POLYGON_SECONDARY_POOL_ADDRESS || "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+    "WMATIC/WPT V3": process.env.POLYGON_PRIMARY_POOL_ADDRESS || "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"
   };
   
   try {

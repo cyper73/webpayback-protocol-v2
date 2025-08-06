@@ -11,8 +11,8 @@ async function withdrawTokens() {
     console.log('🔄 WITHDRAWING WPT TOKENS FROM POOL...');
     
     // Configuration
-    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-    const POOL_CONTRACT = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A'; // USDT/WPT Pool
+    const WPT_CONTRACT = process.env.POLYGON_TOKEN_ADDRESS || '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+    const POOL_CONTRACT = process.env.POLYGON_SECONDARY_POOL_ADDRESS || '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A'; // USDT/WPT Pool
     
     console.log(`📋 Configuration:`);
     console.log(`   WPT Contract: ${WPT_CONTRACT}`);

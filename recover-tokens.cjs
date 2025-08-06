@@ -11,9 +11,9 @@ async function recoverTokens() {
     console.log('🚨 EMERGENCY TOKEN RECOVERY INITIATED...');
     
     // Configuration
-    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-    const WRONG_ADDRESS = '0xe021e5817e8867d7cea10f63bc47e118f3ab9e4a'; // Where tokens went
-    const WALLET_ADDRESS = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]'; // Our wallet
+    const WPT_CONTRACT = process.env.POLYGON_TOKEN_ADDRESS || '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+    const WRONG_ADDRESS = process.env.POLYGON_SECONDARY_POOL_ADDRESS || '0xe021e5817e8867d7cea10f63bc47e118f3ab9e4a'; // Where tokens went
+    const WALLET_ADDRESS = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]'; // Our wallet
     
     console.log(`📋 WPT Contract: ${WPT_CONTRACT}`);
     console.log(`📋 Wrong Address: ${WRONG_ADDRESS}`);

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 // Indirizzi e costanti
 const UNISWAP_V3_FACTORY = "0x1F98431c8aD98523631AE4a59f267346ea31F984";
 const WPOL_ADDRESS = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"; // Wrapped POL
-const WPT_V2_ADDRESS = "0x9408f17a8B4666f8cb8231BA213DE04137dc3825"; // WPT V2
+const WPT_V2_ADDRESS = process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8B4666f8cb8231BA213DE04137dc3825"; // WPT V2
 const FEE_TIER = 3000; // 0.3%
 
 // Pool bytecode hash per Uniswap V3 su Polygon
@@ -57,7 +57,7 @@ async function main() {
   console.log("\n🎯 POOL ADDRESS CALCOLATO:", poolAddress);
   
   // Verifica se la pool esiste su blockchain
-  const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com/");
+  const provider = new ethers.providers.JsonRpcProvider(process.env.POLYGON_RPC_URL || "https://polygon-rpc.com/");
   const code = await provider.getCode(poolAddress);
   const exists = code !== "0x";
   

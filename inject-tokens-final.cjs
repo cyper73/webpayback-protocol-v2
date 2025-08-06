@@ -11,8 +11,8 @@ async function injectTokensFinal() {
     console.log('🚀 FINAL TOKEN INJECTION ATTEMPT...');
     
     // Configuration
-    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-    const TARGET_CONTRACT = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A'; // USDT/WPT Pool
+    const WPT_CONTRACT = process.env.POLYGON_TOKEN_ADDRESS || '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+    const TARGET_CONTRACT = process.env.POLYGON_SECONDARY_POOL_ADDRESS || '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A'; // USDT/WPT Pool
     const AMOUNT = '1000000'; // 1 million WPT
     
     console.log(`📋 Configuration:`);
