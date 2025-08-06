@@ -50,6 +50,7 @@ import {
   rateLimitTokenGeneration
 } from "./security/csrfProtection";
 import walletFingerprintingRoutes from './routes/walletFingerprinting';
+import securityRoutes from './routes/security';
 import { 
   authorizeCreatorAccess,
   authorizeBulkCreatorAccess,
@@ -4118,6 +4119,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Content Certificate NFT routes (Anti-Google AI Overview)
   app.use('/api/content-certificate', contentCertificateRouter);
+  
+  // Advanced Security Monitoring routes (stealth mode)
+  app.use('/api/internal-security', securityRoutes);
   
   // Pool Health Auto-Scaling routes
   app.use('/api/pool-health', poolHealthRouter);
