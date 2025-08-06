@@ -66,10 +66,32 @@ export const getUserSession = (req: Request): UserSession | null => {
     const sessionTime = parseInt(timestamp || '0');
     const isRecentSession = sessionTime > 0 && (now - sessionTime) < 300000; // 5 minutes
     
-    // LAYER 4: IP whitelist check (only specific IPs can access)
-    const allowedIPs = ['127.0.0.1', 'localhost', '::1']; // Local development only
+    // LAYER 4: FOUNDER-SPECIFIC IP WHITELIST (Ultra-restrictive security)
+    const founderAuthorizedIPs = [
+      '192.168.0.100',    // IP locale del PC del founder
+      '185.84.86.163',    // IP pubblico di uscita del founder  
+      '192.168.0.254',    // Gateway del provider del founder
+      '127.0.0.1',        // Localhost per testing
+      'localhost',        // Localhost alternativo
+      '::1'               // IPv6 localhost
+    ];
+    
     const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-    const isWhitelistedIP = allowedIPs.includes(clientIP) || clientIP.includes('127.0.0.1');
+    const realClientIP = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || clientIP;
+    
+    // Check if IP is in founder's authorized list
+    const isFounderAuthorizedIP = founderAuthorizedIPs.some(authorizedIP => {
+      if (typeof realClientIP === 'string') {
+        return realClientIP.includes(authorizedIP) || authorizedIP === realClientIP;
+      }
+      return false;
+    });
+    
+    // Additional security: Check for proxy/VPN headers that might indicate IP spoofing
+    const hasSuspiciousHeaders = !!(
+      req.headers['x-forwarded-for'] && 
+      req.headers['x-forwarded-for'].toString().split(',').length > 2
+    );
     
     // ALL LAYERS MUST PASS for founder access
     if (walletSession && 
@@ -77,12 +99,14 @@ export const getUserSession = (req: Request): UserSession | null => {
         walletSignature && 
         verifiedWallet.toLowerCase() === founderWallet.toLowerCase() &&
         isRecentSession &&
-        isWhitelistedIP) {
+        isFounderAuthorizedIP &&
+        !hasSuspiciousHeaders) {
       
       console.log(`🔐 FORT KNOX ACCESS GRANTED: All security layers verified`);
       console.log(`🔐 Founder wallet: ${verifiedWallet.substring(0,6)}...${verifiedWallet.substring(38)}`);
       console.log(`🔐 Session age: ${Math.round((now - sessionTime)/1000)}s`);
-      console.log(`🔐 Whitelisted IP: ${clientIP}`);
+      console.log(`🔐 Authorized Founder IP: ${realClientIP || clientIP}`);
+      console.log(`🔐 IP validation: PASSED for founder-specific whitelist`);
       
       return { 
         userId: 1, 
@@ -97,11 +121,14 @@ export const getUserSession = (req: Request): UserSession | null => {
       if (!walletSignature) violations.push('MISSING_WALLET_SIGNATURE');
       if (verifiedWallet && verifiedWallet.toLowerCase() !== founderWallet.toLowerCase()) violations.push('WALLET_MISMATCH');
       if (!isRecentSession) violations.push('EXPIRED_SESSION');
-      if (!isWhitelistedIP) violations.push('UNAUTHORIZED_IP');
+      if (!isFounderAuthorizedIP) violations.push('UNAUTHORIZED_IP');
+      if (hasSuspiciousHeaders) violations.push('SUSPICIOUS_PROXY_DETECTED');
       
       console.log(`🚨 SECURITY BREACH ATTEMPT BLOCKED: ${violations.join(', ')}`);
-      console.log(`🚨 Client IP: ${clientIP}, UA: ${userAgent.substring(0,50)}`);
+      console.log(`🚨 Client IP: ${realClientIP || clientIP}, UA: ${userAgent.substring(0,50)}`);
       console.log(`🚨 Wallet attempt: ${verifiedWallet || 'NONE'}`);
+      console.log(`🚨 Founder IP check: ${isFounderAuthorizedIP ? 'PASSED' : 'FAILED'}`);
+      console.log(`🚨 Proxy detection: ${hasSuspiciousHeaders ? 'SUSPICIOUS' : 'CLEAN'}`);
       
       return { 
         userId: 999999, // Blocked session

@@ -6,6 +6,53 @@ export class CredentialProtectionService {
   private static suspiciousAttempts = new Map<string, number>();
   private static blockedIPs = new Set<string>();
   private static founderWallet = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba';
+  
+  // Founder's authorized IP addresses
+  private static founderAuthorizedIPs = [
+    '192.168.0.100',    // IP locale del PC del founder
+    '185.84.86.163',    // IP pubblico di uscita del founder  
+    '192.168.0.254',    // Gateway del provider del founder
+    '127.0.0.1',        // Localhost per testing
+    'localhost',        // Localhost alternativo
+    '::1'               // IPv6 localhost
+  ];
+  
+  // IP access attempts log
+  private static ipAccessLog = new Map<string, {
+    attempts: number;
+    lastAttempt: Date;
+    violations: string[];
+    authorized: boolean;
+  }>();
+
+  /**
+   * Validate IP address against founder's authorized list
+   */
+  static validateFounderIP(req: Request): {
+    isAuthorized: boolean;
+    detectedIP: string;
+    reason?: string;
+  } {
+    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+    const realClientIP = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || clientIP;
+    const finalIP = typeof realClientIP === 'string' ? realClientIP.split(',')[0].trim() : clientIP;
+    
+    // Log access attempt
+    this.logIPAccess(finalIP, 'FOUNDER_WALLET_ACCESS_ATTEMPT');
+    
+    // Check if IP is in founder's authorized list
+    const isAuthorized = this.founderAuthorizedIPs.some(authorizedIP => {
+      return finalIP === authorizedIP || finalIP.includes(authorizedIP);
+    });
+    
+    console.log(`🔍 IP Authorization Check: ${finalIP} -> ${isAuthorized ? 'AUTHORIZED' : 'BLOCKED'}`);
+    
+    return {
+      isAuthorized,
+      detectedIP: finalIP,
+      reason: isAuthorized ? undefined : 'IP_NOT_IN_FOUNDER_WHITELIST'
+    };
+  }
 
   /**
    * Validate that session headers are cryptographically authentic and not simulated
@@ -120,11 +167,41 @@ export class CredentialProtectionService {
   }
 
   /**
+   * Log IP access attempts for forensic analysis
+   */
+  private static logIPAccess(ip: string, accessType: string, violations: string[] = []): void {
+    const existing = this.ipAccessLog.get(ip) || {
+      attempts: 0,
+      lastAttempt: new Date(),
+      violations: [],
+      authorized: this.founderAuthorizedIPs.includes(ip)
+    };
+    
+    existing.attempts += 1;
+    existing.lastAttempt = new Date();
+    existing.violations.push(...violations);
+    
+    this.ipAccessLog.set(ip, existing);
+    
+    // Enhanced logging for founder wallet access attempts
+    if (accessType === 'FOUNDER_WALLET_ACCESS_ATTEMPT') {
+      console.log(`📋 IP FORENSICS: ${ip} attempted founder wallet access (attempt #${existing.attempts})`);
+      console.log(`📋 IP STATUS: ${existing.authorized ? 'AUTHORIZED_FOUNDER_IP' : 'UNAUTHORIZED_IP'}`);
+      if (violations.length > 0) {
+        console.log(`📋 VIOLATIONS: ${violations.join(', ')}`);
+      }
+    }
+  }
+
+  /**
    * Record suspicious activity and block repeat offenders
    */
   private static recordSuspiciousActivity(clientIP: string): void {
     const attempts = this.suspiciousAttempts.get(clientIP) || 0;
     this.suspiciousAttempts.set(clientIP, attempts + 1);
+
+    // Enhanced logging for IP blocking
+    this.logIPAccess(clientIP, 'SUSPICIOUS_ACTIVITY', ['CREDENTIAL_SIMULATION_ATTEMPT']);
 
     // Block IP after 3 suspicious attempts
     if (attempts >= 2) {
@@ -142,7 +219,30 @@ export class CredentialProtectionService {
     return {
       suspiciousAttempts: this.suspiciousAttempts.size,
       blockedIPs: this.blockedIPs.size,
-      totalAttempts: Array.from(this.suspiciousAttempts.values()).reduce((a, b) => a + b, 0)
+      totalAttempts: Array.from(this.suspiciousAttempts.values()).reduce((a, b) => a + b, 0),
+      founderAuthorizedIPs: this.founderAuthorizedIPs.length,
+      ipAccessLog: this.ipAccessLog.size,
+      recentUnauthorizedIPs: Array.from(this.ipAccessLog.entries())
+        .filter(([ip, data]) => !data.authorized && data.lastAttempt > new Date(Date.now() - 24 * 60 * 60 * 1000))
+        .length
+    };
+  }
+
+  /**
+   * Get detailed IP access forensics (founder only)
+   */
+  static getIPForensics() {
+    return {
+      authorizedIPs: this.founderAuthorizedIPs,
+      accessLog: Array.from(this.ipAccessLog.entries()).map(([ip, data]) => ({
+        ip,
+        attempts: data.attempts,
+        lastAttempt: data.lastAttempt.toISOString(),
+        violations: data.violations,
+        authorized: data.authorized,
+        risk: data.violations.length > 3 ? 'HIGH' : data.violations.length > 0 ? 'MEDIUM' : 'LOW'
+      })),
+      blockedIPs: Array.from(this.blockedIPs)
     };
   }
 
@@ -152,6 +252,7 @@ export class CredentialProtectionService {
   static clearSecurityCounters(): void {
     this.suspiciousAttempts.clear();
     this.blockedIPs.clear();
+    this.ipAccessLog.clear();
     console.log('🔐 SECURITY: Security counters cleared');
   }
 }
