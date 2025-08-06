@@ -73,6 +73,38 @@ export const contentCertificateNfts = pgTable("content_certificate_nfts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Advanced Wallet Fingerprinting for Security
+export const walletFingerprints = pgTable("wallet_fingerprints", {
+  id: serial("id").primaryKey(),
+  address: text("address").notNull().unique(),
+  fingerprintId: text("fingerprint_id").notNull(),
+  signaturePattern: text("signature_pattern").notNull(),
+  gasUsageProfile: text("gas_usage_profile").notNull(),
+  timingProfile: text("timing_profile").notNull(),
+  networkUsageProfile: text("network_usage_profile").notNull(),
+  riskScore: integer("risk_score").notNull().default(0),
+  uniquenessScore: integer("uniqueness_score").notNull().default(50),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Security Events for Advanced Monitoring
+export const securityEvents = pgTable("security_events", {
+  id: serial("id").primaryKey(),
+  walletAddress: text("wallet_address").notNull(),
+  eventType: text("event_type").notNull(), // FINGERPRINT_ANALYSIS, SUSPICIOUS_PATTERN, etc.
+  severity: text("severity").notNull(), // LOW, MEDIUM, HIGH, CRITICAL
+  riskScore: integer("risk_score").notNull(),
+  suspiciousPatterns: text("suspicious_patterns").array(),
+  similarWallets: text("similar_wallets").array(),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }).notNull(),
+  recommendedAction: text("recommended_action").notNull(),
+  actionTaken: text("action_taken"),
+  isResolved: boolean("is_resolved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
 // Google AI Overview Detection Logs
 export const googleAiOverviewDetections = pgTable("google_ai_overview_detections", {
   id: serial("id").primaryKey(),

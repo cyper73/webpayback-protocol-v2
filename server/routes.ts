@@ -49,6 +49,7 @@ import {
   getSessionId,
   rateLimitTokenGeneration
 } from "./security/csrfProtection";
+import walletFingerprintingRoutes from './routes/walletFingerprinting';
 import { 
   authorizeCreatorAccess,
   authorizeBulkCreatorAccess,
@@ -4204,6 +4205,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Contract reserves management
   app.use("/api/contract-reserves", contractReservesRouter);
+  
+  // Advanced Wallet Fingerprinting routes
+  app.use("/api/wallet-fingerprinting", walletFingerprintingRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
