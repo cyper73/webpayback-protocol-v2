@@ -14,7 +14,7 @@ async function checkPoolContracts() {
   // Contratti WPT noti
   const contracts = {
     current: process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8b4666f8cb8231ba213de04137dc3825",
-    old: "0x9077051d318b614f915e8a07861090856fdec91e"
+    old: "0x9077051d318b614f915e8a07861090856fdec91e" // Legacy token (deprecated)
   };
   
   // Pool da verificare

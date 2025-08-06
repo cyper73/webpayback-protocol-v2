@@ -15,9 +15,9 @@ async function testAuthenticPool() {
     const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`);
     
     // Pool USDT/WPT V2
-    const POOL_ADDRESS = '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A';
-    const USDT_CONTRACT = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
-    const WPT_CONTRACT = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+    const POOL_ADDRESS = process.env.POLYGON_PRIMARY_POOL_ADDRESS || '0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A';
+    const USDT_CONTRACT = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'; // Polygon USDT (standard)
+    const WPT_CONTRACT = process.env.POLYGON_TOKEN_ADDRESS || '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
     
     const erc20ABI = [
       'function balanceOf(address owner) view returns (uint256)',
