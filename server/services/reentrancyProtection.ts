@@ -44,7 +44,7 @@ interface ReentrancyStats {
 }
 
 class ReentrancyProtectionService {
-  private readonly FOUNDER_WALLET = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]'; // Wallet del founder - NON BLOCCARE MAI
+  private readonly FOUNDER_WALLET = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]'; // Wallet del founder - NON BLOCCARE MAI
   private readonly MAX_SAFE_CALL_DEPTH = 10;
   private readonly SUSPICIOUS_CALL_DEPTH = 5;
   private readonly HIGH_RISK_CALL_DEPTH = 8;

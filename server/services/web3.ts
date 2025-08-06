@@ -4,12 +4,12 @@ import type { InsertRewardDistribution } from "@shared/schema";
 // Multi-Chain Configuration
 const POLYGON_CONFIG = {
   chainId: 137,
-  rpcUrl: "https://polygon-rpc.com/",
+  rpcUrl: process.env.POLYGON_RPC_URL || "https://polygon-rpc.com/",
   explorerUrl: "https://polygonscan.com",
-  tokenAddress: "0x9408f17a8B4666f8cb8231BA213DE04137dc3825", // WPT V2 token (optimized)
-  poolAddress: "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3", // V3 pool CORRETTA POL/WPT V2
-  symbol: "WPT",
-  decimals: 18
+  tokenAddress: process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8B4666f8cb8231BA213DE04137dc3825",
+  poolAddress: process.env.POLYGON_PRIMARY_POOL_ADDRESS || "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
+  symbol: process.env.WPT_TOKEN_SYMBOL || "WPT",
+  decimals: parseInt(process.env.WPT_TOKEN_DECIMALS || "18")
 };
 
 // Ethereum Mainnet Configuration (Ready for WPT mainnet deployment)
@@ -122,7 +122,7 @@ class Web3Service {
 
       // Pool-specific configuration
       const poolConfig = poolType === 'usdt' ? {
-        poolAddress: "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+        poolAddress: process.env.POLYGON_SECONDARY_POOL_ADDRESS || "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
         token0: "USDT",
         token1: "WPT",
         version: "V2",
@@ -135,7 +135,7 @@ class Web3Service {
           "Lower gas costs than V3"
         ]
       } : {
-        poolAddress: "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
+        poolAddress: process.env.POLYGON_PRIMARY_POOL_ADDRESS || "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
         token0: "WMATIC",
         token1: "WPT", 
         version: "V3",

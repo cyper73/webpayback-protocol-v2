@@ -5,17 +5,10 @@ import crypto from 'crypto';
 export class CredentialProtectionService {
   private static suspiciousAttempts = new Map<string, number>();
   private static blockedIPs = new Set<string>();
-  private static founderWallet = '0xca5Ea48C76C72cc37cFb75c452457d0e6d0508Ba';
+  private static founderWallet = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]';
   
-  // Founder's authorized IP addresses
-  private static founderAuthorizedIPs = [
-    '192.168.0.100',    // IP locale del PC del founder
-    '185.84.86.163',    // IP pubblico di uscita del founder  
-    '192.168.0.254',    // Gateway del provider del founder
-    '127.0.0.1',        // Localhost per testing
-    'localhost',        // Localhost alternativo
-    '::1'               // IPv6 localhost
-  ];
+  // Founder's authorized IP addresses (from environment)
+  private static founderAuthorizedIPs = (process.env.FOUNDER_AUTHORIZED_IPS || '127.0.0.1,localhost,::1').split(',').map(ip => ip.trim());
   
   // IP access attempts log
   private static ipAccessLog = new Map<string, {

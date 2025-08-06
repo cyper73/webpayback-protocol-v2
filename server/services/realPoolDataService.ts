@@ -37,15 +37,15 @@ class RealPoolDataService {
   private readonly WMATIC_TOKEN = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
   // USDT: USD Tether (used in V2 pool) - CORRECT Polygon address
   private readonly USDT_TOKEN = "0xc2132D05D31c914a87C6609C6cc3c5b7A6d88B17";
-  // WPT: WebPayback Token (verified - deployed 6 days ago)
-  private readonly WPT_TOKEN = "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
+  // WPT: WebPayback Token (from environment)
+  private readonly WPT_TOKEN = process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
   // SECURITY: Blacklisted old WPT token contract - DO NOT USE
   private readonly OLD_WPT_TOKEN_BLACKLIST = "0x9077051d318b614f915e8a07861090856fdec91e";
   
-  // Pool addresses - ACTIVE POOLS ONLY
-  private readonly WMATIC_WPT_POOL = "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool WMATIC/WPT
-  private readonly USDT_WPT_POOL_V2 = "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A"; // NEW V2 pool USDT/WPT
+  // Pool addresses - ACTIVE POOLS ONLY (from environment)
+  private readonly WMATIC_WPT_POOL = process.env.POLYGON_PRIMARY_POOL_ADDRESS || "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3"; // V3 pool WMATIC/WPT
+  private readonly USDT_WPT_POOL_V2 = process.env.POLYGON_SECONDARY_POOL_ADDRESS || "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A"; // NEW V2 pool USDT/WPT
   
   // SECURITY: No blacklisted pools currently - all pools verified as authentic
   private readonly PHANTOM_POOLS_BLACKLIST: string[] = [

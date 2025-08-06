@@ -27,7 +27,7 @@ interface AccessEvent {
 }
 
 export class FraudDetectionService {
-  private readonly FOUNDER_WALLET = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]'; // Wallet del founder - NON BLOCCARE MAI
+  private readonly FOUNDER_WALLET = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]'; // Wallet del founder - NON BLOCCARE MAI
   private readonly MIN_REPUTATION_SCORE = 20;
   private readonly MAX_DAILY_ACCESSES_PER_DOMAIN = 500;
   private readonly MAX_DAILY_ACCESSES_PER_IP = 200;

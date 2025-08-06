@@ -4,8 +4,8 @@ import { ethers } from 'ethers';
 const router = Router();
 
 // Contract addresses and ABI
-const WPT_CONTRACT_ADDRESS = '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
-const FOUNDER_WALLET = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]';
+const WPT_CONTRACT_ADDRESS = process.env.POLYGON_TOKEN_ADDRESS || '0x9408f17a8B4666f8cb8231BA213DE04137dc3825';
+const FOUNDER_WALLET = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]';
 
 // Minimal ERC20 ABI for transfer operations
 const ERC20_ABI = [

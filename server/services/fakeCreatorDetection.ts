@@ -33,7 +33,7 @@ interface FakeCreatorStats {
 
 export class FakeCreatorDetectionService {
   private static instance: FakeCreatorDetectionService;
-  private readonly FOUNDER_WALLET = process.env.FOUNDER_WALLET || '0x***********************************************[FOUNDER]'; // Wallet del founder - NON BLOCCARE MAI
+  private readonly FOUNDER_WALLET = process.env.FOUNDER_WALLET_ADDRESS || '0x***********************************************[FOUNDER]'; // Wallet del founder - NON BLOCCARE MAI
   
   // Lista domini famosi per confronto
   private famousDomains = [
