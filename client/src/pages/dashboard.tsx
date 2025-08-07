@@ -82,7 +82,7 @@ export default function Dashboard() {
     rewards = [], 
     pool = [], 
     compliance = [] 
-  } = data || {};
+  } = data as any || {};
 
   return (
     <ErrorBoundary>

@@ -101,8 +101,8 @@ export const getUserSession = (req: Request): UserSession | null => {
       console.log(`🔓 Founder IP: ${realClientIP}`);
       return { 
         userId: 1, 
-        isAdmin: false, 
-        authenticatedCreatorIds: [4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 25, 26, 27] 
+        isAdmin: true, 
+        authenticatedCreatorIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27] 
       };
     }
     
