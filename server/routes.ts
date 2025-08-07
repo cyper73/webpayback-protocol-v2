@@ -1510,6 +1510,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+
   // Get all creators (filtered by user access for non-admins)
   app.get("/api/creators", async (req, res) => {
     try {
