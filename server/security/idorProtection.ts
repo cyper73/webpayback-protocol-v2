@@ -23,11 +23,8 @@ const userSessions = new Map<string, UserSession>();
 // All sessions must now go through proper wallet verification
 // userSessions.set('session_user_1', { ... }); // REMOVED FOR SECURITY
 
-userSessions.set('session_admin', {
-  userId: 999,
-  isAdmin: true,
-  authenticatedCreatorIds: [] // Admin can access everything
-});
+// Admin sessions managed through environment variables for security
+// No hardcoded admin sessions for enhanced security
 
 // Extract session from request with proper device fingerprinting
 export const getUserSession = (req: Request): UserSession | null => {
@@ -46,9 +43,18 @@ export const getUserSession = (req: Request): UserSession | null => {
   const sessionHash = crypto.createHash('md5').update(sessionFingerprint).digest('hex');
   const userId = parseInt(sessionHash.substring(0, 8), 16) % 1000 + 2;
   
-  // Admin check
-  if (userAgent.includes('admin')) {
-    return { userId: 999, isAdmin: true, authenticatedCreatorIds: [] };
+  // Secure admin check using environment variables
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const authHeader = req.headers.authorization;
+  
+  if (authHeader && adminUsername && adminPassword) {
+    const credentials = Buffer.from(authHeader.split(' ')[1] || '', 'base64').toString();
+    const [username, password] = credentials.split(':');
+    
+    if (username === adminUsername && password === adminPassword) {
+      return { userId: 999, isAdmin: true, authenticatedCreatorIds: [] };
+    }
   }
   
   // SECURITY FORTRESS: Multi-layered credential simulation protection
