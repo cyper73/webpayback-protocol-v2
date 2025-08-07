@@ -70,7 +70,8 @@ export const getUserSession = (req: Request): UserSession | null => {
     // LAYER 4: FOUNDER-SPECIFIC IP WHITELIST (Ultra-restrictive security)
     const founderAuthorizedIPs = [
       '192.168.0.100',    // IP locale del PC del founder
-      '185.84.86.163',    // IP pubblico di uscita del founder  
+      '185.84.86.163',    // IP pubblico di uscita del founder (vecchio provider)
+      '185.84.84.155',    // IP nuovo provider Tecnotel Servizi Tecnologici (Umbria)
       '192.168.0.254',    // Gateway del provider del founder
       '127.0.0.1',        // Localhost per testing
       'localhost',        // Localhost alternativo
