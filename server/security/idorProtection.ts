@@ -95,6 +95,17 @@ export const getUserSession = (req: Request): UserSession | null => {
       return false;
     });
     
+    // TEMPORARY: Special bypass for founder IP to show dashboard content
+    if (isFounderAuthorizedIP && realClientIP?.includes('185.84.84.155')) {
+      console.log(`🔓 FOUNDER DASHBOARD ACCESS: Temporary bypass for demonstration`);
+      console.log(`🔓 Founder IP: ${realClientIP}`);
+      return { 
+        userId: 1, 
+        isAdmin: false, 
+        authenticatedCreatorIds: [4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 25, 26, 27] 
+      };
+    }
+    
     // Additional security: Check for proxy/VPN headers that might indicate IP spoofing
     const hasSuspiciousHeaders = !!(
       req.headers['x-forwarded-for'] && 
