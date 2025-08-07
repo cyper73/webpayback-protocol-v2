@@ -78,6 +78,7 @@ export const getUserSession = (req: Request): UserSession | null => {
       '192.168.0.100',    // IP locale del PC del founder
       '185.84.86.163',    // IP pubblico di uscita del founder (vecchio provider)
       '185.84.84.155',    // IP nuovo provider Tecnotel Servizi Tecnologici (Umbria)
+      '89.38.99.119',     // IP attuale attivo del founder
       '192.168.0.254',    // Gateway del provider del founder
       '127.0.0.1',        // Localhost per testing
       'localhost',        // Localhost alternativo
@@ -96,7 +97,7 @@ export const getUserSession = (req: Request): UserSession | null => {
     });
     
     // TEMPORARY: Special bypass for founder IP to show dashboard content
-    if (isFounderAuthorizedIP && realClientIP?.includes('185.84.84.155')) {
+    if (isFounderAuthorizedIP && (realClientIP?.includes('185.84.84.155') || realClientIP?.includes('89.38.99.119'))) {
       console.log(`🔓 FOUNDER DASHBOARD ACCESS: Temporary bypass for demonstration`);
       console.log(`🔓 Founder IP: ${realClientIP}`);
       return { 
