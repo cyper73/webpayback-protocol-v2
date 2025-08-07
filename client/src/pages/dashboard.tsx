@@ -86,28 +86,28 @@ export default function Dashboard() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-deep-space text-white">
+      <div className="min-h-screen bg-gray-900 text-white">
       {/* Clean Navigation Header */}
-      <header className="glass-card border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-gray-800/80 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <img src={wptLogo} alt="WPT Logo" className="w-8 h-8" />
-                <span className="text-lg font-bold gradient-text">WebPayback Protocol</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">WebPayback Protocol</span>
               </div>
-              <div className="hidden sm:flex items-center space-x-1 bg-glass-dark px-2 py-1 rounded-full">
-                <div className={`w-2 h-2 rounded-full ${isFetching ? 'bg-amber-400 animate-pulse' : 'bg-neon-green'} pulse-animation`}></div>
+              <div className="hidden sm:flex items-center space-x-1 bg-gray-800/60 px-2 py-1 rounded-full">
+                <div className={`w-2 h-2 rounded-full ${isFetching ? 'bg-amber-400 animate-pulse' : 'bg-green-400'} animate-pulse`}></div>
                 <span className="text-xs text-gray-300">Level 280 AI Active</span>
               </div>
             </div>
             
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2 text-sm">
-                <Wallet className="text-electric-blue w-4 h-4" />
+                <Wallet className="text-blue-400 w-4 h-4" />
                 <span className="font-mono text-xs">0x9408f17a8B4666f8cb8231BA213DE04137dc3825</span>
               </div>
-              <div className="flex items-center space-x-2 bg-glass-dark px-2 py-1 rounded-lg">
+              <div className="flex items-center space-x-2 bg-gray-800/60 px-2 py-1 rounded-lg">
                 <Coins className="text-amber-400 w-4 h-4" />
                 <span className="font-mono text-xs">WPT Live</span>
               </div>
@@ -117,32 +117,32 @@ export default function Dashboard() {
       </header>
 
       {/* Quick Actions Bar */}
-      <div className="bg-glass-dark/50 border-b border-white/5">
+      <div className="bg-gray-800/30 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <RouterLink to="/getting-started">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-blue-500/30 hover:bg-blue-500/20 text-white">
+              <Button variant="outline" size="sm" className="bg-gray-800/60 border-blue-500/30 hover:bg-blue-500/20 text-white">
                 <BookOpen className="w-4 h-4 mr-2" />
                 Getting Started
               </Button>
             </RouterLink>
             
             <RouterLink to="/content-certificate">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-orange-500/30 hover:bg-orange-500/20 text-white">
+              <Button variant="outline" size="sm" className="bg-gray-800/60 border-orange-500/30 hover:bg-orange-500/20 text-white">
                 <Shield className="w-4 h-4 mr-2" />
                 Content Certificate (2FA)
               </Button>
             </RouterLink>
             
             <RouterLink to="/citations">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
+              <Button variant="outline" size="sm" className="bg-gray-800/60 border-blue-400/30 hover:bg-blue-400/20 text-white">
                 <FileText className="w-4 h-4 mr-2" />
                 Citations Rewards (2FA)
               </Button>
             </RouterLink>
             
             <RouterLink to="/pool-health">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-blue-500/30 hover:bg-blue-500/20 text-white">
+              <Button variant="outline" size="sm" className="bg-gray-800/60 border-blue-500/30 hover:bg-blue-500/20 text-white">
                 <Activity className="w-4 h-4 mr-2" />
                 Pool Health
               </Button>
@@ -152,17 +152,17 @@ export default function Dashboard() {
       </div>
 
       {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dashboard-container">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
-        <section className="dashboard-section">
-          <Card className="glass-card rounded-2xl shadow-neon-blue">
+        <section className="w-full">
+          <Card className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/20 rounded-2xl shadow-lg shadow-blue-500/10">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold gradient-text">
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
                   🔧 Infrastructure Dashboard
                 </CardTitle>
                 <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-sm text-gray-300">Systems Active</span>
                 </div>
               </div>
@@ -170,10 +170,10 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                <div className="bg-glass-dark rounded-lg p-4">
+                <div className="bg-gray-800/60 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-electric-blue/20 rounded-full flex items-center justify-center">
-                      <span className="text-electric-blue font-bold text-sm">GP</span>
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-blue-400 font-bold text-sm">GP</span>
                     </div>
                     <div>
                       <h3 className="font-semibold text-white">Gas Pool Status</h3>
@@ -183,7 +183,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-400">Health</span>
-                      <span className="text-sm font-medium text-neon-green">Healthy</span>
+                      <span className="text-sm font-medium text-green-400">Healthy</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-400">Balance</span>
@@ -196,7 +196,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-glass-dark rounded-lg p-4">
+                <div className="bg-gray-800/60 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center">
                       <span className="text-amber-400 font-bold text-sm">BP</span>
@@ -222,7 +222,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-glass-dark rounded-lg p-4">
+                <div className="bg-gray-800/60 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-purple-400/20 rounded-full flex items-center justify-center">
                       <span className="text-purple-400 font-bold text-sm">CL</span>
@@ -235,7 +235,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-400">MATIC/USD</span>
-                      <span className="text-sm font-mono text-electric-blue">$0.95</span>
+                      <span className="text-sm font-mono text-blue-400">$0.95</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-400">ETH/USD</span>
@@ -248,10 +248,10 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-glass-dark rounded-lg p-4">
+                <div className="bg-gray-800/60 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center">
-                      <span className="text-neon-green font-bold text-sm">CO</span>
+                    <div className="w-8 h-8 bg-green-400/20 rounded-full flex items-center justify-center">
+                      <span className="text-green-400 font-bold text-sm">CO</span>
                     </div>
                     <div>
                       <h3 className="font-semibold text-white">Cost Optimization</h3>
@@ -260,7 +260,7 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-neon-green">95%</div>
+                      <div className="text-2xl font-bold text-green-400">95%</div>
                       <div className="text-xs text-gray-400">Gas Savings</div>
                     </div>
                     <div className="flex justify-between">
