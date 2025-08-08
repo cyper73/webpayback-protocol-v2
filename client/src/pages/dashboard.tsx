@@ -314,7 +314,7 @@ export default function Dashboard() {
         {/* AGENTS GRID - LEVEL 280 AI */}
         <section className="dashboard-section">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-            <AgentCard agent={dashboardInfo.agents[0]} />
+            <AgentCard agent={agents[0] || { id: 1, name: "WebPayback", status: "active", level: 280, accuracy: 98.5, uptime: 99.9 }} />
             <AgentCommunication />
           </div>
         </section>
@@ -374,8 +374,8 @@ export default function Dashboard() {
         {/* INTEGRATION MODULES */}
         <section className="dashboard-section">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-            <MultiChainDeployment networks={dashboardInfo.networks} />
-            <TokenEconomics stats={dashboardInfo.stats} />
+            <MultiChainDeployment networks={networks} />
+            <TokenEconomics stats={stats} />
             <NetworkSwitcher />
           </div>
         </section>
@@ -418,7 +418,7 @@ export default function Dashboard() {
         {/* ANALYTICS & MONITORING */}
         <section className="dashboard-section">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-            <LiveStats stats={dashboardInfo.stats} />
+            <LiveStats stats={stats} />
             <AlchemyUsageMonitor />
           </div>
         </section>
@@ -427,7 +427,7 @@ export default function Dashboard() {
         <section className="dashboard-section">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
             <QlooCulturalDashboard />
-            <ComplianceMonitor compliance={dashboardInfo.compliance} />
+            <ComplianceMonitor compliance={compliance} />
           </div>
         </section>
 
