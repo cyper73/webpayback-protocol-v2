@@ -65,6 +65,7 @@ export default function Dashboard() {
   // This prevents the initialization message from appearing
 
   // Fix TypeScript errors by ensuring proper types with fallback
+  const dashboardInfo = dashboardData as any || {};
   const { 
     agents = [], 
     networks = [], 
@@ -73,7 +74,7 @@ export default function Dashboard() {
     rewards = [], 
     pool = [], 
     compliance = [] 
-  } = dashboardData || {};
+  } = dashboardInfo;
 
   return (
     <ErrorBoundary>
