@@ -292,8 +292,6 @@
   text-align: left;
   padding: 1rem;
 }
-  margin: 0 auto;
-}
 
 /* Dashboard grid is now handled by Tailwind's native grid classes */
 
@@ -315,11 +313,7 @@
   box-sizing: border-box;
 }
 
-.dashboard-section {
-  width: 100%;
-  min-height: fit-content;
-  margin: 0 auto;
-}
+/* Dashboard sections already defined above - removing duplicate */
 
 /* Card styling and spacing */
 .glass-card {
