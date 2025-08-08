@@ -86,6 +86,34 @@
     backdrop-filter: blur(10px);
     border: 1px solid hsla(0, 0%, 100%, 0.1);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    text-align: left;
+  }
+  
+  /* Fix card content alignment */
+  .glass-card .card-header,
+  .glass-card .card-content,
+  .glass-card .card-title,
+  .glass-card .card-description {
+    text-align: left;
+  }
+  
+  /* Center card titles only */
+  .glass-card .card-title {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  /* Fix content positioning inside cards */
+  .glass-card .flex,
+  .glass-card .grid {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  
+  .glass-card .space-y-2 > *,
+  .glass-card .space-y-4 > * {
+    margin-left: 0;
+    text-align: left;
   }
   
   /* Override Card background only when glass-card is present */
@@ -223,6 +251,28 @@
   flex-direction: column;
   gap: 1.25rem;
   width: 100%;
+}
+
+/* Dashboard section styling */
+.dashboard-section {
+  margin-bottom: 2rem;
+}
+
+/* Fix text alignment in dashboard cards */
+.dashboard-section .glass-card {
+  text-align: left;
+}
+
+.dashboard-section .glass-card h3,
+.dashboard-section .glass-card .card-title {
+  text-align: center;
+  font-weight: 600;
+}
+
+.dashboard-section .glass-card .card-content {
+  text-align: left;
+  padding: 1rem;
+}
   margin: 0 auto;
 }
 
