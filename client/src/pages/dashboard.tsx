@@ -64,16 +64,7 @@ export default function Dashboard() {
   // Always show content, never loading screen
   // This prevents the initialization message from appearing
 
-  const data = dashboardData || {
-    agents: [],
-    networks: [],
-    creators: [],
-    stats: { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 },
-    rewards: [],
-    pool: [],
-    compliance: []
-  };
-  
+  // Fix TypeScript errors by ensuring proper types with fallback
   const { 
     agents = [], 
     networks = [], 
@@ -82,7 +73,7 @@ export default function Dashboard() {
     rewards = [], 
     pool = [], 
     compliance = [] 
-  } = data;
+  } = dashboardData || {};
 
   return (
     <ErrorBoundary>
