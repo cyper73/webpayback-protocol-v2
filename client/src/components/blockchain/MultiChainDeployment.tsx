@@ -76,7 +76,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
   };
 
   const getNextDeployableNetwork = () => {
-    return networks.find(n => n.deploymentStatus === "pending");
+    return networks.find(n => (n.deploymentStatus || "pending") === "pending");
   };
 
   const getProgressPercentage = (status: string) => {
@@ -100,7 +100,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
             {networks.map((network) => {
               const iconClass = networkIcons[network.name as keyof typeof networkIcons] || "fas fa-circle";
               const colorClass = networkColors[network.name as keyof typeof networkColors] || "border-gray-500/30";
-              const statusClass = statusColors[network.deploymentStatus as keyof typeof statusColors] || "text-gray-400 bg-gray-400/20";
+              const statusClass = statusColors[(network.deploymentStatus || "pending") as keyof typeof statusColors] || "text-gray-400 bg-gray-400/20";
               
               return (
                 <Card key={network.id} className={`glass-card rounded-lg ${colorClass}`}>
@@ -111,7 +111,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
                         <span className="font-semibold">{network.name}</span>
                       </div>
                       <Badge className={`text-xs ${statusClass}`}>
-                        {network.deploymentStatus.toUpperCase()}
+                        {network.deploymentStatus?.toUpperCase() || "UNKNOWN"}
                       </Badge>
                     </div>
                     

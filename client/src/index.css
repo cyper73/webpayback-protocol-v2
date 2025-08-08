@@ -124,6 +124,26 @@
     border-color: var(--cyber-purple);
   }
   
+  .bg-deep-space {
+    background-color: var(--deep-space);
+  }
+  
+  .bg-glass-dark {
+    background-color: var(--glass-dark);
+  }
+  
+  .text-electric-blue {
+    color: var(--electric-blue);
+  }
+  
+  .text-neon-green {
+    color: var(--neon-green);
+  }
+  
+  .text-cyber-purple {
+    color: var(--cyber-purple);
+  }
+  
   .text-electric-blue {
     color: var(--electric-blue);
   }
