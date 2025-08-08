@@ -78,11 +78,11 @@ export default function Dashboard() {
     agents = [], 
     networks = [], 
     creators = [], 
-    stats = {}, 
+    stats = { totalRequests: 0, totalRewards: 0, uniqueCreators: 0, averageUsage: 0 }, 
     rewards = [], 
     pool = [], 
     compliance = [] 
-  } = data || {};
+  } = data;
 
   return (
     <ErrorBoundary>
