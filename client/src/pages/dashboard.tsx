@@ -96,7 +96,7 @@ export default function Dashboard() {
     rewards = [], 
     pool = [], 
     compliance = [] 
-  } = dashboardInfo;
+  } = dashboardInfo as any;
 
   return (
     <ErrorBoundary>
