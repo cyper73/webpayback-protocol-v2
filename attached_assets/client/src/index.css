@@ -83,12 +83,6 @@
     background: hsla(240, 6%, 10%, 0.8);
   }
   
-  /* Override Card background only when glass-card is present */
-  .glass-card.card,
-  .card.glass-card {
-    background: hsla(240, 6%, 10%, 0.8);
-  }
-  
   /* Deep space background */
   .bg-deep-space {
     background: hsl(240, 33%, 6%);
@@ -190,124 +184,6 @@
   .animate-scroll {
     animation: scroll 30s linear infinite;
   }
-
-/* Dashboard Layout Optimization */
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* Dashboard grid is now handled by Tailwind's native grid classes */
-
-/* Width inheritance and container sizing */
-.min-h-screen {
-  width: 100%;
-}
-
-.max-w-7xl {
-  max-width: 80rem;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Grid children sizing */
-.grid > * {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.dashboard-section {
-  width: 100%;
-  min-height: fit-content;
-  margin: 0 auto;
-}
-
-/* Card styling and spacing */
-.glass-card {
-  height: fit-content;
-  min-height: auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.glass-card .card-header {
-  padding: 1rem 1.25rem 0.75rem 1.25rem;
-}
-
-.glass-card .card-content {
-  padding: 0.75rem 1.25rem 1rem 1.25rem;
-  flex: 1;
-}
-
-/* Grid item alignment */
-.grid > * {
-  height: fit-content;
-  align-self: start;
-  min-height: auto;
-}
-
-/* Compact spacing for internal components */
-.space-y-6 > * + * {
-  margin-top: 1.25rem;
-}
-
-.space-y-4 > * + * {
-  margin-top: 0.875rem;
-}
-
-/* Optimize card content spacing */
-.glass-card .grid {
-  gap: 0.875rem;
-}
-
-.glass-card .space-y-3 > * + * {
-  margin-top: 0.75rem;
-}
-
-/* Security Systems specific optimization */
-.dashboard-section .space-y-6 .glass-card {
-  min-height: 340px;
-  max-height: none;
-  overflow: visible;
-}
-
-/* Better grid alignment for security cards */
-.dashboard-section .space-y-6 {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Prevent text overlap in security cards */
-.glass-card .grid .space-y-2 > * + * {
-  margin-top: 0.75rem;
-}
-
-.glass-card .grid .space-y-3 > * + * {
-  margin-top: 1rem;
-}
-
-/* Ensure proper spacing for security metrics */
-.glass-card .grid > div {
-  min-height: 80px;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Fix overlapping headers and content */
-.glass-card .card-header {
-  z-index: 10;
-  position: relative;
-  padding-bottom: 0.75rem;
-}
 }
 
 @keyframes pulse {
