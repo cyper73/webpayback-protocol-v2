@@ -13,7 +13,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import PoolDataMonitoring from "@/components/pool/PoolDataMonitoring";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-import { GasTracker } from "@/components/gas/GasTracker";
+import GasTracker from "@/components/gas/GasTracker";
 import PoolDrainProtection from "@/components/pool/PoolDrainProtection";
 import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
