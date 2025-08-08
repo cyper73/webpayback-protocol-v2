@@ -225,16 +225,42 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Status</span>
-                      <span className="text-sm font-medium text-amber-400">Active</span>
+                      <span className="text-sm text-gray-400">Daily Budget</span>
+                      <span className="text-sm font-mono text-amber-400">$50</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Pending</span>
-                      <span className="text-sm font-mono">0 rewards</span>
+                      <span className="text-sm text-gray-400">Today Used</span>
+                      <span className="text-sm font-mono">$12.47</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Batch Size</span>
-                      <span className="text-sm font-mono">50</span>
+                      <span className="text-sm text-gray-400">Pool Threshold</span>
+                      <span className="text-sm font-mono text-neon-green">15%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-glass-dark rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 bg-orange-400/20 rounded-full flex items-center justify-center">
+                      <span className="text-orange-400 font-bold text-sm">CL</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">Chainlink</h3>
+                      <p className="text-xs text-gray-400">Price feeds & automation</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-400">Price Feed</span>
+                      <span className="text-sm font-medium text-neon-green">Active</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-400">MATIC/USD</span>
+                      <span className="text-sm font-mono">$0.969</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-400">Automation</span>
+                      <span className="text-sm font-medium text-neon-green">Online</span>
                     </div>
                   </div>
                 </div>
@@ -242,234 +268,198 @@ export default function Dashboard() {
                 <div className="bg-glass-dark rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-purple-400/20 rounded-full flex items-center justify-center">
-                      <span className="text-purple-400 font-bold text-sm">CL</span>
+                      <span className="text-purple-400 font-bold text-sm">AM</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">Chainlink Prices</h3>
-                      <p className="text-xs text-gray-400">Live price feeds</p>
+                      <h3 className="font-semibold text-white">Alchemy Monitor</h3>
+                      <p className="text-xs text-gray-400">Usage & limits</p>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">MATIC/USD</span>
-                      <span className="text-sm font-mono text-electric-blue">$0.95</span>
+                      <span className="text-sm text-gray-400">API Calls</span>
+                      <span className="text-sm font-mono">12/200</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">ETH/USD</span>
-                      <span className="text-sm font-mono text-purple-400">$3,241</span>
+                      <span className="text-sm text-gray-400">Daily Quota</span>
+                      <span className="text-sm font-mono text-neon-green">6%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">WPT/USD</span>
-                      <span className="text-sm font-mono text-amber-400">$0.0022</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-glass-dark rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center">
-                      <span className="text-neon-green font-bold text-sm">CO</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white">Cost Optimization</h3>
-                      <p className="text-xs text-gray-400">Gas savings</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-neon-green">95%</div>
-                      <div className="text-xs text-gray-400">Gas Savings</div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Individual</span>
-                      <span className="text-sm font-mono">0.017 MATIC</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Batch</span>
-                      <span className="text-sm font-mono">0.0008 MATIC</span>
+                      <span className="text-sm text-gray-400">Status</span>
+                      <span className="text-sm font-medium text-neon-green">Optimal</span>
                     </div>
                   </div>
                 </div>
               </div>
+              
+              {/* Action Row */}
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button size="sm" variant="outline" className="bg-electric-blue/10 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Gas Pool Settings
+                </Button>
+                <Button size="sm" variant="outline" className="bg-amber-500/10 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Sync Chainlink
+                </Button>
+                <Button size="sm" variant="outline" className="bg-purple-500/10 border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Logs
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
-              <div className="mt-6 p-4 bg-glass-dark rounded-lg">
-                <div className="flex items-center justify-center space-x-8">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-neon-green rounded-full"></div>
-                    <span className="text-sm text-gray-300">Gas Pool Healthy</span>
+        {/* AGENTS GRID - LEVEL 280 AI */}
+        <section className="dashboard-section">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <AgentCard agent={dashboardInfo.agents[0]} />
+            <AgentCommunication />
+          </div>
+        </section>
+
+        {/* 🌐 BLOCKCHAIN & WEB3 INTEGRATION */}
+        <section className="dashboard-section">
+          <Card className="glass-card rounded-2xl shadow-neon-green">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-bold gradient-text">🌐 Multi-Chain Blockchain</CardTitle>
+                <Badge className="bg-neon-green text-black font-semibold">4 Networks</Badge>
+              </div>
+              <p className="text-gray-400">Ethereum, Polygon, BSC, Arbitrum - Multi-chain deployment ready</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="text-center p-4 rounded-lg bg-glass-dark border border-blue-500/20">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-blue-400" />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
-                    <span className="text-sm text-gray-300">Batch Processor Active</span>
+                  <h3 className="font-semibold text-white mb-1">Polygon</h3>
+                  <p className="text-xs text-gray-400 mb-2">Primary Network</p>
+                  <Badge className="bg-neon-green text-black text-xs">Connected</Badge>
+                </div>
+                
+                <div className="text-center p-4 rounded-lg bg-glass-dark border border-gray-500/20">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gray-500/20 rounded-full flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-gray-400" />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-electric-blue rounded-full"></div>
-                    <span className="text-sm text-gray-300">Chainlink Connected</span>
+                  <h3 className="font-semibold text-white mb-1">Ethereum</h3>
+                  <p className="text-xs text-gray-400 mb-2">Available</p>
+                  <Badge variant="outline" className="text-xs">Ready</Badge>
+                </div>
+
+                <div className="text-center p-4 rounded-lg bg-glass-dark border border-gray-500/20">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gray-500/20 rounded-full flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-gray-400" />
                   </div>
+                  <h3 className="font-semibold text-white mb-1">BSC</h3>
+                  <p className="text-xs text-gray-400 mb-2">Available</p>
+                  <Badge variant="outline" className="text-xs">Ready</Badge>
+                </div>
+
+                <div className="text-center p-4 rounded-lg bg-glass-dark border border-gray-500/20">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gray-500/20 rounded-full flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-gray-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-1">Arbitrum</h3>
+                  <p className="text-xs text-gray-400 mb-2">Available</p>
+                  <Badge variant="outline" className="text-xs">Ready</Badge>
                 </div>
               </div>
             </CardContent>
           </Card>
         </section>
 
-        {/* Creator Registration Portal - Priority Section */}
+        {/* INTEGRATION MODULES */}
         <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-            <CreatorPortal />
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            <MultiChainDeployment networks={dashboardInfo.networks} />
+            <TokenEconomics stats={dashboardInfo.stats} />
+            <NetworkSwitcher />
+          </div>
+        </section>
+
+        {/* WEB3 & POOL MONITORING */}
+        <section className="dashboard-section">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            <TokenInfo />
+            <PoolDataMonitoring />
             <GasTracker />
           </div>
         </section>
 
-        {/* Agent Collaboration Panel */}
-        <section className="dashboard-section">
-          <Card className="glass-card rounded-2xl shadow-neon-blue">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold gradient-text">
-                  Multi-Agent Orchestration Command Center
-                </CardTitle>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-neon-green rounded-full pulse-animation"></div>
-                  <span className="text-sm text-gray-300">All agents synchronized</span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {agents.map((agent: any) => (
-                  <AgentCard key={agent.id} agent={agent} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Inter-Agent Communication */}
-        <section className="dashboard-section">
-          <AgentCommunication />
-        </section>
-
-        {/* Analytics & Multi-Chain Deployment */}
-        <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-            <div className="xl:col-span-2">
-              <MultiChainDeployment networks={networks} />
-            </div>
-            <div>
-              <LiveStats stats={stats} />
-            </div>
-          </div>
-        </section>
-
-        {/* Token Economics and Pool Management */}
-        <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-            <TokenEconomics stats={stats} pool={pool} rewards={rewards} />
-            <TokenInfo />
-            <PoolDataMonitoring />
-          </div>
-        </section>
-
-        {/* Creator Rewards & Governance */}
+        {/* CREATORS & REWARDS */}
         <section className="dashboard-section">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <CreatorPortal />
             <RewardDistribution />
-            <ComplianceMonitor compliance={compliance} />
           </div>
         </section>
 
-        {/* Qloo Cultural Intelligence Dashboard */}
-        <section className="dashboard-section">
-          <Card className="glass-card rounded-2xl shadow-neon-purple border-purple-500/30">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold gradient-text">
-                  🧠 Qloo Cultural Intelligence System
-                </CardTitle>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-purple-400 rounded-full pulse-animation"></div>
-                  <span className="text-sm text-gray-300">LLM → Qloo → WebPayback Active</span>
-                </div>
-              </div>
-              <p className="text-gray-400">Taste-aware WPT rewards powered by cultural AI intelligence</p>
-            </CardHeader>
-            <CardContent>
-              <QlooCulturalDashboard />
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Security & Monitoring Systems */}
-        <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-            <div className="space-y-6">
-              <PoolDrainProtection />
-              <ReentrancyProtection />
-            </div>
-            <div className="space-y-6">
-              <FakeCreatorDetection />
-              <AlchemyUsageMonitor />
-            </div>
-          </div>
-        </section>
-
-        {/* AI Query & VPN Protection */}
+        {/* 🛡️ SECURITY SYSTEMS - CRITICAL PRIORITY */}
         <section className="dashboard-section">
           <Card className="glass-card rounded-2xl shadow-neon-purple">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold gradient-text">
-                Advanced AI Query & VPN Protection
-              </CardTitle>
-              <p className="text-gray-400">Enhanced fraud detection with semantic analysis and geo-intelligence</p>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-bold gradient-text">🛡️ Security Systems</CardTitle>
+                <Badge className="bg-red-500/20 text-red-300 border border-red-500/30">Critical Systems</Badge>
+              </div>
+              <p className="text-gray-400">Multi-layer protection: Pool drain, reentrancy, fake creators, AI queries</p>
             </CardHeader>
-            <CardContent>
-              <AIQueryProtectionDashboard />
+            <CardContent className="space-y-6">
+              <PoolDrainProtection />
+              <FakeCreatorDetection />
+              <ReentrancyProtection />
             </CardContent>
           </Card>
         </section>
 
-        {/* Network Switcher */}
+        {/* ANALYTICS & MONITORING */}
         <section className="dashboard-section">
-          <NetworkSwitcher />
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <LiveStats stats={dashboardInfo.stats} />
+            <AlchemyUsageMonitor />
+          </div>
+        </section>
+
+        {/* CULTURAL AI & COMPLIANCE */}
+        <section className="dashboard-section">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <QlooCulturalDashboard />
+            <ComplianceMonitor compliance={dashboardInfo.compliance} />
+          </div>
+        </section>
+
+        {/* AI QUERY PROTECTION */}
+        <section className="dashboard-section">
+          <AIQueryProtectionDashboard />
+        </section>
+
+        {/* WebPayback Footer Info */}
+        <section className="dashboard-section">
+          <Card className="glass-card border border-electric-blue/30">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-2">
+                  <img src={wptLogo} alt="WPT" className="w-6 h-6" />
+                  <span className="font-bold text-lg gradient-text">WebPayback Protocol v2.0</span>
+                </div>
+                <p className="text-sm text-gray-400 max-w-2xl mx-auto">
+                  The world's first decentralized creator compensation protocol. Powered by Level 280 AI agents, 
+                  multi-chain deployment, and advanced security systems. Real TVL: ${pool[0]?.tvl || 0} + €{Math.round(pool[1]?.tvl) || 0}
+                </p>
+                <div className="flex items-center justify-center space-x-6 text-xs text-gray-500">
+                  <span>🔧 Infrastructure: Active</span>
+                  <span>🤖 AI Level: 280</span>
+                  <span>🛡️ Security: Enhanced</span>
+                  <span>🌐 Multi-Chain: Ready</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </section>
           </main>
-
-          {/* Footer with Privacy Policy */}
-          <footer className="glass-card border-t border-white/10 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <img src={wptLogo} alt="WPT Logo" className="w-6 h-6" />
-              <span className="text-sm text-gray-400">WebPayback Protocol - Where AI meets fair compensation for creators</span>
-            </div>
-            <div className="flex items-center space-x-6">
-              <RouterLink href="/privacy" className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors">
-                <Shield className="h-4 w-4" />
-                <span>Privacy Policy</span>
-              </RouterLink>
-              <RouterLink href="/terms" className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors">
-                <FileText className="h-4 w-4" />
-                <span>Terms & Conditions</span>
-              </RouterLink>
-              <a 
-                href="https://github.com/cyper73/webpayback-protocol/tree/webpayback" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                <Link className="h-4 w-4" />
-                <span>GitHub</span>
-              </a>
-              <a 
-                href="mailto:cyper73@gmail.com" 
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                Contact
-              </a>
-            </div>
-          </div>
-        </div>
-        </footer>
         </div>
       </div>
     </ErrorBoundary>

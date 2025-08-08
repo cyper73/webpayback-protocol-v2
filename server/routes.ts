@@ -89,6 +89,9 @@ import poolHealthRouter from "./routes/poolHealth";
 import antiDumpSlippageRoutes from "./routes/antiDumpSlippage";
 import userRoutes from "./routes/user";
 import contractReservesRouter from "./routes/contractReserves";
+import qlooRoutes from "./routes/qloo";
+import apiStatusRoutes from "./routes/apiStatus";
+import founderAuthRoutes from "./routes/founderAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -4146,6 +4149,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // User routes
   app.use('/api/user', userRoutes);
+  
+  // Qloo Cultural Intelligence routes
+  app.use('/api/qloo', qlooRoutes);
+  
+  // API Status and Configuration routes
+  app.use('/api/status', apiStatusRoutes);
+  
+  // Founder Authentication and IP Authorization routes
+  app.use('/api/founder-auth', founderAuthRoutes);
   
   // Allowance Management routes
   // Admin login endpoint  

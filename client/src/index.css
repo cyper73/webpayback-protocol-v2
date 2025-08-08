@@ -2,286 +2,163 @@
 @tailwind components;
 @tailwind utilities;
 
+/* WebPayback Protocol - Advanced CSS Variables */
 :root {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.5rem;
+  /* Main Colors */
+  --deep-space: #0a0a0a;
+  --glass-dark: rgba(25, 25, 25, 0.8);
+  --glass-light: rgba(255, 255, 255, 0.05);
+  --electric-blue: #00d4ff;
+  --neon-green: #00ff88;
+  --cyber-purple: #8b5cf6;
+  --warning-amber: #fbbf24;
+  --danger-red: #ef4444;
   
-  /* Custom WebPayback Colors */
-  --electric-blue: hsl(190, 100%, 50%);
-  --neon-green: hsl(150, 100%, 50%);
-  --cyber-purple: hsl(255, 84%, 64%);
-  --deep-space: hsl(240, 33%, 6%);
-  --dark-gray: hsl(240, 6%, 10%);
-  --glass-dark: hsla(240, 6%, 10%, 0.8);
-  --glass-light: hsla(0, 0%, 100%, 0.1);
+  /* Glass Effects */
+  --glass-blur: blur(12px);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--electric-blue) 0%, var(--cyber-purple) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--neon-green) 0%, var(--electric-blue) 100%);
+  --gradient-danger: linear-gradient(135deg, var(--danger-red) 0%, var(--warning-amber) 100%);
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.5rem;
+  --background: 220 71% 4%;
+  --foreground: 213 31% 91%;
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+  --popover: 224 71% 4%;
+  --popover-foreground: 215 20.2% 65.1%;
+  --primary: 210 20% 98%;
+  --primary-foreground: 220.9 39.3% 11%;
+  --secondary: 215 27.9% 16.9%;
+  --secondary-foreground: 210 20% 98%;
+  --muted: 215 27.9% 16.9%;
+  --muted-foreground: 217.9 10.6% 64.9%;
+  --accent: 215 27.9% 16.9%;
+  --accent-foreground: 210 20% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 20% 98%;
+  --border: 215 27.9% 16.9%;
+  --input: 215 27.9% 16.9%;
+  --ring: 216 12.2% 83.9%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply font-sans antialiased text-foreground;
-    background: var(--deep-space);
-  }
+/* Base Styles */
+* {
+  border-color: hsl(var(--border));
 }
 
-@layer components {
-  /* WebPayback Protocol Glass Effect */
-  .glass-card {
-    background: hsla(240, 6%, 10%, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid hsla(0, 0%, 100%, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  }
-  
-  /* Override Card background only when glass-card is present */
-  .glass-card.card,
-  .card.glass-card {
-    background: hsla(240, 6%, 10%, 0.8);
-  }
-  
-  /* Override Card background only when glass-card is present */
-  .glass-card.card,
-  .card.glass-card {
-    background: hsla(240, 6%, 10%, 0.8);
-  }
-  
-  /* Deep space background */
-  .bg-deep-space {
-    background: hsl(240, 33%, 6%);
-  }
-  
-  .pulse-animation {
-    animation: pulse 2s infinite;
-    will-change: opacity;
-  }
-  
-  .floating-animation {
-    animation: float 3s ease-in-out infinite;
-    will-change: transform;
-  }
-  
-  .gradient-text {
-    background: linear-gradient(45deg, var(--electric-blue), var(--neon-green));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    /* Fallback for browsers that don't support background-clip */
-    color: var(--electric-blue);
-  }
-  
-  .blockchain-grid {
-    background-image: radial-gradient(circle at 1px 1px, hsla(190, 100%, 50%, 0.3) 1px, transparent 0);
-    background-size: 20px 20px;
-  }
-  
-  .transaction-flow {
-    background: linear-gradient(90deg, transparent, hsla(150, 100%, 50%, 0.3), transparent);
-    animation: flow 3s linear infinite;
-  }
-  
-  .shadow-neon-blue {
-    box-shadow: 0 0 20px hsla(190, 100%, 50%, 0.3);
-  }
-  
-  .shadow-neon-green {
-    box-shadow: 0 0 20px hsla(150, 100%, 50%, 0.3);
-  }
-  
-  .shadow-neon-purple {
-    box-shadow: 0 0 20px hsla(255, 84%, 64%, 0.3);
-  }
-  
-  .border-electric-blue {
-    border-color: var(--electric-blue);
-  }
-  
-  .border-neon-green {
-    border-color: var(--neon-green);
-  }
-  
-  .border-cyber-purple {
-    border-color: var(--cyber-purple);
-  }
-  
-  .bg-deep-space {
-    background-color: var(--deep-space);
-  }
-  
-  .bg-glass-dark {
-    background-color: var(--glass-dark);
-  }
-  
-  .text-electric-blue {
-    color: var(--electric-blue);
-  }
-  
-  .text-neon-green {
-    color: var(--neon-green);
-  }
-  
-  .text-cyber-purple {
-    color: var(--cyber-purple);
-  }
-  
-  .bg-electric-blue {
-    background-color: var(--electric-blue);
-  }
-  
-  .bg-neon-green {
-    background-color: var(--neon-green);
-  }
-  
-  .bg-cyber-purple {
-    background-color: var(--cyber-purple);
-  }
-  
-  .bg-deep-space {
-    background-color: var(--deep-space);
-  }
-  
-  .bg-glass-dark {
-    background-color: var(--glass-dark);
-  }
-  
-  .animate-scroll {
-    animation: scroll 30s linear infinite;
-  }
+body {
+  background: var(--deep-space);
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
 
-/* Dashboard Layout Optimization */
+/* WebPayback Glass Morphism System */
+.glass-card {
+  background: var(--glass-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(25, 25, 25, 0.9);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Layout Containers */
+.bg-deep-space {
+  background: var(--deep-space);
+}
+
+.bg-glass-dark {
+  background: var(--glass-dark);
+}
+
+/* Typography & Gradients */
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-electric-blue {
+  color: var(--electric-blue);
+}
+
+.text-neon-green {
+  color: var(--neon-green);
+}
+
+.text-cyber-purple {
+  color: var(--cyber-purple);
+}
+
+/* Dashboard Container System */
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 2rem;
   width: 100%;
-  margin: 0 auto;
-}
-
-/* Dashboard grid is now handled by Tailwind's native grid classes */
-
-/* Width inheritance and container sizing */
-.min-h-screen {
-  width: 100%;
-}
-
-.max-w-7xl {
-  max-width: 80rem;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Grid children sizing */
-.grid > * {
-  width: 100%;
-  box-sizing: border-box;
+  max-width: none;
+  margin: 0;
+  padding: 1.5rem;
 }
 
 .dashboard-section {
   width: 100%;
-  min-height: fit-content;
-  margin: 0 auto;
+  margin-bottom: 2rem;
 }
 
-/* Card styling and spacing */
-.glass-card {
-  height: fit-content;
-  min-height: auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.glass-card .card-header {
-  padding: 1rem 1.25rem 0.75rem 1.25rem;
-}
-
-.glass-card .card-content {
-  padding: 0.75rem 1.25rem 1rem 1.25rem;
-  flex: 1;
-}
-
-/* Grid item alignment */
-.grid > * {
-  height: fit-content;
-  align-self: start;
-  min-height: auto;
-}
-
-/* Compact spacing for internal components */
-.space-y-6 > * + * {
-  margin-top: 1.25rem;
-}
-
-.space-y-4 > * + * {
-  margin-top: 0.875rem;
-}
-
-/* Optimize card content spacing */
-.glass-card .grid {
-  gap: 0.875rem;
-}
-
-.glass-card .space-y-3 > * + * {
-  margin-top: 0.75rem;
-}
-
-/* Security Systems specific optimization */
-.dashboard-section .space-y-6 .glass-card {
-  min-height: 340px;
-  max-height: none;
-  overflow: visible;
-}
-
-/* Better grid alignment for security cards */
-.dashboard-section .space-y-6 {
-  display: flex;
-  flex-direction: column;
+/* Grid Layout Corrections */
+.dashboard-section .grid {
+  display: grid;
   gap: 1.5rem;
+  width: 100%;
+}
+
+.dashboard-section .grid.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1280px) {
+  .dashboard-section .grid.xl\\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dashboard-section .grid.xl\\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .dashboard-section .grid.xl\\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Card Content Spacing */
+.glass-card .space-y-6 > * + * {
+  margin-top: 1.5rem;
 }
 
 /* Prevent text overlap in security cards */
@@ -308,144 +185,61 @@
   position: relative;
   padding-bottom: 0.75rem;
 }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes flow {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* Dashboard Layout Optimization */
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* Dashboard grid is now handled by Tailwind's native grid classes */
-
-/* Width inheritance and container sizing */
-.min-h-screen {
-  width: 100%;
-}
-
-.max-w-7xl {
-  max-width: 80rem;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Grid children sizing */
-.grid > * {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.dashboard-section {
-  width: 100%;
-  min-height: fit-content;
-  margin: 0 auto;
-}
-
-/* Card styling and spacing */
-.glass-card {
-  height: fit-content;
-  min-height: auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.glass-card .card-header {
-  padding: 1rem 1.25rem 0.75rem 1.25rem;
-}
 
 .glass-card .card-content {
-  padding: 0.75rem 1.25rem 1rem 1.25rem;
-  flex: 1;
+  position: relative;
+  z-index: 5;
 }
 
-/* Grid item alignment */
-.grid > * {
-  height: fit-content;
-  align-self: start;
-  min-height: auto;
+/* Typography optimization */
+.glass-card .text-2xl, .glass-card .text-3xl {
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
 }
 
-/* Compact spacing for internal components */
-.space-y-6 > * + * {
-  margin-top: 1.25rem;
+.glass-card .text-xs, .glass-card .text-sm {
+  line-height: 1.4;
 }
 
-.space-y-4 > * + * {
-  margin-top: 0.875rem;
-}
-
-/* Optimize card content spacing */
-.glass-card .grid {
-  gap: 0.875rem;
-}
-
-.glass-card .space-y-3 > * + * {
-  margin-top: 0.75rem;
-}
-
-/* Security Systems specific optimization */
-.dashboard-section .space-y-6 .glass-card {
-  min-height: 340px;
-  max-height: none;
-  overflow: visible;
-}
-
-/* Better grid alignment for security cards */
-.dashboard-section .space-y-6 {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Prevent text overlap in security cards */
-.glass-card .grid .space-y-2 > * + * {
-  margin-top: 0.75rem;
-}
-
-.glass-card .grid .space-y-3 > * + * {
-  margin-top: 1rem;
-}
-
-/* Ensure proper spacing for security metrics */
+/* Grid container optimization */
 .glass-card .grid > div {
-  min-height: 80px;
-  padding: 0.75rem;
+  position: relative;
+  width: 100%;
+  min-height: 120px;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+  .dashboard-section .space-y-6 .glass-card .grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Header and badge alignment */
+.glass-card .card-header .flex.items-center.justify-between {
+  align-items: flex-start;
+}
+
+.glass-card .card-header .badge {
+  margin-top: 0.25rem;
+}
+
+/* Ensure security metric containers have proper height */
+.glass-card .bg-gray-800\/50 {
+  min-height: 100px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(55, 65, 81, 0.3);
 }
 
-/* Fix overlapping headers and content */
-.glass-card .card-header {
-  z-index: 10;
-  position: relative;
-  padding-bottom: 0.75rem;
+.glass-card .bg-red-500\/20, .glass-card .bg-blue-500\/20 {
+  min-height: 100px;
+  padding: 1rem;
+  border-radius: 0.5rem;
 }
 
 .glass-card .card-content {
@@ -505,4 +299,118 @@
 .glass-card .bg-red-500\/20, .glass-card .bg-blue-500\/20 {
   position: relative;
   z-index: 1;
+}
+
+/* Neon Effects */
+.shadow-neon-blue {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 212, 255, 0.1);
+}
+
+.shadow-neon-green {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 40px rgba(0, 255, 136, 0.1);
+}
+
+.shadow-neon-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+}
+
+/* Pulse Animation */
+.pulse-animation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Status Indicators */
+.status-active {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.status-warning {
+  color: var(--warning-amber);
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.status-danger {
+  color: var(--danger-red);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* Interactive Elements */
+.glass-button {
+  background: var(--glass-dark);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+  
+  .glass-card {
+    border-radius: 12px;
+  }
+  
+  .dashboard-section {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-animation {
+    animation: none;
+  }
+  
+  .glass-card {
+    transition: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .glass-card {
+    background: white;
+    color: black;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
 }

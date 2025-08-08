@@ -82,8 +82,11 @@ router.post('/transfer-to-reserves', founderOnly, async (req: any, res) => {
     const amountWei = ethers.parseUnits(amount.toString(), 18);
     
     // Setup provider and signer
-    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`); // [REDACTED_FOR_GITHUB_SECURITY]
-    const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider); // [REDACTED_FOR_GITHUB_SECURITY]
+    const alchemyKey = process.env.ALCHEMY_API_KEY || 'demo-api-key';
+    const privateKey = process.env.PRIVATE_KEY || '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    
+    const provider = new ethers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`);
+    const signer = new ethers.Wallet(privateKey, provider);
     const contract = new ethers.Contract(WPT_CONTRACT_ADDRESS, ERC20_ABI, signer);
 
     // Check founder's balance first

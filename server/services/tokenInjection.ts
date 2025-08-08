@@ -21,10 +21,20 @@ export class TokenInjectionService {
 
   constructor() {
     // Initialize provider and wallet (ethers v5 API)
-    this.provider = new ethers.providers.JsonRpcProvider(
-      `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}` // [REDACTED_FOR_GITHUB_SECURITY]
-    );
-    this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, this.provider); // [REDACTED_FOR_GITHUB_SECURITY]
+    const alchemyKey = process.env.ALCHEMY_API_KEY || 'demo-api-key';
+    const privateKey = process.env.PRIVATE_KEY || '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    
+    try {
+      this.provider = new ethers.providers.JsonRpcProvider(
+        `https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`
+      );
+      this.wallet = new ethers.Wallet(privateKey, this.provider);
+    } catch (error) {
+      console.warn('Failed to initialize token injection service, using mock mode:', error);
+      // Create a mock provider for development
+      this.provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+      this.wallet = new ethers.Wallet(privateKey, this.provider);
+    }
 
     // WPT contract ABI (minimal for transfer)
     const wptABI = [

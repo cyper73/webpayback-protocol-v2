@@ -2,19 +2,16 @@ import { RequestHandler } from "express";
 import { CredentialProtectionService } from "./security/credentialProtection";
 
 // Admin credentials for allowance management and pool manager
-const ADMIN_CREDENTIALS = {
-  username: process.env.ADMIN_USERNAME || "admin",
-  password: process.env.ADMIN_PASSWORD || "changeme"
+// Using lazy loading to ensure environment variables are available
+const getAdminCredentials = () => {
+  return {
+    username: process.env.ADMIN_USERNAME || 'admin',
+    password: process.env.ADMIN_PASSWORD || 'changeme'
+  };
 };
 
-// TEMPORARILY DISABLED: Admin authentication middleware for platform restoration
+// Admin authentication middleware with IP protection (founder's IP only)
 export const authenticateAdmin: RequestHandler = (req, res, next) => {
-  // BYPASS: Allow admin access for webpayback.com platform restoration
-  console.log(`✅ ADMIN ACCESS GRANTED: Temporary bypass for platform restoration`);
-  (req as any).isAdmin = true;
-  return next();
-  
-  // Original code (disabled for platform restoration)
   // STEP 1: Validate IP is authorized (founder's IP only)
   const ipValidation = CredentialProtectionService.validateFounderIP(req);
   
@@ -41,6 +38,9 @@ export const authenticateAdmin: RequestHandler = (req, res, next) => {
   const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
   const [username, password] = credentials.split(':');
 
+  // Get credentials using lazy loading
+  const ADMIN_CREDENTIALS = getAdminCredentials();
+  
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
     console.log(`✅ ADMIN ACCESS GRANTED: IP ${ipValidation.detectedIP} authorized`);
     // Add admin flag to request
@@ -76,7 +76,10 @@ export const adminLogin: RequestHandler = (req, res) => {
 
   // STEP 2: Validate admin credentials
   const { username, password } = req.body;
-
+  
+  // Get credentials using lazy loading
+  const ADMIN_CREDENTIALS = getAdminCredentials();
+  
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
     console.log(`✅ ADMIN LOGIN SUCCESSFUL: IP ${ipValidation.detectedIP} authorized`);
     

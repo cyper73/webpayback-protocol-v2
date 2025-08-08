@@ -42,11 +42,13 @@ export interface QlooRewardCalculation {
 
 export class QlooService {
   private apiKey: string;
-  private baseUrl = 'https://hackathon.api.qloo.com';
+  private baseUrl: string;
   
   constructor() {
-    this.apiKey = process.env.QLOO_API_KEY || '[REDACTED_FOR_GITHUB_SECURITY]'; // [REDACTED_FOR_GITHUB_SECURITY]
+    this.apiKey = process.env.QLOO_API_KEY || '[REDACTED_FOR_GITHUB_SECURITY]';
+    this.baseUrl = process.env.QLOO_API_URL || 'https://hackathon.api.qloo.com';
     console.log('🚀 Qloo LIVE API integration activated with hackathon endpoint!');
+    console.log(`📡 Using Qloo API: ${this.baseUrl}`);
   }
 
   /**

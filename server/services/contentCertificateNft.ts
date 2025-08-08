@@ -9,8 +9,19 @@ export class ContentCertificateNftService {
   private signer: ethers.Wallet;
   
   constructor() {
-    this.provider = new ethers.providers.AlchemyProvider('matic', process.env.ALCHEMY_API_KEY); // [REDACTED_FOR_GITHUB_SECURITY]
-    this.signer = new ethers.Wallet(process.env.PRIVATE_KEY!, this.provider); // [REDACTED_FOR_GITHUB_SECURITY]
+    // Use demo provider for development if API key is not available
+    const alchemyKey = process.env.ALCHEMY_API_KEY || 'demo-api-key';
+    const privateKey = process.env.PRIVATE_KEY || '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    
+    try {
+      this.provider = new ethers.providers.AlchemyProvider('matic', alchemyKey);
+      this.signer = new ethers.Wallet(privateKey, this.provider);
+    } catch (error) {
+      console.warn('Failed to initialize blockchain provider for NFT service, using mock mode:', error);
+      // Create a mock provider for development
+      this.provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+      this.signer = new ethers.Wallet(privateKey, this.provider);
+    }
   }
 
   // Generate content fingerprint using SHA-256
