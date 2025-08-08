@@ -82,17 +82,13 @@ export default function Dashboard() {
     rewards = [], 
     pool = [], 
     compliance = [] 
-  } = data as any || {};
+  } = data || {};
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen text-white relative overflow-hidden" style={{ background: 'var(--deep-space)' }}>
-      {/* Animated Background */}
-      <div className="absolute inset-0 blockchain-grid opacity-20"></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-transparent to-cyber-purple/5"></div>
-      
+      <div className="min-h-screen bg-deep-space text-white">
       {/* Clean Navigation Header */}
-      <header className="glass-card border-b border-white/10 sticky top-0 z-50 relative">
+      <header className="glass-card border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -121,11 +117,11 @@ export default function Dashboard() {
       </header>
 
       {/* Quick Actions Bar */}
-      <div className="bg-glass-dark/50 border-b border-white/5 relative">
+      <div className="bg-glass-dark/50 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <RouterLink to="/getting-started">
-              <Button variant="outline" size="sm" className="bg-glass-dark border-electric-blue/30 hover:bg-electric-blue/20 text-white">
+              <Button variant="outline" size="sm" className="bg-glass-dark border-blue-500/30 hover:bg-blue-500/20 text-white">
                 <BookOpen className="w-4 h-4 mr-2" />
                 Getting Started
               </Button>
@@ -156,9 +152,9 @@ export default function Dashboard() {
       </div>
 
       {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 relative">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dashboard-container">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
-        <section className="w-full">
+        <section className="dashboard-section">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
             <CardHeader>
               <div className="flex items-center justify-between">

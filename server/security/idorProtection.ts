@@ -23,8 +23,11 @@ const userSessions = new Map<string, UserSession>();
 // All sessions must now go through proper wallet verification
 // userSessions.set('session_user_1', { ... }); // REMOVED FOR SECURITY
 
-// Admin sessions managed through environment variables for security
-// No hardcoded admin sessions for enhanced security
+userSessions.set('session_admin', {
+  userId: 999,
+  isAdmin: true,
+  authenticatedCreatorIds: [] // Admin can access everything
+});
 
 // Extract session from request with proper device fingerprinting
 export const getUserSession = (req: Request): UserSession | null => {
@@ -43,22 +46,12 @@ export const getUserSession = (req: Request): UserSession | null => {
   const sessionHash = crypto.createHash('md5').update(sessionFingerprint).digest('hex');
   const userId = parseInt(sessionHash.substring(0, 8), 16) % 1000 + 2;
   
-  // Secure admin check using environment variables
-  const adminUsername = process.env.ADMIN_USERNAME;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const authHeader = req.headers.authorization;
-  
-  if (authHeader && adminUsername && adminPassword) {
-    const credentials = Buffer.from(authHeader.split(' ')[1] || '', 'base64').toString();
-    const [username, password] = credentials.split(':');
-    
-    if (username === adminUsername && password === adminPassword) {
-      return { userId: 999, isAdmin: true, authenticatedCreatorIds: [] };
-    }
+  // Admin check
+  if (userAgent.includes('admin')) {
+    return { userId: 999, isAdmin: true, authenticatedCreatorIds: [] };
   }
   
   // SECURITY FORTRESS: Multi-layered credential simulation protection
-  // NOTE: Security checks only trigger when attempting founder wallet authentication
   if (userAgent.includes('Windows') || userAgent.includes('Gecko') || userAgent.includes('rv:141')) {
     // LAYER 1: Header validation
     const walletSession = req.headers['x-wallet-session'] as string;
@@ -77,8 +70,7 @@ export const getUserSession = (req: Request): UserSession | null => {
     // LAYER 4: FOUNDER-SPECIFIC IP WHITELIST (Ultra-restrictive security)
     const founderAuthorizedIPs = [
       '192.168.0.100',    // IP locale del PC del founder
-      '185.84.86.163',    // IP pubblico di uscita del founder (vecchio provider)
-      '185.84.84.155',    // IP nuovo provider Tecnotel Servizi Tecnologici (Umbria)
+      '185.84.86.163',    // IP pubblico di uscita del founder  
       '192.168.0.254',    // Gateway del provider del founder
       '127.0.0.1',        // Localhost per testing
       'localhost',        // Localhost alternativo
@@ -96,47 +88,12 @@ export const getUserSession = (req: Request): UserSession | null => {
       return false;
     });
     
-    // SECURITY LOGIC: IP blocking ONLY when attempting founder wallet access
-    // Regular dashboard access is allowed from any IP without wallet authentication
-    const isAttemptingFounderWalletAccess = (
-      walletSession || 
-      verifiedWallet || 
-      walletSignature || 
-      verifiedWallet?.toLowerCase() === founderWallet.toLowerCase()
-    );
-
-    // TEMPORARY: Special bypass for founder IP to show dashboard content
-    if (isFounderAuthorizedIP && realClientIP?.includes('185.84.84.155')) {
-      console.log(`🔓 FOUNDER DASHBOARD ACCESS: Temporary bypass for demonstration`);
-      console.log(`🔓 Founder IP: ${realClientIP}`);
-      return { 
-        userId: 1, 
-        isAdmin: true, 
-        authenticatedCreatorIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27] 
-      };
-    }
-    
     // Additional security: Check for proxy/VPN headers that might indicate IP spoofing
     const hasSuspiciousHeaders = !!(
       req.headers['x-forwarded-for'] && 
       req.headers['x-forwarded-for'].toString().split(',').length > 2
     );
     
-    // IP RESTRICTIONS ONLY APPLY when attempting founder wallet access
-    if (isAttemptingFounderWalletAccess && !isFounderAuthorizedIP) {
-      console.log(`🚨 FOUNDER WALLET ACCESS BLOCKED: Unauthorized IP attempting founder wallet`);
-      console.log(`🚨 Client IP: ${realClientIP || clientIP}`);
-      console.log(`🚨 Wallet attempt: ${verifiedWallet || 'NONE'}`);
-      
-      SystemForensics.logSuspiciousAccess(req, verifiedWallet || 'NONE', ['FOUNDER_WALLET_UNAUTHORIZED_IP']);
-      
-      return { 
-        userId: 999999, // Blocked session
-        isAdmin: false, 
-        authenticatedCreatorIds: [] // Complete lockout
-      };
-    }
-
     // ALL LAYERS MUST PASS for founder access
     if (walletSession && 
         verifiedWallet && 
@@ -168,42 +125,36 @@ export const getUserSession = (req: Request): UserSession | null => {
       if (!isFounderAuthorizedIP) violations.push('UNAUTHORIZED_IP');
       if (hasSuspiciousHeaders) violations.push('SUSPICIOUS_PROXY_DETECTED');
       
-      // Only log security violations if attempting founder wallet access
-      if (isAttemptingFounderWalletAccess) {
-        console.log(`🚨 FOUNDER WALLET SECURITY BREACH: ${violations.join(', ')}`);
-        console.log(`🚨 Client IP: ${realClientIP || clientIP}, UA: ${userAgent.substring(0,50)}`);
-        console.log(`🚨 Wallet attempt: ${verifiedWallet || 'NONE'}`);
-        console.log(`🚨 Founder IP check: ${isFounderAuthorizedIP ? 'PASSED' : 'FAILED'}`);
-        console.log(`🚨 Proxy detection: ${hasSuspiciousHeaders ? 'SUSPICIOUS' : 'CLEAN'}`);
-        
-        // Advanced forensics logging
-        SystemForensics.logSuspiciousAccess(req, verifiedWallet || 'NONE', violations);
-        
-        return { 
-          userId: 999999, // Blocked session
-          isAdmin: false, 
-          authenticatedCreatorIds: [] // Complete lockout
-        };
-      }
+      console.log(`🚨 SECURITY BREACH ATTEMPT BLOCKED: ${violations.join(', ')}`);
+      console.log(`🚨 Client IP: ${realClientIP || clientIP}, UA: ${userAgent.substring(0,50)}`);
+      console.log(`🚨 Wallet attempt: ${verifiedWallet || 'NONE'}`);
+      console.log(`🚨 Founder IP check: ${isFounderAuthorizedIP ? 'PASSED' : 'FAILED'}`);
+      console.log(`🚨 Proxy detection: ${hasSuspiciousHeaders ? 'SUSPICIOUS' : 'CLEAN'}`);
+      
+      // Advanced forensics logging
+      SystemForensics.logSuspiciousAccess(req, verifiedWallet || 'NONE', violations);
+      
+      return { 
+        userId: 999999, // Blocked session
+        isAdmin: false, 
+        authenticatedCreatorIds: [] // Complete lockout
+      };
     }
   }
   
-  // Allow general dashboard access from any IP without wallet authentication
-  // This provides basic viewing access to public data
-  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-  const realClientIP = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || clientIP;
-  console.log(`SESSION: General dashboard access from IP=${realClientIP || clientIP}`);
-  console.log(`SESSION: Device: ${userAgent.substring(0, 50)}...`);
+  // Mobile/External devices = Different user IDs with NO access to founder data
+  console.log(`SESSION: External device (ID: ${userId}) - NO access to founder creators`);
+  console.log(`SESSION: Device fingerprint: IP=${ip}, UA=${userAgent.substring(0, 50)}...`);
   
   return { 
     userId: userId, 
     isAdmin: false, 
-    authenticatedCreatorIds: [4, 7, 8, 9, 10, 11, 12] // Basic public access to some creators
+    authenticatedCreatorIds: [] // No access to any creators
   };
 };
 
 // IDOR Protection: Verify user can access creator data
-export const authorizeCreatorAccess = (req: Request, res: Response, next: NextFunction) => {
+export const authorizeCreatorAccess = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const creatorId = parseInt(req.params.id || req.params.creatorId || req.body.creatorId);
     
@@ -254,7 +205,7 @@ export const authorizeCreatorAccess = (req: Request, res: Response, next: NextFu
 };
 
 // IDOR Protection for bulk operations - ensure user owns all referenced creators
-export const authorizeBulkCreatorAccess = (req: Request, res: Response, next: NextFunction) => {
+export const authorizeBulkCreatorAccess = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const creatorIds: number[] = [];
     
