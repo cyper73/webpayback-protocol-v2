@@ -68,6 +68,48 @@
   }
 }
 
+/* CSS Custom Properties for Cyber Theme */
+.bg-glass-dark {
+  background: var(--glass-dark);
+  backdrop-filter: blur(10px);
+}
+
+.bg-electric-blue {
+  background-color: var(--electric-blue);
+}
+
+.bg-neon-green {
+  background-color: var(--neon-green);
+}
+
+.bg-cyber-purple {
+  background-color: var(--cyber-purple);
+}
+
+.text-electric-blue {
+  color: var(--electric-blue);
+}
+
+.text-neon-green {
+  color: var(--neon-green);
+}
+
+.text-cyber-purple {
+  color: var(--cyber-purple);
+}
+
+.border-electric-blue {
+  border-color: var(--electric-blue);
+}
+
+.border-neon-green {
+  border-color: var(--neon-green);
+}
+
+.border-cyber-purple {
+  border-color: var(--cyber-purple);
+}
+
 @layer components {
   .glass-card {
     background: var(--glass-dark);
@@ -112,41 +154,7 @@
     box-shadow: 0 0 20px hsla(255, 84%, 64%, 0.3);
   }
   
-  .border-electric-blue {
-    border-color: var(--electric-blue);
-  }
-  
-  .border-neon-green {
-    border-color: var(--neon-green);
-  }
-  
-  .border-cyber-purple {
-    border-color: var(--cyber-purple);
-  }
-  
-  .text-electric-blue {
-    color: var(--electric-blue);
-  }
-  
-  .text-neon-green {
-    color: var(--neon-green);
-  }
-  
-  .text-cyber-purple {
-    color: var(--cyber-purple);
-  }
-  
-  .bg-electric-blue {
-    background-color: var(--electric-blue);
-  }
-  
-  .bg-neon-green {
-    background-color: var(--neon-green);
-  }
-  
-  .bg-cyber-purple {
-    background-color: var(--cyber-purple);
-  }
+
   
   .bg-deep-space {
     background-color: var(--deep-space);
