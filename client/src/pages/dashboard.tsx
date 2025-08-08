@@ -103,8 +103,9 @@ export default function Dashboard() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen text-white bg-deep-space">
-      {/* WebPayback Protocol Header */}
-      <header className="glass-card border-b border-white/10 sticky top-0 z-50">
+        <div className="w-full">
+          {/* WebPayback Protocol Header */}
+          <header className="glass-card border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -130,10 +131,10 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </header>
+          </header>
 
-      {/* WebPayback Actions Bar */}
-      <div className="bg-glass-dark/50 border-b border-white/5">
+          {/* WebPayback Actions Bar */}
+          <div className="bg-glass-dark/50 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <RouterLink to="/getting-started">
@@ -165,10 +166,10 @@ export default function Dashboard() {
             </RouterLink>
           </div>
         </div>
-      </div>
+          </div>
 
-      {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dashboard-container">
+          {/* Main Dashboard */}
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dashboard-container">
         {/* 🔧 INFRASTRUCTURE DASHBOARD - TOP PRIORITY */}
         <section className="dashboard-section">
           <Card className="glass-card rounded-2xl shadow-neon-blue">
@@ -421,10 +422,10 @@ export default function Dashboard() {
         <section className="dashboard-section">
           <NetworkSwitcher />
         </section>
-      </main>
+          </main>
 
-      {/* Footer with Privacy Policy */}
-      <footer className="glass-card border-t border-white/10 mt-8">
+          {/* Footer with Privacy Policy */}
+          <footer className="glass-card border-t border-white/10 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
@@ -458,7 +459,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </footer>
+        </footer>
+        </div>
       </div>
     </ErrorBoundary>
   );
