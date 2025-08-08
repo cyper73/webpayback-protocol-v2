@@ -13,7 +13,7 @@ import TokenInfo from "@/components/web3/TokenInfo";
 import PoolDataMonitoring from "@/components/pool/PoolDataMonitoring";
 import RewardDistribution from "@/components/web3/RewardDistribution";
 import NetworkSwitcher from "@/components/web3/NetworkSwitcher";
-// import { GasTracker } from "@/components/gas/GasTracker"; // DISABLED - causing crashes
+import { GasTracker } from "@/components/gas/GasTracker";
 import PoolDrainProtection from "@/components/pool/PoolDrainProtection";
 import FakeCreatorDetection from "@/components/security/FakeCreatorDetection";
 import ReentrancyProtection from "@/components/security/ReentrancyProtection";
@@ -57,12 +57,11 @@ export default function Dashboard() {
   const { data: dashboardData, isFetching } = useQuery({
     queryKey: ["/api/analytics/dashboard"],
     refetchInterval: isUserInteracting ? false : 30000,
-    staleTime: 0,
+    staleTime: 30000, // 30 seconds cache
     gcTime: 5 * 60 * 1000,
   });
 
-  // Always show content, never loading screen - FORCE RENDER
-  // This prevents the initialization message from appearing
+  // Always show content with proper error handling
   
   // Ensure dashboard data always has content for rendering
   const dashboardInfo = dashboardData || {
@@ -99,12 +98,7 @@ export default function Dashboard() {
   } = dashboardInfo as any;
 
   // DEBUG: Final rendering test
-  console.log("🎯 WEBPAYBACK FINAL RENDER - Card fix applied:", { 
-    hasData: !!dashboardInfo, 
-    agentsCount: agents.length, 
-    networksCount: networks.length,
-    cssFixed: "glass-card override applied"
-  });
+  // Removed debug logging for production
   
   return (
     <ErrorBoundary>
@@ -320,38 +314,7 @@ export default function Dashboard() {
         {/* Creator Registration Portal - Priority Section */}
         <section className="dashboard-section dashboard-grid grid-cols-1 xl:grid-cols-2">
           <CreatorPortal />
-          <Card className="glass-card rounded-2xl shadow-neon-green">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold gradient-text flex items-center gap-2">
-                <Zap className="w-6 h-6 text-amber-400" />
-                ⚡ Gas Pool Tracker
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-glass-dark rounded-lg p-4">
-                  <h3 className="font-semibold text-white mb-2">Pool Status</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Balance</span>
-                      <span className="text-sm font-mono text-amber-400">0.002 MATIC</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Health</span>
-                      <span className="text-sm font-medium text-neon-green">Healthy</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-glass-dark rounded-lg p-4">
-                  <h3 className="font-semibold text-white mb-2">Optimization</h3>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-neon-green">95%</div>
-                    <div className="text-xs text-gray-400">Gas Savings</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <GasTracker />
         </section>
 
         {/* Agent Collaboration Panel */}
