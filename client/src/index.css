@@ -69,6 +69,17 @@
 }
 
 @layer components {
+  /* Logo Size Fix - Override Ionos Scaling */
+  img[alt="WPT Logo"] {
+    width: 32px !important;
+    height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    object-fit: contain !important;
+  }
+
   /* WebPayback Protocol Glass Effect */
   .glass-card {
     background: hsla(240, 6%, 10%, 0.8);

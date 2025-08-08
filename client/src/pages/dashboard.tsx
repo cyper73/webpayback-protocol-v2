@@ -110,7 +110,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <img src={wptLogo} alt="WPT Logo" className="w-8 h-8" />
+                <img src={wptLogo} alt="WPT Logo" className="w-8 h-8 object-contain" style={{maxWidth: '32px', maxHeight: '32px'}} />
                 <span className="text-lg font-bold gradient-text">WebPayback Protocol</span>
               </div>
               <div className="hidden sm:flex items-center space-x-1 bg-glass-dark px-2 py-1 rounded-full">
