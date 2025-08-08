@@ -69,10 +69,21 @@
 }
 
 @layer components {
-  .glass-card {
-    background: var(--glass-dark);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-light);
+  /* FORCE WebPayback Protocol Glass Effect */
+  .glass-card, 
+  .card, 
+  [class*="Card"],
+  [data-radix-card],
+  .bg-glass-dark {
+    background: hsla(240, 6%, 10%, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid hsla(0, 0%, 100%, 0.1) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  }
+  
+  /* Force deep space background */
+  .bg-deep-space {
+    background: hsl(240, 33%, 6%) !important;
   }
   
   .pulse-animation {

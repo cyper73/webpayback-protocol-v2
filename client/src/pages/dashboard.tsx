@@ -98,10 +98,13 @@ export default function Dashboard() {
     compliance = [] 
   } = dashboardInfo as any;
 
+  // DEBUG: Force simple render first
+  console.log("🔧 DASHBOARD RENDERING - Data:", { dashboardInfo, agents, networks, creators });
+  
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-deep-space text-white">
-      {/* Clean Navigation Header */}
+      <div className="min-h-screen text-white" style={{ background: "hsl(240, 33%, 6%)" }}>
+      {/* WebPayback Protocol Header */}
       <header className="glass-card border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -130,7 +133,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Quick Actions Bar */}
+      {/* WebPayback Actions Bar */}
       <div className="bg-glass-dark/50 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-wrap items-center justify-center gap-3">
