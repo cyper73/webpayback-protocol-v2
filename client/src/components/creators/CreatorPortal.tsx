@@ -19,13 +19,16 @@ import TwoFactorAuthSetup from "@/components/security/TwoFactorAuthSetup";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 
-const formSchema = insertCreatorSchema.extend({
+const formSchema = z.object({
+  websiteUrl: z.string().url("Please enter a valid URL"),
+  walletAddress: z.string().min(42, "Valid Ethereum address required"),
+  contentCategory: z.enum(["blog_articles", "news_journalism", "educational_content", "technical_documentation", "creative_writing", "art_design", "music_audio", "video_content", "social_media", "academic_papers", "photography"]),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
   }),
   walletSignature: z.string().optional(),
   verificationMessage: z.string().optional()
-}).omit({ userId: true });
+});
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -55,10 +58,10 @@ export default function CreatorPortal() {
     defaultValues: {
       websiteUrl: "",
       walletAddress: "",
-      walletSignature: "",
-      verificationMessage: "",
       contentCategory: "blog_articles" as const,
-      termsAccepted: false
+      termsAccepted: false,
+      walletSignature: "",
+      verificationMessage: ""
     }
   });
 

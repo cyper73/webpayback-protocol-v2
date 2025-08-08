@@ -40,7 +40,7 @@ export default function AgentCard({ agent }: AgentCardProps) {
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold">{agent.name}</h3>
-          <Icon className="text-lg floating-animation" />
+          <Icon className="w-5 h-5 floating-animation" />
         </div>
         
         <p className="text-sm text-gray-300 mb-3">{description}</p>
@@ -48,7 +48,14 @@ export default function AgentCard({ agent }: AgentCardProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <span>Status</span>
-            <Badge variant={agent.status === "active" ? "default" : "secondary"} className="text-xs">
+            <Badge 
+              variant={agent.status === "active" ? "default" : "secondary"} 
+              className={`text-xs ${
+                agent.status === "active" 
+                  ? "bg-neon-green/20 text-neon-green border-neon-green/30" 
+                  : "bg-gray-600/20 text-gray-400 border-gray-600/30"
+              }`}
+            >
               {agent.status}
             </Badge>
           </div>

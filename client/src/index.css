@@ -90,10 +90,12 @@
   
   .pulse-animation {
     animation: pulse 2s infinite;
+    will-change: opacity;
   }
   
   .floating-animation {
     animation: float 3s ease-in-out infinite;
+    will-change: transform;
   }
   
   .gradient-text {
@@ -101,6 +103,8 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    /* Fallback for browsers that don't support background-clip */
+    color: var(--electric-blue);
   }
   
   .blockchain-grid {
@@ -143,18 +147,6 @@
   
   .bg-glass-dark {
     background-color: var(--glass-dark);
-  }
-  
-  .text-electric-blue {
-    color: var(--electric-blue);
-  }
-  
-  .text-neon-green {
-    color: var(--neon-green);
-  }
-  
-  .text-cyber-purple {
-    color: var(--cyber-purple);
   }
   
   .text-electric-blue {
