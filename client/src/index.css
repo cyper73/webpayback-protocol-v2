@@ -92,15 +92,18 @@
   /* Fix card content alignment */
   .glass-card .card-header,
   .glass-card .card-content,
-  .glass-card .card-title,
   .glass-card .card-description {
     text-align: left;
   }
   
-  /* Center card titles only */
-  .glass-card .card-title {
-    text-align: center;
+  /* Center ALL card titles */
+  .glass-card .card-title,
+  .glass-card h1,
+  .glass-card h2,
+  .glass-card h3 {
+    text-align: center !important;
     margin-bottom: 1rem;
+    width: 100%;
   }
   
   /* Fix content positioning inside cards */
@@ -116,14 +119,28 @@
     text-align: left;
   }
   
-  /* Specific fixes for Gas Pool Status and Batch Processing titles */
-  .glass-card h3,
-  .glass-card .font-semibold,
-  .glass-card .text-lg,
-  .glass-card .text-xl {
+  /* Specific fixes for inner module titles */
+  .glass-card .bg-glass-dark h3,
+  .glass-card .bg-glass-dark .font-semibold,
+  .glass-card .rounded-lg h3,
+  .glass-card .rounded-lg .font-semibold {
     text-align: center !important;
-    width: 100%;
-    margin-bottom: 0.75rem;
+    width: 100% !important;
+    margin-bottom: 0.75rem !important;
+    display: block !important;
+  }
+  
+  /* Override flex alignment for title containers */
+  .glass-card .flex.items-center.gap-2 {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  
+  /* Center icon + text combinations */
+  .glass-card .flex.items-center.gap-2 > div:last-child {
+    text-align: center !important;
+    width: 100% !important;
   }
   
   /* Gas Pool specific centering */

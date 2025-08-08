@@ -54,14 +54,12 @@ export function GasTracker() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Gas Pool Status */}
           <div className="bg-glass-dark rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center">
+            <div className="text-center mb-3">
+              <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center mx-auto mb-2">
                 <Zap className="w-4 h-4 text-amber-400" />
               </div>
-              <div className="text-center w-full">
-                <h3 className="font-semibold text-white text-center">Pool Status</h3>
-                <p className="text-xs text-gray-400">Current reserves</p>
-              </div>
+              <h3 className="font-semibold text-white text-center">Gas Pool Status</h3>
+              <p className="text-xs text-gray-400">Current reserves</p>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -87,14 +85,12 @@ export function GasTracker() {
 
           {/* Optimization Metrics */}
           <div className="bg-glass-dark rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center">
+            <div className="text-center mb-3">
+              <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center mx-auto mb-2">
                 <TrendingUp className="w-4 h-4 text-neon-green" />
               </div>
-              <div className="text-center w-full">
-                <h3 className="font-semibold text-white text-center">Optimization</h3>
-                <p className="text-xs text-gray-400">Batch processing</p>
-              </div>
+              <h3 className="font-semibold text-white text-center">Batch Processing</h3>
+              <p className="text-xs text-gray-400">Optimization metrics</p>
             </div>
             <div className="space-y-2">
               <div className="text-center">
