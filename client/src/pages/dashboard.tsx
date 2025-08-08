@@ -98,8 +98,13 @@ export default function Dashboard() {
     compliance = [] 
   } = dashboardInfo as any;
 
-  // DEBUG: Force simple render first
-  console.log("🔧 DASHBOARD RENDERING - Data:", { dashboardInfo, agents, networks, creators });
+  // DEBUG: Final rendering test
+  console.log("🎯 WEBPAYBACK FINAL RENDER - Card fix applied:", { 
+    hasData: !!dashboardInfo, 
+    agentsCount: agents.length, 
+    networksCount: networks.length,
+    cssFixed: "glass-card override applied"
+  });
   
   return (
     <ErrorBoundary>
