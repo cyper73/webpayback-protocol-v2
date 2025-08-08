@@ -206,12 +206,14 @@
   100% { transform: translateX(-50%); }
 }
 
-/* Dashboard Layout Optimization */
+/* Dashboard Layout Optimization - FORCE CONTAINER WIDTH */
 .dashboard-container {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  max-width: 100%;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 auto !important;
 }
 
 .dashboard-grid {
@@ -221,9 +223,51 @@
   width: 100%;
 }
 
+/* Fix grid layouts specifically */
+.dashboard-grid.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.dashboard-grid.xl\:grid-cols-2 {
+  grid-template-columns: 1fr;
+}
+
+.dashboard-grid.xl\:grid-cols-3 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1280px) {
+  .dashboard-grid.xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .dashboard-grid.xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* FORCE PROPER WIDTH INHERITANCE */
+.min-h-screen {
+  width: 100% !important;
+}
+
+.max-w-7xl {
+  max-width: 80rem !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Fix all grid children */
+.grid > * {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 .dashboard-section {
-  width: 100%;
+  width: 100% !important;
   min-height: fit-content;
+  margin: 0 auto !important;
 }
 
 /* Ensure consistent card heights and better spacing */
@@ -232,6 +276,8 @@
   min-height: auto !important;
   display: flex;
   flex-direction: column;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .glass-card .card-header {
