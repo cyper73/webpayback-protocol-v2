@@ -58,8 +58,8 @@ export function GasTracker() {
               <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center">
                 <Zap className="w-4 h-4 text-amber-400" />
               </div>
-              <div>
-                <h3 className="font-semibold text-white">Pool Status</h3>
+              <div className="text-center w-full">
+                <h3 className="font-semibold text-white text-center">Pool Status</h3>
                 <p className="text-xs text-gray-400">Current reserves</p>
               </div>
             </div>
@@ -91,8 +91,8 @@ export function GasTracker() {
               <div className="w-8 h-8 bg-neon-green/20 rounded-full flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-neon-green" />
               </div>
-              <div>
-                <h3 className="font-semibold text-white">Optimization</h3>
+              <div className="text-center w-full">
+                <h3 className="font-semibold text-white text-center">Optimization</h3>
                 <p className="text-xs text-gray-400">Batch processing</p>
               </div>
             </div>

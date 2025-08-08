@@ -116,6 +116,22 @@
     text-align: left;
   }
   
+  /* Specific fixes for Gas Pool Status and Batch Processing titles */
+  .glass-card h3,
+  .glass-card .font-semibold,
+  .glass-card .text-lg,
+  .glass-card .text-xl {
+    text-align: center !important;
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Gas Pool specific centering */
+  .glass-card .text-center > .text-2xl,
+  .glass-card .text-center > .font-bold {
+    text-align: center !important;
+  }
+  
   /* Override Card background only when glass-card is present */
   .glass-card.card,
   .card.glass-card {
@@ -265,8 +281,11 @@
 
 .dashboard-section .glass-card h3,
 .dashboard-section .glass-card .card-title {
-  text-align: center;
+  text-align: center !important;
   font-weight: 600;
+  margin-bottom: 1rem;
+  width: 100%;
+  display: block;
 }
 
 .dashboard-section .glass-card .card-content {
