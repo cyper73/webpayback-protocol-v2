@@ -313,7 +313,7 @@ export default function Dashboard() {
 
         {/* Creator Registration Portal - Priority Section */}
         <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-5">
             <CreatorPortal />
             <GasTracker />
           </div>
@@ -334,7 +334,7 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-4 gap-6">
                 {agents.map((agent: any) => (
                   <AgentCard key={agent.id} agent={agent} />
                 ))}
@@ -350,8 +350,8 @@ export default function Dashboard() {
 
         {/* Analytics & Multi-Chain Deployment */}
         <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-            <div className="xl:col-span-2">
+          <div className="grid grid-cols-3 gap-5">
+            <div className="col-span-2">
               <MultiChainDeployment networks={networks} />
             </div>
             <div>
@@ -362,7 +362,7 @@ export default function Dashboard() {
 
         {/* Token Economics and Pool Management */}
         <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+          <div className="grid grid-cols-3 gap-5">
             <TokenEconomics stats={stats} pool={pool} rewards={rewards} />
             <TokenInfo />
             <PoolDataMonitoring />
@@ -371,7 +371,7 @@ export default function Dashboard() {
 
         {/* Creator Rewards & Governance */}
         <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-5">
             <RewardDistribution />
             <ComplianceMonitor compliance={compliance} />
           </div>
@@ -400,7 +400,7 @@ export default function Dashboard() {
 
         {/* Security & Monitoring Systems */}
         <section className="dashboard-section">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-5">
             <div className="space-y-6">
               <PoolDrainProtection />
               <ReentrancyProtection />

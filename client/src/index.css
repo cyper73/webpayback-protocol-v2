@@ -98,6 +98,27 @@
     width: 100% !important;
   }
   
+  /* Force all grids to display horizontally */
+  .dashboard-section .grid {
+    display: grid !important;
+  }
+  
+  .dashboard-section .grid-cols-1.xl\\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .dashboard-section .grid-cols-1.xl\\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  .dashboard-section .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
+  .dashboard-section .grid-cols-1.md\\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
   .bg-glass-dark {
     background: hsla(240, 6%, 10%, 0.9);
     backdrop-filter: blur(10px);
