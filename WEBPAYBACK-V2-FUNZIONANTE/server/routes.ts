@@ -92,6 +92,7 @@ import contractReservesRouter from "./routes/contractReserves";
 import qlooRoutes from "./routes/qloo";
 import apiStatusRoutes from "./routes/apiStatus";
 import founderAuthRoutes from "./routes/founderAuth";
+import circulatingSupplyRouter from "./routes/circulatingSupply";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -4236,6 +4237,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Contract reserves management
   app.use("/api/contract-reserves", contractReservesRouter);
+  
+  // CoinGecko circulating supply endpoint - public API with rate limiting
+  app.use("/api", generalRateLimit, circulatingSupplyRouter);
   
   // Internal security system - restricted access
   app.use("/api/internal-security", walletFingerprintingRoutes);

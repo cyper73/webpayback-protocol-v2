@@ -1,0 +1,21 @@
+Backup aggiornato il Sat Aug  9 10:32:24 PM UTC 2025
+✅ AGGIORNAMENTI INCLUSI:
+- Endpoint CoinGecko /api/circulating-supply implementato
+- Router circulatingSupply.ts aggiunto  
+- Rate limiting configurato
+- Calcolo circulating supply basato su dati blockchain reali
+- File routes.ts aggiornato con nuovo router
+- replit.md aggiornato con documentazione
+
+📊 ENDPOINT COINGECKO:
+URL: /api/circulating-supply
+Risultato: 9,712,053 WPT circolanti
+Calcolo: 10M totali - 287,947 bloccati nei pool
+Formato: Solo numero (requisito CoinGecko)
+Rate Limit: Implementato per protezione
+
+🔐 SICUREZZA:
+- Endpoint pubblico senza autenticazione
+- Cache 5 minuti per ottimizzazione  
+- Rate limiting per protezione API
+- Calcolo basato su dati autentici blockchain
