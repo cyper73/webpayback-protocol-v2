@@ -116,7 +116,7 @@ export function ChainlinkVRFDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">
                 {vrfStats?.totalRequests || 0}

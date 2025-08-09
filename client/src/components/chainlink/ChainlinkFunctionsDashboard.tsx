@@ -120,7 +120,7 @@ export function ChainlinkFunctionsDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-400">
                 {functionsStats?.totalRequests || 0}

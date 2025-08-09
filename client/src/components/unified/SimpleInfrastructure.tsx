@@ -53,7 +53,7 @@ export default function SimpleInfrastructure() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-4 gap-6">
         {/* Gas Pool Status */}
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-3">
