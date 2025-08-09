@@ -104,7 +104,7 @@ export default function TokenInfo() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col gap-3">
       {/* Network Status */}
       <Card className="border-green-500/20 bg-green-900/5">
         <CardHeader>

@@ -15,12 +15,12 @@ export default function TokenEconomics({ stats, pool = [], rewards = [] }: Token
   const avgApy = pool.length > 0 ? pool.reduce((sum, p) => sum + parseFloat(p.apy || "0"), 0) / pool.length : 0;
 
   return (
-    <Card className="glass-card rounded-2xl h-fit">
+    <Card className="glass-card rounded-2xl h-full flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold gradient-text">Token Economics Dashboard</CardTitle>
       </CardHeader>
       <CardContent className="pb-3">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-3 gap-2.5">
           {/* Creator Fee Distribution */}
           <div className="bg-glass-dark rounded-lg p-2.5">
             <div className="flex items-center justify-between mb-1.5">
