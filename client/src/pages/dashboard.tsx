@@ -186,7 +186,7 @@ export default function Dashboard() {
               <p className="text-gray-400">Gas Pool Management & Chainlink Integration</p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="infrastructure-grid">
                 <div className="bg-glass-dark rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-amber-400/20 rounded-full flex items-center justify-center">
