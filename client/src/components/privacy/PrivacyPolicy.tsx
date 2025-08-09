@@ -216,10 +216,10 @@ export function PrivacyPolicy() {
                   For data access, deletion, or privacy questions:
                 </p>
                 <a 
-                  href="mailto:cyper73@gmail.com" 
+                  href="mailto:info@webpayback.com" 
                   className="text-blue-500 hover:text-blue-600 text-sm font-medium"
                 >
-                  cyper73@gmail.com
+                  info@webpayback.com
                 </a>
               </div>
               <div>

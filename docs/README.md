@@ -306,9 +306,9 @@ WebPayback Protocol offers the first creator economy platform with native Polygo
 ## 📞 Support
 
 - **Business Contact**: [info@webpayback.com](mailto:info@webpayback.com)
-- **Technical Support**: [cyper73@gmail.com](mailto:cyper73@gmail.com)
+- **Technical Support**: [info@webpayback.com](mailto:info@webpayback.com)
 - **GitHub Issues**: [Report bugs and request features](https://github.com/cyper73/webpayback/issues)
-- **Privacy Requests**: [cyper73@gmail.com](mailto:cyper73@gmail.com)
+- **Privacy Requests**: [info@webpayback.com](mailto:info@webpayback.com)
 - **Documentation**: [Full documentation](./docs/README.md)
 
 ---

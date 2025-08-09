@@ -135,7 +135,7 @@ router.post('/request', csrfProtection, async (req: Request, res: Response) => {
       requestId,
       message: 'GDPR request received and is being processed',
       expectedResponse: '30 days (as per GDPR Article 12)',
-      contact: 'cyper73@gmail.com',
+      contact: 'info@webpayback.com',
       nextSteps: [
         'Identity verification email sent',
         'Legal team notified',
@@ -201,8 +201,8 @@ router.get('/info', async (req: Request, res: Response) => {
     gdprCompliance: {
       dataController: {
         name: 'WebPayback Protocol',
-        email: 'cyper73@gmail.com',
-        dpo: 'cyper73@gmail.com' // Data Protection Officer
+        email: 'info@webpayback.com',
+        dpo: 'info@webpayback.com' // Data Protection Officer
       },
       legalBasis: [
         'Article 6(1)(b) GDPR: Contract performance',

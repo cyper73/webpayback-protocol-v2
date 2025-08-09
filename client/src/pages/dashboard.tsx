@@ -460,7 +460,7 @@ export default function Dashboard() {
                 <span>GitHub</span>
               </a>
               <a 
-                href="mailto:cyper73@gmail.com" 
+                href="mailto:info@webpayback.com" 
                 className="text-sm text-gray-400 hover:text-white transition-colors"
               >
                 Contact

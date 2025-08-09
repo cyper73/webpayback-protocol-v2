@@ -32,7 +32,7 @@ router.get('/info', async (req: Request, res: Response) => {
       ccpaCompliance: {
         dataController: {
           name: "WebPayback Protocol",
-          contact: "cyper73@gmail.com",
+          contact: "info@webpayback.com",
           address: "Digital Platform - Blockchain Protocol",
           responseTime: "45 days maximum as required by CCPA"
         },
@@ -136,7 +136,7 @@ router.post('/data-request', csrfProtection, async (req: Request, res: Response)
       status: 'received',
       estimatedCompletion: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(), // 45 days
       contactInfo: {
-        email: "cyper73@gmail.com",
+        email: "info@webpayback.com",
         subject: `CCPA Request ${requestId}`,
         message: "For questions about your request, please contact us with your request ID"
       },
