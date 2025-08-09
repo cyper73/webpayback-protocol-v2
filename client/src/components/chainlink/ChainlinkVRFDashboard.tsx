@@ -156,7 +156,7 @@ export function ChainlinkVRFDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-sm text-gray-400 mb-1">Network</div>
               <div className="text-white font-mono">{vrfHealth?.network || 'N/A'}</div>

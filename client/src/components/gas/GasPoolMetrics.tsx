@@ -147,7 +147,7 @@ export function GasPoolMetrics() {
       </div>
 
       {/* Advanced Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-6">
         
         {/* Cost Analysis */}
         <Card className="glass-card rounded-xl">
