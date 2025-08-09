@@ -104,7 +104,7 @@ export default function PoolDataMonitoring() {
   const minutesLeft = Math.floor((status.hoursUntilRefresh - hoursLeft) * 60);
 
   return (
-    <Card className="border-blue-500/20 bg-blue-900/5 h-full flex flex-col">
+    <Card className="border-blue-500/20 bg-glass-dark backdrop-blur-md h-full flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Database className="h-5 w-5 text-blue-400" />

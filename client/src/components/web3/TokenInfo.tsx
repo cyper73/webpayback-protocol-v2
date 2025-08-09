@@ -106,7 +106,7 @@ export default function TokenInfo() {
   return (
     <div className="h-full flex flex-col gap-3">
       {/* Network Status */}
-      <Card className="border-green-500/20 bg-green-900/5">
+      <Card className="border-green-500/20 bg-glass-dark backdrop-blur-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-green-400" />
@@ -132,7 +132,7 @@ export default function TokenInfo() {
 
 
       {/* Token Information */}
-      <Card className="border-blue-500/20 bg-blue-900/5">
+      <Card className="border-blue-500/20 bg-glass-dark backdrop-blur-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-400" />
