@@ -130,7 +130,7 @@ class BlockchainService {
           chainId: network.chainId,
           rpcUrl: network.rpcUrl,
           deploymentStatus: isPolygon ? "deployed" : "pending",
-          contractAddress: isPolygon ? "0x9077051D318b614F915E8A0786C91e" : undefined,
+          contractAddress: isPolygon ? process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8B4666f8cb8231BA213DE04137dc3825" : undefined,
           gasUsed: isPolygon ? "21000" : undefined,
           deployedAt: isPolygon ? new Date() : undefined
         });

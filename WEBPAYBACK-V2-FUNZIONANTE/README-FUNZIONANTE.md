@@ -75,6 +75,14 @@ npm run build && npm start
 ✅ **Pool V3 WMATIC/WPT**: TVL €218 EUR
 ✅ **Alchemy SDK**: Ottimizzato e funzionante
 
+## 🔄 MODIFICHE RECENTI (09/08/2025)
+
+✅ **TOKEN V1 ELIMINATO**: Rimosso completamente token obsoleto 0x9077051D318b614F915E8A07861090856FDEC91e
+✅ **TOKEN V2 IMPLEMENTATO**: Sistema usa esclusivamente token V2: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
+✅ **DATABASE AGGIORNATO**: Contract address di Polygon aggiornato nel database
+✅ **MULTI-CHAIN DEPLOYMENT**: Modulo ora mostra indirizzo token corretto
+✅ **CONSISTENZA TOTALE**: Tutto il sistema coerente con token V2
+
 ## 🔐 SICUREZZA VALIDATA
 
 ✅ **Multi-layer Security**: CORS, CSRF, Input validation
