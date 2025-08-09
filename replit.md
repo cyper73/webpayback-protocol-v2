@@ -137,6 +137,7 @@ Preferred communication style: Simple, everyday language.
 - **Environment Variables Updated**: POLYGON_TOKEN_ADDRESS secret configured with V2 token address
 - **GitHub Repository Updated**: All links now point to https://github.com/cyper73/webpayback-public
 - **PROFESSIONAL EMAIL MIGRATION COMPLETED**: All contact addresses migrated from cyper73@gmail.com to info@webpayback.com across entire platform including Contact & Support section, CCPA/GDPR compliance routes, and documentation
+- **ADMINISTRATOR IP ACCESS UPDATED**: FOUNDER_AUTHORIZED_IPS secret updated to include 83.174.147.238 for administrator portal access with IP-based security validation
 - **Backup Maintained**: WEBPAYBACK-V2-FUNZIONANTE directory kept current with all changes
 
 ## System Architecture
