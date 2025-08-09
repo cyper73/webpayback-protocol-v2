@@ -82,6 +82,7 @@ npm run build && npm start
 ✅ **DATABASE AGGIORNATO**: Contract address di Polygon aggiornato nel database
 ✅ **MULTI-CHAIN DEPLOYMENT**: Modulo ora mostra indirizzo token corretto
 ✅ **CONSISTENZA TOTALE**: Tutto il sistema coerente con token V2
+✅ **GITHUB REPOSITORY**: Link aggiornati a https://github.com/cyper73/webpayback-public
 
 ## 🔐 SICUREZZA VALIDATA
 

@@ -130,6 +130,14 @@ WebPayback Protocol is a sophisticated decentralized application (dApp) that com
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 9, 2025)
+
+- **TOKEN V2 MIGRATION COMPLETED**: Eliminated all V1 token references (0x9077051D318b614F915E8A07861090856FDEC91e) from entire system
+- **Multi-Chain Deployment Module Fixed**: Updated database to display correct V2 token address (0x9408f17a8B4666f8cb8231BA213DE04137dc3825)
+- **Environment Variables Updated**: POLYGON_TOKEN_ADDRESS secret configured with V2 token address
+- **GitHub Repository Updated**: All links now point to https://github.com/cyper73/webpayback-public
+- **Backup Maintained**: WEBPAYBACK-V2-FUNZIONANTE directory kept current with all changes
+
 ## System Architecture
 
 ### Frontend Architecture
