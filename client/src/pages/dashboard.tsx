@@ -451,7 +451,7 @@ export default function Dashboard() {
                 <span>Terms & Conditions</span>
               </RouterLink>
               <a 
-                href="https://github.com/cyper73/webpayback-protocol/tree/webpayback" 
+                href="https://github.com/cyper73/webpayback-public" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition-colors"

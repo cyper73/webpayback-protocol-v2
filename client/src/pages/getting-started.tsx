@@ -292,7 +292,7 @@ export default function GettingStarted() {
             </Badge>
             
             <a 
-              href="https://github.com/cyper73/webpayback-protocol/tree/webpayback" 
+              href="https://github.com/cyper73/webpayback-public" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300 hover:text-foreground transition-colors"
