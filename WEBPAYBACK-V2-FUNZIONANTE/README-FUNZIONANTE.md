@@ -70,7 +70,7 @@ npm run build && npm start
 ## 📊 STATO BLOCKCHAIN INTEGRATIONS
 
 ✅ **Polygon Mainnet**: Completamente funzionale
-✅ **WPT Token**: 0x9408f17a8B4666f8cb8231BA21eb2b1c81DBC8a6F  
+✅ **WPT Token V2**: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825  
 ✅ **Pool V2 USDT/WPT**: TVL $549 USD
 ✅ **Pool V3 WMATIC/WPT**: TVL €218 EUR
 ✅ **Alchemy SDK**: Ottimizzato e funzionante
