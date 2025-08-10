@@ -19,3 +19,4 @@ Rate Limit: Implementato per protezione
 - Cache 5 minuti per ottimizzazione  
 - Rate limiting per protezione API
 - Calcolo basato su dati autentici blockchain
+Aggiornamento del 2025-08-10: Implementata validazione anti-duplicati website URL

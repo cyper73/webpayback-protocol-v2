@@ -216,6 +216,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
+    // Check if website URL is already registered with a different wallet
+    const existingCreatorByWebsite = await this.getCreatorByWebsiteUrl(insertCreator.websiteUrl);
+    if (existingCreatorByWebsite && existingCreatorByWebsite.walletAddress !== insertCreator.walletAddress) {
+      throw new Error(`This website URL is already registered with a different wallet address. Each website can only be registered once.`);
+    }
+
     // Check wallet address registration limit (max 15 registrations per wallet)
     const existingCreators = await this.getCreatorsByWalletAddress(insertCreator.walletAddress);
     if (existingCreators.length >= 15) {
