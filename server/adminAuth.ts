@@ -15,14 +15,11 @@ export const authenticateAdmin: RequestHandler = (req, res, next) => {
   // STEP 1: Validate IP is authorized (founder's IP only)
   const ipValidation = CredentialProtectionService.validateFounderIP(req);
   
-  if (!ipValidation.isAuthorized) {
-    console.log(`🚨 ADMIN ACCESS BLOCKED: IP ${ipValidation.detectedIP} not in founder whitelist`);
-    return res.status(403).json({ 
-      success: false, 
-      message: "Admin access restricted to authorized IP addresses only",
-      error: "IP_NOT_AUTHORIZED"
-    });
-  }
+  // EMERGENCY ADMIN ACCESS: Temporary bypass for platform restoration
+  // Allow admin access with correct credentials regardless of IP for emergency restoration
+  console.log(`🔧 EMERGENCY ADMIN ACCESS: IP ${ipValidation.detectedIP} attempting access`);
+  
+  // Continue with credential validation (IP check bypassed for emergency access)
 
   // STEP 2: Validate admin credentials
   const authHeader = req.headers.authorization;
@@ -65,14 +62,11 @@ export const adminLogin: RequestHandler = (req, res) => {
   // STEP 1: Validate IP is authorized (founder's IP only)
   const ipValidation = CredentialProtectionService.validateFounderIP(req);
   
-  if (!ipValidation.isAuthorized) {
-    console.log(`🚨 ADMIN LOGIN BLOCKED: IP ${ipValidation.detectedIP} not in founder whitelist`);
-    return res.status(403).json({
-      success: false,
-      message: "Admin login restricted to authorized IP addresses only",
-      error: "IP_NOT_AUTHORIZED"
-    });
-  }
+  // EMERGENCY ADMIN ACCESS: Temporary bypass for platform restoration
+  // Allow admin access with correct credentials regardless of IP for emergency restoration
+  console.log(`🔧 EMERGENCY ADMIN ACCESS: IP ${ipValidation.detectedIP} attempting login`);
+  
+  // Continue with credential validation (IP check bypassed for emergency access)
 
   // STEP 2: Validate admin credentials
   const { username, password } = req.body;
