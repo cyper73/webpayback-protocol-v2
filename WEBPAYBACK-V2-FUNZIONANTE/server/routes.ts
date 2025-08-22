@@ -72,6 +72,22 @@ import {
   emergencyRateLimit,
   getRateLimitStats
 } from "./security/rateLimiting";
+
+// HTTPS-only middleware for admin endpoints
+function requireHTTPS(req: Request, res: Response, next: NextFunction) {
+  // Check if request is using HTTPS
+  const isHTTPS = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  
+  if (!isHTTPS && process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ 
+      error: 'HTTPS required for admin access',
+      message: 'Admin endpoints can only be accessed via HTTPS in production'
+    });
+  }
+  
+  next();
+}
+
 import {
   reentrancyProtection,
   rewardReentrancyProtection,
@@ -4161,13 +4177,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/founder-auth', founderAuthRoutes);
   
   // Allowance Management routes
-  // Admin login endpoint  
-  app.post("/api/admin/login", adminLogin);
+  // Admin login endpoint - HTTPS ONLY
+  app.post("/api/admin/login", requireHTTPS, adminLogin);
 
   registerAllowanceRoutes(app);
 
-  // Auto Pool Manager routes (Admin authentication required)
-  app.get("/api/auto-pool-manager/status", authenticateAdmin, async (req, res) => {
+  // Auto Pool Manager routes (Admin authentication required) - HTTPS ONLY
+  app.get("/api/auto-pool-manager/status", requireHTTPS, authenticateAdmin, async (req, res) => {
     try {
       res.json({
         success: true,
@@ -4203,7 +4219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auto-pool-manager/configure", authenticateAdmin, async (req, res) => {
+  app.post("/api/auto-pool-manager/configure", requireHTTPS, authenticateAdmin, async (req, res) => {
     try {
       const { rebalanceThreshold, emergencyStopEnabled, gasLimit } = req.body;
       
@@ -4222,7 +4238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auto-pool-manager/emergency-stop", authenticateAdmin, async (req, res) => {
+  app.post("/api/auto-pool-manager/emergency-stop", requireHTTPS, authenticateAdmin, async (req, res) => {
     try {
       res.json({
         success: true,

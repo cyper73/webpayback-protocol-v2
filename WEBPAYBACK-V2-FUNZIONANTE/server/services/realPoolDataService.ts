@@ -40,7 +40,6 @@ class RealPoolDataService {
   // WPT: WebPayback Token (from environment)
   private readonly WPT_TOKEN = process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8b4666f8cb8231ba213de04137dc3825";
   
-  // SECURITY: Blacklisted old WPT token contract - DO NOT USE
   // CURRENT WPT TOKEN V2 - ONLY VERSION SUPPORTED
   // Token Address: 0x9408f17a8B4666f8cb8231BA213DE04137dc3825
   

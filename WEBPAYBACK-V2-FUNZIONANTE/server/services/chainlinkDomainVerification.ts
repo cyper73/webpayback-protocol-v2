@@ -318,15 +318,15 @@ Steps:
     const isHighRisk = this.isHighRiskTLD(domain);
     
     return {
-      domainAge: isFamous ? 3650 : Math.random() * 365, // Famous domains are old
-      sslCertificate: isFamous ? true : Math.random() > 0.2,
-      dnsRecords: isFamous ? true : Math.random() > 0.1,
+      domainAge: isFamous ? 3650 : Math.random() * 1800 + 180, // Normal domains: 6 months - 5 years old
+      sslCertificate: isFamous ? true : Math.random() > 0.05, // 95% of normal domains have SSL now
+      dnsRecords: isFamous ? true : Math.random() > 0.02, // 98% of normal domains have DNS
       whoisData: {
         registrar: isFamous ? 'MarkMonitor Inc.' : 'Generic Registrar',
         registrationDate: new Date(Date.now() - (isFamous ? 3650 : Math.random() * 365) * 24 * 60 * 60 * 1000),
         expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
       },
-      reputationScore: isFamous ? 25 : (isHighRisk ? -20 : Math.random() * 10)
+      reputationScore: isFamous ? 25 : (isHighRisk ? -10 : Math.random() * 30 + 5)
     };
   }
 
@@ -395,13 +395,17 @@ Steps:
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
-    // Force correct logic for famous domains
-    const requiresManualReview = isFamous && !isSpecificPage;
-    const requiresMetaTag = isFamous && isSpecificPage;
+    // MANDATORY META TAG VERIFICATION FOR ALL DOMAINS
+    // All domains require meta tag verification to prevent impersonation
+    // Famous root domains still require manual review for extra security
+    const isVerified = false; // Never auto-verify, always require meta tag
+    const requiresManualReview = isFamous && !isSpecificPage; // Only famous root domains need manual review
+    const requiresMetaTag = !requiresManualReview; // All domains except famous root domains need meta tag
     
     let verificationToken;
     let metaTagInstruction;
     
+    // ALWAYS generate token for non-manual review domains
     if (requiresMetaTag) {
       verificationToken = this.generateVerificationToken();
       metaTagInstruction = this.generatePlatformSpecificInstructions(domain, verificationToken);
@@ -417,14 +421,17 @@ Steps:
       securityLevel,
       requiresManualReview,
       requiresMetaTag,
-      riskFactors
+      riskFactors,
+      isFamous: isFamous,
+      isVerified: isVerified,
+      DEBUG_logic: `isFamous=${isFamous}, isSpecificPage=${isSpecificPage}, requiresManualReview=${requiresManualReview}, requiresMetaTag=${requiresMetaTag}`
     });
 
     return {
       domain,
       fullUrl: websiteUrl,
       isSpecificPage,
-      isVerified: verificationScore >= 70 && !requiresManualReview && !requiresMetaTag,
+      isVerified: isVerified,
       securityLevel,
       requiresManualReview,
       requiresMetaTag,
