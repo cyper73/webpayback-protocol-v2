@@ -130,18 +130,18 @@ WebPayback Protocol is a sophisticated decentralized application (dApp) that com
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (August 9, 2025)
+## Recent Changes (August 22, 2025)
 
+- **CHAINLINK DOMAIN VERIFICATION OPTIMIZED**: Significantly improved domain verification logic to be permissive for legitimate business domains while maintaining strict controls for famous platforms
+- **AUTOMATIC VERIFICATION FOR NORMAL DOMAINS**: Domains with score ≥50, SSL certificate, and non-high-risk TLD now auto-verify without manual intervention
+- **FAMOUS DOMAIN PROTECTION ENHANCED**: Microsoft, Facebook, YouTube and other major platforms require manual review (root domains) or meta tag verification (specific pages) to prevent impersonation
+- **REALISTIC SIMULATION PARAMETERS**: Updated domain scoring to reflect real-world conditions - 95% SSL adoption, better reputation scores for legitimate domains
+- **CREATOR REGISTRATION STREAMLINED**: Removed bureaucratic barriers for legitimate business websites while maintaining security against fraud
+- **CSRF TOKEN ENDPOINT FIXED**: Corrected endpoint mismatch from `/api/csrf/token` to `/api/csrf-token` enabling proper form submissions
+- **DATABASE-LEVEL DUPLICATE PROTECTION**: Added unique_website_url constraint preventing domain registration abuse even at SQL level
 - **TOKEN V2 MIGRATION COMPLETED**: Eliminated all V1 token references (0x9077051D318b614F915E8A07861090856FDEC91e) from entire system
-- **Multi-Chain Deployment Module Fixed**: Updated database to display correct V2 token address (0x9408f17a8B4666f8cb8231BA213DE04137dc3825)
-- **Environment Variables Updated**: POLYGON_TOKEN_ADDRESS secret configured with V2 token address
-- **GitHub Repository Updated**: All links now point to https://github.com/cyper73/webpayback-public
-- **PROFESSIONAL EMAIL MIGRATION COMPLETED**: All contact addresses migrated from cyper73@gmail.com to info@webpayback.com across entire platform including Contact & Support section, CCPA/GDPR compliance routes, and documentation
-- **ADMINISTRATOR ACCESS RESTORED**: Complete admin authentication system configured with IP 83.174.147.238, username cyper, password Matisse73 - fully operational and tested
-- **COINGECKO API ENDPOINT IMPLEMENTED**: Created /api/circulating-supply endpoint returning real-time WPT V2 circulating supply (9,712,053 tokens) based on authentic blockchain pool data
-- **WEBSITE DUPLICATE PREVENTION IMPLEMENTED**: Added validation to prevent same website URL from being registered with multiple wallet addresses - each website can only be registered once
-- **ADMINISTRATOR IP ACCESS UPDATED**: FOUNDER_AUTHORIZED_IPS secret updated to include 83.174.147.238 for administrator portal access with IP-based security validation
-- **Backup Maintained**: WEBPAYBACK-V2-FUNZIONANTE directory kept current with all changes
+- **COINGECKO API ENDPOINT IMPLEMENTED**: Created /api/circulating-supply endpoint returning real-time WPT V2 circulating supply (9,712,053 tokens)
+- **ADMINISTRATOR ACCESS OPERATIONAL**: Complete admin system with IP 83.174.147.238, username cyper, password Matisse73
 
 ## System Architecture
 

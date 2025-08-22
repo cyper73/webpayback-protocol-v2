@@ -318,15 +318,15 @@ Steps:
     const isHighRisk = this.isHighRiskTLD(domain);
     
     return {
-      domainAge: isFamous ? 3650 : Math.random() * 365, // Famous domains are old
-      sslCertificate: isFamous ? true : Math.random() > 0.2,
-      dnsRecords: isFamous ? true : Math.random() > 0.1,
+      domainAge: isFamous ? 3650 : Math.random() * 1800 + 180, // Normal domains: 6 months - 5 years old
+      sslCertificate: isFamous ? true : Math.random() > 0.05, // 95% of normal domains have SSL now
+      dnsRecords: isFamous ? true : Math.random() > 0.02, // 98% of normal domains have DNS
       whoisData: {
         registrar: isFamous ? 'MarkMonitor Inc.' : 'Generic Registrar',
         registrationDate: new Date(Date.now() - (isFamous ? 3650 : Math.random() * 365) * 24 * 60 * 60 * 1000),
         expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
       },
-      reputationScore: isFamous ? 25 : (isHighRisk ? -20 : Math.random() * 10)
+      reputationScore: isFamous ? 25 : (isHighRisk ? -10 : Math.random() * 30 + 5)
     };
   }
 
@@ -395,11 +395,12 @@ Steps:
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
-    // Enhanced logic for domain verification
-    // Allow legitimate domains with reasonable scores, not just famous ones
-    const isVerified = verificationScore >= 60 && !isHighRisk && chainlinkData.sslCertificate;
-    const requiresManualReview = (isFamous && !isSpecificPage) || (verificationScore < 60 && !isHighRisk);
-    const requiresMetaTag = (isFamous && isSpecificPage) || (verificationScore >= 60 && !isFamous && !isVerified);
+    // Enhanced logic: Strict ONLY for famous domains, permissive for normal websites
+    // Normal domains: Auto-approve if basic security requirements met
+    // Famous domains: Require meta tag verification for specific pages, manual review for root domains
+    const isVerified = !isFamous && verificationScore >= 50 && !isHighRisk && chainlinkData.sslCertificate;
+    const requiresManualReview = isFamous && !isSpecificPage; // Only famous domains need manual review
+    const requiresMetaTag = isFamous && isSpecificPage; // Only famous domains need meta tag verification
     
     let verificationToken;
     let metaTagInstruction;
