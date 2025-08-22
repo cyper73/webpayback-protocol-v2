@@ -17,7 +17,7 @@ export async function apiRequest(
   // Auto-add CSRF token for POST requests (except domain check which is read-only)
   if (method === 'POST' && !url.includes('/api/domain/chainlink/check')) {
     try {
-      const tokenResponse = await fetch('/api/csrf/token');
+      const tokenResponse = await fetch('/api/csrf-token');
       const tokenData = await tokenResponse.json();
       headers['X-CSRF-Token'] = tokenData.csrfToken;
     } catch (error) {
