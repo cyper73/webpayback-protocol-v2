@@ -132,6 +132,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (August 22, 2025)
 
+- **ADMIN WEB INTERFACE DISABLED FOR SECURITY**: Removed public access to /admin routes - admin functions now only available via secure CLI tools (quick-admin.sh and admin-cli.js)
 - **MANDATORY META TAG VERIFICATION IMPLEMENTED**: All domains now require meta tag verification to prove ownership before registration - no automatic approvals or bypasses allowed
 - **COMPREHENSIVE SECURITY BARRIERS**: Registration requires sequential completion of: meta tag verification + wallet signature + Google Auth + 2FA setup - failure at any step blocks registration completely  
 - **DOMAIN VERIFICATION SYSTEM OPTIMIZED**: Normal business domains require meta tag verification, famous root domains need manual review, famous pages need meta tag verification
