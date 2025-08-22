@@ -395,9 +395,11 @@ Steps:
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
-    // Force correct logic for famous domains
-    const requiresManualReview = isFamous && !isSpecificPage;
-    const requiresMetaTag = isFamous && isSpecificPage;
+    // Enhanced logic for domain verification
+    // Allow legitimate domains with reasonable scores, not just famous ones
+    const isVerified = verificationScore >= 60 && !isHighRisk && chainlinkData.sslCertificate;
+    const requiresManualReview = (isFamous && !isSpecificPage) || (verificationScore < 60 && !isHighRisk);
+    const requiresMetaTag = (isFamous && isSpecificPage) || (verificationScore >= 60 && !isFamous && !isVerified);
     
     let verificationToken;
     let metaTagInstruction;
@@ -424,7 +426,7 @@ Steps:
       domain,
       fullUrl: websiteUrl,
       isSpecificPage,
-      isVerified: verificationScore >= 70 && !requiresManualReview && !requiresMetaTag,
+      isVerified: isVerified,
       securityLevel,
       requiresManualReview,
       requiresMetaTag,
