@@ -395,16 +395,17 @@ Steps:
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
-    // Enhanced logic: Strict ONLY for famous domains, permissive for normal websites
-    // Normal domains: Auto-approve if basic security requirements met
-    // Famous domains: Require meta tag verification for specific pages, manual review for root domains
-    const isVerified = !isFamous && verificationScore >= 50 && !isHighRisk && chainlinkData.sslCertificate;
-    const requiresManualReview = isFamous && !isSpecificPage; // Only famous domains need manual review
-    const requiresMetaTag = isFamous && isSpecificPage; // Only famous domains need meta tag verification
+    // MANDATORY META TAG VERIFICATION FOR ALL DOMAINS
+    // All domains require meta tag verification to prevent impersonation
+    // Famous root domains still require manual review for extra security
+    const isVerified = false; // Never auto-verify, always require meta tag
+    const requiresManualReview = isFamous && !isSpecificPage; // Only famous root domains need manual review
+    const requiresMetaTag = !requiresManualReview; // All domains except famous root domains need meta tag
     
     let verificationToken;
     let metaTagInstruction;
     
+    // ALWAYS generate token for non-manual review domains
     if (requiresMetaTag) {
       verificationToken = this.generateVerificationToken();
       metaTagInstruction = this.generatePlatformSpecificInstructions(domain, verificationToken);
@@ -420,7 +421,10 @@ Steps:
       securityLevel,
       requiresManualReview,
       requiresMetaTag,
-      riskFactors
+      riskFactors,
+      isFamous: isFamous,
+      isVerified: isVerified,
+      DEBUG_logic: `isFamous=${isFamous}, isSpecificPage=${isSpecificPage}, requiresManualReview=${requiresManualReview}, requiresMetaTag=${requiresMetaTag}`
     });
 
     return {
