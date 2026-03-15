@@ -2,8 +2,11 @@
 # Usa questo script dal tuo PC Windows
 
 $BaseUrl = "https://web-payback-tokenizer.replit.app"
-$Username = "cyper"
-$Password = "Matisse73"
+$Username = Read-Host "Admin username"
+$Password = Read-Host "Admin password" -AsSecureString
+$Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
+    [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
+)
 
 function Get-AdminToken {
     Write-Host "🔐 Getting admin token..." -ForegroundColor Blue
