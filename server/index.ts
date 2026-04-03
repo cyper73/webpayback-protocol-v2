@@ -107,16 +107,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// MAINTENANCE MODE - System Upgrade in Progress
-app.use('*', (req, res) => {
-  res.status(503).json({
-    success: false,
-    message: "System Upgrade in Progress",
-    details: "New architectural foundations are arriving on the platform. For this reason, our servers will be inaccessible until further notice. We are currently working on safely migrating all user accounts and credits to the new system. Thank you for your patience."
-  });
-});
-
 (async () => {
+  // MAINTENANCE MODE - intercepts all requests before routes and Vite
+  app.use((req, res) => {
+    res.status(503).json({
+      success: false,
+      message: "System Upgrade in Progress",
+      details: "New architectural foundations are arriving on the platform. For this reason, our servers will be inaccessible until further notice. We are currently working on safely migrating all user accounts and credits to the new system. Thank you for your patience."
+    });
+  });
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
