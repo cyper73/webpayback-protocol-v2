@@ -17,7 +17,7 @@ if (rawHumanityEnvironment !== humanityEnvironment) {
 const humanityRedirectUri =
   import.meta.env.VITE_HUMANITY_REDIRECT_URI ||
   import.meta.env.VITE_REDIRECT_URI ||
-  "https://webpayback.com/callback";
+  `${window.location.origin}/callback`;
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
