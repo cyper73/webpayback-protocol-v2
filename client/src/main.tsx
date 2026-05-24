@@ -19,17 +19,10 @@ const humanityRedirectUri =
   import.meta.env.VITE_REDIRECT_URI ||
   `${window.location.origin}/callback`;
 
-const humanityClientId = import.meta.env.VITE_HUMANITY_CLIENT_ID;
-
-const AppWrapper = () => {
-  if (!humanityClientId) {
-    console.warn("[Humanity SDK] VITE_HUMANITY_CLIENT_ID not configured. Humanity features disabled.");
-    return <App />;
-  }
-
-  return (
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
     <HumanityProvider
-      clientId={humanityClientId}
+      clientId={import.meta.env.VITE_HUMANITY_CLIENT_ID}
       redirectUri={humanityRedirectUri}
       environment={humanityEnvironment}
       storage="memory"
@@ -44,11 +37,5 @@ const AppWrapper = () => {
     >
       <App />
     </HumanityProvider>
-  );
-};
-
-createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
-    <AppWrapper />
   </BrowserRouter>,
 );
