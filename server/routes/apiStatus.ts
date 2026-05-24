@@ -96,7 +96,7 @@ router.get('/test/alchemy', async (req, res) => {
       });
     }
     
-    const provider = new ethers.JsonRpcProvider(
+    const provider = new ethers.providers.JsonRpcProvider(
       `https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}`
     );
     
@@ -129,7 +129,7 @@ router.get('/test/polygon', async (req, res) => {
     console.log('🧪 Testing Polygon RPC connection...');
     
     const rpcUrl = process.env.POLYGON_RPC || 'https://polygon-rpc.com/';
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     
     const blockNumber = await provider.getBlockNumber();
     const network = await provider.getNetwork();

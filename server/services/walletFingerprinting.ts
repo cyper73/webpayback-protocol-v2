@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { walletFingerprints, securityEvents } from "@shared/schema";
+// import { walletFingerprints, securityEvents } from "@shared/schema";
 import { eq, and, gte, desc, sql } from "drizzle-orm";
 import { ethers } from "ethers";
 

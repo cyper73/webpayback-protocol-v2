@@ -1,4 +1,3 @@
-import { InsertAiAgent, AiAgent, InsertAgentCommunication } from "@shared/schema";
 import { storage } from "../storage";
 
 interface AgentMetrics {

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { db } from '../db';
-import { walletFingerprints, securityEvents } from '@shared/schema';
+// import { walletFingerprints, securityEvents } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
 interface TransactionPattern {

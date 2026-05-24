@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { db } from '../db';
-import { securityEvents } from '@shared/schema';
+// import { securityEvents } from '@shared/schema';
 
 interface DEXTransaction {
   hash: string;

@@ -114,7 +114,7 @@ router.post('/sync', verifyPrivyToken, async (req, res) => {
       return res.status(400).json({ error: 'Invalid userId' });
     }
 
-    if (!privyUserId || privyUserId !== req.privyUserId) {
+    if (!privyUserId || privyUserId !== (req as any).privyUserId) {
       return res.status(403).json({ error: 'Privy user mismatch' });
     }
 
