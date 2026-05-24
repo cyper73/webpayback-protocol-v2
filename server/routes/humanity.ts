@@ -67,8 +67,11 @@ router.post('/login', async (_req, res) => {
  * the Humanity token endpoint server-to-server and returns the access token.
  */
 router.post('/exchange-token', async (req, res) => {
+  // Always respond with JSON no matter what
+  res.setHeader('Content-Type', 'application/json');
+
   try {
-    const { code, codeVerifier } = req.body;
+    const { code, codeVerifier } = req.body ?? {};
 
     if (!code || typeof code !== 'string') {
       return res.status(400).json({ error: 'Missing or invalid code' });
@@ -77,24 +80,68 @@ router.post('/exchange-token', async (req, res) => {
       return res.status(400).json({ error: 'Missing or invalid codeVerifier' });
     }
 
-    if (!humanityService.sdk) {
-      return res.status(503).json({ error: 'Humanity SDK not initialized on server' });
+    const clientId = process.env.HUMANITY_CLIENT_ID;
+    const redirectUri = process.env.HUMANITY_REDIRECT_URI;
+    const environment = process.env.HUMANITY_ENVIRONMENT ?? 'sandbox';
+
+    if (!clientId) {
+      return res.status(503).json({ error: 'HUMANITY_CLIENT_ID not configured on server' });
+    }
+    if (!redirectUri) {
+      return res.status(503).json({ error: 'HUMANITY_REDIRECT_URI not configured on server' });
     }
 
-    const tokenResult = await humanityService.sdk.exchangeCodeForToken({ code, codeVerifier });
+    const tokenEndpoint = environment === 'production'
+      ? 'https://api.humanity.org/oauth/token'
+      : 'https://api.sandbox.humanity.org/oauth/token';
+
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      code_verifier: codeVerifier,
+      redirect_uri: redirectUri,
+      client_id: clientId,
+    });
+
+    console.log(`[Humanity exchange-token] POST ${tokenEndpoint} redirect_uri=${redirectUri}`);
+
+    const upstream = await fetch(tokenEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+
+    const rawText = await upstream.text();
+    console.log(`[Humanity exchange-token] upstream ${upstream.status}: ${rawText.slice(0, 300)}`);
+
+    let tokenData: any;
+    try {
+      tokenData = JSON.parse(rawText);
+    } catch {
+      return res.status(502).json({
+        error: `Humanity server returned non-JSON (${upstream.status}): ${rawText.slice(0, 200)}`,
+      });
+    }
+
+    if (!upstream.ok || tokenData.error) {
+      return res.status(upstream.ok ? 400 : upstream.status).json({
+        error: tokenData.error_description ?? tokenData.error ?? `Humanity error ${upstream.status}`,
+      });
+    }
 
     return res.json({
       success: true,
-      accessToken: tokenResult.accessToken,
-      refreshToken: tokenResult.refreshToken,
-      expiresIn: tokenResult.expiresIn,
-      tokenType: 'Bearer',
-      scope: tokenResult.scope,
+      accessToken: tokenData.access_token ?? null,
+      refreshToken: tokenData.refresh_token ?? null,
+      expiresIn: tokenData.expires_in ?? null,
+      tokenType: tokenData.token_type ?? 'Bearer',
+      scope: tokenData.scope ?? null,
     });
+
   } catch (err: any) {
-    console.error('[Humanity exchange-token error]', err?.message ?? err);
-    return res.status(400).json({
-      error: err?.message ?? 'Token exchange failed',
+    console.error('[Humanity exchange-token] unexpected error:', err?.message ?? err);
+    return res.status(500).json({
+      error: err?.message ?? 'Internal server error during token exchange',
     });
   }
 });
