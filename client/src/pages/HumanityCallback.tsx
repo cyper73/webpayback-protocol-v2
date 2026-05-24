@@ -4,124 +4,139 @@ import { useAuth } from "@humanity-org/react-sdk";
 import { Loader2, AlertCircle } from "lucide-react";
 
 /**
- * Humanity OAuth callback page.
+ * Humanity OAuth callback page — HYBRID approach.
  *
- * Humanity redirects the user here with `?code=...&state=...` (success) or
- * `?error=...&error_description=...` (failure). The HumanityProvider SDK
- * (mounted in main.tsx with storage="localStorage") automatically detects
- * the code in the URL, performs the PKCE token exchange, persists the access
- * token, and flips `useAuth().isAuthenticated` to true.
- *
- * This component:
- *  1. If the URL carries an explicit OAuth error, displays it immediately.
- *  2. Otherwise waits for the SDK to flip `isAuthenticated`.
- *  3. After a generous timeout, surfaces a friendly retry screen — never
- *     prematurely redirects to /login with a false-negative error.
+ * The Humanity React SDK stores PKCE in sessionStorage, but its internal
+ * callback handler tries to exchange the code browser-to-Humanity which
+ * fails in production due to CORS. We intercept the redirect here, read
+ * code/state from the URL and the PKCE verifier from sessionStorage, then
+ * POST to our backend /api/humanity/exchange-token which does the exchange
+ * server-to-server. After a successful exchange we store the access token in
+ * localStorage (so it survives page refreshes) and navigate to /login.
  */
 export default function HumanityCallback() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
-  // Read OAuth error / code synchronously from the URL once on mount.
-  const [urlError] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get("error");
-    if (!err) return null;
-    const desc = params.get("error_description");
-    return desc ? `${err}: ${desc}` : err;
-  });
+  const [status, setStatus] = useState<"loading" | "error">("loading");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [hasAuthCode] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return new URLSearchParams(window.location.search).has("code");
-  });
-
-  const [timedOut, setTimedOut] = useState(false);
-
-  // Redirect to /login as soon as the SDK confirms authentication.
   useEffect(() => {
+    const run = async () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+        const state = params.get("state");
+        const oauthError = params.get("error");
+        const oauthDesc = params.get("error_description");
+
+        if (oauthError) {
+          setErrorMessage(oauthDesc ? `${oauthError}: ${oauthDesc}` : oauthError);
+          setStatus("error");
+          return;
+        }
+
+        if (!code || !state) {
+          setErrorMessage("Missing OAuth code or state in callback URL.");
+          setStatus("error");
+          return;
+        }
+
+        const codeVerifier = sessionStorage.getItem("humanity_pkce");
+        const storedState = sessionStorage.getItem("humanity_state");
+
+        if (!codeVerifier) {
+          setErrorMessage("Missing PKCE code verifier. The session may have expired or the redirect came from a different browser tab.");
+          setStatus("error");
+          return;
+        }
+
+        if (storedState && state !== storedState) {
+          setErrorMessage(`OAuth state mismatch. Possible CSRF attempt or stale session.`);
+          setStatus("error");
+          return;
+        }
+
+        // Call our backend which exchanges the code server-to-server.
+        const response = await fetch("/api/humanity/exchange-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, codeVerifier }),
+        });
+
+        const data = await response.json().catch(() => ({
+          error: `Server returned non-JSON (HTTP ${response.status})`,
+        }));
+
+        if (!response.ok || data.error) {
+          const msg = data.error ?? `Token exchange failed (${response.status})`;
+          setErrorMessage(msg);
+          setStatus("error");
+          return;
+        }
+
+        // Persist token in localStorage so it survives page refresh.
+        if (data.accessToken) {
+          localStorage.setItem("humanity_access_token", data.accessToken);
+        }
+        if (data.refreshToken) {
+          localStorage.setItem("humanity_refresh_token", data.refreshToken);
+        }
+        if (data.expiresIn) {
+          const expiresAt = Date.now() + data.expiresIn * 1000;
+          localStorage.setItem("humanity_token_expires_at", String(expiresAt));
+        }
+
+        // Clean up sessionStorage PKCE so the SDK internal handler won't
+        // also try (and fail) to exchange the already-consumed code.
+        sessionStorage.removeItem("humanity_pkce");
+        sessionStorage.removeItem("humanity_state");
+        sessionStorage.removeItem("humanity_redirect_count");
+
+        navigate("/login", { replace: true });
+      } catch (err: any) {
+        console.error("[HumanityCallback] unexpected error:", err);
+        setErrorMessage(err?.message ?? "Unexpected error during callback");
+        setStatus("error");
+      }
+    };
+
+    // Give the SDK internal effect a moment to run, but ultimately we
+    // control the exchange. If the SDK already set isAuthenticated (e.g.
+    // from a cached token), just redirect.
     if (isAuthenticated) {
       navigate("/login", { replace: true });
+      return;
     }
+
+    run();
   }, [isAuthenticated, navigate]);
 
-  // Give the SDK plenty of time to complete the exchange before showing a
-  // failure. We do NOT redirect to /login?error=... — that was causing
-  // false-negative "Sign in failed" toasts when the SDK was still working.
-  useEffect(() => {
-    if (urlError || isAuthenticated || !hasAuthCode) return;
-    const t = setTimeout(() => setTimedOut(true), 20000);
-    return () => clearTimeout(t);
-  }, [urlError, isAuthenticated, hasAuthCode]);
-
-  // Case 1: Humanity explicitly returned an error.
-  if (urlError) {
+  if (status === "error" && errorMessage) {
     return (
-      <ErrorView
-        title="Humanity sign-in error"
-        message={urlError}
-        onRetry={() => navigate("/login", { replace: true })}
-      />
+      <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
+        <div className="max-w-md w-full bg-gray-900 border border-gray-800 rounded-lg p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-6 w-6 text-red-400 shrink-0" />
+            <h2 className="text-lg font-semibold text-white">Sign-in failed</h2>
+          </div>
+          <p className="text-sm text-gray-300 break-words">{errorMessage}</p>
+          <button
+            onClick={() => navigate("/login", { replace: true })}
+            className="w-full bg-electric-blue hover:bg-electric-blue/80 text-black font-medium px-4 py-2 rounded-md transition"
+          >
+            Back to sign in
+          </button>
+        </div>
+      </div>
     );
   }
 
-  // Case 2: URL has neither code nor error — user landed here directly.
-  if (!hasAuthCode) {
-    return (
-      <ErrorView
-        title="No sign-in in progress"
-        message="This page is reached automatically after signing in with Humanity."
-        onRetry={() => navigate("/login", { replace: true })}
-      />
-    );
-  }
-
-  // Case 3: Exchange took too long.
-  if (timedOut) {
-    return (
-      <ErrorView
-        title="Sign-in is taking longer than expected"
-        message="The Humanity token exchange did not complete. Please try again."
-        onRetry={() => navigate("/login", { replace: true })}
-      />
-    );
-  }
-
-  // Case 4: Default — waiting for the SDK to finish the exchange.
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <div className="flex flex-col items-center space-y-4">
         <Loader2 className="h-10 w-10 animate-spin text-electric-blue" />
         <p className="text-gray-300">Completing Humanity sign-in…</p>
-      </div>
-    </div>
-  );
-}
-
-function ErrorView({
-  title,
-  message,
-  onRetry,
-}: {
-  title: string;
-  message: string;
-  onRetry: () => void;
-}) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
-      <div className="max-w-md w-full bg-gray-900 border border-gray-800 rounded-lg p-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <AlertCircle className="h-6 w-6 text-red-400 shrink-0" />
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
-        </div>
-        <p className="text-sm text-gray-300 break-words">{message}</p>
-        <button
-          onClick={onRetry}
-          className="w-full bg-electric-blue hover:bg-electric-blue/80 text-black font-medium px-4 py-2 rounded-md transition"
-        >
-          Back to sign in
-        </button>
       </div>
     </div>
   );

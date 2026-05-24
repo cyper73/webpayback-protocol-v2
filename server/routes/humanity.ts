@@ -67,17 +67,98 @@ router.post('/login', async (_req, res) => {
  * the Humanity token endpoint server-to-server and returns the access token.
  */
 /**
- * Deprecated: token exchange is now handled entirely client-side by the
- * Humanity React SDK (HumanityProvider with storage="localStorage"). This
- * endpoint remains only to return a clear deprecation message if anything
- * still calls it.
+ * POST /api/humanity/exchange-token
+ * Server-side PKCE token exchange. The frontend React SDK stores PKCE in
+ * sessionStorage, so after the OAuth redirect we read it client-side, POST it
+ * here, and the backend calls Humanity's token endpoint server-to-server
+ * (avoiding browser CORS/CORS restrictions).
  */
-router.post('/exchange-token', (_req, res) => {
+router.post('/exchange-token', async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  return res.status(410).json({
-    error: 'Deprecated endpoint',
-    message: 'OAuth token exchange is performed client-side by the Humanity React SDK.',
-  });
+
+  try {
+    const { code, codeVerifier } = req.body ?? {};
+
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ error: 'Missing or invalid code' });
+    }
+    if (!codeVerifier || typeof codeVerifier !== 'string') {
+      return res.status(400).json({ error: 'Missing or invalid codeVerifier' });
+    }
+
+    const clientId = process.env.HUMANITY_CLIENT_ID;
+    const redirectUri = process.env.HUMANITY_REDIRECT_URI;
+
+    if (!clientId) {
+      return res.status(503).json({ error: 'HUMANITY_CLIENT_ID not configured on server' });
+    }
+    if (!redirectUri) {
+      return res.status(503).json({ error: 'HUMANITY_REDIRECT_URI not configured on server' });
+    }
+
+    const tokenEndpoint = 'https://api.sandbox.humanity.org/oauth/token';
+
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      code_verifier: codeVerifier,
+      redirect_uri: redirectUri,
+      client_id: clientId,
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let upstream: Response;
+    try {
+      upstream = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    const rawText = await upstream.text();
+    // On success never log the body (contains tokens). On error log first 300 chars.
+    if (!upstream.ok) {
+      console.log(`[Humanity exchange-token] upstream ${upstream.status}: ${rawText.slice(0, 300)}`);
+    } else {
+      console.log(`[Humanity exchange-token] upstream ${upstream.status} ok`);
+    }
+
+    let tokenData: any;
+    try {
+      tokenData = JSON.parse(rawText);
+    } catch {
+      return res.status(502).json({
+        error: `Humanity server returned non-JSON (${upstream.status}): ${rawText.slice(0, 200)}`,
+      });
+    }
+
+    if (!upstream.ok || tokenData.error) {
+      return res.status(upstream.ok ? 400 : upstream.status).json({
+        error: tokenData.error_description ?? tokenData.error ?? `Humanity error ${upstream.status}`,
+      });
+    }
+
+    return res.json({
+      success: true,
+      accessToken: tokenData.access_token ?? null,
+      refreshToken: tokenData.refresh_token ?? null,
+      expiresIn: tokenData.expires_in ?? null,
+      tokenType: tokenData.token_type ?? 'Bearer',
+      scope: tokenData.scope ?? null,
+    });
+
+  } catch (err: any) {
+    console.error('[Humanity exchange-token] unexpected error:', err?.message ?? err);
+    return res.status(500).json({
+      error: err?.message ?? 'Internal server error during token exchange',
+    });
+  }
 });
 
 router.get('/status/:userId', async (req, res) => {
