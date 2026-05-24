@@ -164,7 +164,7 @@ const applyRateLimit = (
     console.log(`⚠️ RATE LIMIT EXCEEDED: ${key} exceeded ${config.maxRequests} requests - blocking for ${config.blockDurationMs / 1000}s`);
     
     // Log potential attack
-    console.log(`🚨 POTENTIAL BRUTE FORCE: IP/Session exceeded rate limit on ${identifier}`);
+    console.log(`🚨 POTENTIAL BRUTE FORCE: Session exceeded rate limit on ${identifier}`);
     
     res.status(429).json({
       error: 'Rate limit exceeded. You have been temporarily blocked due to too many requests.',
@@ -267,7 +267,7 @@ export const ipAbuseProtection = (req: Request, res: Response, next: NextFunctio
   
   // Check if IP is permanently blocked
   if (blockedIPs.has(ip)) {
-    console.log(`🚫 IP BLOCKED: Permanent block for ${ip}`);
+    console.log(`🚫 BLOCKED: Permanent block applied`);
     res.status(403).json({
       error: 'Your IP address has been blocked due to abusive behavior.',
       code: 'IP_BLOCKED'
@@ -298,7 +298,7 @@ export const ipAbuseProtection = (req: Request, res: Response, next: NextFunctio
       // Block IP if too many rate limit violations
       if (abuseData!.count >= 5) {
         blockedIPs.add(ip);
-        console.log(`🚨 IP PERMANENTLY BLOCKED: ${ip} exceeded abuse threshold`);
+        console.log(`🚨 PERMANENTLY BLOCKED: Session exceeded abuse threshold`);
       }
     }
   });
@@ -399,7 +399,7 @@ export const emergencyRateLimit = (req: Request, res: Response, next: NextFuncti
   
   // Very aggressive limiting - 50 requests per 10 seconds for external IPs only
   if (entry.count > 50) {
-    console.log(`🚨 EMERGENCY RATE LIMIT: Potential DDoS from ${ip}`);
+    console.log(`🚨 EMERGENCY RATE LIMIT: Potential DDoS detected`);
     res.status(429).json({
       error: 'Emergency rate limit exceeded',
       code: 'EMERGENCY_RATE_LIMIT'

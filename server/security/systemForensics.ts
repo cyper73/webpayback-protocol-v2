@@ -50,7 +50,7 @@ export class SystemForensics {
     if (riskLevel === 'CRITICAL') {
       console.log(`🚨 CRITICAL THREAT DETECTED:`);
       console.log(`🚨 OS: ${osFingerprint.os} | Browser: ${osFingerprint.browser}`);
-      console.log(`🚨 IP: ${logEntry.ip} | Wallet: ${walletAttempt}`);
+      console.log(`🚨 Source: [MASKED] | Wallet: ${walletAttempt}`);
       console.log(`🚨 Violations: ${violations.join(', ')}`);
       console.log(`🚨 FORENSIC ALERT: Potential ${osFingerprint.suspicious ? 'SPOOFED' : 'GENUINE'} ${osFingerprint.os} system`);
     }

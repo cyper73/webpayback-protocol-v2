@@ -38,7 +38,7 @@ export class CredentialProtectionService {
       return finalIP === authorizedIP || finalIP.includes(authorizedIP);
     });
     
-    console.log(`🔍 IP Authorization Check: ${finalIP} -> ${isAuthorized ? 'AUTHORIZED' : 'BLOCKED'}`);
+    console.log(`🔍 IP Authorization Check: [MASKED] -> ${isAuthorized ? 'AUTHORIZED' : 'BLOCKED'}`);
     
     return {
       isAuthorized,
@@ -178,8 +178,8 @@ export class CredentialProtectionService {
     
     // Enhanced logging for founder wallet access attempts
     if (accessType === 'FOUNDER_WALLET_ACCESS_ATTEMPT') {
-      console.log(`📋 IP FORENSICS: ${ip} attempted founder wallet access (attempt #${existing.attempts})`);
-      console.log(`📋 IP STATUS: ${existing.authorized ? 'AUTHORIZED_FOUNDER_IP' : 'UNAUTHORIZED_IP'}`);
+      console.log(`📋 FORENSICS: [MASKED] attempted founder wallet access (attempt #${existing.attempts})`);
+      console.log(`📋 STATUS: ${existing.authorized ? 'AUTHORIZED_FOUNDER_IP' : 'UNAUTHORIZED_IP'}`);
       if (violations.length > 0) {
         console.log(`📋 VIOLATIONS: ${violations.join(', ')}`);
       }
@@ -199,10 +199,10 @@ export class CredentialProtectionService {
     // Block IP after 3 suspicious attempts
     if (attempts >= 2) {
       this.blockedIPs.add(clientIP);
-      console.log(`🚨 SECURITY: Blocked IP ${clientIP} for credential simulation attempts`);
+      console.log(`🚨 SECURITY: Blocked [MASKED] for credential simulation attempts`);
     }
 
-    console.log(`⚠️ SECURITY: Suspicious activity from ${clientIP} (${attempts + 1} attempts)`);
+    console.log(`⚠️ SECURITY: Suspicious activity detected (${attempts + 1} attempts)`);
   }
 
   /**

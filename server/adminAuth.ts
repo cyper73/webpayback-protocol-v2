@@ -17,7 +17,7 @@ export const authenticateAdmin: RequestHandler = (req, res, next) => {
   
   // EMERGENCY ADMIN ACCESS: Temporary bypass for platform restoration
   // Allow admin access with correct credentials regardless of IP for emergency restoration
-  console.log(`🔧 EMERGENCY ADMIN ACCESS: IP ${ipValidation.detectedIP} attempting access`);
+  console.log(`🔧 EMERGENCY ADMIN ACCESS: Attempting access`);
   
   // Continue with credential validation (IP check bypassed for emergency access)
 
@@ -39,13 +39,13 @@ export const authenticateAdmin: RequestHandler = (req, res, next) => {
   const ADMIN_CREDENTIALS = getAdminCredentials();
   
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-    console.log(`✅ ADMIN ACCESS GRANTED: IP ${ipValidation.detectedIP} authorized`);
+    console.log(`✅ ADMIN ACCESS GRANTED: Authorized`);
     // Add admin flag to request
     (req as any).isAdmin = true;
     return next();
   }
 
-  console.log(`🚨 ADMIN ACCESS BLOCKED: Invalid credentials from IP ${ipValidation.detectedIP}`);
+  console.log(`🚨 ADMIN ACCESS BLOCKED: Invalid credentials`);
   return res.status(401).json({ 
     success: false, 
     message: "Invalid admin credentials" 
@@ -64,7 +64,7 @@ export const adminLogin: RequestHandler = (req, res) => {
   
   // EMERGENCY ADMIN ACCESS: Temporary bypass for platform restoration
   // Allow admin access with correct credentials regardless of IP for emergency restoration
-  console.log(`🔧 EMERGENCY ADMIN ACCESS: IP ${ipValidation.detectedIP} attempting login`);
+  console.log(`🔧 EMERGENCY ADMIN ACCESS: Attempting login`);
   
   // Continue with credential validation (IP check bypassed for emergency access)
 
@@ -75,7 +75,7 @@ export const adminLogin: RequestHandler = (req, res) => {
   const ADMIN_CREDENTIALS = getAdminCredentials();
   
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-    console.log(`✅ ADMIN LOGIN SUCCESSFUL: IP ${ipValidation.detectedIP} authorized`);
+    console.log(`✅ ADMIN LOGIN SUCCESSFUL: Authorized`);
     
     // Generate basic auth token
     const token = Buffer.from(`${username}:${password}`).toString('base64');
@@ -88,7 +88,7 @@ export const adminLogin: RequestHandler = (req, res) => {
       authorizedIP: ipValidation.detectedIP
     });
   } else {
-    console.log(`🚨 ADMIN LOGIN BLOCKED: Invalid credentials from IP ${ipValidation.detectedIP}`);
+    console.log(`🚨 ADMIN LOGIN BLOCKED: Invalid credentials`);
     res.status(401).json({
       success: false,
       message: "Invalid credentials"

@@ -1300,7 +1300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`📊 Request Details:`);
       console.log(`   User-Agent: ${userAgent}`);
-      console.log(`   IP Address: ${ipAddress}`);
+      console.log(`   Source: [MASKED]`);
       console.log(`   URL: ${url}`);
       if (walletAddress) console.log(`   Wallet Address: ${walletAddress}`);
       
@@ -1419,7 +1419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: "pending"
       });
       
-      console.log(`✅ AI ACCESS DETECTED: ${aiType} from ${ipAddress}`);
+      console.log(`✅ AI ACCESS DETECTED: ${aiType}`);
       console.log(`   URL: ${url}`);
       console.log(`   Creator: ${creator.name || creator.id}`);
       console.log(`   Confidence: ${(confidence * 100).toFixed(1)}%`);

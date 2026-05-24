@@ -65,7 +65,7 @@ export default function TwoFactorAuthSetup({
   const setupMutation = useMutation({
     mutationFn: async () => {
       try {
-        console.log('Starting 2FA setup for creator:', creatorId, 'email:', creatorEmail);
+        console.log('Starting 2FA setup for creator:', creatorId);
         
         // Get CSRF token first
         const tokenResponse = await fetch('/api/csrf/token', { credentials: 'include' });
@@ -118,7 +118,7 @@ export default function TwoFactorAuthSetup({
   });
 
   const generateSetup = () => {
-    console.log('🔐 generateSetup clicked for creator:', creatorId, 'email:', creatorEmail);
+    console.log('🔐 generateSetup clicked for creator:', creatorId);
     setError(null);
     setupMutation.mutate();
   };

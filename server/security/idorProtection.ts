@@ -74,7 +74,7 @@ export const getUserSession = (req: Request): UserSession | null => {
   
   // Mobile/External devices = Different user IDs with NO access to founder data
   console.log(`SESSION: External device (ID: ${userId}) - NO access to founder creators`);
-  console.log(`SESSION: Device fingerprint: IP=${ip}, UA=${userAgent.substring(0, 50)}...`);
+  console.log(`SESSION: Device fingerprint: [MASKED], UA=${userAgent.substring(0, 50)}...`);
   
   return { 
     userId: userId, 
@@ -295,7 +295,7 @@ export const logIDORAttempt = (req: Request, creatorId: number, allowed: boolean
   const userId = session ? session.userId : 'anonymous';
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
   
-  console.log(`🚨 IDOR ATTEMPT: User ${userId} (IP: ${ip}) ${allowed ? 'GRANTED' : 'DENIED'} access to creator ${creatorId}`);
+  console.log(`🚨 IDOR ATTEMPT: User ${userId} ${allowed ? 'GRANTED' : 'DENIED'} access to creator ${creatorId}`);
   
   // In production, send this to a security monitoring service
   if (!allowed) {
