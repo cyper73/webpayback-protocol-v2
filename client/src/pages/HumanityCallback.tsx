@@ -81,17 +81,18 @@ export default function HumanityCallback() {
           return;
         }
 
-        // Persist token in localStorage so it survives page refresh.
-        if (data.accessToken) {
-          localStorage.setItem("humanity_access_token", data.accessToken);
-        }
-        if (data.refreshToken) {
-          localStorage.setItem("humanity_refresh_token", data.refreshToken);
-        }
-        if (data.expiresIn) {
-          const expiresAt = Date.now() + data.expiresIn * 1000;
-          localStorage.setItem("humanity_token_expires_at", String(expiresAt));
-        }
+        // Persist token in the exact format the Humanity React SDK expects.
+        // The SDK uses localStorage key "humanity_auth" with shape:
+        // { accessToken, refreshToken, expiresAt, authorizationId, appScopedUserId, user }
+        const authState = {
+          accessToken: data.accessToken ?? null,
+          refreshToken: data.refreshToken ?? null,
+          expiresAt: data.expiresIn ? Date.now() + data.expiresIn * 1000 : null,
+          authorizationId: data.authorizationId ?? "",
+          appScopedUserId: data.appScopedUserId ?? "",
+          user: null,
+        };
+        localStorage.setItem("humanity_auth", JSON.stringify(authState));
 
         // Clean up sessionStorage PKCE so the SDK internal handler won't
         // also try (and fail) to exchange the already-consumed code.
