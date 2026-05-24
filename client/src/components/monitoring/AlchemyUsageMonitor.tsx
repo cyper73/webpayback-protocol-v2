@@ -31,12 +31,12 @@ interface AlchemyUsageData {
 export function AlchemyUsageMonitor() {
   const { data: usageData, refetch } = useQuery<AlchemyUsageData>({
     queryKey: ['/api/reentrancy/alchemy/usage'],
-    refetchInterval: 300000, // Reduced from 30s to 5 minutes - usage accumulates gradually
+    refetchInterval: 30000, // Update every 30 seconds
   });
 
   const { data: statusData } = useQuery({
     queryKey: ['/api/reentrancy/alchemy/status'],
-    refetchInterval: 300000, // Reduced from 30s to 5 minutes
+    refetchInterval: 30000,
   });
 
   if (!usageData?.success) {
@@ -96,7 +96,7 @@ export function AlchemyUsageMonitor() {
       <CardContent className="space-y-6">
         
         {/* Current Usage Overview */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-blue-500" />

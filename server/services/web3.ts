@@ -1,15 +1,16 @@
 import { storage } from "../storage";
 import type { InsertRewardDistribution } from "@shared/schema";
+import { ethers } from "ethers";
 
 // Multi-Chain Configuration
-const POLYGON_CONFIG = {
-  chainId: 137,
-  rpcUrl: process.env.POLYGON_RPC_URL || "https://polygon-rpc.com/",
-  explorerUrl: "https://polygonscan.com",
-  tokenAddress: process.env.POLYGON_TOKEN_ADDRESS || "0x9408f17a8B4666f8cb8231BA213DE04137dc3825",
-  poolAddress: process.env.POLYGON_PRIMARY_POOL_ADDRESS || "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
-  symbol: process.env.WPT_TOKEN_SYMBOL || "WPT",
-  decimals: parseInt(process.env.WPT_TOKEN_DECIMALS || "18")
+const HUMANITY_CONFIG = {
+  chainId: 1942999413,
+  rpcUrl: "https://rpc.testnet.humanity.org/",
+  explorerUrl: "https://explorer.testnet.humanity.org/",
+  tokenAddress: "0x0000000000000000000000000000000000000000", // WPT token on Humanity
+  poolAddress: "0x0000000000000000000000000000000000000000", // Humanity pool
+  symbol: "WPT",
+  decimals: 18
 };
 
 // Ethereum Mainnet Configuration (Ready for WPT mainnet deployment)
@@ -50,11 +51,21 @@ interface RewardDistributionResult {
 }
 
 class Web3Service {
-  private currentNetwork = POLYGON_CONFIG; // Default to Polygon
+  private currentNetwork = HUMANITY_CONFIG; // Migrated to Humanity Protocol
+  provider: any;
+  DEX_FACTORY: string;
+  DEX_ROUTER: string;
+
+  constructor() {
+    this.provider = new ethers.providers.JsonRpcProvider(process.env.HUMANITY_RPC || "https://rpc.testnet.humanity.org/");
+    // Will be updated when deployed on Humanity DEX
+    this.DEX_FACTORY = "0x...";
+    this.DEX_ROUTER = "0x...";
+  }
   
   // Switch network configuration
   switchNetwork(networkName: 'polygon' | 'ethereum') {
-    this.currentNetwork = networkName === 'ethereum' ? ETHEREUM_CONFIG : POLYGON_CONFIG;
+    this.currentNetwork = networkName === 'ethereum' ? ETHEREUM_CONFIG : HUMANITY_CONFIG;
   }
   
   get tokenAddress() { return this.currentNetwork.tokenAddress; }
@@ -70,8 +81,8 @@ class Web3Service {
       // For now, we'll return real data about your token
       return {
         address: this.tokenAddress,
-        symbol: POLYGON_CONFIG.symbol,
-        decimals: POLYGON_CONFIG.decimals,
+        symbol: this.currentNetwork.symbol,
+        decimals: this.currentNetwork.decimals,
         totalSupply: "10000000000000000000000000", // 10M tokens (real deployment)
         poolAddress: this.poolAddress,
         poolLiquidity: "500000000000000000000000" // 500K tokens in pool (example)
@@ -118,11 +129,16 @@ class Web3Service {
     try {
       // Get authentic pool data from realPoolDataService (refreshed every 12h)
       const { realPoolDataService } = await import('./realPoolDataService');
-      const realPoolData = await realPoolDataService.getPoolData(poolType);
+      const allPoolData = await realPoolDataService.getPoolData();
+      const realPoolData = poolType === 'usdt' ? allPoolData.usdt : allPoolData.wmatic;
+
+      if (!realPoolData) {
+        throw new Error("Pool data not available");
+      }
 
       // Pool-specific configuration
       const poolConfig = poolType === 'usdt' ? {
-        poolAddress: process.env.POLYGON_SECONDARY_POOL_ADDRESS || "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
+        poolAddress: "0xe021e5817E8867D7CeA10f63BC47E118f3aB9E4A",
         token0: "USDT",
         token1: "WPT",
         version: "V2",
@@ -135,7 +151,7 @@ class Web3Service {
           "Lower gas costs than V3"
         ]
       } : {
-        poolAddress: process.env.POLYGON_PRIMARY_POOL_ADDRESS || "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
+        poolAddress: "0x572a5E8cbfCe8026550f1e2B369c2Bdbcf6634c3",
         token0: "WMATIC",
         token1: "WPT", 
         version: "V3",
@@ -238,10 +254,10 @@ class Web3Service {
   // Get network status and connection info
   async getNetworkStatus() {
     return {
-      chainId: POLYGON_CONFIG.chainId,
-      networkName: "Polygon",
+      chainId: HUMANITY_CONFIG.chainId,
+      networkName: "Humanity Testnet",
       rpcUrl: this.rpcUrl,
-      explorerUrl: POLYGON_CONFIG.explorerUrl,
+      explorerUrl: HUMANITY_CONFIG.explorerUrl,
       tokenAddress: this.tokenAddress,
       poolAddress: this.poolAddress,
       isConnected: true,

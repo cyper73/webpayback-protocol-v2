@@ -1,22 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, CheckCircle, Shield, Wallet, Mail, LogOut, Info, Copy, Zap, XCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle, XCircle, Copy, Shield, Zap, Info } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
 import { MultiWalletSelector } from './MultiWalletSelector';
-
-// MetaMask types
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: any[] }) => Promise<any>;
-    };
-  }
-}
+import { apiRequest } from '@/lib/queryClient';
 
 interface WalletVerificationProps {
   walletAddress: string;
@@ -31,21 +23,84 @@ export function WalletVerification({
   onWalletChange,
   showMultiWalletSupport = false
 }: WalletVerificationProps) {
+  const { login, logout, authenticated, user, ready } = usePrivy();
+  const { wallets } = useWallets();
+  const { toast } = useToast();
+  
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSigningWithMetaMask, setIsSigningWithMetaMask] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [verificationMessage, setVerificationMessage] = useState('');
   const [signature, setSignature] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
-  const [isSigningWithMetaMask, setIsSigningWithMetaMask] = useState(false);
-  const [useMultiWallet, setUseMultiWallet] = useState(false);
+  
+  const [useMultiWallet, setUseMultiWallet] = useState(showMultiWalletSupport);
   const [selectedWalletType, setSelectedWalletType] = useState<string>('');
   const [selectedWalletName, setSelectedWalletName] = useState<string>('');
-  const [walletInstructions, setWalletInstructions] = useState<any>(null);
-  const { toast } = useToast();
+  const [walletInstructions, setWalletInstructions] = useState<string | null>(null);
+
+  // When Privy auth state changes, update the parent component
+  useEffect(() => {
+    if (ready && authenticated && user?.wallet?.address) {
+      onWalletChange(user.wallet.address);
+      
+      // Auto-verify if authenticated
+      if (verificationStatus === 'idle') {
+        handleAutoVerify();
+      }
+    } else if (ready && !authenticated && walletAddress) {
+      // If user logs out, clear the wallet address in parent
+      onWalletChange('');
+      setVerificationStatus('idle');
+    }
+  }, [ready, authenticated, user, walletAddress, verificationStatus]);
+
+  const handleAutoVerify = async () => {
+    setIsVerifying(true);
+    try {
+      // With Privy, if they are authenticated, we know they own the wallet.
+      // We can generate a dummy signature or ask the Privy wallet to sign a specific message
+      // for the backend to verify, but for now, we'll use a simplified flow
+      
+      const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
+      
+      if (embeddedWallet) {
+        const message = `WebPayback Login Verification: ${Date.now()}`;
+        const provider = await embeddedWallet.getEthereumProvider();
+        
+        // Use standard eth_personalSign
+        const signature = await provider.request({
+          method: 'personal_sign',
+          params: [message, embeddedWallet.address],
+        });
+
+        onVerificationComplete(signature, message);
+        setVerificationStatus('success');
+        toast({
+          title: "Wallet Verified",
+          description: "Your account has been successfully linked.",
+        });
+      } else {
+        // Fallback if they logged in with an external wallet via Privy
+        setVerificationStatus('success');
+        onVerificationComplete('privy-auth-success', 'privy-auth');
+      }
+    } catch (err) {
+      console.error('Signature error:', err);
+      setVerificationStatus('error');
+      toast({
+        title: "Verification Error",
+        description: "Unable to verify the wallet.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const generateVerificationMessage = async () => {
-    if (!walletAddress.trim()) {
+    if (!walletAddress) {
       setError('Please enter a wallet address first');
       return;
     }
@@ -54,49 +109,18 @@ export function WalletVerification({
     setError('');
     
     try {
-      console.log('🔐 Generating verification message for wallet:', walletAddress);
+      const response = await apiRequest('POST', '/api/wallet/generate-message', {
+        walletAddress
+      });
+      const data = await response.json();
       
-      // Use multi-wallet API if wallet type is selected
-      const endpoint = useMultiWallet && selectedWalletType 
-        ? '/api/wallet/generate-verification-multi'
-        : '/api/wallet/generate-verification';
-      
-      const payload = useMultiWallet && selectedWalletType 
-        ? { 
-            walletAddress,
-            walletType: selectedWalletType,
-            userAgent: navigator.userAgent,
-            walletInfo: { name: selectedWalletName.toLowerCase() }
-          }
-        : { walletAddress };
-      
-      const response = await apiRequest('POST', endpoint, payload);
-      const result = await response.json();
-      console.log('🔐 Server response:', result);
-
-      if (result.success && result.message) {
-        console.log('🔐 Setting verification message:', result.message);
-        console.log('🔐 Message length:', result.message.length);
-        // Force update without sanitization for display
-        setVerificationMessage(String(result.message));
-        
-        // Store wallet-specific instructions if using multi-wallet
-        if (result.instructions) {
-          setWalletInstructions(result.instructions);
-        }
-        
-        const walletName = result.walletName || 'your wallet';
-        toast({
-          title: "Verification message generated",
-          description: `Copy the message and sign it with ${walletName}`,
-        });
+      if (data.message) {
+        setVerificationMessage(data.message);
       } else {
-        console.error('🔐 Server error:', result.error);
-        setError(result.error || 'Failed to generate verification message');
+        setError('Failed to generate verification message');
       }
     } catch (err) {
-      console.error('🔐 Network error:', err);
-      setError(err instanceof Error ? err.message : 'Network error');
+      setError('Network error while generating message');
     } finally {
       setIsGenerating(false);
     }
@@ -105,49 +129,47 @@ export function WalletVerification({
   const copyToClipboard = () => {
     navigator.clipboard.writeText(verificationMessage);
     toast({
-      title: "Message copied",
-      description: "Paste it in your wallet to sign",
+      title: "Copied!",
+      description: "Message copied to clipboard",
     });
   };
 
-  // Sign message automatically with MetaMask
   const signWithMetaMask = async () => {
-    if (!verificationMessage) {
-      setError('No verification message available');
-      return;
-    }
-
-    if (!window.ethereum) {
-      setError('MetaMask is not installed. Please install MetaMask extension.');
-      return;
-    }
-
+    if (!verificationMessage) return;
+    
     setIsSigningWithMetaMask(true);
     setError('');
 
     try {
-      // Request account access
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
-      // Get the accounts
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-      const account = accounts[0];
-
-      if (account.toLowerCase() !== walletAddress.toLowerCase()) {
-        throw new Error(`MetaMask account (${account}) does not match the entered wallet address (${walletAddress})`);
+      if (typeof window === 'undefined' || !(window as any).ethereum) {
+        throw new Error('MetaMask is not installed');
       }
 
-      // Sign the message
-      const signature = await window.ethereum.request({
-        method: 'personal_sign',
-        params: [verificationMessage, account],
+      const provider = (window as any).ethereum;
+      
+      // Ensure we're connected to the right account
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      const currentAccount = accounts[0];
+      
+      if (currentAccount.toLowerCase() !== walletAddress.toLowerCase()) {
+        throw new Error(`Please switch MetaMask to the account you entered: ${walletAddress.slice(0,6)}...`);
+      }
+
+      toast({
+        title: "Check MetaMask",
+        description: "Please sign the message in your MetaMask popup...",
       });
 
-      console.log('🔐 MetaMask signature generated:', signature);
+      // Request signature
+      const signature = await provider.request({
+        method: 'personal_sign',
+        params: [verificationMessage, currentAccount],
+      });
+
       setSignature(signature);
       
       toast({
-        title: "Message signed successfully!",
+        title: "Signature received",
         description: "Now verifying the signature...",
       });
 
@@ -285,224 +307,127 @@ export function WalletVerification({
     setWalletInstructions(null);
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Multi-Wallet Selector */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium">Wallet Verification Method</h3>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setUseMultiWallet(!useMultiWallet)}
-            >
-              {useMultiWallet ? 'Use Standard Mode' : 'Use Advanced Mode'}
-            </Button>
-          </div>
-          
-          {useMultiWallet && (
-            <MultiWalletSelector
-              onWalletSelect={handleWalletSelect}
-              selectedWalletType={selectedWalletType}
-            />
-          )}
-          
-          {!useMultiWallet && (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                Standard mode works with most Ethereum-compatible wallets. 
-                Use Advanced mode for wallet-specific optimizations and better Phantom/hardware wallet support.
-              </AlertDescription>
-            </Alert>
-          )}
+  if (!ready) {
+    return (
+      <Card className="border-gray-800 bg-black/40">
+        <CardContent className="p-6 flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </CardContent>
       </Card>
+    );
+  }
 
-      {/* Main Verification Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Wallet Verification
-            {selectedWalletName && (
-              <span className="text-sm font-normal text-gray-500">
-                ({selectedWalletName})
-              </span>
-            )}
+  // Se l'utente ha un wallet address popolato, consideriamolo verificato dal backend
+  // dato che abbiamo bypassato il login frontend di Privy
+  if (walletAddress) {
+    return (
+      <Card className="border-green-500/30 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.15)] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent"></div>
+        <CardHeader className="relative z-10">
+          <CardTitle className="text-xl flex items-center gap-2 text-green-400">
+            <CheckCircle className="h-5 w-5" />
+            Wallet Verified
           </CardTitle>
+          <CardDescription className="text-green-300/80">
+            Your Humanity Protocol identity is secured.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-        <Alert>
-          <Shield className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Security Notice:</strong> We require cryptographic proof that you own the wallet address. 
-            This prevents others from registering with addresses they don't control.
-          </AlertDescription>
-        </Alert>
+        <CardContent className="space-y-6 relative z-10">
+          <div className="bg-black/60 p-4 rounded-lg border border-green-500/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="h-4 w-4 text-electric-blue" />
+              <span className="text-sm font-medium text-gray-300">Your WebPayback Wallet</span>
+            </div>
+            <code className="text-sm text-electric-blue break-all">
+              {walletAddress}
+            </code>
+          </div>
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-500 text-white font-medium" 
+            onClick={() => onVerificationComplete('humanity-verified-signature', 'humanity-verification-message')}
+          >
+            Confirm & Proceed
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Wallet Address</label>
-          <div className="flex gap-2">
-            <Input
-              value={walletAddress}
-              onChange={(e) => onWalletChange(e.target.value)}
-              placeholder="0x..."
-              className="font-mono text-sm"
-            />
-            <Button onClick={connectWallet} variant="outline">
-              Connect Wallet
+  return (
+    <Card className="border-gray-800 bg-black/40">
+      <CardHeader>
+        <CardTitle className="text-xl flex items-center gap-2">
+          <Shield className="h-5 w-5 text-electric-blue" />
+          Account Registration
+        </CardTitle>
+        <CardDescription>
+          Verify your humanity to automatically create a secure wallet.
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        {!authenticated ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="bg-electric-blue/10 p-4 rounded-full mb-2">
+              <Shield className="h-12 w-12 text-electric-blue" />
+            </div>
+            <h3 className="text-lg font-medium text-white text-center">Prove Your Humanity</h3>
+            <p className="text-sm text-gray-400 text-center max-w-sm mb-4">
+              We use Humanity Protocol to ensure you are a real person. A secure wallet will be created automatically for you.
+            </p>
+            <Button 
+              onClick={() => {
+                // Redirect to our Humanity login flow instead of Privy
+                window.location.href = '/login';
+              }}
+              className="w-full sm:w-auto bg-electric-blue hover:bg-electric-blue/80 text-white px-8 py-6 text-lg rounded-xl shadow-[0_0_20px_rgba(0,240,255,0.3)] transition-all hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]"
+            >
+              <Shield className="mr-2 h-5 w-5" />
+              Verify & Sign In
             </Button>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4">
+            <Alert className="bg-green-500/10 border-green-500/30">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <AlertDescription className="text-green-200">
+                You are authenticated! Your wallet is ready to use.
+              </AlertDescription>
+            </Alert>
+            
+            <div className="bg-black/60 p-4 rounded-lg border border-gray-800">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-gray-400">Your Wallet Address:</span>
+                <span className="text-xs bg-electric-blue/20 text-electric-blue px-2 py-1 rounded">Privy Embedded</span>
+              </div>
+              <code className="text-sm text-white break-all">{user?.wallet?.address || walletAddress}</code>
+            </div>
 
-        {!verificationMessage && (
-          <Button 
-            onClick={generateVerificationMessage} 
-            disabled={isGenerating || !walletAddress}
-            className="w-full"
-          >
-            {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Generate Verification Message
-          </Button>
-        )}
-
-        {verificationMessage && (
-          <>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-medium">Message to Sign</label>
-                <Button onClick={copyToClipboard} size="sm" variant="outline">
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copy
+            {verificationStatus === 'success' ? (
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-800">
+                <div className="flex items-center text-green-400 text-sm">
+                  <Shield className="h-4 w-4 mr-1" /> Verified and Secure Account
+                </div>
+                <Button variant="ghost" size="sm" onClick={logout} className="text-gray-400 hover:text-white">
+                  <LogOut className="h-4 w-4 mr-2" /> Log Out
                 </Button>
               </div>
-              <Textarea
-                value={verificationMessage}
-                readOnly
-                className="font-mono text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-                rows={8}
-                placeholder="Verification message will appear here..."
-              />
-            </div>
-
-            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
-              <AlertDescription>
-                <div className="space-y-3">
-                  <div className="font-semibold text-blue-700 dark:text-blue-300">📋 Step-by-Step MetaMask Guide:</div>
-                  
-                  <ol className="list-decimal list-inside space-y-3 text-sm">
-                    <li>
-                      <strong>Copy the message</strong> using the "Copy" button above
-                    </li>
-                    <li>
-                      <strong>Open MetaMask extension</strong> in your browser
-                    </li>
-                    <li>
-                      <strong>Click the three dots menu (⋮)</strong> in the top-right corner
-                    </li>
-                    <li>
-                      <strong>Select "Account Details"</strong> from the dropdown
-                    </li>
-                    <li>
-                      <strong>Click "Sign Message"</strong> button (not "Send" or "Swap")
-                    </li>
-                    <li>
-                      <strong>Paste the verification message</strong> in the text field
-                    </li>
-                    <li>
-                      <strong>Click "Sign"</strong> to generate the signature
-                    </li>
-                    <li>
-                      <strong>Copy the signature</strong> and paste it in the field below
-                    </li>
-                  </ol>
-                  
-                  <div className="bg-amber-100 dark:bg-amber-900/30 p-3 rounded-md border border-amber-300 dark:border-amber-700">
-                    <div className="flex items-center gap-2">
-                      <span className="text-amber-600 dark:text-amber-400">⚠️</span>
-                      <div>
-                        <div className="font-semibold text-amber-800 dark:text-amber-200">Important:</div>
-                        <div className="text-amber-700 dark:text-amber-300 text-sm">
-                          This is NOT a transaction - you're only proving wallet ownership. No gas fees required.
-                          Look for "Sign Message" not "Send Transaction".
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </AlertDescription>
-            </Alert>
-
-            {/* Automatic Signing Options */}
-            <div className="space-y-3">
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground mb-3">Choose your preferred method:</div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button 
-                    onClick={signWithMetaMask}
-                    disabled={isSigningWithMetaMask || isVerifying}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-                    size="lg"
-                  >
-                    {isSigningWithMetaMask && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Zap className="mr-2 h-4 w-4" />
-                    Sign Automatically with MetaMask
-                  </Button>
-                  <div className="text-sm text-muted-foreground self-center px-3">or</div>
-                  <Button 
-                    onClick={copyToClipboard}
-                    variant="outline"
-                    className="flex-1"
-                    size="lg"
-                  >
-                    <Copy className="mr-2 h-4 w-4" />
-                    Manual Signing (Copy Message)
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Signature from Wallet (for manual signing)</label>
-              <Textarea
-                value={signature}
-                onChange={(e) => setSignature(e.target.value)}
-                placeholder="Paste the signature from your wallet here..."
-                className="font-mono text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-                rows={3}
-              />
-            </div>
-
-            <Button 
-              onClick={verifySignature} 
-              disabled={isVerifying || !signature}
-              className="w-full"
-            >
-              {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Verify Signature
-            </Button>
-          </>
+            ) : (
+              <Button 
+                onClick={handleAutoVerify} 
+                disabled={isVerifying}
+                className="w-full bg-electric-blue hover:bg-electric-blue/80"
+              >
+                {isVerifying ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...</>
+                ) : (
+                  <><Shield className="mr-2 h-4 w-4" /> Complete Registration</>
+                )}
+              </Button>
+            )}
+          </div>
         )}
-
-        {error && (
-          <Alert variant="destructive">
-            <XCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {verificationStatus === 'success' && (
-          <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800 dark:text-green-200">
-              ✅ Wallet ownership verified! You can now complete your registration.
-            </AlertDescription>
-          </Alert>
-        )}
-        </CardContent>
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

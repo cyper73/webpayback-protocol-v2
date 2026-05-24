@@ -61,14 +61,6 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
-        // WebPayback Protocol Custom Colors
-        'electric-blue': 'var(--electric-blue)',
-        'neon-green': 'var(--neon-green)',
-        'cyber-purple': 'var(--cyber-purple)',
-        'deep-space': 'var(--deep-space)',
-        'dark-gray': 'var(--dark-gray)',
-        'glass-dark': 'var(--glass-dark)',
-        'glass-light': 'var(--glass-light)',
       },
       keyframes: {
         "accordion-down": {
@@ -87,26 +79,10 @@ export default {
             height: "0",
           },
         },
-        // WebPayback Protocol Animations
-        pulse: {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.5" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        flow: {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        float: "float 3s ease-in-out infinite",
-        flow: "flow 3s linear infinite",
       },
     },
   },

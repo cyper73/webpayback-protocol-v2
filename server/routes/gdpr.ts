@@ -60,11 +60,11 @@ router.get('/data/export/:userId', async (req: Request, res: Response) => {
     const gdprData = {
       exportDate: new Date().toISOString(),
       user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        id: (user as any).id,
+        username: (user as any).username,
+        role: (user as any).role,
+        createdAt: (user as any).createdAt,
+        updatedAt: (user as any).updatedAt
       },
       creators: userCreators.map(creator => ({
         id: creator.id,
@@ -135,7 +135,7 @@ router.post('/request', csrfProtection, async (req: Request, res: Response) => {
       requestId,
       message: 'GDPR request received and is being processed',
       expectedResponse: '30 days (as per GDPR Article 12)',
-      contact: 'info@webpayback.com',
+      contact: 'cyper73@gmail.com',
       nextSteps: [
         'Identity verification email sent',
         'Legal team notified',
@@ -160,7 +160,7 @@ router.post('/consent', csrfProtection, async (req: Request, res: Response) => {
     
     // Store consent preferences (in production: database table)
     const consentRecord = {
-      userId: req.session?.userId || null,
+      userId: (req as any).session?.userId || null,
       dataProcessing: validatedData.dataProcessing,
       marketing: validatedData.marketing,
       analytics: validatedData.analytics,
@@ -201,8 +201,8 @@ router.get('/info', async (req: Request, res: Response) => {
     gdprCompliance: {
       dataController: {
         name: 'WebPayback Protocol',
-        email: 'info@webpayback.com',
-        dpo: 'info@webpayback.com' // Data Protection Officer
+        email: 'cyper73@gmail.com',
+        dpo: 'cyper73@gmail.com' // Data Protection Officer
       },
       legalBasis: [
         'Article 6(1)(b) GDPR: Contract performance',

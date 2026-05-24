@@ -83,7 +83,7 @@ export function ChainlinkVRFDashboard() {
 
   useEffect(() => {
     fetchVRFData();
-    const interval = setInterval(fetchVRFData, 120000); // Reduced from 15s to 2 minutes - VRF requests are infrequent
+    const interval = setInterval(fetchVRFData, 15000); // Refresh every 15 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -116,7 +116,7 @@ export function ChainlinkVRFDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">
                 {vrfStats?.totalRequests || 0}
@@ -156,7 +156,7 @@ export function ChainlinkVRFDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <div className="text-sm text-gray-400 mb-1">Network</div>
               <div className="text-white font-mono">{vrfHealth?.network || 'N/A'}</div>

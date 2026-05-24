@@ -1,11 +1,10 @@
 import { 
-  users, creators, blockchainNetworks, aiAgents, agentCommunications, 
+  users, creators, blockchainNetworks, 
   contentTracking, rewardDistributions, poolManagement, complianceRecords,
   fraudDetectionRules, fraudDetectionAlerts, creatorReputationScores, accessPatterns, referralRewards, domainVerifications,
   channelContentMappings, rewardPoolLimits, poolDrainProtection, rewardPoolSecurity,
   type User, type InsertUser, type Creator, type InsertCreator,
-  type BlockchainNetwork, type InsertBlockchainNetwork, type AiAgent, type InsertAiAgent,
-  type AgentCommunication, type InsertAgentCommunication, type ContentTracking, type InsertContentTracking,
+  type BlockchainNetwork, type InsertBlockchainNetwork, type ContentTracking, type InsertContentTracking,
   type RewardDistribution, type InsertRewardDistribution, type PoolManagement, type InsertPoolManagement,
   type ComplianceRecord, type InsertComplianceRecord,
   type FraudDetectionRule, type InsertFraudDetectionRule, type FraudDetectionAlert, type InsertFraudDetectionAlert,
@@ -16,7 +15,7 @@ import {
   type RewardPoolSecurity, type InsertRewardPoolSecurity
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, gte } from "drizzle-orm";
 
 // IStorage interface
 export interface IStorage {
@@ -24,17 +23,6 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
-  
-  // Agent methods
-  getAllAgents(): Promise<AiAgent[]>;
-  getAgent(id: number): Promise<AiAgent | undefined>;
-  getAgentByName(name: string): Promise<AiAgent | undefined>;
-  createAgent(insertAgent: InsertAiAgent): Promise<AiAgent>;
-  updateAgent(id: number, updates: Partial<AiAgent>): Promise<void>;
-  
-  // Agent communication methods
-  getAgentCommunications(): Promise<AgentCommunication[]>;
-  createAgentCommunication(insertComm: InsertAgentCommunication): Promise<AgentCommunication>;
   
   // Blockchain network methods
   getAllBlockchainNetworks(): Promise<BlockchainNetwork[]>;
@@ -143,46 +131,6 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Agent methods
-  async getAllAgents(): Promise<AiAgent[]> {
-    return await db.select().from(aiAgents);
-  }
-
-  async getAgent(id: number): Promise<AiAgent | undefined> {
-    const [agent] = await db.select().from(aiAgents).where(eq(aiAgents.id, id));
-    return agent || undefined;
-  }
-
-  async getAgentByName(name: string): Promise<AiAgent | undefined> {
-    const [agent] = await db.select().from(aiAgents).where(eq(aiAgents.name, name));
-    return agent || undefined;
-  }
-
-  async createAgent(insertAgent: InsertAiAgent): Promise<AiAgent> {
-    const [agent] = await db
-      .insert(aiAgents)
-      .values(insertAgent)
-      .returning();
-    return agent;
-  }
-
-  async updateAgent(id: number, updates: Partial<AiAgent>): Promise<void> {
-    await db.update(aiAgents).set(updates).where(eq(aiAgents.id, id));
-  }
-
-  // Agent communication methods
-  async getAgentCommunications(): Promise<AgentCommunication[]> {
-    return await db.select().from(agentCommunications);
-  }
-
-  async createAgentCommunication(insertComm: InsertAgentCommunication): Promise<AgentCommunication> {
-    const [comm] = await db
-      .insert(agentCommunications)
-      .values(insertComm)
-      .returning();
-    return comm;
-  }
-
   // Blockchain network methods
   async getAllBlockchainNetworks(): Promise<BlockchainNetwork[]> {
     return await db.select().from(blockchainNetworks);
@@ -216,35 +164,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
-    // Check if website URL is already registered with a different wallet
-    const existingCreatorByWebsite = await this.getCreatorByWebsiteUrl(insertCreator.websiteUrl);
-    if (existingCreatorByWebsite && existingCreatorByWebsite.walletAddress !== insertCreator.walletAddress) {
-      throw new Error(`This website URL is already registered with a different wallet address. Each website can only be registered once.`);
-    }
-
     // Check wallet address registration limit (max 15 registrations per wallet)
-    const existingCreators = await this.getCreatorsByWalletAddress(insertCreator.walletAddress);
+    const existingCreators = await this.getCreatorsByWalletAddress((insertCreator as any).walletAddress);
     if (existingCreators.length >= 15) {
       throw new Error(`Maximum registration limit reached for this wallet address (15/15). Please use a different wallet address.`);
     }
 
     // Generate referral code if not provided
-    const referralCode = insertCreator.referralCode || await this.generateReferralCode();
+    const referralCode = (insertCreator as any).referralCode || await this.generateReferralCode();
     
     // Check if this is an early adopter (first 100 creators)
     const creatorCount = await db.select().from(creators);
     const isEarlyAdopter = creatorCount.length < 100;
     const earlyAdopterRank = isEarlyAdopter ? creatorCount.length + 1 : null;
     
-    const [creator] = await db
+    const [creator] = (await db
       .insert(creators)
       .values({
         ...insertCreator,
         referralCode,
         isEarlyAdopter,
         earlyAdopterRank,
-      })
-      .returning();
+      } as any)
+      .returning()) as any;
     return creator;
   }
 
@@ -273,7 +215,7 @@ export class DatabaseStorage implements IStorage {
 
   async generateReferralCode(): Promise<string> {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code;
+    let code = '';
     let exists = true;
     
     while (exists) {
@@ -474,10 +416,12 @@ export class DatabaseStorage implements IStorage {
 
   async getAccessPatternByHashes(creatorId: number, domainHash: string, ipHash: string, aiType: string): Promise<AccessPattern | undefined> {
     const [pattern] = await db.select().from(accessPatterns)
-      .where(eq(accessPatterns.creatorId, creatorId))
-      .where(eq(accessPatterns.domainHash, domainHash))
-      .where(eq(accessPatterns.ipHash, ipHash))
-      .where(eq(accessPatterns.aiType, aiType));
+      .where(and(
+        eq(accessPatterns.creatorId, creatorId),
+        eq(accessPatterns.domainHash, domainHash),
+        eq(accessPatterns.ipHash, ipHash),
+        eq(accessPatterns.aiType, aiType)
+      ));
     return pattern || undefined;
   }
 
@@ -487,8 +431,10 @@ export class DatabaseStorage implements IStorage {
 
   async getCreatorRewardsFromDate(creatorId: number, fromDate: Date): Promise<RewardDistribution[]> {
     return await db.select().from(rewardDistributions)
-      .where(eq(rewardDistributions.creatorId, creatorId))
-      .where(eq(rewardDistributions.createdAt, fromDate));
+      .where(and(
+        eq(rewardDistributions.creatorId, creatorId),
+        gte(rewardDistributions.createdAt, fromDate)
+      ));
   }
 
   async getCreator(creatorId: number): Promise<Creator | undefined> {
@@ -535,7 +481,7 @@ export class DatabaseStorage implements IStorage {
   async updateDomainVerification(id: number, updates: Partial<DomainVerification>): Promise<void> {
     await db
       .update(domainVerifications)
-      .set({ ...updates, updatedAt: new Date() })
+      .set(updates)
       .where(eq(domainVerifications.id, id));
   }
 
@@ -559,8 +505,10 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(channelContentMappings)
-      .where(eq(channelContentMappings.creatorId, creatorId))
-      .where(eq(channelContentMappings.isActive, true));
+      .where(and(
+        eq(channelContentMappings.creatorId, creatorId),
+        eq(channelContentMappings.isActive, true)
+      ));
   }
 
   async updateChannelContentMapping(id: number, updates: Partial<ChannelContentMapping>): Promise<boolean> {
@@ -593,9 +541,11 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(rewardPoolLimits)
-      .where(eq(rewardPoolLimits.walletAddress, walletAddress))
-      .where(eq(rewardPoolLimits.timeframeType, timeframeType))
-      .where(eq(rewardPoolLimits.isActive, true));
+      .where(and(
+        eq(rewardPoolLimits.walletAddress, walletAddress),
+        eq(rewardPoolLimits.timeframeType, timeframeType),
+        eq(rewardPoolLimits.isActive, true)
+      ));
   }
 
   async updateRewardPoolLimits(id: number, updates: Partial<RewardPoolLimits>): Promise<void> {
@@ -621,7 +571,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(poolDrainProtection)
-      .where(eq(poolDrainProtection.protectionType, protectionType));
+      .where(eq(poolDrainProtection.timeframe, protectionType));
   }
 
   async updatePoolDrainProtection(id: number, updates: Partial<PoolDrainProtection>): Promise<void> {

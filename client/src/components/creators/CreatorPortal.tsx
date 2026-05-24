@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,27 +13,39 @@ import { insertCreatorSchema, contentCategoryEnum, type InsertCreator } from "@s
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Copy, Code, Settings, Lock } from "lucide-react";
+import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Copy, Code, Settings, Lock, Coins, Info, HelpCircle } from "lucide-react";
 import { sanitizeUrl, sanitizeWalletAddress, sanitizeToastContent, validateDomain, sanitizeContentCategory } from "@/lib/security";
 import { WalletVerification } from "@/components/wallet/WalletVerification";
-import TwoFactorAuthSetup from "@/components/security/TwoFactorAuthSetup";
+import { HumanityStatus } from "@/components/creators/HumanityStatus";
+import { GaslessWithdrawal } from "@/components/wallet/GaslessWithdrawal";
+import { CashOutGuide } from "@/components/wallet/CashOutGuide";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-const formSchema = z.object({
-  websiteUrl: z.string().url("Please enter a valid URL"),
-  walletAddress: z.string().min(42, "Valid Ethereum address required"),
-  contentCategory: z.enum(["blog_articles", "news_journalism", "educational_content", "technical_documentation", "creative_writing", "art_design", "music_audio", "video_content", "social_media", "academic_papers", "photography"]),
+import ChannelMonitoringDemo from "@/components/ChannelMonitoringDemo";
+
+const formSchema = insertCreatorSchema.extend({
+  websiteUrl: z.string().optional().or(z.literal("")),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
   }),
   walletSignature: z.string().optional(),
   verificationMessage: z.string().optional()
-});
+}).omit({ userId: true }) as any;
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = any;
 
 export default function CreatorPortal() {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,12 +71,52 @@ export default function CreatorPortal() {
     defaultValues: {
       websiteUrl: "",
       walletAddress: "",
-      contentCategory: "blog_articles" as const,
-      termsAccepted: false,
       walletSignature: "",
-      verificationMessage: ""
+      verificationMessage: "",
+      contentCategory: "blog_articles" as const,
+      termsAccepted: false
     }
   });
+
+  // Set wallet address and creator ID from session on mount
+  useEffect(() => {
+    const sessionStr = localStorage.getItem('webpayback_session');
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        if (session.walletAddress) {
+          setValue("walletAddress", session.walletAddress);
+          // Set as verified automatically since it came from Humanity login
+          setIsWalletVerified(true);
+          setWalletSignature('humanity-verified-signature');
+          setVerificationMessage('humanity-verification-message');
+          
+          // If creatorId is missing, try to fetch it
+          if (session.creatorId) {
+            setCurrentCreatorId(session.creatorId);
+          } else {
+            // Attempt to recover creatorId from walletAddress
+            apiRequest("POST", "/api/auth/wallet/check", { walletAddress: session.walletAddress })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success && data.creators && data.creators.length > 0) {
+                  const recoveredId = data.creators[0].id;
+                  setCurrentCreatorId(recoveredId);
+                  // Update session with recovered ID
+                  localStorage.setItem('webpayback_session', JSON.stringify({
+                    ...session,
+                    creatorId: recoveredId
+                  }));
+                }
+              })
+              .catch(err => console.error("Failed to recover creatorId", err));
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse session:', e);
+      }
+    }
+  }, [setValue]);
 
   const checkDomainMutation = useMutation({
     mutationFn: async (websiteUrl: string) => {
@@ -186,17 +239,15 @@ export default function CreatorPortal() {
       setDomainVerification(null);
       setIsDomainVerified(false);
       
-      // AUTOMATIC 2FA SETUP: Check if 2FA setup was generated
-      if (data?.id && data?.requiresImmediateTwoFactorSetup) {
+      // DEPRECATED 2FA SETUP - Replaced by Humanity Protocol
+      if (data?.id) {
         setCurrentCreatorId(data.id);
-        setPreGeneratedTwoFactorSetup(data.twoFactorSetup);
-        setActiveTab("security");
         
-        // Show security requirement message
+        // Show success message
         setTimeout(() => {
           toast({
-            title: "Security Setup Required",
-            description: "2FA is mandatory for all users. Please complete Google Authenticator setup to secure your account.",
+            title: "Registration Successful",
+            description: "Your site is now protected. Identity secured by Humanity Protocol.",
             variant: "default",
           });
         }, 1000);
@@ -420,8 +471,8 @@ export default function CreatorPortal() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     
-    // Always check domain before registration
-    if (!domainVerification) {
+    // Always check domain before registration, IF a domain is provided
+    if (data.websiteUrl && !domainVerification) {
       setIsCheckingDomain(true);
       try {
         const response = await apiRequest("POST", "/api/domain/chainlink/check", { websiteUrl: data.websiteUrl });
@@ -468,7 +519,7 @@ export default function CreatorPortal() {
     }
     
     // If domain verification is required but not completed, block registration
-    if (domainVerification?.requiresManualReview) {
+    if (data.websiteUrl && domainVerification?.requiresManualReview) {
       toast({
         title: "Domain Verification Required",
         description: "Please complete manual domain verification before registration.",
@@ -479,7 +530,7 @@ export default function CreatorPortal() {
     }
     
     // If meta tag verification is required but not completed, block registration
-    if (domainVerification?.requiresMetaTag && !isDomainVerified) {
+    if (data.websiteUrl && domainVerification?.requiresMetaTag && !isDomainVerified) {
       toast({
         title: "Meta Tag Verification Required",
         description: "Please complete meta tag verification before registration.",
@@ -516,20 +567,45 @@ export default function CreatorPortal() {
   const demoEmail = "creator@webpayback.com";
 
   return (
-    <Card className="glass-card rounded-2xl">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold gradient-text">Creator Portal</CardTitle>
+    <Card className="glass-card rounded-2xl shadow-neon-blue border-electric-blue/30 overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-electric-blue/5 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+      <CardHeader className="border-b border-white/5 bg-black/20 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-electric-blue/20 rounded-xl">
+              <Globe className="w-6 h-6 text-electric-blue" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-bold text-white">Registration Portal</CardTitle>
+              <p className="text-gray-400 text-sm mt-1">Manage identity, monitor citations, and withdraw your tokens</p>
+            </div>
+          </div>
+          {currentCreatorId && (
+            <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/30">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Creator Active
+            </Badge>
+          )}
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="registration" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Registration
+          <TabsList className="grid w-full grid-cols-4 bg-black/40 border border-white/10 rounded-xl p-1 h-auto">
+            <TabsTrigger value="registration" className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-electric-blue/20 data-[state=active]:text-white rounded-lg transition-all">
+              <FileText className="w-5 h-5" />
+              <span className="text-xs font-medium">Registration</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Lock className="w-4 h-4" />
-              Security (2FA)
+            <TabsTrigger value="humanity" className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400 rounded-lg transition-all">
+              <Shield className="w-5 h-5" />
+              <span className="text-xs font-medium">Proof of Humanity</span>
+            </TabsTrigger>
+            <TabsTrigger value="channels" className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400 rounded-lg transition-all">
+              <Globe className="w-5 h-5" />
+              <span className="text-xs font-medium">Channel Monitor</span>
+            </TabsTrigger>
+            <TabsTrigger value="wallet" className="flex flex-col items-center gap-2 py-3 data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400 rounded-lg transition-all">
+              <Coins className="w-5 h-5" />
+              <span className="text-xs font-medium">Wallet & Withdrawals</span>
             </TabsTrigger>
           </TabsList>
           
@@ -537,20 +613,31 @@ export default function CreatorPortal() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Label htmlFor="websiteUrl" className="block text-sm font-medium mb-2">
-              Website URL
+              Independent Website / Blog Integration
             </Label>
             <div className="p-3 mb-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-yellow-300">
-                  <p className="font-semibold mb-1">Important: Use specific content URLs</p>
+                  <p className="font-semibold mb-1">Important: Social Accounts vs Independent Domains</p>
                   <ul className="space-y-1 text-xs">
-                    <li>• <strong>YouTube:</strong> Link to specific video (youtube.com/watch?v=xxx)</li>
-                    <li>• <strong>Instagram:</strong> Link to specific post (instagram.com/p/xxx)</li>
-                    <li>• <strong>TikTok:</strong> Link to specific video (tiktok.com/@user/video/xxx)</li>
-                    <li>• <strong>Discord:</strong> Link to specific channel (discord.com/channels/xxx)</li>
-                    <li>• <strong>GitHub:</strong> Link to specific repository (github.com/user/repo)</li>
-                    <li>• <strong>Personal sites:</strong> Your website homepage is fine</li>
+                    <li>• <strong>Social Media (Google/YouTube, Facebook/Instagram, X, LinkedIn, Discord, Telegram, GitHub):</strong> Leave this empty. You will verify these automatically via Humanity Protocol in the next step.</li>
+                    <li>• <strong>Independent Websites/Blogs (or unsupported platforms):</strong> Enter your custom domain/URL here to receive the AI-Shield meta tag. <em>(Tip: This is the perfect fallback to protect your content if Humanity Protocol hasn't added your specific platform yet!)</em></li>
+                    <li className="mt-2 text-white font-medium">⚠️ Step 1: Copy and paste this code to verify ownership before clicking "Check Domain":</li>
+                    <li className="mt-1 space-y-2">
+                      <div>
+                        <span className="text-gray-400 font-semibold">For Websites:</span> Paste into the <code className="bg-black/50 px-1 py-0.5 rounded text-electric-blue">&lt;head&gt;</code> section
+                        <code className="block bg-black/60 p-2 rounded border border-gray-700 text-electric-blue break-all mt-1">
+                          &lt;meta name="webpayback-verification" content="wpt-verify-{watch("walletAddress") ? watch("walletAddress").slice(0, 10) : 'your-wallet'}" /&gt;
+                        </code>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 font-semibold">For Socials/YouTube:</span> Paste this text in a public post or your channel "About" section
+                        <code className="block bg-black/60 p-2 rounded border border-gray-700 text-green-400 break-all mt-1">
+                          webpayback-verify-{watch("walletAddress") ? watch("walletAddress").slice(0, 10) : 'your-wallet'}
+                        </code>
+                      </div>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -559,7 +646,7 @@ export default function CreatorPortal() {
               <Input
                 id="websiteUrl"
                 type="url"
-                placeholder="https://youtube.com/watch?v=abc123 or https://your-website.com"
+                placeholder="https://your-independent-blog.com"
                 className="flex-1 bg-glass-dark border border-white/10 rounded-lg px-4 py-2 focus:border-electric-blue focus:outline-none text-white"
                 {...register("websiteUrl")}
               />
@@ -577,29 +664,166 @@ export default function CreatorPortal() {
               <p className="text-red-400 text-sm mt-1">{errors.websiteUrl.message}</p>
             )}
             {renderDomainVerificationStatus()}
+
+            {/* AI Shield Snippet Generator */}
+            {currentCreatorId && watch("walletAddress") && (
+              <div className="mt-4 p-4 border border-electric-blue/30 bg-electric-blue/5 rounded-lg flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-white flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-electric-blue" />
+                    AI-Shield Active Defense
+                  </h4>
+                  <p className="text-sm text-gray-400 mt-1">Get the code snippets to block AI bots from scraping your site.</p>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue/20">
+                      <Code className="w-4 h-4 mr-2" />
+                      Generate Snippets
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[90vw] md:max-w-[800px] lg:max-w-[900px] bg-deep-space border-gray-800 text-white max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 text-xl">
+                        <Shield className="w-5 h-5 text-electric-blue" />
+                        Your AI-Shield Configuration
+                      </DialogTitle>
+                      <DialogDescription className="text-gray-400">
+                        Implement these technical measures on your domain to legally block unauthorized AI scraping.
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="bg-electric-blue/10 border border-electric-blue/30 rounded-lg p-3 mt-2">
+                      <p className="text-sm text-electric-blue font-medium flex items-start gap-2">
+                        <span className="text-lg">💡</span>
+                        <span>For maximum technical and legal protection under the EU AI Act, you must implement <strong>BOTH</strong> steps below.</span>
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                      {/* Left Column: Meta Tags / Social Snippets */}
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h5 className="text-sm font-semibold text-white">1A. For Websites: HTML Meta Tags</h5>
+                            <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => {
+                              navigator.clipboard.writeText(`<meta name="webpayback-verification" content="wpt-verify-${watch("walletAddress")?.slice(0, 10)}" />\n<meta name="robots" content="noai, noimageai">`);
+                              toast({ title: "Copied to clipboard!" });
+                            }}>
+                              <Copy className="w-3 h-3 mr-1" /> Copy
+                            </Button>
+                          </div>
+                          <p className="text-xs text-gray-400">Add to your website's <code className="bg-black/50 px-1 rounded">&lt;head&gt;</code></p>
+                          <a href="#" onClick={(e) => { e.preventDefault(); toast({ title: "Help Center", description: "Opening CMS Integration Guide for WordPress, Wix, etc."}); }} className="text-xs text-electric-blue hover:text-electric-blue/80 hover:underline flex items-center gap-1 w-fit transition-colors">
+                            <HelpCircle className="w-3 h-3" /> How to do this on WordPress/Wix?
+                          </a>
+                          <pre className="bg-black/60 p-3 rounded-lg border border-gray-800 text-xs text-electric-blue overflow-x-auto whitespace-pre-wrap break-all">
+                            <code>{`<meta name="webpayback-verification" content="wpt-verify-${watch("walletAddress")?.slice(0, 10)}" />\n<meta name="robots" content="noai, noimageai">`}</code>
+                          </pre>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h5 className="text-sm font-semibold text-white">1B. For Socials/YouTube: Text Snippet</h5>
+                            <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => {
+                              navigator.clipboard.writeText(`webpayback-verify-${watch("walletAddress")?.slice(0, 10)}`);
+                              toast({ title: "Copied to clipboard!" });
+                            }}>
+                              <Copy className="w-3 h-3 mr-1" /> Copy
+                            </Button>
+                          </div>
+                          <p className="text-xs text-gray-400">Paste this in a public post or your channel's "About" section if your platform is not yet supported by Humanity Protocol.</p>
+                          <pre className="bg-black/60 p-3 rounded-lg border border-gray-800 text-xs text-green-400 overflow-x-auto">
+                            <code>{`webpayback-verify-${watch("walletAddress")?.slice(0, 10)}`}</code>
+                          </pre>
+                        </div>
+                      </div>
+
+                      {/* Right Column: Robots.txt */}
+                      <div className="space-y-2 border-t md:border-t-0 md:border-l border-gray-800 md:pl-6 pt-4 md:pt-0">
+                        <div className="flex items-center justify-between">
+                          <h5 className="text-sm font-semibold text-white">2. robots.txt Rules <span className="text-xs text-yellow-400 font-normal ml-2">(Websites Only)</span></h5>
+                          <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => {
+                            navigator.clipboard.writeText(`User-agent: GPTBot\nDisallow: /\nUser-agent: ChatGPT-User\nDisallow: /\nUser-agent: Anthropic-ai\nDisallow: /\nUser-agent: Claude-Web\nDisallow: /\nUser-agent: Google-Extended\nDisallow: /\nUser-agent: CCBot\nDisallow: /\nUser-agent: meta-externalagent\nDisallow: /\nUser-agent: OAI-SearchBot\nDisallow: /\nUser-agent: PerplexityBot\nDisallow: /\nUser-agent: Cohere-ai\nDisallow: /\nUser-agent: grok\nDisallow: /\nUser-agent: bingbot\nDisallow: /\nUser-agent: Copilot\nDisallow: /\nUser-agent: Mistral\nDisallow: /\nUser-agent: AlephAlpha\nDisallow: /\nUser-agent: DeepSeek\nDisallow: /\nUser-agent: Qwen\nDisallow: /\nUser-agent: Baiduspider\nDisallow: /\nUser-agent: YisouSpider\nDisallow: /\nUser-agent: Bytespider\nDisallow: /\nUser-agent: Sogou web spider\nDisallow: /\nUser-agent: Suno\nDisallow: /\nUser-agent: Udio\nDisallow: /\nUser-agent: ElevenLabs\nDisallow: /`);
+                            toast({ title: "Copied to clipboard!" });
+                          }}>
+                            <Copy className="w-3 h-3 mr-1" /> Copy
+                          </Button>
+                        </div>
+                        <div className="text-xs text-gray-400 space-y-1">
+                          <p className="text-yellow-400 font-medium">⚠️ Skip this step if you are verifying a YouTube channel or Social Media profile.</p>
+                          <p>Create a file named exactly <code className="bg-black/50 px-1 rounded text-electric-blue">robots.txt</code> and place it in the <strong>root folder</strong> of your independent website.</p>
+                          <p>It must be accessible at: <code className="text-gray-300">https://your-domain.com/robots.txt</code></p>
+                          <a href="#" onClick={(e) => { e.preventDefault(); toast({ title: "Help Center", description: "Opening robots.txt guide for WordPress, Wix, etc."}); }} className="text-electric-blue hover:text-electric-blue/80 hover:underline flex items-center gap-1 pt-1 w-fit transition-colors">
+                            <HelpCircle className="w-3 h-3" /> How to edit robots.txt on WordPress/Wix?
+                          </a>
+                        </div>
+                        <pre className="bg-black/60 p-3 rounded-lg border border-gray-800 text-xs text-green-400 overflow-y-auto max-h-[250px] mt-2">
+                          <code>{`User-agent: GPTBot\nDisallow: /\nUser-agent: ChatGPT-User\nDisallow: /\nUser-agent: Anthropic-ai\nDisallow: /\nUser-agent: Claude-Web\nDisallow: /\nUser-agent: Google-Extended\nDisallow: /\nUser-agent: CCBot\nDisallow: /\nUser-agent: meta-externalagent\nDisallow: /\nUser-agent: OAI-SearchBot\nDisallow: /\nUser-agent: PerplexityBot\nDisallow: /\nUser-agent: Cohere-ai\nDisallow: /\nUser-agent: grok\nDisallow: /\nUser-agent: bingbot\nDisallow: /\nUser-agent: Copilot\nDisallow: /\nUser-agent: Mistral\nDisallow: /\nUser-agent: AlephAlpha\nDisallow: /\nUser-agent: DeepSeek\nDisallow: /\nUser-agent: Qwen\nDisallow: /\nUser-agent: Baiduspider\nDisallow: /\nUser-agent: YisouSpider\nDisallow: /\nUser-agent: Bytespider\nDisallow: /\nUser-agent: Sogou web spider\nDisallow: /\nUser-agent: Suno\nDisallow: /\nUser-agent: Udio\nDisallow: /\nUser-agent: ElevenLabs\nDisallow: /`}</code>
+                        </pre>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
           </div>
 
           {/* WALLET CRYPTOGRAPHIC VERIFICATION */}
-          <WalletVerification
-            walletAddress={watch("walletAddress")}
-            onVerificationComplete={(signature, message) => {
-              setWalletSignature(signature);
-              setVerificationMessage(message);
-              setIsWalletVerified(true);
-              setValue("walletSignature", signature);
-              setValue("verificationMessage", message);
-              toast({
-                title: "Wallet Verified",
-                description: "Your wallet ownership has been cryptographically verified",
-              });
-            }}
-            onWalletChange={(address) => {
-              setValue("walletAddress", address);
-              setIsWalletVerified(false);
-              setWalletSignature("");
-              setVerificationMessage("");
-            }}
-          />
+          {!currentCreatorId ? (
+            <WalletVerification
+              walletAddress={watch("walletAddress")}
+              onVerificationComplete={(signature, message) => {
+                setWalletSignature(signature);
+                setVerificationMessage(message);
+                setIsWalletVerified(true);
+                setValue("walletSignature", signature);
+                setValue("verificationMessage", message);
+                toast({
+                  title: "Wallet Verified",
+                  description: "Your wallet ownership has been cryptographically verified",
+                });
+              }}
+              onWalletChange={(address) => {
+                setValue("walletAddress", address);
+                setIsWalletVerified(false);
+                setWalletSignature("");
+                setVerificationMessage("");
+              }}
+            />
+          ) : (
+            <Card className="border-electric-blue/30 bg-electric-blue/5">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-electric-blue" />
+                  Social Media Verification
+                </CardTitle>
+                <CardDescription>
+                  Your identity is verified. You can now link your social accounts (Google/YouTube, Facebook/Instagram, X, LinkedIn, GitHub, Discord, Telegram) to your Humanity ID.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-start gap-3 text-sm text-blue-200">
+                  <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-blue-300 mb-1">Before you click:</p>
+                    <p>Make sure you have already connected your social media accounts (Google/YouTube, Facebook/Instagram, X, LinkedIn, Discord, Telegram, GitHub) inside the <strong>Humanity Protocol App</strong>. Clicking this button will securely sync those verified platforms to your WebPayback profile.</p>
+                  </div>
+                </div>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue/10"
+                  onClick={() => {
+                    navigate("/login");
+                  }}
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  Link Social Accounts via Humanity
+                </Button>
+              </CardContent>
+            </Card>
+          )}
           
           <div>
             <Label htmlFor="contentCategory" className="block text-sm font-medium mb-2">
@@ -657,41 +881,72 @@ export default function CreatorPortal() {
             </form>
           </TabsContent>
           
-          <TabsContent value="security" className="mt-6">
+          <TabsContent value="channels" className="mt-6">
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h3 className="text-lg font-semibold mb-2">Two-Factor Authentication</h3>
+                <h3 className="text-lg font-semibold mb-2 text-white">Channel Monitoring Setup</h3>
+                <p className="text-gray-400 text-sm max-w-2xl mx-auto">
+                  Automatically protect all videos in your channel by simply registering a single URL. 
+                  WebPayback will monitor any AI scraping across your entire content library.
+                </p>
+              </div>
+              
+              <ChannelMonitoringDemo />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="humanity" className="mt-6">
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-semibold mb-2">Proof of Humanity</h3>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Enhance your Creator Portal security with Google Authenticator
+                  Verify your identity to access exclusive reward multipliers and API shield protection.
+                </p>
+              </div>
+              
+              {currentCreatorId ? (
+                <HumanityStatus creatorId={currentCreatorId} />
+              ) : (
+                <Card className="w-full">
+                  <CardContent className="p-6 text-center">
+                    <Shield className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <h4 className="text-lg font-semibold mb-2">Verification Required</h4>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      Prove your humanity to unlock reward multipliers.
+                    </p>
+                    <Button 
+                      onClick={() => navigate("/login")}
+                      className="bg-electric-blue hover:bg-electric-blue/80"
+                    >
+                      Verify Humanity
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="wallet" className="mt-6">
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-semibold mb-2">Wallet & Earnings</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  Manage your WPT-HUMAN tokens and withdraw your earnings directly to your wallet.
                 </p>
               </div>
               
               {currentCreatorId ? (
                 <>
-                  <div className="text-xs text-gray-500 mb-2">
-                    Debug: CreatorID={currentCreatorId}, Email={demoEmail}
-                  </div>
-                  <TwoFactorAuthSetup 
-                    creatorId={currentCreatorId}
-                    creatorEmail={demoEmail}
-                    preGeneratedSetup={preGeneratedTwoFactorSetup}
-                    onSetupComplete={() => {
-                      toast({
-                        title: "Security Enhanced!",
-                        description: "Your account is now protected with 2FA",
-                      });
-                      // Clear pre-generated setup after completion
-                      setPreGeneratedTwoFactorSetup(null);
-                    }}
-                  />
+                  <GaslessWithdrawal creatorId={currentCreatorId} />
+                  <CashOutGuide />
                 </>
               ) : (
                 <Card className="w-full">
                   <CardContent className="p-6 text-center">
-                    <Lock className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <Shield className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <h4 className="text-lg font-semibold mb-2">Complete Registration First</h4>
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      Register as a creator first to enable Two-Factor Authentication for your account.
+                      You must be registered to view your balance and withdraw tokens.
                     </p>
                     <Button 
                       onClick={() => setActiveTab("registration")}

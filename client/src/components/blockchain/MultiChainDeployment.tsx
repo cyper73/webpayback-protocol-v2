@@ -76,7 +76,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
   };
 
   const getNextDeployableNetwork = () => {
-    return networks.find(n => (n.deploymentStatus || "pending") === "pending");
+    return networks.find(n => n.deploymentStatus === "pending");
   };
 
   const getProgressPercentage = (status: string) => {
@@ -100,7 +100,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
             {networks.map((network) => {
               const iconClass = networkIcons[network.name as keyof typeof networkIcons] || "fas fa-circle";
               const colorClass = networkColors[network.name as keyof typeof networkColors] || "border-gray-500/30";
-              const statusClass = statusColors[(network.deploymentStatus || "pending") as keyof typeof statusColors] || "text-gray-400 bg-gray-400/20";
+              const statusClass = statusColors[network.deploymentStatus as keyof typeof statusColors] || "text-gray-400 bg-gray-400/20";
               
               return (
                 <Card key={network.id} className={`glass-card rounded-lg ${colorClass}`}>
@@ -111,7 +111,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
                         <span className="font-semibold">{network.name}</span>
                       </div>
                       <Badge className={`text-xs ${statusClass}`}>
-                        {network.deploymentStatus?.toUpperCase() || "UNKNOWN"}
+                        {network.deploymentStatus.toUpperCase()}
                       </Badge>
                     </div>
                     
@@ -126,7 +126,7 @@ export default function MultiChainDeployment({ networks }: MultiChainDeploymentP
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Supply:</span>
-                            <span>10,000,000 WPT</span>
+                            <span>1,000,000 WPT</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Gas Used:</span>

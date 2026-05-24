@@ -46,19 +46,19 @@ export default function ChainlinkDashboard() {
   // Fetch Chainlink prices
   const { data: prices, isLoading: pricesLoading, refetch: refetchPrices } = useQuery<ChainlinkPrices>({
     queryKey: ['/api/chainlink/prices'],
-    refetchInterval: 180000, // Reduced from 30s to 3 minutes - price feeds are stable
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Fetch automation status
   const { data: automation, isLoading: automationLoading, refetch: refetchAutomation } = useQuery<AutomationStatus>({
     queryKey: ['/api/chainlink/automation/status'],
-    refetchInterval: 300000, // Reduced from 15s to 5 minutes - automation status is stable
+    refetchInterval: 15000, // Refresh every 15 seconds
   });
 
   // Fetch feed health
   const { data: health, isLoading: healthLoading, refetch: refetchHealth } = useQuery<FeedHealth>({
     queryKey: ['/api/chainlink/health'],
-    refetchInterval: 300000, // Reduced from 60s to 5 minutes - feed health changes slowly
+    refetchInterval: 60000, // Refresh every minute
   });
 
   // Manual refresh all data

@@ -37,7 +37,7 @@ const ReentrancyProtection: React.FC = () => {
     };
 
     loadStats();
-    const interval = setInterval(loadStats, 300000); // Reduced from 30s to 5 minutes - security stats are stable
+    const interval = setInterval(loadStats, 30000); // Refresh ogni 30 secondi
     return () => clearInterval(interval);
   }, []);
 
@@ -55,7 +55,7 @@ const ReentrancyProtection: React.FC = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center">

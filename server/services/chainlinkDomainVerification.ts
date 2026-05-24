@@ -318,15 +318,15 @@ Steps:
     const isHighRisk = this.isHighRiskTLD(domain);
     
     return {
-      domainAge: isFamous ? 3650 : Math.random() * 1800 + 180, // Normal domains: 6 months - 5 years old
-      sslCertificate: isFamous ? true : Math.random() > 0.05, // 95% of normal domains have SSL now
-      dnsRecords: isFamous ? true : Math.random() > 0.02, // 98% of normal domains have DNS
+      domainAge: isFamous ? 3650 : Math.random() * 365, // Famous domains are old
+      sslCertificate: isFamous ? true : Math.random() > 0.2,
+      dnsRecords: isFamous ? true : Math.random() > 0.1,
       whoisData: {
         registrar: isFamous ? 'MarkMonitor Inc.' : 'Generic Registrar',
         registrationDate: new Date(Date.now() - (isFamous ? 3650 : Math.random() * 365) * 24 * 60 * 60 * 1000),
         expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
       },
-      reputationScore: isFamous ? 25 : (isHighRisk ? -10 : Math.random() * 30 + 5)
+      reputationScore: isFamous ? 25 : (isHighRisk ? -20 : Math.random() * 10)
     };
   }
 
@@ -349,7 +349,7 @@ Steps:
         riskFactors,
         verificationToken: undefined,
         metaTagInstruction: '❌ YOUTUBE CHANNEL URL NOT SUPPORTED:\n\nYou have entered a YouTube channel URL, but verification requires a specific video URL.\n\nPlease:\n1. Go to one of your YouTube videos\n2. Copy the video URL (youtube.com/watch?v=xxx)\n3. Use that URL instead of your channel URL',
-        chainlinkData: undefined
+        chainlinkData: undefined as any
       };
     }
     
@@ -395,17 +395,13 @@ Steps:
       verificationScore >= 80 ? 'low' :
       verificationScore >= 60 ? 'medium' : 'high';
 
-    // MANDATORY META TAG VERIFICATION FOR ALL DOMAINS
-    // All domains require meta tag verification to prevent impersonation
-    // Famous root domains still require manual review for extra security
-    const isVerified = false; // Never auto-verify, always require meta tag
-    const requiresManualReview = isFamous && !isSpecificPage; // Only famous root domains need manual review
-    const requiresMetaTag = !requiresManualReview; // All domains except famous root domains need meta tag
+    // Force correct logic for famous domains
+    const requiresManualReview = isFamous && !isSpecificPage;
+    const requiresMetaTag = isFamous && isSpecificPage;
     
     let verificationToken;
     let metaTagInstruction;
     
-    // ALWAYS generate token for non-manual review domains
     if (requiresMetaTag) {
       verificationToken = this.generateVerificationToken();
       metaTagInstruction = this.generatePlatformSpecificInstructions(domain, verificationToken);
@@ -421,17 +417,14 @@ Steps:
       securityLevel,
       requiresManualReview,
       requiresMetaTag,
-      riskFactors,
-      isFamous: isFamous,
-      isVerified: isVerified,
-      DEBUG_logic: `isFamous=${isFamous}, isSpecificPage=${isSpecificPage}, requiresManualReview=${requiresManualReview}, requiresMetaTag=${requiresMetaTag}`
+      riskFactors
     });
 
     return {
       domain,
       fullUrl: websiteUrl,
       isSpecificPage,
-      isVerified: isVerified,
+      isVerified: verificationScore >= 70 && !requiresManualReview && !requiresMetaTag,
       securityLevel,
       requiresManualReview,
       requiresMetaTag,
@@ -550,7 +543,7 @@ Steps:
         console.log('🔗 HTTP Error:', response.status, response.statusText);
       }
     } catch (error) {
-      console.log('🔗 Fetch failed:', error.message);
+      console.log('🔗 Fetch failed:', error instanceof Error ? error.message : String(error));
       console.log('🔗 URL may not be publicly accessible or CORS blocked');
     }
     
@@ -642,7 +635,7 @@ Steps:
           reviewNotes: `Automatically verified by Chainlink with score ${chainlinkResult.verificationScore}/100`
         };
 
-        const verification = await storage.createDomainVerification(verificationData);
+        const verification = await storage.createDomainVerification(verificationData as any);
         
         return {
           success: true,
@@ -666,7 +659,7 @@ Steps:
           reviewNotes: `Chainlink flagged for manual review: ${chainlinkResult.riskFactors.join(', ')}`
         };
 
-        const verification = await storage.createDomainVerification(verificationData);
+        const verification = await storage.createDomainVerification(verificationData as any);
         
         return {
           success: false,

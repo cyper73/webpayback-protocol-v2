@@ -7,7 +7,6 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const creators: any = pgTable("creators", {
@@ -28,18 +27,23 @@ export const creators: any = pgTable("creators", {
   referredBy: integer("referred_by").references((): any => creators.id),
   totalReferrals: integer("total_referrals").default(0),
   referralBonus: decimal("referral_bonus", { precision: 18, scale: 8 }).default("0"),
-  // Two-Factor Authentication fields for enhanced security
+  // DEPRECATED Two-Factor Authentication fields (Replaced by Humanity Protocol)
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
-  twoFactorSecret: text("two_factor_secret"), // Base32 encoded secret for TOTP
-  twoFactorBackupCodes: text("two_factor_backup_codes").array(), // Array of backup codes
-  twoFactorSetupAt: timestamp("two_factor_setup_at"), // When 2FA was enabled
-  lastTwoFactorUsed: timestamp("last_two_factor_used"), // Last successful 2FA verification
+  twoFactorSecret: text("two_factor_secret"), 
+  twoFactorBackupCodes: text("two_factor_backup_codes").array(), 
+  twoFactorSetupAt: timestamp("two_factor_setup_at"), 
+  lastTwoFactorUsed: timestamp("last_two_factor_used"), 
   // Channel-level monitoring fields
   platformType: text("platform_type").default("single_page"), // single_page, youtube_channel, instagram_profile, etc.
   channelId: text("channel_id"), // YouTube channel ID, Instagram username, etc.
   channelName: text("channel_name"), // Display name of the channel
   channelVerificationUrl: text("channel_verification_url"), // URL used for verification
   monitoringScope: text("monitoring_scope").default("single_url"), // single_url, full_channel, domain_wide
+  // Humanity Protocol Verification
+  isHumanityVerified: boolean("is_humanity_verified").default(false),
+  humanityScore: integer("humanity_score").default(0),
+  humanityVerificationDate: timestamp("humanity_verification_date"),
+  humanityCredentialId: text("humanity_credential_id"), // ID of the VC or proof
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -74,38 +78,6 @@ export const contentCertificateNfts = pgTable("content_certificate_nfts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Advanced Wallet Fingerprinting for Security
-export const walletFingerprints = pgTable("wallet_fingerprints", {
-  id: serial("id").primaryKey(),
-  address: text("address").notNull().unique(),
-  fingerprintId: text("fingerprint_id").notNull(),
-  signaturePattern: text("signature_pattern").notNull(),
-  gasUsageProfile: text("gas_usage_profile").notNull(),
-  timingProfile: text("timing_profile").notNull(),
-  networkUsageProfile: text("network_usage_profile").notNull(),
-  riskScore: integer("risk_score").notNull().default(0),
-  uniquenessScore: integer("uniqueness_score").notNull().default(50),
-  lastUpdated: timestamp("last_updated").defaultNow(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Security Events for Advanced Monitoring
-export const securityEvents = pgTable("security_events", {
-  id: serial("id").primaryKey(),
-  walletAddress: text("wallet_address").notNull(),
-  eventType: text("event_type").notNull(), // FINGERPRINT_ANALYSIS, SUSPICIOUS_PATTERN, etc.
-  severity: text("severity").notNull(), // LOW, MEDIUM, HIGH, CRITICAL
-  riskScore: integer("risk_score").notNull(),
-  suspiciousPatterns: text("suspicious_patterns").array(),
-  similarWallets: text("similar_wallets").array(),
-  confidence: decimal("confidence", { precision: 5, scale: 2 }).notNull(),
-  recommendedAction: text("recommended_action").notNull(),
-  actionTaken: text("action_taken"),
-  isResolved: boolean("is_resolved").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  resolvedAt: timestamp("resolved_at"),
-});
-
 // Google AI Overview Detection Logs
 export const googleAiOverviewDetections = pgTable("google_ai_overview_detections", {
   id: serial("id").primaryKey(),
@@ -134,26 +106,7 @@ export const blockchainNetworks = pgTable("blockchain_networks", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const aiAgents = pgTable("ai_agents", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  type: text("type").notNull(), // webpayback, autoregolator, poolagent, transparentagent
-  status: text("status").default("active"), // active, inactive, processing
-  expertiseLevel: integer("expertise_level").default(280),
-  lastActivity: timestamp("last_activity").defaultNow(),
-  metrics: jsonb("metrics").default({}),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const agentCommunications = pgTable("agent_communications", {
-  id: serial("id").primaryKey(),
-  fromAgentId: integer("from_agent_id").references(() => aiAgents.id),
-  toAgentId: integer("to_agent_id").references(() => aiAgents.id),
-  message: text("message").notNull(),
-  messageType: text("message_type").default("question"), // question, answer, notification
-  timestamp: timestamp("timestamp").defaultNow(),
-  isRead: boolean("is_read").default(false),
-});
+// Deprecated Agent tables removed
 
 export const contentTracking = pgTable("content_tracking", {
   id: serial("id").primaryKey(),
@@ -533,23 +486,7 @@ export const blockchainNetworksRelations = relations(blockchainNetworks, ({ many
   poolManagement: many(poolManagement),
 }));
 
-export const aiAgentsRelations = relations(aiAgents, ({ many }) => ({
-  sentMessages: many(agentCommunications, { relationName: "sentMessages" }),
-  receivedMessages: many(agentCommunications, { relationName: "receivedMessages" }),
-}));
-
-export const agentCommunicationsRelations = relations(agentCommunications, ({ one }) => ({
-  fromAgent: one(aiAgents, {
-    fields: [agentCommunications.fromAgentId],
-    references: [aiAgents.id],
-    relationName: "sentMessages",
-  }),
-  toAgent: one(aiAgents, {
-    fields: [agentCommunications.toAgentId],
-    references: [aiAgents.id],
-    relationName: "receivedMessages",
-  }),
-}));
+// Agent relations deprecated
 
 export const contentTrackingRelations = relations(contentTracking, ({ one }) => ({
   creator: one(creators, {
@@ -667,7 +604,9 @@ export const contentCategoryEnum = z.enum([
   "photography"
 ]);
 
-export const insertCreatorSchema = createInsertSchema(creators).pick({
+export const insertCreatorSchema = createInsertSchema(creators, {
+  contentCategory: contentCategoryEnum
+}).pick({
   userId: true,
   websiteUrl: true,
   walletAddress: true,
@@ -680,8 +619,6 @@ export const insertCreatorSchema = createInsertSchema(creators).pick({
   channelName: true,
   channelVerificationUrl: true,
   monitoringScope: true,
-}).extend({
-  contentCategory: contentCategoryEnum
 });
 
 export const insertChannelContentMappingSchema = createInsertSchema(channelContentMappings).pick({
@@ -701,20 +638,7 @@ export const insertBlockchainNetworkSchema = createInsertSchema(blockchainNetwor
   gasUsed: true,
 });
 
-export const insertAiAgentSchema = createInsertSchema(aiAgents).pick({
-  name: true,
-  type: true,
-  status: true,
-  expertiseLevel: true,
-  metrics: true,
-});
-
-export const insertAgentCommunicationSchema = createInsertSchema(agentCommunications).pick({
-  fromAgentId: true,
-  toAgentId: true,
-  message: true,
-  messageType: true,
-});
+// Agent schemas deprecated
 
 export const insertContentTrackingSchema = createInsertSchema(contentTracking).pick({
   creatorId: true,
@@ -911,11 +835,7 @@ export type Creator = typeof creators.$inferSelect;
 export type InsertBlockchainNetwork = z.infer<typeof insertBlockchainNetworkSchema>;
 export type BlockchainNetwork = typeof blockchainNetworks.$inferSelect;
 
-export type InsertAiAgent = z.infer<typeof insertAiAgentSchema>;
-export type AiAgent = typeof aiAgents.$inferSelect;
-
-export type InsertAgentCommunication = z.infer<typeof insertAgentCommunicationSchema>;
-export type AgentCommunication = typeof agentCommunications.$inferSelect;
+// Types for deprecated agents removed
 
 export type InsertContentTracking = z.infer<typeof insertContentTrackingSchema>;
 export type ContentTracking = typeof contentTracking.$inferSelect;

@@ -9,19 +9,8 @@ export class ContentCertificateNftService {
   private signer: ethers.Wallet;
   
   constructor() {
-    // Use demo provider for development if API key is not available
-    const alchemyKey = process.env.ALCHEMY_API_KEY || 'demo-api-key';
-    const privateKey = process.env.PRIVATE_KEY || '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
-    
-    try {
-      this.provider = new ethers.providers.AlchemyProvider('matic', alchemyKey);
-      this.signer = new ethers.Wallet(privateKey, this.provider);
-    } catch (error) {
-      console.warn('Failed to initialize blockchain provider for NFT service, using mock mode:', error);
-      // Create a mock provider for development
-      this.provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-      this.signer = new ethers.Wallet(privateKey, this.provider);
-    }
+    this.provider = new ethers.providers.AlchemyProvider('matic', process.env.ALCHEMY_API_KEY); // [REDACTED_FOR_GITHUB_SECURITY]
+    this.signer = new ethers.Wallet(process.env.PRIVATE_KEY!, this.provider); // [REDACTED_FOR_GITHUB_SECURITY]
   }
 
   // Generate content fingerprint using SHA-256
@@ -79,7 +68,7 @@ export class ContentCertificateNftService {
 
       // Mock NFT minting (in production, use actual NFT contract)
       const mockTokenId = `WPT-CERT-${Date.now()}-${params.creatorId}`;
-      const mockContractAddress = "0x9408f17a8B4666f8cb8231BA213DE04137dc3825"; // WPT contract for demo
+      const mockContractAddress = "0x0000000000000000000000000000000000000000"; // Humanity Protocol NFT contract for demo
       const mockTxHash = `0x${crypto.randomBytes(32).toString('hex')}`;
 
       // Store certificate in database
@@ -92,7 +81,7 @@ export class ContentCertificateNftService {
         nftContractAddress: mockContractAddress,
         mintTransactionHash: mockTxHash,
         royaltyPercentage: (params.royaltyPercentage || 10).toString(),
-        blockchainNetwork: "polygon"
+        blockchainNetwork: "humanity"
       }).returning();
 
       console.log(`✅ Content Certificate NFT minted: ${mockTokenId}`);
@@ -144,7 +133,7 @@ export class ContentCertificateNftService {
           // Calculate WPT reward based on confidence and royalty percentage
           const baseReward = 1.0; // Base 1 WPT per detection
           const confidenceMultiplier = matchingConfidence / 100;
-          const royaltyMultiplier = parseFloat(cert.royaltyPercentage) / 10;
+          const royaltyMultiplier = parseFloat(cert.royaltyPercentage || '10') / 10;
           const wptReward = baseReward * confidenceMultiplier * royaltyMultiplier;
 
           // Log detection

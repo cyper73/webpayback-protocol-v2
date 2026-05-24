@@ -6,7 +6,7 @@ import { gasManager } from "./gasManager";
 import { channelMonitoringService } from "./channelMonitoring";
 import { mevProtectionService } from "./mevProtection";
 import { poolDrainProtectionService } from "./poolDrainProtection";
-import { fakeCreatorDetection } from "./fakeCreatorDetection";
+import { fakeCreatorDetectionService } from "./fakeCreatorDetection";
 import { aiQueryProtection } from "./aiQueryProtection";
 import { vpnDetection } from "./vpnDetection";
 
@@ -303,7 +303,7 @@ class ContentMonitoringService {
       // 🔍 FAKE CREATOR DETECTION CHECK
       console.log(`🔍 Checking for fake creator: ${creator.websiteUrl}`);
       try {
-        const fakeCreatorCheck = await fakeCreatorDetection.detectFakeCreator(creator.id, creator.websiteUrl);
+        const fakeCreatorCheck = await fakeCreatorDetectionService.detectFakeCreator(creator.id, creator.websiteUrl);
         
         if (fakeCreatorCheck.shouldBlock) {
           console.log(`🚨 FAKE CREATOR DETECTED - Blocking reward:
@@ -412,6 +412,29 @@ class ContentMonitoringService {
         rewardAmount,
         creator.walletAddress
       );
+
+      // Trigger the Citation Reward Engine to process the citation properly and apply multipliers
+      try {
+        const { citationRewardEngine } = await import('./citationRewardEngine');
+        const citationResult = await citationRewardEngine.processCitation({
+            sourceUrl: detection.url,
+            citationContext: `AI Access detected by ${detection.aiType}`,
+            citationType: 'content_reference',
+            querySource: `Query to ${detection.aiType}`,
+            aiModel: detection.aiType,
+            userAgent: detection.userAgent,
+            confidence: detection.confidence
+        });
+        if(citationResult.success) {
+            console.log(`✅ Citation Reward Engine processed citation successfully. Reward: ${citationResult.rewardAmount} WPT`);
+            // we could update the rewardAmount here to reflect the final amount after multipliers, but we keep the base rewardAmount for the log below
+            rewardAmount = citationResult.rewardAmount.toFixed(8);
+        } else {
+             console.warn(`⚠️ Citation Reward Engine failed to process citation: ${citationResult.error}`);
+        }
+      } catch (err) {
+         console.warn(`⚠️ Failed to invoke Citation Reward Engine:`, err);
+      }
 
       console.log(`✅ AI Access Detected and Rewarded:
         Creator: ${creator.id}

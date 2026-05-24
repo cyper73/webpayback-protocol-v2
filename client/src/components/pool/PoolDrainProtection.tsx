@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -53,10 +53,13 @@ interface ProtectionTestResult {
 }
 
 export default function PoolDrainProtection() {
+  const [testResult, setTestResult] = useState<ProtectionTestResult | null>(null);
+  const [testLoading, setTestLoading] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState("");
 
   const { data: stats, isLoading: statsLoading } = useQuery<PoolProtectionStats>({
     queryKey: ['/api/pool/drain-protection/stats'],
-    refetchInterval: 120000, // Reduced from 10s to 2 minutes - protection stats are stable
+    refetchInterval: 10000, // Refresh every 10 seconds
   });
 
   const { data: securityEvents, isLoading: eventsLoading } = useQuery<{ 
@@ -65,10 +68,28 @@ export default function PoolDrainProtection() {
     timestamp: string; 
   }>({
     queryKey: ['/api/pool/drain-protection/security-events'],
-    refetchInterval: 180000, // Reduced from 15s to 3 minutes - events are rare
+    refetchInterval: 15000, // Refresh every 15 seconds
   });
 
+  const testProtection = async (simulationType: string) => {
+    setTestLoading(true);
+    try {
+      const response = await apiRequest('POST', '/api/pool/drain-protection/test', {
+        walletAddress: selectedWallet,
+        rewardAmount: 1.0,
+        simulationType
+      });
 
+      if (response.ok) {
+        const result = await response.json();
+        setTestResult(result);
+      }
+    } catch (error) {
+      console.error('Protection test failed:', error);
+    } finally {
+      setTestLoading(false);
+    }
+  };
 
   const getRiskColor = (riskScore: number) => {
     if (riskScore >= 80) return 'text-red-600';
@@ -212,42 +233,102 @@ export default function PoolDrainProtection() {
         </Card>
       )}
 
-      {/* Security Events */}
-      {securityEvents?.events && securityEvents.events.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Activity className="h-4 w-4 text-purple-500" />
-              <span>Recent Security Events</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {securityEvents.events.slice(0, 5).map((event) => (
-                <div key={event.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <Badge className={getAlertColor(event.alertLevel)}>
-                        {event.alertLevel.toUpperCase()}
-                      </Badge>
-                      <span className="text-sm font-medium">{event.suspiciousActivity}</span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Wallet: {event.walletAddress.slice(0, 6)}...{event.walletAddress.slice(-4)}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      Risk Score: {event.riskScore}% • Action: {event.actionTaken}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {new Date(event.createdAt).toLocaleTimeString()}
-                  </div>
-                </div>
-              ))}
+      {/* Security Events - DEPRECATED WITH HUMANITY-FIRST ARCHITECTURE */}
+      {/* 
+        This section is hidden because the Humanity-First flow prevents non-verified 
+        bots/sybils from creating a wallet entirely. 
+        Pool Drain Protection is now handled upstream by Humanity Protocol biometric verification.
+      */}
+
+      {/* Protection Testing */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <DollarSign className="h-4 w-4 text-green-500" />
+            <span>Protection Testing</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                onClick={() => testProtection('normal')}
+                disabled={testLoading}
+                variant="outline"
+                size="sm"
+              >
+                Normal Test
+              </Button>
+              <Button 
+                onClick={() => testProtection('high_frequency')}
+                disabled={testLoading}
+                variant="outline"
+                size="sm"
+              >
+                High Frequency
+              </Button>
+              <Button 
+                onClick={() => testProtection('large_amount')}
+                disabled={testLoading}
+                variant="outline"
+                size="sm"
+              >
+                Large Amount
+              </Button>
+              <Button 
+                onClick={() => testProtection('drain_attempt')}
+                disabled={testLoading}
+                variant="destructive"
+                size="sm"
+              >
+                Drain Attempt
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
+
+            {testResult && (
+              <Alert className={testResult.protection.canDistribute ? "border-green-200" : "border-red-200"}>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Test Type:</span>
+                      <Badge variant="outline">{testResult.simulationType}</Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Amount:</span>
+                      <span>{testResult.testAmount} WPT</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Result:</span>
+                      <Badge variant={testResult.protection.canDistribute ? "default" : "destructive"}>
+                        {testResult.protection.canDistribute ? "ALLOWED" : "BLOCKED"}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Risk Score:</span>
+                      <span className={getRiskColor(testResult.protection.riskScore)}>
+                        {testResult.protection.riskScore.toFixed(1)}%
+                      </span>
+                    </div>
+                    {testResult.protection.securityAlerts.length > 0 && (
+                      <div className="mt-2">
+                        <div className="text-sm font-medium mb-1">Security Alerts:</div>
+                        <div className="space-y-1">
+                          {testResult.protection.securityAlerts.map((alert, index) => (
+                            <div key={index} className="text-xs text-red-600 bg-red-50 p-1 rounded">
+                              {alert}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

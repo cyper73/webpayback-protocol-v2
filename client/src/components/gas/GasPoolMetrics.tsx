@@ -47,13 +47,13 @@ interface GasSystemStatus {
 export function GasPoolMetrics() {
   const { data: gasStatus } = useQuery<GasSystemStatus>({
     queryKey: ["/api/gas/status"],
-    refetchInterval: 30000, // Reduced from 5s to 30s - gas data doesn't change that quickly
-    retry: 1
+    refetchInterval: 5000,
+    retry: 3
   });
 
   if (!gasStatus) {
     return (
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
           <Card key={i} className="glass-card rounded-xl">
             <CardContent className="p-4">
@@ -79,7 +79,7 @@ export function GasPoolMetrics() {
     <div className="space-y-6">
       
       {/* Key Performance Indicators */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Value Processed */}
         <Card className="glass-card rounded-xl">
@@ -147,7 +147,7 @@ export function GasPoolMetrics() {
       </div>
 
       {/* Advanced Metrics */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Cost Analysis */}
         <Card className="glass-card rounded-xl">

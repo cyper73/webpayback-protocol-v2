@@ -1,21 +1,22 @@
 import { ethers } from 'ethers';
 import { storage } from '../storage';
 
-// Chainlink Data Feeds on Polygon
+// Chainlink Data Feeds (Humanity Protocol Migration)
 const CHAINLINK_FEEDS = {
-  MATIC_USD: "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0", // MATIC/USD Price Feed
-  ETH_USD: "0xF9680D99D6C9589e2a93a78A04A279e509205945",   // ETH/USD Price Feed (for calculations)
+  // To be updated with Humanity Protocol oracles in Phase 2
+  HP_USD: "0x...", 
 };
 
-// Polygon RPC endpoint
-const POLYGON_RPC = process.env.POLYGON_RPC || "https://polygon-rpc.com/";
+// RPC endpoint (Note: Used for mock Chainlink data if on Humanity chain)
+const HUMANITY_RPC = process.env.HUMANITY_RPC || "https://rpc.testnet.humanity.org/";
 
 class ChainlinkService {
   private provider: ethers.providers.JsonRpcProvider;
   private priceFeeds: { [key: string]: ethers.Contract };
 
   constructor() {
-    this.provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC, 137); // Polygon network ID
+    // Chainlink price feeds typically run on major networks, fallback to Polygon for now
+    this.provider = new ethers.providers.JsonRpcProvider(HUMANITY_RPC); 
     this.priceFeeds = {};
     this.initializePriceFeeds();
   }
@@ -30,13 +31,13 @@ class ChainlinkService {
 
     // Initialize price feed contracts
     this.priceFeeds.MATIC_USD = new ethers.Contract(
-      CHAINLINK_FEEDS.MATIC_USD,
+      (CHAINLINK_FEEDS as any).MATIC_USD,
       priceFeedABI,
       this.provider
     );
 
     this.priceFeeds.ETH_USD = new ethers.Contract(
-      CHAINLINK_FEEDS.ETH_USD,
+      (CHAINLINK_FEEDS as any).ETH_USD,
       priceFeedABI,
       this.provider
     );

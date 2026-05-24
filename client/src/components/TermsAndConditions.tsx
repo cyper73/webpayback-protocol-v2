@@ -176,20 +176,20 @@ const TermsAndConditions: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div className="bg-electric-blue/10 border border-electric-blue/20 rounded p-4">
                   <p className="font-medium text-electric-blue">Technical Support</p>
-                  <a href="mailto:info@webpayback.com" className="text-sm text-gray-400 hover:text-white">
-                    info@webpayback.com
+                  <a href="mailto:cyper73@gmail.com" className="text-sm text-gray-400 hover:text-white">
+                    cyper73@gmail.com
                   </a>
                 </div>
                 <div className="bg-electric-blue/10 border border-electric-blue/20 rounded p-4">
                   <p className="font-medium text-electric-blue">Legal Inquiries</p>
-                  <a href="mailto:info@webpayback.com" className="text-sm text-gray-400 hover:text-white">
-                    info@webpayback.com
+                  <a href="mailto:cyper73@gmail.com" className="text-sm text-gray-400 hover:text-white">
+                    cyper73@gmail.com
                   </a>
                 </div>
                 <div className="bg-electric-blue/10 border border-electric-blue/20 rounded p-4">
                   <p className="font-medium text-electric-blue">Privacy Concerns</p>
-                  <a href="mailto:info@webpayback.com" className="text-sm text-gray-400 hover:text-white">
-                    info@webpayback.com
+                  <a href="mailto:cyper73@gmail.com" className="text-sm text-gray-400 hover:text-white">
+                    cyper73@gmail.com
                   </a>
                 </div>
               </div>
