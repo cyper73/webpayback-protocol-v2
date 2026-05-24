@@ -151,6 +151,11 @@ verify-*.js
 *-test.js
 security-monitoring-dashboard.js
 
+# Old backup copies (excluded from scanning)
+WEBPAYBACK-V2-*/
+webpayback-protocol-*/
+attached_assets/
+
 # Internal documentation (only truly sensitive files)
 # Note: Technical documentation is kept for transparency
 
