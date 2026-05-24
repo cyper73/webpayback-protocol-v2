@@ -1,76 +1,106 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, XCircle } from "lucide-react";
-import { useHumanity } from "@humanity-org/react-sdk";
 
-const TIMEOUT_MS = 30_000; // 30 seconds max wait
+const PKCE_KEY = "humanity_pkce";
+const STATE_KEY = "humanity_state";
+
+type Status = "loading" | "success" | "error";
 
 export default function HumanityCallback() {
   const navigate = useNavigate();
-  const { isAuthenticated, error } = useHumanity();
-  const hasCode = new URLSearchParams(window.location.search).has("code");
-  const navigatedRef = useRef(false);
-  const [timedOut, setTimedOut] = useState(false);
+  const calledRef = useRef(false);
+  const [status, setStatus] = useState<Status>("loading");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // If there's no code at all, this page was opened directly — go home
   useEffect(() => {
-    if (!hasCode) {
-      navigate("/", { replace: true });
-    }
-  }, [hasCode, navigate]);
+    if (calledRef.current) return;
+    calledRef.current = true;
 
-  // Wait for SDK to either authenticate or emit an error
-  // Do NOT navigate on isLoading=false alone — the SDK has two sequential
-  // effects and the first one sets unauthenticated before the callback
-  // processor starts.
-  useEffect(() => {
-    if (!hasCode || navigatedRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const state = params.get("state");
+    const oauthError = params.get("error");
 
-    if (isAuthenticated) {
-      navigatedRef.current = true;
-      navigate("/login", { replace: true });
+    // Clean the URL immediately so the code isn't reused on refresh
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    // Humanity returned an error directly
+    if (oauthError) {
+      const desc = params.get("error_description") ?? oauthError;
+      setErrorMsg(desc);
+      setStatus("error");
+      setTimeout(() => navigate("/login", { replace: true }), 2500);
       return;
     }
 
-    if (error) {
-      navigatedRef.current = true;
-      // Small delay so the error is visible to the user
-      setTimeout(() => navigate("/login", { replace: true }), 1500);
+    // No code — wrong page or stale URL
+    if (!code) {
+      navigate("/", { replace: true });
+      return;
     }
-  }, [isAuthenticated, error, hasCode, navigate]);
 
-  // Safety timeout — if SDK never resolves, go back to login
-  useEffect(() => {
-    if (!hasCode) return;
-    const timer = setTimeout(() => {
-      if (!navigatedRef.current) {
-        navigatedRef.current = true;
-        setTimedOut(true);
-        setTimeout(() => navigate("/login", { replace: true }), 2000);
-      }
-    }, TIMEOUT_MS);
-    return () => clearTimeout(timer);
-  }, [hasCode, navigate]);
+    // Read PKCE state saved by the SDK before the redirect
+    const codeVerifier = sessionStorage.getItem(PKCE_KEY);
+    const storedState = sessionStorage.getItem(STATE_KEY);
 
-  if (timedOut) {
-    return (
-      <div className="min-h-screen bg-black/90 flex items-center justify-center p-4">
-        <div className="flex flex-col items-center gap-4 text-gray-300">
-          <XCircle className="h-8 w-8 text-red-400" />
-          <span className="text-lg">Authentication timed out.</span>
-          <span className="text-sm text-gray-500">Returning to login…</span>
-        </div>
-      </div>
-    );
-  }
+    // Clean up immediately so they can't be reused
+    sessionStorage.removeItem(PKCE_KEY);
+    sessionStorage.removeItem(STATE_KEY);
+    // Reset the redirect counter so future logins work
+    sessionStorage.removeItem("humanity_redirect_count");
 
-  if (error) {
+    if (!codeVerifier) {
+      setErrorMsg("PKCE verifier missing — please try logging in again.");
+      setStatus("error");
+      setTimeout(() => navigate("/login", { replace: true }), 2500);
+      return;
+    }
+
+    if (!state || !storedState || state !== storedState) {
+      setErrorMsg("OAuth state mismatch — possible CSRF. Please try again.");
+      setStatus("error");
+      setTimeout(() => navigate("/login", { replace: true }), 2500);
+      return;
+    }
+
+    // Exchange code for token server-side (bypasses browser CORS/CSP entirely)
+    fetch("/api/humanity/exchange-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, codeVerifier }),
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error ?? `HTTP ${res.status}`);
+        }
+        // Store the token so the rest of the app can use it
+        if (data.accessToken) {
+          sessionStorage.setItem("humanity_access_token", data.accessToken);
+          if (data.refreshToken) {
+            sessionStorage.setItem("humanity_refresh_token", data.refreshToken);
+          }
+        }
+        setStatus("success");
+        navigate("/login", { replace: true });
+      })
+      .catch((err: any) => {
+        console.error("[HumanityCallback] exchange failed:", err);
+        setErrorMsg(err?.message ?? "Token exchange failed. Please try again.");
+        setStatus("error");
+        setTimeout(() => navigate("/login", { replace: true }), 2500);
+      });
+  }, [navigate]);
+
+  if (status === "error") {
     return (
       <div className="min-h-screen bg-black/90 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4 text-gray-300">
           <XCircle className="h-8 w-8 text-red-400" />
           <span className="text-lg">Sign-in failed.</span>
-          <span className="text-sm text-gray-500">{error.message}</span>
+          <span className="text-sm text-gray-500 text-center max-w-xs">{errorMsg}</span>
+          <span className="text-xs text-gray-600">Returning to login…</span>
         </div>
       </div>
     );

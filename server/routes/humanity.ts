@@ -60,6 +60,45 @@ router.post('/login', async (_req, res) => {
   });
 });
 
+/**
+ * POST /api/humanity/exchange-token
+ * Server-side PKCE token exchange — avoids browser CSP/CORS restrictions entirely.
+ * Frontend sends { code, codeVerifier } from the OAuth redirect; backend calls
+ * the Humanity token endpoint server-to-server and returns the access token.
+ */
+router.post('/exchange-token', async (req, res) => {
+  try {
+    const { code, codeVerifier } = req.body;
+
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ error: 'Missing or invalid code' });
+    }
+    if (!codeVerifier || typeof codeVerifier !== 'string') {
+      return res.status(400).json({ error: 'Missing or invalid codeVerifier' });
+    }
+
+    if (!humanityService.sdk) {
+      return res.status(503).json({ error: 'Humanity SDK not initialized on server' });
+    }
+
+    const tokenResult = await humanityService.sdk.exchangeCodeForToken({ code, codeVerifier });
+
+    return res.json({
+      success: true,
+      accessToken: tokenResult.accessToken,
+      refreshToken: tokenResult.refreshToken,
+      expiresIn: tokenResult.expiresIn,
+      tokenType: 'Bearer',
+      scope: tokenResult.scope,
+    });
+  } catch (err: any) {
+    console.error('[Humanity exchange-token error]', err?.message ?? err);
+    return res.status(400).json({
+      error: err?.message ?? 'Token exchange failed',
+    });
+  }
+});
+
 router.get('/status/:userId', async (req, res) => {
   try {
     const userId = Number(req.params.userId);
