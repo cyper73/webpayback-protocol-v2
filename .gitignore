@@ -159,5 +159,36 @@ attached_assets/
 # Internal documentation (only truly sensitive files)
 # Note: Technical documentation is kept for transparency
 
+# Admin and internal guides (not for public repo)
+ACCESSO-ADMIN-GUIDA.md
+README-ADMIN-CLI.md
+COMPLETE-CODEBASE-README.md
+README_*.md
+content-*.md
+DEPLOYMENT-SPECS.md
+DEPLOYMENT-PARAMETERS.md
+DEPLOYMENT-RESULTS.md
+GUI-ANALYSIS-README.md
+WEBPAYBACK-CONSULTATION-REPORT.md
+WEBPAYBACK-CONSULTATION-REPORT-EN.md
+FEE-REVENUE-ANALYSIS.md
+POOL-DRAIN-PROTECTION.md
+PRE-DEPLOYMENT-CHECKLIST.md
+UNISWAP-GAS-ERROR-SOLUTION.md
+UNISWAP-V3-POOL-STRATEGY.md
+WPT-V1-DISABLING-GUIDE.md
+
+# Internal docs directory
+docs/DEPLOYMENT_PARAMETERS.md
+docs/DEPLOYMENT_RESULTS.md
+docs/FEE_REVENUE_ANALYSIS.md
+docs/POOL_DRAIN_PROTECTION_UPDATE.md
+docs/PRE_DEPLOYMENT_CHECKLIST.md
+docs/replit.md
+docs/UNISWAP_GAS_ERROR_SOLUTION.md
+docs/UNISWAP_POOL_MANUAL_GUIDE.md
+docs/UNISWAP_V3_POOL_STRATEGY.md
+docs/WPT_V1_DISABLING_GUIDE.md
+
 # Test pages (internal functionality)
 test-connectivity.tsx
