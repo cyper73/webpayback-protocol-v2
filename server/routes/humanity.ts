@@ -105,14 +105,28 @@ router.post('/exchange-token', async (req, res) => {
 
     console.log(`[Humanity exchange-token] POST ${tokenEndpoint} redirect_uri=${redirectUri}`);
 
-    const upstream = await fetch(tokenEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let upstream: Response;
+    try {
+      upstream = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const rawText = await upstream.text();
-    console.log(`[Humanity exchange-token] upstream ${upstream.status}: ${rawText.slice(0, 300)}`);
+    // Only log full body on errors; on success log status + length to avoid leaking tokens.
+    if (!upstream.ok) {
+      console.log(`[Humanity exchange-token] upstream ${upstream.status}: ${rawText.slice(0, 300)}`);
+    } else {
+      console.log(`[Humanity exchange-token] upstream ${upstream.status} ok (body length=${rawText.length})`);
+    }
 
     let tokenData: any;
     try {
