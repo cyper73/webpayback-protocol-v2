@@ -98,14 +98,6 @@ router.post('/exchange-token', async (req, res) => {
 
     const tokenEndpoint = 'https://api.sandbox.humanity.org/oauth/token';
 
-    const body = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      code_verifier: codeVerifier,
-      redirect_uri: redirectUri,
-      client_id: clientId,
-    });
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
@@ -113,8 +105,14 @@ router.post('/exchange-token', async (req, res) => {
     try {
       upstream = await fetch(tokenEndpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grant_type: 'authorization_code',
+          code,
+          code_verifier: codeVerifier,
+          redirect_uri: redirectUri,
+          client_id: clientId,
+        }),
         signal: controller.signal,
       });
     } finally {
