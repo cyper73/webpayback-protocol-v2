@@ -42,8 +42,14 @@ export default function HumanityCallback() {
           return;
         }
 
-        const codeVerifier = sessionStorage.getItem("humanity_pkce");
-        const storedState = sessionStorage.getItem("humanity_state");
+        // Firefox ETP can wipe sessionStorage after a cross-origin redirect.
+        // Try sessionStorage first, fall back to localStorage backup created in Login.tsx.
+        const codeVerifier =
+          sessionStorage.getItem("humanity_pkce") ||
+          localStorage.getItem("humanity_pkce_backup");
+        const storedState =
+          sessionStorage.getItem("humanity_state") ||
+          localStorage.getItem("humanity_state_backup");
 
         if (!codeVerifier) {
           setErrorMessage("Missing PKCE code verifier. The session may have expired or the redirect came from a different browser tab.");
@@ -92,6 +98,8 @@ export default function HumanityCallback() {
         sessionStorage.removeItem("humanity_pkce");
         sessionStorage.removeItem("humanity_state");
         sessionStorage.removeItem("humanity_redirect_count");
+        localStorage.removeItem("humanity_pkce_backup");
+        localStorage.removeItem("humanity_state_backup");
 
         navigate("/login", { replace: true });
       } catch (err: any) {

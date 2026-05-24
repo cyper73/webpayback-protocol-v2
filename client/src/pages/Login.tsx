@@ -96,6 +96,21 @@ export default function Login() {
     })();
   }, [isAuthenticated, user, privyAuthenticated, privyUser, getAccessToken]);
 
+  // Firefox ETP isolates sessionStorage across site redirects.
+  // Mirror Humanity PKCE/state to localStorage as backup before the redirect,
+  // so the callback page can recover them after returning from Humanity Portal.
+  useEffect(() => {
+    if (isLoading) {
+      const t = setTimeout(() => {
+        const pkce = sessionStorage.getItem("humanity_pkce");
+        const state = sessionStorage.getItem("humanity_state");
+        if (pkce) localStorage.setItem("humanity_pkce_backup", pkce);
+        if (state) localStorage.setItem("humanity_state_backup", state);
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [isLoading]);
+
   useEffect(() => {
     if (verificationError) {
       toast({
