@@ -25,7 +25,7 @@ createRoot(document.getElementById("root")!).render(
       clientId={import.meta.env.VITE_HUMANITY_CLIENT_ID}
       redirectUri={humanityRedirectUri}
       environment={humanityEnvironment}
-      storage="localStorage"
+      storage="memory"
       theme="system"
       onError={(error) => {
         console.error("[Humanity SDK]", {
