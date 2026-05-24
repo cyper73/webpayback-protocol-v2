@@ -92,38 +92,24 @@ function App() {
         loginMethods: ['email', 'wallet'],
         appearance: {
           theme: 'dark',
-          accentColor: '#10b981', // Emerald green to match WebPayback
-          logo: '/logo.png', 
+          accentColor: '#10b981',
+          logo: '/logo.png',
         },
         embeddedWallets: {
-          ethereum: {
-            createOnLogin: 'users-without-wallets'
-          }
+          createOnLogin: 'all-users',
+          noPromptOnSignature: true
         },
-        supportedChains: [{
-          id: 1942999413, // Humanity Protocol Testnet Chain ID
-          name: 'Humanity Testnet',
-          network: 'humanity-testnet',
-          nativeCurrency: { name: 'tHP', symbol: 'tHP', decimals: 18 },
-          rpcUrls: {
-            default: { http: ['https://rpc.testnet.humanity.org'] },
-            public: { http: ['https://rpc.testnet.humanity.org'] }
-          },
-          blockExplorers: {
-            default: { name: 'Humanity Explorer', url: 'https://explorer.testnet.humanity.org' }
-          }
-        }],
         defaultChain: {
-          id: 1942999413, // Humanity Protocol Testnet Chain ID
-          name: 'Humanity Testnet',
-          network: 'humanity-testnet',
-          nativeCurrency: { name: 'tHP', symbol: 'tHP', decimals: 18 },
+          id: 137,
+          name: 'Polygon',
+          network: 'polygon',
+          nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
           rpcUrls: {
-            default: { http: ['https://rpc.testnet.humanity.org'] },
-            public: { http: ['https://rpc.testnet.humanity.org'] }
+            default: { http: ['https://polygon-rpc.com'] },
+            public: { http: ['https://polygon-rpc.com'] }
           },
           blockExplorers: {
-            default: { name: 'Humanity Explorer', url: 'https://explorer.testnet.humanity.org' }
+            default: { name: 'Polygonscan', url: 'https://polygonscan.com' }
           }
         }
       }}
