@@ -257,7 +257,7 @@ export default function Login() {
                 <h3 className="text-xl font-medium text-white text-center">Prove Your Humanity</h3>
                 <div className="w-full flex justify-center">
                   <HumanityConnect
-                    mode="popup"
+                    mode="redirect"
                     scopes={["openid", "identity:read"]}
                     variant="primary"
                     size="md"
