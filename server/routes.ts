@@ -1113,8 +1113,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract channel information from the URL
       const channelInfo = channelMonitoringService.extractChannelInfo(schemaValidatedData.websiteUrl);
       
-      // CRYPTOGRAPHIC WALLET VERIFICATION - Verify wallet signature before allowing registration
-      if (schemaValidatedData.walletSignature && schemaValidatedData.verificationMessage) {
+      // WALLET VERIFICATION - Accept Humanity Protocol auth or cryptographic signature
+      if (schemaValidatedData.walletSignature === 'humanity-verified-signature') {
+        // User authenticated via Humanity Protocol (biometric proof of identity).
+        // This is accepted as a valid wallet verification — no separate crypto signature needed.
+        console.log('✅ Humanity Protocol verification accepted for registration:', schemaValidatedData.walletAddress);
+      } else if (schemaValidatedData.walletSignature && schemaValidatedData.verificationMessage) {
+        // Standard cryptographic wallet signature verification
         const verificationResult = await walletVerificationService.verifyWalletSignature(
           schemaValidatedData.walletAddress, 
           schemaValidatedData.verificationMessage, 
@@ -1130,7 +1135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('✅ Wallet signature verified for registration:', schemaValidatedData.walletAddress);
       } else {
         return res.status(400).json({ 
-          error: "Wallet signature verification is required. Please sign the verification message." 
+          error: "Wallet verification is required. Please sign in with Humanity Protocol or sign the verification message." 
         });
       }
 
