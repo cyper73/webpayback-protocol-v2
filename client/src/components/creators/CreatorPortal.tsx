@@ -57,7 +57,6 @@ export default function CreatorPortal() {
   const [isWalletVerified, setIsWalletVerified] = useState(false);
   const [activeTab, setActiveTab] = useState("registration");
   const [currentCreatorId, setCurrentCreatorId] = useState<number | null>(null);
-  const [preGeneratedTwoFactorSetup, setPreGeneratedTwoFactorSetup] = useState<any>(null);
 
   const {
     register,

@@ -6,9 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, Shield, CheckCircle, AlertTriangle, Copy, Smartphone } from 'lucide-react';
+import { Wallet, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import { WalletVerification } from '@/components/wallet/WalletVerification';
-import { TwoFactorAuthSetup } from '@/components/security/TwoFactorAuthSetup';
 import { apiRequest } from '@/lib/queryClient';
 
 interface Creator {
@@ -25,17 +24,13 @@ interface WalletLoginProps {
 }
 
 export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
-  const [step, setStep] = useState<'wallet-input' | 'wallet-verify' | '2fa-auth' | 'completed'>('wallet-input');
+  const [step, setStep] = useState<'wallet-input' | 'wallet-verify' | 'completed'>('wallet-input');
   const [walletAddress, setWalletAddress] = useState('');
   const [foundCreators, setFoundCreators] = useState<Creator[]>([]);
-  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const [twoFactorCode, setTwoFactorCode] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  
+
   const { toast } = useToast();
 
-  // Step 1: Check if wallet is registered
   const checkWalletMutation = useMutation({
     mutationFn: async (address: string) => {
       const response = await apiRequest('POST', '/api/auth/wallet/check', {
@@ -46,7 +41,6 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
     onSuccess: (data) => {
       if (data.success && data.creators?.length > 0) {
         setFoundCreators(data.creators);
-        // If wallet is verified, go to wallet verification, otherwise reject
         const verifiedCreators = data.creators.filter((c: Creator) => c.isWalletVerified);
         if (verifiedCreators.length > 0) {
           setStep('wallet-verify');
@@ -66,48 +60,10 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
     }
   });
 
-  // Step 2: Verify wallet signature (cryptographic proof)
-  const handleWalletVerificationComplete = (signature: string, message: string) => {
-    console.log('Wallet verification completed:', walletAddress);
-    
-    // Check if any creator has 2FA enabled
-    const creatorsWithTwoFactor = foundCreators.filter(c => c.twoFactorEnabled);
-    
-    if (creatorsWithTwoFactor.length > 0) {
-      setSelectedCreator(creatorsWithTwoFactor[0]); // Select first creator with 2FA
-      setStep('2fa-auth');
-      toast({
-        title: "Wallet Verified",
-        description: "Please enter your 2FA code to complete login",
-      });
-    } else {
-      // No 2FA required, complete login
-      completeLogin();
-    }
+  const handleWalletVerificationComplete = async (_signature: string, _message: string) => {
+    await completeLogin();
   };
 
-  // Step 3: Verify 2FA code
-  const verify2FAMutation = useMutation({
-    mutationFn: async (code: string) => {
-      const response = await apiRequest('POST', '/api/auth/2fa/verify', {
-        creatorId: selectedCreator?.id,
-        token: code
-      });
-      return response.json();
-    },
-    onSuccess: (data) => {
-      if (data.success) {
-        completeLogin();
-      } else {
-        setError(data.error || '2FA verification failed');
-      }
-    },
-    onError: (error: any) => {
-      setError(error.message || '2FA verification failed');
-    }
-  });
-
-  // Complete login and create session
   const completeLogin = async () => {
     try {
       const response = await apiRequest('POST', '/api/auth/wallet/login', {
@@ -115,7 +71,7 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
         creatorIds: foundCreators.map(c => c.id)
       });
       const data = await response.json();
-      
+
       if (data.success) {
         setStep('completed');
         onLoginSuccess({
@@ -140,39 +96,17 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
       setError('Please enter your wallet address');
       return;
     }
-
-    // Basic wallet address validation
     if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
       setError('Please enter a valid Ethereum wallet address');
       return;
     }
-
     setError('');
     checkWalletMutation.mutate(walletAddress.toLowerCase());
   };
 
-  const handle2FASubmit = () => {
-    if (!twoFactorCode.trim()) {
-      setError('Please enter your 2FA code');
-      return;
-    }
-
-    if (twoFactorCode.length !== 6) {
-      setError('2FA code must be 6 digits');
-      return;
-    }
-
-    setError('');
-    verify2FAMutation.mutate(twoFactorCode);
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      if (step === 'wallet-input') {
-        handleWalletSubmit();
-      } else if (step === '2fa-auth') {
-        handle2FASubmit();
-      }
+      handleWalletSubmit();
     }
   };
 
@@ -224,7 +158,7 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
                   ))}
                 </div>
               </div>
-              
+
               <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium">
                   ⚡ Multi-Wallet Support
@@ -233,7 +167,7 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
                   Connect with MetaMask, Coinbase, Trust Wallet, WalletConnect, or any other supported wallet to sign the verification message.
                 </p>
               </div>
-              
+
               <WalletVerification
                 walletAddress={walletAddress}
                 onVerificationComplete={handleWalletVerificationComplete}
@@ -247,59 +181,6 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
     );
   }
 
-  if (step === '2fa-auth') {
-    return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5 text-blue-600" />
-            Step 3: Two-Factor Authentication
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Enter the 6-digit code from your Google Authenticator app
-            </p>
-            <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg">
-              <p className="text-sm text-green-800 dark:text-green-200">
-                Site: {selectedCreator?.websiteUrl}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <Input
-              type="text"
-              placeholder="000000"
-              value={twoFactorCode}
-              onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              onKeyPress={handleKeyPress}
-              className="text-center text-2xl tracking-widest font-mono"
-              maxLength={6}
-            />
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button 
-              onClick={handle2FASubmit}
-              disabled={verify2FAMutation.isPending || twoFactorCode.length !== 6}
-              className="w-full"
-            >
-              {verify2FAMutation.isPending ? 'Verifying...' : 'Verify & Login'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Step 1: Wallet Input
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -322,7 +203,7 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
               type="text"
               placeholder="0x..."
               value={walletAddress}
-              onChange={(e) => setWalletAddress(e.target.value.trim())}
+              onChange={(e) => setWalletAddress(e.target.value)}
               onKeyPress={handleKeyPress}
               className="font-mono"
             />
@@ -335,22 +216,13 @@ export function WalletLogin({ onLoginSuccess }: WalletLoginProps) {
             </Alert>
           )}
 
-          <Button 
+          <Button
             onClick={handleWalletSubmit}
-            disabled={checkWalletMutation.isPending || !walletAddress.trim()}
+            disabled={checkWalletMutation.isPending}
             className="w-full"
           >
-            {checkWalletMutation.isPending ? 'Checking...' : 'Continue'}
+            {checkWalletMutation.isPending ? 'Checking...' : 'Check Wallet'}
           </Button>
-        </div>
-
-        <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Don't have an account? Register in{' '}
-            <span className="text-blue-600 dark:text-blue-400 underline cursor-pointer">
-              Creator Portal
-            </span>
-          </p>
         </div>
       </CardContent>
     </Card>
