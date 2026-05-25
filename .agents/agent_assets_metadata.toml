@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "kGzkpmZnhb4tOJoJsNomh"
+uri = "file://docs/ISSUES-AND-SOLUTIONS.md"
+type = "text"
+title = "Issues & Solutions — WebPayback Protocol"
