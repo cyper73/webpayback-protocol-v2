@@ -189,6 +189,7 @@ docs/UNISWAP_GAS_ERROR_SOLUTION.md
 docs/UNISWAP_POOL_MANUAL_GUIDE.md
 docs/UNISWAP_V3_POOL_STRATEGY.md
 docs/WPT_V1_DISABLING_GUIDE.md
+docs/ISSUES-AND-SOLUTIONS.md
 
 # Test pages (internal functionality)
 test-connectivity.tsx
