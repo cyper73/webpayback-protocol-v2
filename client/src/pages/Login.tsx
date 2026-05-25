@@ -413,6 +413,7 @@ export default function Login() {
                     });
                   }
                   localStorage.removeItem("webpayback_session");
+                  localStorage.removeItem("humanity_auth");
                   window.dispatchEvent(new CustomEvent("webpayback-logout"));
                 }}
                 variant="outline"

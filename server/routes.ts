@@ -1178,8 +1178,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Creator registration error:", error);
+      // Friendly message for duplicate domain registration
+      const errMsg = error instanceof Error ? error.message : "Unknown error";
+      if (errMsg.includes("unique_website_url") || errMsg.includes("duplicate key")) {
+        return res.status(400).json({
+          error: "This domain is already registered. If it belongs to you, log in with the wallet used during the original registration."
+        });
+      }
       // XSS Prevention: Sanitize error messages
-      res.status(400).json({ error: sanitizeErrorMessage(error instanceof Error ? error.message : "Unknown error") });
+      res.status(400).json({ error: sanitizeErrorMessage(errMsg) });
     }
   });
 
