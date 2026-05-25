@@ -143,7 +143,7 @@ Preferred communication style: Simple, everyday language.
 - **DATABASE-LEVEL DUPLICATE PROTECTION**: Added unique_website_url constraint preventing domain registration abuse even at SQL level
 - **TOKEN V2 MIGRATION COMPLETED**: Eliminated all V1 token references (0x9077051D318b614F915E8A07861090856FDEC91e) from entire system
 - **COINGECKO API ENDPOINT IMPLEMENTED**: Created /api/circulating-supply endpoint returning real-time WPT V2 circulating supply (9,712,053 tokens)
-- **ADMINISTRATOR ACCESS OPERATIONAL**: Complete admin system with IP 83.174.147.238, username cyper, password Matisse73
+- **ADMINISTRATOR ACCESS OPERATIONAL**: Complete admin system; credentials and authorized IP stored only in Replit Secrets (never in source code)
 
 ## System Architecture
 

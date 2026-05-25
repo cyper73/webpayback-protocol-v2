@@ -193,3 +193,8 @@ docs/ISSUES-AND-SOLUTIONS.md
 
 # Test pages (internal functionality)
 test-connectivity.tsx
+# Deployment artifacts with on-chain wallet/contract addresses
+deployments/
+
+# Replit project README (may contain operational notes)
+replit.md
