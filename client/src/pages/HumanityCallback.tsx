@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@humanity-org/react-sdk";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -13,15 +13,31 @@ import { Loader2, AlertCircle } from "lucide-react";
  * POST to our backend /api/humanity/exchange-token which does the exchange
  * server-to-server. After a successful exchange we store the access token in
  * localStorage (so it survives page refreshes) and navigate to /login.
+ *
+ * Race condition fix: we use a ref (hasStarted) so this runs exactly once,
+ * regardless of how many times isAuthenticated or navigate change. We also
+ * clear the ?code= params from the URL immediately on mount so the SDK
+ * internal handler does not re-process them and trigger a second redirect.
  */
 export default function HumanityCallback() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const hasStarted = useRef(false);
 
   const [status, setStatus] = useState<"loading" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // Guard: run exactly once
+    if (hasStarted.current) return;
+    hasStarted.current = true;
+
+    // If already authenticated (cached token), skip exchange and go to /login
+    if (isAuthenticated) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     const run = async () => {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -29,6 +45,10 @@ export default function HumanityCallback() {
         const state = params.get("state");
         const oauthError = params.get("error");
         const oauthDesc = params.get("error_description");
+
+        // Clear ?code= params from the URL immediately so the SDK internal
+        // handler cannot also process them and cause a second redirect.
+        window.history.replaceState({}, "", window.location.pathname);
 
         if (oauthError) {
           setErrorMessage(oauthDesc ? `${oauthError}: ${oauthDesc}` : oauthError);
@@ -43,7 +63,7 @@ export default function HumanityCallback() {
         }
 
         // Firefox ETP can wipe sessionStorage after a cross-origin redirect.
-        // Try sessionStorage first, fall back to localStorage backup created in Login.tsx.
+        // Try sessionStorage first, fall back to localStorage backup.
         const codeVerifier =
           sessionStorage.getItem("humanity_pkce") ||
           localStorage.getItem("humanity_pkce_backup");
@@ -52,16 +72,26 @@ export default function HumanityCallback() {
           localStorage.getItem("humanity_state_backup");
 
         if (!codeVerifier) {
-          setErrorMessage("Missing PKCE code verifier. The session may have expired or the redirect came from a different browser tab.");
+          setErrorMessage(
+            "Missing PKCE code verifier. The session may have expired or the redirect came from a different browser tab."
+          );
           setStatus("error");
           return;
         }
 
         if (storedState && state !== storedState) {
-          setErrorMessage(`OAuth state mismatch. Possible CSRF attempt or stale session.`);
+          setErrorMessage("OAuth state mismatch. Possible CSRF attempt or stale session.");
           setStatus("error");
           return;
         }
+
+        // Clean up PKCE keys before calling backend so the SDK internal handler
+        // won't find them and attempt its own (CORS-blocked) exchange.
+        sessionStorage.removeItem("humanity_pkce");
+        sessionStorage.removeItem("humanity_state");
+        sessionStorage.removeItem("humanity_redirect_count");
+        localStorage.removeItem("humanity_pkce_backup");
+        localStorage.removeItem("humanity_state_backup");
 
         // Call our backend which exchanges the code server-to-server.
         const response = await fetch("/api/humanity/exchange-token", {
@@ -82,8 +112,6 @@ export default function HumanityCallback() {
         }
 
         // Persist token in the exact format the Humanity React SDK expects.
-        // The SDK uses localStorage key "humanity_auth" with shape:
-        // { accessToken, refreshToken, expiresAt, authorizationId, appScopedUserId, user }
         const authState = {
           accessToken: data.accessToken ?? null,
           refreshToken: data.refreshToken ?? null,
@@ -94,14 +122,6 @@ export default function HumanityCallback() {
         };
         localStorage.setItem("humanity_auth", JSON.stringify(authState));
 
-        // Clean up sessionStorage PKCE so the SDK internal handler won't
-        // also try (and fail) to exchange the already-consumed code.
-        sessionStorage.removeItem("humanity_pkce");
-        sessionStorage.removeItem("humanity_state");
-        sessionStorage.removeItem("humanity_redirect_count");
-        localStorage.removeItem("humanity_pkce_backup");
-        localStorage.removeItem("humanity_state_backup");
-
         navigate("/login", { replace: true });
       } catch (err: any) {
         console.error("[HumanityCallback] unexpected error:", err);
@@ -110,16 +130,9 @@ export default function HumanityCallback() {
       }
     };
 
-    // Give the SDK internal effect a moment to run, but ultimately we
-    // control the exchange. If the SDK already set isAuthenticated (e.g.
-    // from a cached token), just redirect.
-    if (isAuthenticated) {
-      navigate("/login", { replace: true });
-      return;
-    }
-
     run();
-  }, [isAuthenticated, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // empty deps — runs once on mount only
 
   if (status === "error" && errorMessage) {
     return (
