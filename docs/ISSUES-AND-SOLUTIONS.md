@@ -1,148 +1,148 @@
-# WebPayback Protocol — Issues, Solutions & Alternatives
+# WebPayback Protocol — Problemi, Soluzioni e Alternative
 
-> Session log: May 2026  
+> Log sessione: Maggio 2026
 > Stack: React 18 + Vite + Express + PostgreSQL (Neon) · Privy v3.18.0 · Humanity SDK v0.0.3
 
 ---
 
-## Issue 1 — Humanity SDK OAuth Token Exchange Failing in Production
+## Problema 1 — Scambio token OAuth di Humanity SDK che falliva in produzione
 
-### Symptom
-After the user authenticated on Humanity's portal and was redirected back to `/callback`, the token exchange failed silently or threw a CORS error. The user was stuck on the loading screen.
+### Sintomo
+Dopo che l'utente si autenticava sul portale Humanity e veniva reindirizzato a `/callback`, lo scambio del token falliva silenziosamente o restituiva un errore CORS. L'utente restava bloccato sulla schermata di caricamento.
 
-### Root Cause
-The Humanity React SDK attempted to exchange the OAuth `code` directly from the browser to Humanity's token endpoint. In production this request is blocked by CORS policy, since the exchange must come from a trusted origin.
+### Causa radice
+Il React SDK di Humanity tentava di scambiare il codice OAuth direttamente dal browser al token endpoint di Humanity. In produzione questa richiesta viene bloccata dalle policy CORS, poiché lo scambio deve avvenire da un'origine attendibile.
 
-### Implemented Solution
-Moved the token exchange server-side. The browser sends `{ code, codeVerifier }` to our own backend endpoint `/api/humanity/exchange-token`, which performs the call server-to-server with no CORS restrictions. The resulting access token is then returned to the client and stored in `localStorage`.
+### Soluzione implementata
+Spostato lo scambio token server-side. Il browser invia `{ code, codeVerifier }` al nostro endpoint backend `/api/humanity/exchange-token`, che esegue la chiamata server-to-server senza restrizioni CORS. Il token di accesso risultante viene restituito al client e memorizzato in `localStorage`.
 
-### Alternative Solutions
-- **Proxy endpoint with refresh rotation**: same approach but add automatic token refresh logic on the backend, reducing the number of times the user must re-authenticate.
-- **Backend session with httpOnly cookie**: instead of returning the token to the client at all, store it in a server-side session and set a `httpOnly` cookie. The token never touches JavaScript, making it immune to XSS attacks.
-
----
-
-## Issue 2 — Firefox ETP Wiped PKCE from sessionStorage
-
-### Symptom
-On Firefox with Enhanced Tracking Protection enabled, users occasionally hit the error: _"Missing PKCE code verifier"_ after being redirected back from Humanity's auth page.
-
-### Root Cause
-Firefox's Enhanced Tracking Protection (ETP) treats cross-site navigations as potential tracking attempts. When the browser navigates away to `app.sandbox.humanity.org` and then back, ETP can clear `sessionStorage` for the originating domain — removing the PKCE `code_verifier` that was saved before the redirect.
-
-### Implemented Solution
-Before initiating the OAuth redirect, the PKCE `code_verifier` and `state` are backed up to `localStorage` under separate keys (`humanity_pkce_backup`, `humanity_state_backup`). In `HumanityCallback.tsx`, the code reads from `sessionStorage` first and falls back to `localStorage` if the value is missing. Both copies are deleted immediately after a successful exchange.
-
-### Alternative Solutions
-- **Server-side PKCE storage**: generate the PKCE pair on the backend and store it in the user's server session (keyed by a short-lived cookie). The client never touches `sessionStorage` at all, so browser privacy protections cannot interfere.
-- **State parameter encoding**: encode the `code_verifier` inside the OAuth `state` parameter (encrypted). On callback, decode it from the URL instead of reading storage. This is storage-free but requires care to keep the state size within URL limits.
+### Alternative
+- **Endpoint proxy con rotazione refresh**: stesso approccio ma aggiungendo logica di refresh automatico del token sul backend, riducendo le volte in cui l'utente deve ri-autenticarsi.
+- **Sessione backend con cookie httpOnly**: invece di restituire il token al client, memorizzarlo in una sessione server-side e impostare un cookie `httpOnly`. Il token non tocca mai JavaScript, rendendolo immune agli attacchi XSS.
 
 ---
 
-## Issue 3 — Privy Embedded Wallet Hanging on Creation
+## Problema 2 — Firefox ETP cancellava il PKCE da sessionStorage
 
-### Symptom
-After email login via Privy, the embedded wallet creation spinner ran indefinitely. The user was never granted a wallet address and could not proceed.
+### Sintomo
+Su Firefox con Enhanced Tracking Protection abilitato, gli utenti occasionalmente incontravano l'errore: _"Missing PKCE code verifier"_ dopo essere stati reindirizzati dalla pagina di auth di Humanity.
 
-### Root Cause
-Privy was configured with `defaultChain` set to **Humanity Testnet (chain ID 1942999413)**, which is not supported by Privy's embedded wallet infrastructure. Privy silently failed to create the wallet because it could not reach the RPC endpoint for that chain.
+### Causa radice
+L'Enhanced Tracking Protection (ETP) di Firefox tratta le navigazioni cross-site come potenziali tentativi di tracking. Quando il browser naviga su `app.sandbox.humanity.org` e poi torna indietro, ETP può cancellare il `sessionStorage` del dominio originario — rimuovendo il `code_verifier` PKCE che era stato salvato prima del redirect.
 
-### Implemented Solution
-Changed `defaultChain` to **Polygon (137)**, a fully supported chain. Embedded wallets are now created on Polygon instantly. Since all EVM chains share the same address derivation, the wallet address produced is valid on Humanity Testnet and every other EVM network as well.
+### Soluzione implementata
+Prima di avviare il redirect OAuth, il `code_verifier` e lo `state` PKCE vengono salvati in backup su `localStorage` sotto chiavi separate (`humanity_pkce_backup`, `humanity_state_backup`). In `HumanityCallback.tsx`, il codice legge prima da `sessionStorage` e, se il valore manca, effettua il fallback su `localStorage`. Entrambe le copie vengono cancellate immediatamente dopo uno scambio riuscito.
 
-### Alternative Solutions
-- **Ethereum mainnet as default**: equally supported by Privy; useful if the primary use case is Ethereum rather than Polygon.
-- **Dynamic chain detection**: detect which chain the user's external wallet is connected to and set that as the default, giving a more native experience for MetaMask/WalletConnect users.
-
----
-
-## Issue 4 — Dropdown Menus and Toast Notifications Had Invisible Black Text
-
-### Symptom
-Select dropdowns and toast notification messages were unreadable — dark text on a dark background.
-
-### Root Cause
-The shadcn/ui default theme uses CSS variables (`--foreground`, `--destructive-foreground`) that resolve to dark colors in certain configurations. The components had no explicit text color override, so they inherited the theme's default dark value.
-
-### Implemented Solution
-Applied explicit `text-white` to all affected components:
-- `SelectContent` and `SelectItem` in `select.tsx`
-- `ToastTitle` and `ToastDescription` in `toast.tsx`
-- Replaced `text-destructive-foreground` with `text-white` in the `destructive` toast variant
-
-Also added `bg-[hsl(240,33%,8%)]`, `border-2 border-[hsl(190,100%,50%)]`, and neon glow `shadow` for visual consistency with the WebPayback cyber theme.
-
-### Alternative Solutions
-- **CSS variable override in `index.css`**: redefine `--foreground` and `--destructive-foreground` in the `.dark` class to always resolve to white. This propagates automatically to all shadcn components without per-component overrides.
-- **Tailwind dark mode variants**: use `dark:text-white` on each component for a more composable approach that works in both light and dark modes.
+### Alternative
+- **PKCE storage server-side**: generare la coppia PKCE sul backend e memorizzarla nella sessione dell'utente (chiave da un cookie a breve durata). Il client non tocca mai `sessionStorage`, quindi le protezioni privacy del browser non possono interferire.
+- **Codifica nel parametro state**: codificare il `code_verifier` dentro il parametro OAuth `state` (cifrato). Al callback, decodificarlo dall'URL invece di leggere dallo storage. È storage-free ma richiede attenzione per mantenere la dimensione dello state entro i limiti dell'URL.
 
 ---
 
-## Issue 5 — Redundant 2FA Gate Blocking Creator Portal Access
+## Problema 3 — Creazione wallet embedded di Privy che bloccava
 
-### Symptom
-After successfully authenticating via Humanity (biometric) and Privy (wallet + OTP), users were shown a Google Authenticator (TOTP) prompt before accessing the Creator Portal — a third authentication step that added friction without meaningful security benefit.
+### Sintomo
+Dopo il login via email su Privy, lo spinner di creazione del wallet embedded girava all'infinito. L'utente non riceveva mai un indirizzo wallet e non poteva procedere.
 
-### Root Cause
-`ProtectedCreatorPortal.tsx` wrapped the portal in a `TwoFactorGate` component that checked `sessionStorage` for a `webpayback_2fa_verified` flag. This flag was set only after entering a TOTP code and was cleared on browser close or tab reload. The gate was implemented before Privy and Humanity were integrated and was never removed.
+### Causa radice
+Privy era configurato con `defaultChain` impostato su **Humanity Testnet (chain ID 1942999413)**, che non è supportato dall'infrastruttura wallet embedded di Privy. Privy falliva silenziosamente nella creazione del wallet perché non poteva raggiungere l'RPC endpoint per quella chain.
 
-### Implemented Solution
-Removed the `TwoFactorGate` wrapper from `ProtectedCreatorPortal.tsx`. The component now renders `CreatorPortal` directly. Also removed the 2FA step from `WalletLogin.tsx`. Backend routes for `/api/auth/2fa/*` were already marked deprecated and return stub responses — no backend changes were needed.
+### Soluzione implementata
+Cambiato `defaultChain` a **Polygon (137)**, una chain pienamente supportata. I wallet embedded vengono ora creati istantaneamente su Polygon. Poiché tutte le chain EVM condividono lo stesso address derivation, l'indirizzo del wallet prodotto è valido anche su Humanity Testnet e su ogni altra rete EVM.
 
-### Alternative Solutions
-- **Optional 2FA**: keep TOTP as an opt-in security upgrade for users who want it, rather than a mandatory gate.
-- **Session-level caching**: if 2FA is re-introduced, store the verified flag in a server-side session rather than `sessionStorage`, so it survives page reloads without asking the user to re-verify every time.
+### Alternative
+- **Ethereum mainnet come default**: altrettanto supportato da Privy; utile se il caso d'uso principale è Ethereum anziché Polygon.
+- **Rilevamento dinamico chain**: rilevare a quale chain è connesso il wallet esterno dell'utente e impostarlo come default, offrendo un'esperienza più nativa per utenti MetaMask/WalletConnect.
 
 ---
 
-## Issue 6 — Double Redirect at End of Humanity OAuth Callback
+## Problema 4 — Menu dropdown e notifiche Toast con testo nero invisibile
 
-### Symptom
-After a successful Humanity login, users saw a brief "double jump" — two rapid navigations — before landing on `/login`.
+### Sintomo
+I dropdown Select e i messaggi delle notifiche Toast erano illeggibili — testo scuro su sfondo scuro.
 
-### Root Cause
-A race condition in `HumanityCallback.tsx`. The `useEffect` depended on `[isAuthenticated, navigate]`. The sequence was:
+### Causa radice
+Il tema di default shadcn/ui usa variabili CSS (`--foreground`, `--destructive-foreground`) che risolvono a colori scuri in certe configurazioni. I componenti non avevano override esplicito del colore del testo, quindi ereditavano il valore scuro di default del tema.
 
-1. Component mounts → `isAuthenticated = false` → `run()` starts
-2. `run()` saves token to `localStorage`
-3. The `HumanityProvider` detects the new token → sets `isAuthenticated = true`
-4. `useEffect` re-fires due to dependency change → first `navigate("/login")`
-5. `run()` completes → second `navigate("/login")`
+### Soluzione implementata
+Applicato `text-white` esplicito a tutti i componenti interessati:
+- `SelectContent` e `SelectItem` in `select.tsx`
+- `ToastTitle` e `ToastDescription` in `toast.tsx`
+- Sostituito `text-destructive-foreground` con `text-white` nella variante `destructive` del toast
 
-Additionally, the Humanity SDK's internal callback handler detected the `?code=` parameters still present in the URL and attempted its own (CORS-blocked) exchange, adding another navigation attempt.
+Aggiunti anche `bg-[hsl(240,33%,8%)]`, `border-2 border-[hsl(190,100%,50%)]` e neon glow `shadow` per coerenza visiva con il tema cyber di WebPayback.
 
-### Implemented Solution
-Three changes applied together:
+### Alternative
+- **Override variabili CSS in `index.css`**: ridefinire `--foreground` e `--destructive-foreground` nella classe `.dark` per risolvere sempre a bianco. Questo si propaga automaticamente a tutti i componenti shadcn senza override per-componente.
+- **Varianti Tailwind dark mode**: usare `dark:text-white` su ogni componente per un approccio più componibile che funziona sia in light che in dark mode.
 
-| Change | Effect |
+---
+
+## Problema 5 — Gate 2FA ridondante che bloccava l'accesso al Creator Portal
+
+### Sintomo
+Dopo l'autenticazione riuscita su Humanity (biometrica) e su Privy (wallet + OTP), agli utenti veniva mostrato un prompt Google Authenticator (TOTP) prima di accedere al Creator Portal — un terzo step di autenticazione che aggiungeva attrito senza un beneficio di sicurezza significativo.
+
+### Causa radice
+`ProtectedCreatorPortal.tsx` wrappava il portal in un componente `TwoFactorGate` che controllava `sessionStorage` per la flag `webpayback_2fa_verified`. Questa flag veniva impostata solo dopo l'inserimento di un codice TOTP e veniva cancellata alla chiusura del browser o al refresh del tab. Il gate era stato implementato prima dell'integrazione di Privy e Humanity e non era mai stato rimosso.
+
+### Soluzione implementata
+Rimosso il wrapper `TwoFactorGate` da `ProtectedCreatorPortal.tsx`. Il componente ora renderizza `CreatorPortal` direttamente. Rimosso anche lo step 2FA da `WalletLogin.tsx`. Le route backend per `/api/auth/2fa/*` erano già marcate deprecate e restituiscono risposte stub — nessuna modifica backend necessaria.
+
+### Alternative
+- **2FA opzionale**: mantenere TOTP come upgrade di sicurezza opt-in per utenti che lo vogliono, invece di un gate obbligatorio.
+- **Cache a livello di sessione**: se il 2FA viene reintrodotto, memorizzare la flag verificata in una sessione server-side anziché in `sessionStorage`, così sopravvive al refresh della pagina senza richiedere all'utente di ri-verificarsi ogni volta.
+
+---
+
+## Problema 6 — Doppio redirect alla fine del callback OAuth di Humanity
+
+### Sintomo
+Dopo un login Humanity riuscito, gli utenti vedevano un breve "salto doppio" — due navigazioni rapide — prima di atterrare su `/login`.
+
+### Causa radice
+Una race condition in `HumanityCallback.tsx`. L'`useEffect` dipendeva da `[isAuthenticated, navigate]`. La sequenza era:
+
+1. Component monta → `isAuthenticated = false` → `run()` si avvia
+2. `run()` salva il token in `localStorage`
+3. Il `HumanityProvider` rileva il nuovo token → imposta `isAuthenticated = true`
+4. `useEffect` si ri-attiva per cambiamento dipendenza → primo `navigate("/login")`
+5. `run()` completa → secondo `navigate("/login")`
+
+Inoltre, l'handler interno del callback dell'SDK Humanity rilevava i parametri `?code=` ancora presenti nell'URL e tentava il proprio scambio (bloccato da CORS), aggiungendo un altro tentativo di navigazione.
+
+### Soluzione implementata
+Tre modifiche applicate insieme:
+
+| Modifica | Effetto |
 |---|---|
-| `useRef(hasStarted)` guard | The exchange logic runs exactly once on mount, regardless of re-renders |
-| `window.history.replaceState({}, "", pathname)` on mount | Clears `?code=&state=` from the URL immediately, preventing the SDK from detecting and re-processing the parameters |
-| `useEffect` deps changed to `[]` | Effect no longer re-triggers when `isAuthenticated` changes |
-| PKCE keys removed **before** backend call | SDK cannot find the verifier and attempt a parallel exchange |
+| Guard `useRef(hasStarted)` | La logica di scambio esegue esattamente una volta al mount, indipendentemente dai re-render |
+| `window.history.replaceState({}, "", pathname)` al mount | Pulisce `?code=&state=` dall'URL immediatamente, impedendo all'SDK di rilevare e ri-processare i parametri |
+| Dipendenze `useEffect` cambiate a `[]` | L'effetto non si ri-attiva più quando `isAuthenticated` cambia |
+| Chiavi PKCE rimosse **prima** della chiamata backend | L'SDK non trova il verifier e non può tentare uno scambio parallelo |
 
-### Alternative Solutions
-- **Dedicated callback route outside React Router**: handle the `/callback` URL at the Express level, do the token exchange server-side before the SPA loads, then redirect to `/login` with a short-lived session cookie. React never sees `?code=` at all.
-- **Popup mode for OAuth**: configure `HumanityConnect` with `mode="popup"` instead of `mode="redirect"`. The OAuth flow happens in a popup window; the parent page never navigates, so there is no redirect cycle and no race condition. Drawback: popups can be blocked by browsers.
+### Alternative
+- **Route callback dedicata fuori da React Router**: gestire l'URL `/callback` a livello Express, eseguire lo scambio token server-side prima che la SPA carichi, poi reindirizzare a `/login` con un cookie di sessione a breve durata. React non vede mai `?code=`.
+- **Modalità popup per OAuth**: configurare `HumanityConnect` con `mode="popup"` invece di `mode="redirect"`. Il flusso OAuth avviene in una finestra popup; la pagina genitore non naviga mai, quindi non c'è ciclo di redirect né race condition. Svantaggio: i popup possono essere bloccati dal browser.
 
 ---
 
-## Issue 7 — In-Memory Storage Appeared to Work in Localhost
+## Problema 7 — Storage in-memory che sembrava funzionare su localhost
 
-### Symptom / Question
-Setting `storage="memory"` in `HumanityProvider` seemed to work fine during local development but would fail in production.
+### Sintomo / Domanda
+Impostare `storage="memory"` in `HumanityProvider` sembrava funzionare durante lo sviluppo locale ma falliva in produzione.
 
-### Root Cause
-In localhost, browsers apply significantly relaxed privacy and tracking protections:
-- `localhost` is treated as a trusted secure origin — Firefox ETP and Safari ITP do not activate
-- Vite's Hot Module Replacement (HMR) preserves parts of the JavaScript module state across fast reloads, making it appear that memory survives navigation
-- The redirect cycle (`localhost:5000 → Humanity → localhost:5000`) may be classified as same-site by some browsers, reducing storage clearing
+### Causa radice
+In localhost, i browser applicano protezioni privacy e tracking significativamente più rilassate:
+- `localhost` è trattato come un'origine sicura attendibile — Firefox ETP e Safari ITP non si attivano
+- L'Hot Module Replacement (HMR) di Vite preserva parti dello stato del modulo JavaScript tra ricaricamenti rapidi, facendo sembrare che la memoria sopravviva alla navigazione
+- Il ciclo di redirect (`localhost:5000 → Humanity → localhost:5000`) può essere classificato come same-site da alcuni browser, riducendo la cancellazione dello storage
 
-In production (`webpayback.com → app.humanity.org → webpayback.com`) the redirect is truly cross-origin. A full page reload occurs and all in-memory JavaScript state is completely destroyed between steps.
+In produzione (`webpayback.com → app.humanity.org → webpayback.com`) il redirect è veramente cross-origin. Si verifica un full page reload e tutto lo stato JavaScript in-memory viene completamente distrutto tra i passaggi.
 
-### Why localStorage Is Required for OAuth
-The PKCE `code_verifier` must be available when the browser returns from Humanity's auth page. Since the redirect destroys memory, the verifier must be stored in a persistent medium (`localStorage` or `sessionStorage`) before the redirect and read back on return.
+### Perché localStorage è richiesto per OAuth
+Il `code_verifier` PKCE deve essere disponibile quando il browser torna dalla pagina di auth di Humanity. Poiché il redirect distrugge la memoria, il verifier deve essere memorizzato in un mezzo persistente (`localStorage` o `sessionStorage`) prima del redirect e riletto al ritorno.
 
-### More Secure Alternatives
-- **httpOnly cookie session**: the backend stores the token; the client receives only a session cookie. Token is never exposed to JavaScript — eliminates XSS risk entirely.
-- **Short-lived encrypted state parameter**: encode the PKCE verifier inside the OAuth `state` value (AES-encrypted, signed). Decoded on callback from the URL — no storage needed at all.
+### Alternative più sicure
+- **Sessione con cookie httpOnly**: il backend memorizza il token; il client riceve solo un cookie di sessione. Il token non è mai esposto a JavaScript — elimina completamente il rischio XSS.
+- **Parametro state cifrato a breve durata**: codificare il `code_verifier` dentro il valore OAuth `state` (AES-cifrato, firmato). Decodificato al callback dall'URL — nessuno storage necessario.
