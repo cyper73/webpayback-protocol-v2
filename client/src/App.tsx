@@ -28,9 +28,11 @@ function MaintenancePage() {
     </div>
   );
 }
+
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { PrivyProvider } from '@privy-io/react-auth';
+import { HumanityProvider } from "@humanity-org/react-sdk";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -54,6 +56,7 @@ import ProtectedNFTModule from "@/components/auth/ProtectedNFTModule";
 import ProtectedRewardsModule from "@/components/auth/ProtectedRewardsModule";
 import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner";
 import { SecurityTest } from "@/pages/SecurityTest";
+
 function Router() {
   return (
     <Routes>
@@ -83,9 +86,22 @@ function Router() {
 function App() {
   if (MAINTENANCE_MODE) return <MaintenancePage />;
 
-  const privyAppId = import.meta.env.VITE_PRIVY_APP_ID || 'cmn0xgyny01ra0ciijd8kc2kk'; // Fallback if env is missing
+  const privyAppId = import.meta.env.VITE_PRIVY_APP_ID || 'cmn0xgyny01ra0ciijd8kc2kk';
+
+  const rawHumanityEnvironment =
+    (import.meta.env.VITE_HUMANITY_ENVIRONMENT as "production" | "sandbox" | undefined) || "sandbox";
+  const humanityEnvironment: "production" | "sandbox" =
+    rawHumanityEnvironment === "production" ? "production" : "sandbox";
+
+  const humanityRedirectUri =
+    import.meta.env.VITE_HUMANITY_REDIRECT_URI ||
+    import.meta.env.VITE_REDIRECT_URI ||
+    `${window.location.origin}/callback`;
 
   return (
+    // PrivyProvider must be the outermost React context so that all usePrivy()
+    // hooks (and other React hooks) resolve against the same React instance.
+    // HumanityProvider is nested inside so it inherits the same React tree.
     <PrivyProvider
       appId={privyAppId}
       config={{
@@ -114,13 +130,28 @@ function App() {
         }
       }}
     >
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Router />
-          <Toaster />
-          <CookieConsentBanner />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <HumanityProvider
+        clientId={import.meta.env.VITE_HUMANITY_CLIENT_ID}
+        redirectUri={humanityRedirectUri}
+        environment={humanityEnvironment}
+        storage="localStorage"
+        theme="system"
+        onError={(error: any) => {
+          console.error("[Humanity SDK]", {
+            message: error.message,
+            code: error.code,
+            statusCode: error.statusCode,
+          });
+        }}
+      >
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Router />
+            <Toaster />
+            <CookieConsentBanner />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </HumanityProvider>
     </PrivyProvider>
   );
 }
