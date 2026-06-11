@@ -130,6 +130,8 @@ WebPayback Protocol is a sophisticated decentralized application (dApp) that com
 
 Preferred communication style: Simple, everyday language.
 
+**GitHub push**: Non eseguire mai `git push` verso il repository GitHub senza esplicita autorizzazione dell'utente.
+
 ## Recent Changes (August 22, 2025)
 
 - **SECURITY BACKUP CREATED**: Latest backup with all security updates in WEBPAYBACK-V2-SECURITY-UPDATE-[timestamp] folder and archive
