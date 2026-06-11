@@ -32,8 +32,12 @@ export default function HumanityCallback() {
     if (hasStarted.current) return;
     hasStarted.current = true;
 
-    // If already authenticated (cached token), skip exchange and go to /login
-    if (isAuthenticated) {
+    // If already authenticated AND there is no fresh ?code= in the URL, skip
+    // exchange and just navigate. If ?code= IS present we always process it —
+    // the user just completed a new Humanity login and we must exchange the new
+    // token even if an old cached session exists.
+    const hasCode = new URLSearchParams(window.location.search).has("code");
+    if (isAuthenticated && !hasCode) {
       navigate("/login", { replace: true });
       return;
     }

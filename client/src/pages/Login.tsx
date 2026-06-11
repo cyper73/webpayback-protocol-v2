@@ -1,10 +1,74 @@
 import { useEffect, useState } from "react";
-import { HumanityConnect, useAuth, useVerification } from "@humanity-org/react-sdk";
+import { HumanityConnect, useAuth, useVerification, clearVerificationCache } from "@humanity-org/react-sdk";
+
+// ---------------------------------------------------------------------------
+// Custom PKCE helper — forces the Humanity consent screen by adding
+// prompt=consent to the authorization URL.  The SDK's HumanityConnect does not
+// expose this parameter, so we build the redirect manually while reusing the
+// same sessionStorage/localStorage keys the SDK expects for the callback.
+// ---------------------------------------------------------------------------
+async function loginWithForcedConsent(): Promise<void> {
+  const clientId = import.meta.env.VITE_HUMANITY_CLIENT_ID as string;
+  const redirectUri = import.meta.env.VITE_HUMANITY_REDIRECT_URI as string;
+  const env = (import.meta.env.VITE_HUMANITY_ENVIRONMENT as string) || "sandbox";
+
+  if (!clientId || !redirectUri) {
+    console.error("[Humanity] VITE_HUMANITY_CLIENT_ID or VITE_HUMANITY_REDIRECT_URI not set");
+    return;
+  }
+
+  const base =
+    env === "production"
+      ? "https://api.humanity.org/oauth/authorize"
+      : "https://api.sandbox.humanity.org/oauth/authorize";
+
+  // Generate PKCE verifier (43-128 random chars, URL-safe base64)
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  const verifier = btoa(String.fromCharCode(...array))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+
+  // SHA-256 challenge
+  const encoded = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest("SHA-256", encoded);
+  const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+
+  // Random state
+  const stateArr = new Uint8Array(16);
+  crypto.getRandomValues(stateArr);
+  const state = btoa(String.fromCharCode(...stateArr))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+
+  // Store PKCE using the same keys as the SDK + localStorage backup (Firefox ETP)
+  sessionStorage.setItem("humanity_pkce", verifier);
+  sessionStorage.setItem("humanity_state", state);
+  localStorage.setItem("humanity_pkce_backup", verifier);
+  localStorage.setItem("humanity_state_backup", state);
+
+  const url = new URL(base);
+  url.searchParams.set("client_id", clientId);
+  url.searchParams.set("redirect_uri", redirectUri);
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("scope", "openid identity:read");
+  url.searchParams.set("code_challenge", challenge);
+  url.searchParams.set("code_challenge_method", "S256");
+  url.searchParams.set("state", state);
+  url.searchParams.set("prompt", "consent");
+
+  window.location.href = url.toString();
+}
 import { usePrivy } from "@privy-io/react-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, Shield, Sparkles, LogOut } from "lucide-react";
+import { CheckCircle, Loader2, RefreshCw, Shield, Sparkles, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
@@ -289,6 +353,15 @@ export default function Login() {
                     }}
                   />
                 </div>
+                <p className="text-xs text-gray-500 text-center mt-1">
+                  Changed credentials or not seeing the consent screen?{" "}
+                  <button
+                    onClick={() => loginWithForcedConsent()}
+                    className="text-electric-blue underline hover:text-electric-blue/80 cursor-pointer bg-transparent border-none p-0"
+                  >
+                    Force re-consent
+                  </button>
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -334,7 +407,10 @@ export default function Login() {
             </div>
             <div className="flex gap-3 pt-2">
               <Button
-                onClick={() => verify("is_human")}
+                onClick={() => {
+                  clearVerificationCache();
+                  verify("is_human");
+                }}
                 disabled={isVerifying}
                 className="flex-1 bg-electric-blue hover:bg-electric-blue/80 text-white"
               >
@@ -342,7 +418,10 @@ export default function Login() {
                 {isVerifying ? "Verifying..." : "Verify is_human"}
               </Button>
               <Button
-                onClick={() => resetVerification()}
+                onClick={() => {
+                  clearVerificationCache();
+                  resetVerification();
+                }}
                 variant="outline"
                 className="flex-1 border-gray-700 hover:bg-gray-800 text-gray-300"
               >
@@ -422,6 +501,22 @@ export default function Login() {
                 <LogOut className="w-4 h-4 mr-2" />
                 Log Out
               </Button>
+            </div>
+            {/* Re-auth: forces a new Humanity login with prompt=consent so that
+                changed credentials (e.g. removed palm, added social) produce a
+                fresh access token and the verify() call returns updated results */}
+            <div className="pt-2 border-t border-gray-800">
+              <Button
+                onClick={() => loginWithForcedConsent()}
+                variant="outline"
+                className="w-full border-gray-700 hover:bg-gray-800 text-gray-400 text-sm"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Re-authenticate with Humanity (changed credentials?)
+              </Button>
+              <p className="text-xs text-gray-600 text-center mt-1">
+                Use this if you added / removed credentials in Humanity and verify still returns the old result.
+              </p>
             </div>
           </CardContent>
         </Card>
