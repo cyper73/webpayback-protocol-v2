@@ -159,6 +159,87 @@ router.post('/exchange-token', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/humanity/refresh-token
+ * Refreshes an expired Humanity access token using the stored refresh token.
+ * Frontend sends { refreshToken }; backend calls Humanity token endpoint
+ * server-to-server and returns a new access token.
+ */
+router.post('/refresh-token', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+
+  try {
+    const { refreshToken } = req.body ?? {};
+
+    if (!refreshToken || typeof refreshToken !== 'string') {
+      return res.status(400).json({ error: 'Missing or invalid refreshToken' });
+    }
+
+    const clientId = process.env.HUMANITY_CLIENT_ID;
+    if (!clientId) {
+      return res.status(503).json({ error: 'HUMANITY_CLIENT_ID not configured on server' });
+    }
+
+    const tokenEndpoint = 'https://api.sandbox.humanity.org/oauth/token';
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let upstream: Response;
+    try {
+      upstream = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+          client_id: clientId,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    const rawText = await upstream.text();
+    if (!upstream.ok) {
+      console.log(`[Humanity refresh-token] upstream ${upstream.status}: ${rawText.slice(0, 300)}`);
+    } else {
+      console.log(`[Humanity refresh-token] upstream ${upstream.status} ok`);
+    }
+
+    let tokenData: any;
+    try {
+      tokenData = JSON.parse(rawText);
+    } catch {
+      return res.status(502).json({
+        error: `Humanity server returned non-JSON (${upstream.status}): ${rawText.slice(0, 200)}`,
+      });
+    }
+
+    if (!upstream.ok || tokenData.error) {
+      return res.status(upstream.ok ? 400 : upstream.status).json({
+        error: tokenData.error_description ?? tokenData.error ?? `Humanity error ${upstream.status}`,
+      });
+    }
+
+    return res.json({
+      success: true,
+      accessToken: tokenData.access_token ?? null,
+      refreshToken: tokenData.refresh_token ?? null,
+      expiresIn: tokenData.expires_in ?? null,
+      tokenType: tokenData.token_type ?? 'Bearer',
+      scope: tokenData.scope ?? null,
+    });
+
+  } catch (err: any) {
+    console.error('[Humanity refresh-token] unexpected error:', err?.message ?? err);
+    return res.status(500).json({
+      error: err?.message ?? 'Internal server error during token refresh',
+    });
+  }
+});
+
 router.get('/status/:userId', async (req, res) => {
   try {
     const userId = Number(req.params.userId);

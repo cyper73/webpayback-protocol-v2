@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HumanityConnect, useAuth, useVerification, clearVerificationCache } from "@humanity-org/react-sdk";
 
 // ---------------------------------------------------------------------------
@@ -88,6 +88,78 @@ export default function Login() {
     verified: boolean;
     count: number;
   } | null>(null);
+  const [tokenRefreshing, setTokenRefreshing] = useState(false);
+  const refreshAttempted = useRef(false);
+
+  // Auto-refresh expired Humanity token on mount.
+  // If expiresAt is in the past (or within 5 min) and we have a refreshToken,
+  // silently call the backend refresh endpoint. On failure, clear the stale
+  // humanity_auth so the SDK shows the re-auth UI instead of "token expired".
+  useEffect(() => {
+    if (refreshAttempted.current) return;
+    refreshAttempted.current = true;
+
+    const raw = localStorage.getItem("humanity_auth");
+    if (!raw) return;
+
+    let auth: any;
+    try { auth = JSON.parse(raw); } catch { return; }
+
+    const expiresAt: number | null = auth?.expiresAt ?? null;
+    const refreshToken: string | null = auth?.refreshToken ?? null;
+    const BUFFER_MS = 5 * 60 * 1000; // 5 min buffer
+
+    const isExpiredOrSoon = expiresAt !== null && Date.now() >= expiresAt - BUFFER_MS;
+    if (!isExpiredOrSoon) return; // token still valid, nothing to do
+
+    if (!refreshToken) {
+      // No refresh token — wipe stale auth so SDK doesn't error with "token expired"
+      localStorage.removeItem("humanity_auth");
+      toast({
+        title: "Sessione Humanity scaduta",
+        description: "Accedi nuovamente con Humanity per continuare.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // We have a refresh token — try to get a new access token silently
+    setTokenRefreshing(true);
+    fetch("/api/humanity/refresh-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.error || !data.accessToken) {
+          throw new Error(data.error ?? "Refresh failed");
+        }
+        // Update stored auth with new tokens
+        const updated = {
+          ...auth,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken ?? refreshToken,
+          expiresAt: data.expiresIn ? Date.now() + data.expiresIn * 1000 : auth.expiresAt,
+        };
+        localStorage.setItem("humanity_auth", JSON.stringify(updated));
+        toast({
+          title: "Token Humanity rinnovato",
+          description: "La sessione è stata aggiornata automaticamente.",
+        });
+      })
+      .catch(() => {
+        // Refresh failed — remove stale auth so SDK shows re-auth UI
+        localStorage.removeItem("humanity_auth");
+        toast({
+          title: "Sessione Humanity scaduta",
+          description: "Il token è scaduto. Accedi di nuovo con Humanity.",
+          variant: "destructive",
+        });
+      })
+      .finally(() => setTokenRefreshing(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated || !privyAuthenticated) {
@@ -261,10 +333,13 @@ export default function Login() {
     })();
   }, [verificationStatus, verificationResult, toast]);
 
-  if (isLoading) {
+  if (isLoading || tokenRefreshing) {
     return (
-      <div className="min-h-screen bg-black/90 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-black/90 flex items-center justify-center p-4 flex-col gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-electric-blue" />
+        {tokenRefreshing && (
+          <p className="text-sm text-gray-400">Rinnovo sessione Humanity…</p>
+        )}
       </div>
     );
   }
