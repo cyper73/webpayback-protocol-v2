@@ -73,7 +73,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const { toast } = useToast();
-  const { isLoading, isAuthenticated, user, logout } = useAuth();
+  const { isLoading, isAuthenticated, user, logout, refreshToken: humanityRefreshToken } = useAuth();
   const { authenticated: privyAuthenticated, user: privyUser, getAccessToken, login } = usePrivy();
   const {
     verify,
@@ -91,10 +91,9 @@ export default function Login() {
   const [tokenRefreshing, setTokenRefreshing] = useState(false);
   const refreshAttempted = useRef(false);
 
-  // Auto-refresh expired Humanity token on mount.
-  // If expiresAt is in the past (or within 5 min) and we have a refreshToken,
-  // silently call the backend refresh endpoint. On failure, clear the stale
-  // humanity_auth so the SDK shows the re-auth UI instead of "token expired".
+  // Auto-refresh expired Humanity token on mount using the SDK's native
+  // refreshToken() — this updates the SDK's internal React state correctly,
+  // unlike writing to localStorage directly which leaves stale in-memory state.
   useEffect(() => {
     if (refreshAttempted.current) return;
     refreshAttempted.current = true;
@@ -106,14 +105,14 @@ export default function Login() {
     try { auth = JSON.parse(raw); } catch { return; }
 
     const expiresAt: number | null = auth?.expiresAt ?? null;
-    const refreshToken: string | null = auth?.refreshToken ?? null;
-    const BUFFER_MS = 5 * 60 * 1000; // 5 min buffer
+    const storedRefreshToken: string | null = auth?.refreshToken ?? null;
+    const BUFFER_MS = 5 * 60 * 1000; // refresh 5 min before expiry
 
     const isExpiredOrSoon = expiresAt !== null && Date.now() >= expiresAt - BUFFER_MS;
-    if (!isExpiredOrSoon) return; // token still valid, nothing to do
+    if (!isExpiredOrSoon) return; // token still valid
 
-    if (!refreshToken) {
-      // No refresh token — wipe stale auth so SDK doesn't error with "token expired"
+    if (!storedRefreshToken) {
+      // No refresh token available — clear stale auth so SDK shows re-auth UI
       localStorage.removeItem("humanity_auth");
       toast({
         title: "Sessione Humanity scaduta",
@@ -123,33 +122,17 @@ export default function Login() {
       return;
     }
 
-    // We have a refresh token — try to get a new access token silently
+    // Use SDK's native refreshToken() — updates internal React state correctly
     setTokenRefreshing(true);
-    fetch("/api/humanity/refresh-token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    })
-      .then(async (res) => {
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || data.error || !data.accessToken) {
-          throw new Error(data.error ?? "Refresh failed");
-        }
-        // Update stored auth with new tokens
-        const updated = {
-          ...auth,
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken ?? refreshToken,
-          expiresAt: data.expiresIn ? Date.now() + data.expiresIn * 1000 : auth.expiresAt,
-        };
-        localStorage.setItem("humanity_auth", JSON.stringify(updated));
+    humanityRefreshToken()
+      .then(() => {
         toast({
-          title: "Token Humanity rinnovato",
-          description: "La sessione è stata aggiornata automaticamente.",
+          title: "Sessione rinnovata",
+          description: "Il token Humanity è stato aggiornato automaticamente.",
         });
       })
       .catch(() => {
-        // Refresh failed — remove stale auth so SDK shows re-auth UI
+        // SDK refresh failed — clear stale auth so the re-auth UI appears
         localStorage.removeItem("humanity_auth");
         toast({
           title: "Sessione Humanity scaduta",
