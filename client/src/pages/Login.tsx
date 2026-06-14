@@ -301,14 +301,23 @@ export default function Login() {
   const humanVerified = Boolean(humanResult?.verified);
   const humanScore = Number(humanResult?.score ?? 0);
 
-  // Parse social accounts from result — SDK may nest under value, result.value, or social_accounts
+  // Parse social accounts — SDK may nest under value, result.value, or social_accounts
+  // Priority: value > social_accounts > result.value
   const rawSocial =
     socialResult?.value ??
-    socialResult?.result?.value ??
     socialResult?.social_accounts ??
+    socialResult?.result?.value ??
     [];
-  const socialAccounts: { platform?: string; username?: string; verified?: boolean }[] =
+  const allSocialAccounts: { type?: string; platform?: string; username?: string; verified?: boolean }[] =
     Array.isArray(rawSocial) ? rawSocial : [];
+  // Deduplicate: key by "type|platform|username"
+  const seen = new Set<string>();
+  const socialAccounts = allSocialAccounts.filter((acc) => {
+    const key = `${acc.type ?? ""}|${acc.platform ?? ""}|${acc.username ?? ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   const socialVerified = Boolean(socialResult?.verified) || socialAccounts.length > 0;
 
   return (
@@ -427,18 +436,27 @@ export default function Login() {
             {/* Social accounts list */}
             {socialResult && socialAccounts.length > 0 && (
               <div className="space-y-1.5 pt-1">
-                {socialAccounts.map((acc, i) => (
-                  <div key={i} className="flex items-center justify-between px-3 py-1.5 rounded-md bg-gray-900/60 border border-gray-800">
-                    <span className="text-xs text-gray-300 capitalize">
-                      {acc.platform ?? acc.username ?? `Account ${i + 1}`}
-                    </span>
-                    {acc.verified !== false ? (
-                      <CheckCircle className="h-3.5 w-3.5 text-green-400" />
-                    ) : (
-                      <XCircle className="h-3.5 w-3.5 text-red-400" />
-                    )}
-                  </div>
-                ))}
+                {socialAccounts.map((acc, i) => {
+                  const platformLabel = (acc.type ?? acc.platform ?? "").replace(/_/g, " ") || null;
+                  const username = acc.username ?? null;
+                  return (
+                    <div key={i} className="flex items-center justify-between px-3 py-2 rounded-md bg-gray-900/60 border border-gray-800">
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs text-gray-200 capitalize font-medium">
+                          {platformLabel ?? username ?? `Account ${i + 1}`}
+                        </span>
+                        {platformLabel && username && (
+                          <span className="text-[10px] text-gray-500 truncate">{username}</span>
+                        )}
+                      </div>
+                      {acc.verified !== false ? (
+                        <CheckCircle className="h-3.5 w-3.5 text-green-400 shrink-0 ml-2" />
+                      ) : (
+                        <XCircle className="h-3.5 w-3.5 text-red-400 shrink-0 ml-2" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
