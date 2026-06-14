@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
   Loader2,
-  RefreshCw,
   Shield,
   Sparkles,
   LogOut,
   AlertTriangle,
+  Users,
+  XCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -41,6 +42,11 @@ export default function Login() {
   } = useVerification();
 
   const [isReauthing, setIsReauthing] = useState(false);
+  const [humanResult, setHumanResult] = useState<any>(null);
+  const [isVerifyingHuman, setIsVerifyingHuman] = useState(false);
+  const [socialResult, setSocialResult] = useState<any>(null);
+  const [isVerifyingSocial, setIsVerifyingSocial] = useState(false);
+  const [socialError, setSocialError] = useState<string | null>(null);
   const refreshAttempted = useRef(false);
 
   // ─── Auto-refresh expired token using SDK's native function ────────────────
@@ -160,6 +166,47 @@ export default function Login() {
     }).catch(() => {});
   }, [verificationStatus, verificationResult]);
 
+  // ─── is_human verification ────────────────────────────────────────────────
+  const handleHumanVerify = async () => {
+    setIsVerifyingHuman(true);
+    clearVerificationCache();
+    resetVerification();
+    setHumanResult(null);
+    try {
+      const result = await verify("is_human");
+      setHumanResult(result);
+    } catch (err: any) {
+      toast({
+        title: "Verification failed",
+        description: err?.message ?? "is_human check failed.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifyingHuman(false);
+    }
+  };
+
+  // ─── social_accounts verification ─────────────────────────────────────────
+  const handleSocialVerify = async () => {
+    setIsVerifyingSocial(true);
+    setSocialResult(null);
+    setSocialError(null);
+    clearVerificationCache();
+    try {
+      const result = await verify("social_accounts");
+      setSocialResult(result);
+    } catch (err: any) {
+      setSocialError(err?.message ?? "social_accounts check failed.");
+      toast({
+        title: "Social verification failed",
+        description: err?.message ?? "Could not read social credentials.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifyingSocial(false);
+    }
+  };
+
   // ─── Handle re-auth after credential changes ──────────────────────────────
   const handleReauth = async () => {
     setIsReauthing(true);
@@ -249,8 +296,20 @@ export default function Login() {
   }
 
   // ─── STEP 3: Both authenticated — verify credentials ──────────────────────
-  const isVerified = Boolean((verificationResult as any)?.verified);
-  const score = Number((verificationResult as any)?.score ?? 0);
+
+  // Derived values from individual result states
+  const humanVerified = Boolean(humanResult?.verified);
+  const humanScore = Number(humanResult?.score ?? 0);
+
+  // Parse social accounts from result — SDK may nest under value, result.value, or social_accounts
+  const rawSocial =
+    socialResult?.value ??
+    socialResult?.result?.value ??
+    socialResult?.social_accounts ??
+    [];
+  const socialAccounts: { platform?: string; username?: string; verified?: boolean }[] =
+    Array.isArray(rawSocial) ? rawSocial : [];
+  const socialVerified = Boolean(socialResult?.verified) || socialAccounts.length > 0;
 
   return (
     <div className="min-h-screen bg-black/90 flex items-center justify-center p-4">
@@ -273,66 +332,142 @@ export default function Login() {
               <span className="text-sm text-gray-400">Humanity identity</span>
               <Badge className="bg-green-500/20 text-green-400 border-none">Connected</Badge>
             </div>
-            {verificationStatus === "success" && (
+
+            {/* is_human result */}
+            {humanResult && (
               <>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">is_human</span>
-                  <Badge className={isVerified ? "bg-green-500/20 text-green-400 border-none" : "bg-red-500/20 text-red-400 border-none"}>
-                    {isVerified ? "Verified" : "Not verified"}
+                  <Badge className={humanVerified
+                    ? "bg-green-500/20 text-green-400 border-none"
+                    : "bg-red-500/20 text-red-400 border-none"}>
+                    {humanVerified ? "Verified" : "Not verified"}
                   </Badge>
                 </div>
-                {score > 0 && (
+                {humanScore > 0 && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-400">Humanity score</span>
-                    <Badge className="bg-electric-blue/20 text-electric-blue border-none">{score}</Badge>
+                    <Badge className="bg-electric-blue/20 text-electric-blue border-none">{humanScore}</Badge>
                   </div>
                 )}
               </>
             )}
+
+            {/* social_accounts result */}
+            {socialResult && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">social_accounts</span>
+                <Badge className={socialVerified
+                  ? "bg-green-500/20 text-green-400 border-none"
+                  : "bg-yellow-500/20 text-yellow-400 border-none"}>
+                  {socialVerified ? `${socialAccounts.length || "✓"} account(s)` : "None found"}
+                </Badge>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Verification card */}
+        {/* is_human verification card */}
         <Card className="border-gray-800 bg-black/60 backdrop-blur-xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white text-base">Credential Verification</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-base flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-electric-blue" />
+              Human Credential Check
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <p className="text-xs text-gray-500">
+              Checks your palm / biometric credential registered in the Humanity mock generator.
+            </p>
             <Button
-              onClick={() => {
-                clearVerificationCache();
-                resetVerification();
-                verify("is_human");
-              }}
-              disabled={isVerifying}
+              onClick={handleHumanVerify}
+              disabled={isVerifyingHuman}
               className="w-full bg-electric-blue hover:bg-electric-blue/80 text-white"
             >
-              {isVerifying ? (
+              {isVerifyingHuman ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Verifying…</>
               ) : (
-                <><Sparkles className="w-4 h-4 mr-2" />Run Credential Check</>
+                <>Verify is_human</>
               )}
             </Button>
-
-            {verificationStatus === "error" && (
+            {verificationStatus === "error" && !isVerifyingHuman && (
               <div className="flex items-start gap-2 p-3 rounded-md bg-red-500/10 border border-red-500/20">
                 <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-red-300">{verificationError?.message ?? "Verification failed."}</p>
               </div>
             )}
-
-            <p className="text-xs text-gray-600 text-center">
-              Changed your credentials in Humanity (added/removed palm or social)?{" "}
-              <button
-                onClick={handleReauth}
-                disabled={isReauthing}
-                className="text-electric-blue underline hover:text-electric-blue/80 cursor-pointer bg-transparent border-none p-0 disabled:opacity-50"
-              >
-                {isReauthing ? "Redirecting…" : "Re-authenticate to refresh"}
-              </button>
-            </p>
           </CardContent>
         </Card>
+
+        {/* social_accounts verification card */}
+        <Card className="border-gray-800 bg-black/60 backdrop-blur-xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-base flex items-center gap-2">
+              <Users className="h-4 w-4 text-electric-blue" />
+              Social Scope Check
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-xs text-gray-500">
+              Reads the social account credentials you added in the Humanity credential mock generator (Twitter, LinkedIn, etc.).
+            </p>
+            <Button
+              onClick={handleSocialVerify}
+              disabled={isVerifyingSocial}
+              variant="outline"
+              className="w-full border-electric-blue/40 hover:bg-electric-blue/10 text-electric-blue"
+            >
+              {isVerifyingSocial ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Checking…</>
+              ) : (
+                <>Verify social_accounts</>
+              )}
+            </Button>
+
+            {/* Social accounts list */}
+            {socialResult && socialAccounts.length > 0 && (
+              <div className="space-y-1.5 pt-1">
+                {socialAccounts.map((acc, i) => (
+                  <div key={i} className="flex items-center justify-between px-3 py-1.5 rounded-md bg-gray-900/60 border border-gray-800">
+                    <span className="text-xs text-gray-300 capitalize">
+                      {acc.platform ?? acc.username ?? `Account ${i + 1}`}
+                    </span>
+                    {acc.verified !== false ? (
+                      <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+                    ) : (
+                      <XCircle className="h-3.5 w-3.5 text-red-400" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {socialResult && socialAccounts.length === 0 && (
+              <p className="text-xs text-yellow-500 text-center">
+                No social accounts found. Add them in the Humanity mock generator, then re-authenticate.
+              </p>
+            )}
+
+            {socialError && (
+              <div className="flex items-start gap-2 p-3 rounded-md bg-red-500/10 border border-red-500/20">
+                <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-red-300">{socialError}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Re-auth note */}
+        <p className="text-xs text-gray-600 text-center px-4">
+          Changed credentials in the mock generator (added/removed palm or social)?{" "}
+          <button
+            onClick={handleReauth}
+            disabled={isReauthing}
+            className="text-electric-blue underline hover:text-electric-blue/80 cursor-pointer bg-transparent border-none p-0 disabled:opacity-50"
+          >
+            {isReauthing ? "Redirecting…" : "Re-authenticate to refresh"}
+          </button>
+        </p>
 
         {/* Navigation */}
         <div className="flex gap-3">
