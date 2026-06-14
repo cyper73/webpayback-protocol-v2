@@ -198,3 +198,6 @@ deployments/
 
 # Replit project README (may contain operational notes)
 replit.md
+
+# Internal integration reports (not for version control)
+humanity-sdk-integration-report.md
